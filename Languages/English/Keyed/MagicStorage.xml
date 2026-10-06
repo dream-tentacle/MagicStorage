@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_NetworkStatus>Storage network: {0}</MS_NetworkStatus>
+  <MS_Status_Rebuilding>rebuilding connections</MS_Status_Rebuilding>
+  <MS_Status_NoCore>no control core connected</MS_Status_NoCore>
+  <MS_Status_MultipleCores>multiple control cores; storage operations and production suspended</MS_Status_MultipleCores>
+  <MS_Status_Ready>operational</MS_Status_Ready>
+  <MS_NetworkCapacity>Connected units: {0}\nSlots used: {1} / {2}</MS_NetworkCapacity>
+  <MS_UnitCapacity>Slots used: {0} / {1}</MS_UnitCapacity>
+  <MS_ManualWithdrawalOnly>Ordinary hauling cannot withdraw stored items. Dedicated outlets can supply their supported needs.</MS_ManualWithdrawalOnly>
+  <MS_FoodOutletUse>Supplies meals, packed food, feeding, animal feed and equipment nutrition. Food is selected for the eater or equipment. Hopper priority must exceed core priority.</MS_FoodOutletUse>
+  <MS_ConduitAlreadyPresent>A storage conduit or its construction plan is already here.</MS_ConduitAlreadyPresent>
+  <MS_UI_Open>View items</MS_UI_Open>
+  <MS_UI_OpenDesc>View all items in connected storage units and withdraw selected quantities around the core.</MS_UI_OpenDesc>
+  <MS_UI_Title>Storage network inventory</MS_UI_Title>
+  <MS_UI_Capacity>Storage units: {0}    Slots used: {1} / {2}</MS_UI_Capacity>
+  <MS_UI_Search>Search</MS_UI_Search>
+  <MS_UI_AllCategories>All categories</MS_UI_AllCategories>
+  <MS_UI_Sort0>Sort: name</MS_UI_Sort0>
+  <MS_UI_Sort1>Sort: stored</MS_UI_Sort1>
+  <MS_UI_Sort2>Sort: available</MS_UI_Sort2>
+  <MS_UI_Item>Item</MS_UI_Item>
+  <MS_UI_Total>Stored</MS_UI_Total>
+  <MS_UI_Available>Available</MS_UI_Available>
+  <MS_UI_Quantity>Withdraw</MS_UI_Quantity>
+  <MS_UI_Remaining>Remaining</MS_UI_Remaining>
+  <MS_UI_Empty>No matching items.</MS_UI_Empty>
+  <MS_UI_Selected>Selected: {0} entries, {1} items (including selections hidden by filters).</MS_UI_Selected>
+  <MS_UI_Forbid>Forbid withdrawn items</MS_UI_Forbid>
+  <MS_UI_ForbidTip>Off by default. Prevents immediate restocking, but also prevents ordinary use. Existing ground stacks keep their forbidden status.</MS_UI_ForbidTip>
+  <MS_UI_Hint>Ordinary hauling cannot withdraw items; dedicated outlets supply supported needs. Quantity buttons support the game's adjustment hotkeys.</MS_UI_Hint>
+  <MS_UI_Reset>Reset quantities</MS_UI_Reset>
+  <MS_UI_Withdraw>Withdraw selected</MS_UI_Withdraw>
+  <MS_UI_Close>Close</MS_UI_Close>
+  <MS_UI_All>All</MS_UI_All>
+  <MS_UI_Result>Placed: {0}; awaiting placement: {1}; not withdrawn: {2}. Pending items are saved and retried automatically.</MS_UI_Result>
+  <MS_UI_Refreshed>The network or inventory changed. The list was refreshed and withdrawal quantities were reset.</MS_UI_Refreshed>
+  <MS_UI_NegativeWithdraw>Negative withdraws</MS_UI_NegativeWithdraw>
+  <MS_UI_SelectedColumn>Withdraw</MS_UI_SelectedColumn>
+  <MS_UI_TotalTip>Total quantity held in the storage network.</MS_UI_TotalTip>
+  <MS_UI_AvailableTip>Quantity available for withdrawal, excluding hauling and collection reservations.</MS_UI_AvailableTip>
+  <MS_UI_SelectedTip>Quantity to place around the core on confirmation.</MS_UI_SelectedTip>
+  <MS_UI_RemainingTip>Quantity remaining in the network after this withdrawal.</MS_UI_RemainingTip>
+  <MS_UI_QuantityTip>Right arrows increase withdrawal; left arrows decrease it. Double arrows withdraw all or reset to zero. Negative values withdraw from storage. Supports the game's quantity adjustment hotkeys.</MS_UI_QuantityTip>
+  <MS_ReceiverCapacity>Receiving buffer: {0} / {1} stacks</MS_ReceiverCapacity>
+  <MS_ReceiverUse>Uses the connected core's filter and priority. Delivered items are automatically sent to storage units. Waiting items remain ordinary ground items.</MS_ReceiverUse>
+</LanguageData>

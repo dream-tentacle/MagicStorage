@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_TakeStorageFood.reportString>Collecting TargetA from the food outlet.</MS_TakeStorageFood.reportString>
+  <MS_StorageFoodEat.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodEat.reportString>
+  <MS_StorageFoodPack.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodPack.reportString>
+  <MS_StorageFoodFeedPatient.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodFeedPatient.reportString>
+  <MS_StorageFoodWardenFeed.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodWardenFeed.reportString>
+  <MS_StorageFoodDeliver.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodDeliver.reportString>
+  <MS_StorageFoodBottleFeed.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodBottleFeed.reportString>
+  <MS_StorageFoodTrain.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodTrain.reportString>
+  <MS_StorageFoodTame.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodTame.reportString>
+  <MS_StorageFoodGathering.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodGathering.reportString>
+  <MS_StorageFoodBinge.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodBinge.reportString>
+  <MS_StorageFoodHopper.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodHopper.reportString>
+  <MS_StorageFoodGrowthVat.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodGrowthVat.reportString>
+  <MS_StorageFoodBiosculpter.reportString>Collecting TargetA from the food outlet.</MS_StorageFoodBiosculpter.reportString>
+</LanguageData>

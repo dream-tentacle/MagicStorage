@@ -1,0 +1,23 @@
+# Build outputs (main project and tests)
+[Bb]in/
+[Oo]bj/
+/Assemblies/*
+!/Assemblies/.gitkeep
+
+# Local IDE state and per-user settings
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build diagnostics and test results
+*.log
+*.binlog
+TestResults/
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

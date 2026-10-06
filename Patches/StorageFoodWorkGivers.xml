@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_FeedPatient"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_FeedPatient"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageFeedPatient</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Warden_Feed"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Warden_Feed"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageWardenFeed</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Warden_DeliverFood"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Warden_DeliverFood"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageWardenDeliver</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_BottleFeedBaby"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_BottleFeedBaby"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageBottleFeed</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Train"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Train"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageTrain</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Tame"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_Tame"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageTame</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_CookFillHopper"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_CookFillHopper"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageHopper</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_HaulToGrowthVat"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_HaulToGrowthVat"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageGrowthVat</giverClass></value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_HaulToBiosculpterPod"]/giverClass</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/WorkGiverDef[giverClass="WorkGiver_HaulToBiosculpterPod"]/giverClass</xpath>
+      <value><giverClass>MagicStorage.WorkGiver_StorageBiosculpter</giverClass></value>
+    </match>
+  </Operation>
+</Patch>

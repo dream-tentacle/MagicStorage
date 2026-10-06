@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_NetworkStatus>存储网络：{0}</MS_NetworkStatus>
+  <MS_Status_Rebuilding>正在重建连接</MS_Status_Rebuilding>
+  <MS_Status_NoCore>未连接控制核心</MS_Status_NoCore>
+  <MS_Status_MultipleCores>存在多个控制核心，所有存取及生产已暂停</MS_Status_MultipleCores>
+  <MS_Status_Ready>可工作</MS_Status_Ready>
+  <MS_NetworkCapacity>已连接单元：{0}\n已用槽位：{1} / {2}</MS_NetworkCapacity>
+  <MS_UnitCapacity>已用槽位：{0} / {1}</MS_UnitCapacity>
+  <MS_ManualWithdrawalOnly>普通搬运不会取出已存物品，专用取货口可按对应需求领取。</MS_ManualWithdrawalOnly>
+  <MS_FoodOutletUse>供应用餐、备餐、喂食、动物饲料及设备营养。按食用者或设备的需求取货。料斗优先级需高于核心。</MS_FoodOutletUse>
+  <MS_ConduitAlreadyPresent>此处已有存储线或其建造计划。</MS_ConduitAlreadyPresent>
+  <MS_UI_Open>查看物品</MS_UI_Open>
+  <MS_UI_OpenDesc>查看相连存储单元内的所有物品，选择数量后取出到核心周围。</MS_UI_OpenDesc>
+  <MS_UI_Title>存储网络库存</MS_UI_Title>
+  <MS_UI_Capacity>存储单元：{0}    已用槽位：{1} / {2}</MS_UI_Capacity>
+  <MS_UI_Search>搜索</MS_UI_Search>
+  <MS_UI_AllCategories>所有类别</MS_UI_AllCategories>
+  <MS_UI_Sort0>排序：名称</MS_UI_Sort0>
+  <MS_UI_Sort1>排序：库存数量</MS_UI_Sort1>
+  <MS_UI_Sort2>排序：可取数量</MS_UI_Sort2>
+  <MS_UI_Item>物品</MS_UI_Item>
+  <MS_UI_Total>库存</MS_UI_Total>
+  <MS_UI_Available>可取出</MS_UI_Available>
+  <MS_UI_Quantity>取出数量</MS_UI_Quantity>
+  <MS_UI_Remaining>剩余库存</MS_UI_Remaining>
+  <MS_UI_Empty>没有符合条件的物品。</MS_UI_Empty>
+  <MS_UI_Selected>已选择 {0} 项，共 {1} 个物品（包括筛选隐藏的选择）。</MS_UI_Selected>
+  <MS_UI_Forbid>取出后设为禁止</MS_UI_Forbid>
+  <MS_UI_ForbidTip>默认关闭。禁止可防止殖民者立即搬回，但也会阻止正常取用。不会改变周围已有物品的禁止状态。</MS_UI_ForbidTip>
+  <MS_UI_Hint>普通搬运不会从网络取货；专用取货口可供应对应需求。数量按钮支持原版数量调整快捷键。</MS_UI_Hint>
+  <MS_UI_Reset>重置数量</MS_UI_Reset>
+  <MS_UI_Withdraw>取出所选物品</MS_UI_Withdraw>
+  <MS_UI_Close>关闭</MS_UI_Close>
+  <MS_UI_All>全部</MS_UI_All>
+  <MS_UI_Result>已落地：{0}；等待落地：{1}；未取出：{2}。等待落地的物品会保存并自动重试。</MS_UI_Result>
+  <MS_UI_Refreshed>网络或库存已变化，已刷新列表并重置取出数量。</MS_UI_Refreshed>
+  <MS_UI_NegativeWithdraw>负数表示取出</MS_UI_NegativeWithdraw>
+  <MS_UI_SelectedColumn>取出</MS_UI_SelectedColumn>
+  <MS_UI_TotalTip>网络内保存的总数量。</MS_UI_TotalTip>
+  <MS_UI_AvailableTip>当前可以取出的数量，不包括搬运和取货任务预约的部分。</MS_UI_AvailableTip>
+  <MS_UI_SelectedTip>确认后将放到核心周围的数量。</MS_UI_SelectedTip>
+  <MS_UI_RemainingTip>本次取出后，网络内剩余的数量。</MS_UI_RemainingTip>
+  <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量。双箭头全部取出或归零。负数表示从网络取出；支持原版数量调整快捷键。</MS_UI_QuantityTip>
+  <MS_ReceiverCapacity>接收暂存：{0} / {1} 堆</MS_ReceiverCapacity>
+  <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置。送到的物品自动存入单元，等待转存的物品仍按地面物品处理。</MS_ReceiverUse>
+</LanguageData>

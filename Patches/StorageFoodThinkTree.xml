@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- Preserve native thresholds, priorities, tags and DLC requirements. -->
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_GetFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_GetFood"]</xpath>
+    <match Class="PatchOperationAttributeSet">
+      <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_GetFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_GetFood"]</xpath>
+      <attribute>Class</attribute><value>MagicStorage.JobGiver_StorageFood</value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_PackFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_PackFood"]</xpath>
+    <match Class="PatchOperationAttributeSet">
+      <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_PackFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_PackFood"]</xpath>
+      <attribute>Class</attribute><value>MagicStorage.JobGiver_StoragePackFood</value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_EatInGatheringArea"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_EatInGatheringArea"]</xpath>
+    <match Class="PatchOperationAttributeSet">
+      <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_EatInGatheringArea"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_EatInGatheringArea"]</xpath>
+      <attribute>Class</attribute><value>MagicStorage.JobGiver_StorageGatheringFood</value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_BingeFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_BingeFood"]</xpath>
+    <match Class="PatchOperationAttributeSet">
+      <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_BingeFood"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_BingeFood"]</xpath>
+      <attribute>Class</attribute><value>MagicStorage.JobGiver_StorageBingeFood</value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_Autofeed"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_Autofeed"]</xpath>
+    <match Class="PatchOperationAttributeSet">
+      <xpath>Defs/ThinkTreeDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_Autofeed"] | Defs/DutyDef[not(contains(defName, "Caravan"))]//*[@Class="JobGiver_Autofeed"]</xpath>
+      <attribute>Class</attribute><value>MagicStorage.JobGiver_StorageAutofeed</value>
+    </match>
+  </Operation>
+  <Operation Class="PatchOperationConditional">
+    <xpath>Defs/MentalStateDef[defName="Binging_Food"]/workerClass[text()="MentalStateWorker_BingingFood"]</xpath>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/MentalStateDef[defName="Binging_Food"]/workerClass[text()="MentalStateWorker_BingingFood"]</xpath>
+      <value><workerClass>MagicStorage.MentalStateWorker_StorageBingeFood</workerClass></value>
+    </match>
+  </Operation>
+</Patch>

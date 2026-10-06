@@ -1,0 +1,47 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>7.3</LangVersion>
+    <OutputPath>bin\</OutputPath>
+    <AssemblyName>StorageFoundationTests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" /><Reference Include="System.Core" />
+    <Reference Include="0Harmony">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EngineStubs.cs" /><Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="JobStubs.cs" />
+    <Compile Include="HaulingPatchStubs.cs" />
+    <Compile Include="ReceiverStubs.cs" />
+    <Compile Include="StorageReceiverTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageReceiver.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageReception.cs" />
+    <Compile Include="FoodStubs.cs" />
+    <Compile Include="FoodRequestStubs.cs" />
+    <Compile Include="StorageFoodRequestTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Food\StorageFoodRequest.cs" />
+    <Compile Include="..\Source\MagicStorage\Food\JobDriver_FetchStorageFood.cs" />
+    <Compile Include="..\Source\MagicStorage\Food\StorageFoodThinkNodes.cs" />
+    <Compile Include="StorageFoodTests.cs" />
+    <Compile Include="WithdrawalStubs.cs" />
+    <Compile Include="StorageWithdrawalTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageWithdrawal.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageRecoveryBatch.cs" />
+    <Compile Include="..\Source\MagicStorage\Food\StorageFoodUtility.cs" />
+    <Compile Include="..\Source\MagicStorage\Food\JobDriver_TakeStorageFood.cs" />
+    <Compile Include="..\Source\MagicStorage\MagicStorageMod.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\StorageNetwork.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\MapComponent_StorageNetworks.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageInventory.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageIncomingReservations.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageOutgoingReservations.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
