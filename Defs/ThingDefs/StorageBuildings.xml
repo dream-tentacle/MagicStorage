@@ -29,6 +29,9 @@
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
     <size>(2,2)</size>
     <rotatable>false</rotatable>
+    <passability>Impassable</passability>
+    <surfaceType>None</surfaceType>
+    <disableImpassableShotOverConfigError>true</disableImpassableShotOverConfigError>
     <graphicData>
       <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
       <graphicClass>Graphic_Single</graphicClass>
