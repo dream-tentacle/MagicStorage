@@ -41,6 +41,7 @@ namespace MagicStorage
         {
             Map releaseMap = MapHeld;
             IntVec3 releaseCell = PositionHeld;
+            StorageRecoveryBatch batch = null;
             if (Inventory.UsedSlots > 0)
             {
                 if (releaseMap == null)
@@ -51,7 +52,7 @@ namespace MagicStorage
                 }
                 var manager = releaseMap.GetComponent<MapComponent_StorageNetworks>();
                 manager.NotifyNodeUnavailable(this);
-                StorageRecoveryBatch batch = manager.CreateRecovery(releaseCell);
+                batch = manager.CreateRecovery(releaseCell);
                 while (Inventory.Contents.Count > 0)
                 {
                     Thing item = Inventory.Contents[Inventory.Contents.Count - 1];
@@ -64,6 +65,9 @@ namespace MagicStorage
                 }
             }
             base.Destroy(mode);
+            // Remove the building first so it cannot obstruct placement. Try every stack
+            // immediately; only undelivered contents remain in the saved retry buffer.
+            if (batch != null) releaseMap.GetComponent<MapComponent_StorageNetworks>().ReleaseRecovery(batch);
         }
 
         public override string GetInspectString()

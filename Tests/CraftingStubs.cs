@@ -94,18 +94,18 @@ namespace Verse
     public class Skills { public SkillRecord record = new SkillRecord(); public SkillRecord GetSkill(SkillDef def) => record; }
     public class SkillRecord { public int Level = 10; }
     public class PawnEquipment { public List<Thing> AllEquipmentListForReading = new List<Thing>(); }
-    public class PawnApparel { public List<Thing> WornApparel = new List<Thing>(); }
+    public partial class PawnApparel { public List<RimWorld.Apparel> WornApparel = new List<RimWorld.Apparel>(); }
     public static class ModsConfig { public static bool BiotechActive = true; }
 }
 namespace RimWorld
 {
-    public class ApparelProperties { public bool careIfWornByCorpse = true; }
+    public partial class ApparelProperties { public bool careIfWornByCorpse = true; }
     public class CompQuality { }
     public enum RotStage { Fresh, Rotting }
     public enum QualityCategory { Awful, Poor, Normal, Good, Excellent, Masterwork, Legendary }
     public struct QualityRange
     { public QualityCategory min, max; public static QualityRange All => new QualityRange { max = QualityCategory.Legendary }; public bool Includes(QualityCategory v) => v >= min && v <= max; }
-    public class Apparel : Thing { public bool WornByCorpse; }
+    public partial class Apparel : Thing { public bool WornByCorpse; }
     public class WorkTypeDef { }
     [Flags] public enum WorkTags { None = 0, Intellectual = 1 }
     public class WorkGiverDef

@@ -22,6 +22,8 @@ namespace MagicStorage
         internal IReadOnlyList<Building_StorageUnit> StorageUnits => units;
         private readonly List<Building_StorageSupplyShelf> supplyShelves = new List<Building_StorageSupplyShelf>();
         internal IReadOnlyList<Building_StorageSupplyShelf> SupplyShelves => supplyShelves;
+        private readonly List<Building_StorageApparelAdapter> apparelAdapters = new List<Building_StorageApparelAdapter>();
+        internal IReadOnlyList<Building_StorageApparelAdapter> ApparelAdapters => apparelAdapters;
 
         public MapComponent_StorageNetworks(Map map) : base(map) { }
         public IThingHolder ParentHolder => map;
@@ -35,6 +37,7 @@ namespace MagicStorage
             if (node.parent is Building_StorageReceiver receiver) receivers.Add(receiver);
             if (node.parent is Building_StorageUnit unit) units.Add(unit);
             if (node.parent is Building_StorageSupplyShelf shelf) supplyShelves.Add(shelf);
+            if (node.parent is Building_StorageApparelAdapter adapter) apparelAdapters.Add(adapter);
             List<IntVec3> cells = new List<IntVec3>();
             foreach (IntVec3 cell in node.parent.OccupiedRect())
             {
@@ -54,6 +57,7 @@ namespace MagicStorage
             if (node.parent is Building_StorageReceiver receiver) receivers.Remove(receiver);
             if (node.parent is Building_StorageUnit unit) units.Remove(unit);
             if (node.parent is Building_StorageSupplyShelf shelf) supplyShelves.Remove(shelf);
+            if (node.parent is Building_StorageApparelAdapter adapter) apparelAdapters.Remove(adapter);
             if (occupied.TryGetValue(node, out var cells))
             {
                 foreach (IntVec3 cell in cells)

@@ -129,6 +129,29 @@
     <uiOrder>3106</uiOrder>
   </ThingDef>
 
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_StorageApparelAdapter</defName>
+    <label>衣物适配器</label>
+    <description>供殖民者从相连的存储网络领取衣物并自动换装。遵循殖民者的衣物政策，按正常换装规则比较网络与地图上的衣物。出发前预留选中的衣物，到达后才从存储单元取出。换下的衣物按正常机制放在地上。\n\n需要连接到可工作的存储网络。每次供一名殖民者使用，自身可以传导存储连接。</description>
+    <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>
+    <tickerType>Rare</tickerType>
+    <size>(2,1)</size>
+    <rotatable>true</rotatable>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <canOverlapZones>false</canOverlapZones>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Dresser</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,1)</drawSize>
+      <color>(0.6,0.8,1)</color>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <placeWorkers><li>PlaceWorker_PreventInteractionSpotOverlap</li></placeWorkers>
+    <costList><Steel>60</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3107</uiOrder>
+  </ThingDef>
+
   <ThingDef ParentName="BuildingBase">
     <defName>MS_StorageConduit</defName>
     <drawStyleCategory>Conduits</drawStyleCategory>

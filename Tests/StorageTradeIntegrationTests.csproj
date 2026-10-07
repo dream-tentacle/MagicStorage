@@ -21,6 +21,12 @@
     <Compile Include="EngineStubs.cs" />
     <Compile Include="StorageFoundationTests.cs" />
     <Compile Include="CoreContainerStubs.cs" />
+    <Compile Include="ApparelStubs.cs" />
+    <Compile Include="StorageApparelTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageApparelAdapter.cs" />
+    <Compile Include="..\Source\MagicStorage\Apparel\StorageApparelPolicy.cs" />
+    <Compile Include="..\Source\MagicStorage\Apparel\JobGiver_OptimizeStorageApparel.cs" />
+    <Compile Include="..\Source\MagicStorage\Apparel\JobDriver_TakeStorageApparel.cs" />
     <Compile Include="ConstructionStubs.cs" />
     <Compile Include="ConstructionSupplyTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ConstructionSupplyUnit.cs" />

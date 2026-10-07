@@ -45,7 +45,6 @@ namespace Verse
     {
         public bool CanTradeNow = true, AllowedTrade = true;
         public TraderKindDef TraderKind = new TraderKindDef();
-        public PawnMindState mindState = new PawnMindState();
         public IEnumerable<Thing> Goods => inventory.innerContainer;
         public TradePermission CanTradeWith(Faction faction, TraderKindDef kind) => new TradePermission { Accepted = AllowedTrade };
         public void GiveSoldThingToTrader(Thing item, int count, Pawn negotiator) => inventory.innerContainer.TryAdd(item.SplitOff(count), false);
@@ -58,7 +57,6 @@ namespace Verse
             part.Map.Ground.Add(part);
         }
     }
-    public class PawnMindState { public bool traderDismissed; }
     public struct TradePermission { public bool Accepted; }
 }
 namespace RimWorld

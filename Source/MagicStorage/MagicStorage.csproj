@@ -65,6 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MagicStorageMod.cs" />
+    <Compile Include="Buildings\Building_StorageApparelAdapter.cs" />
+    <Compile Include="Apparel\StorageApparelPolicy.cs" />
+    <Compile Include="Apparel\JobGiver_OptimizeStorageApparel.cs" />
+    <Compile Include="Apparel\JobDriver_TakeStorageApparel.cs" />
     <Compile Include="Trading\StorageTradeTransaction.cs" />
     <Compile Include="Trading\StorageTradeSession.cs" />
     <Compile Include="Trading\Tradeable_Storage.cs" />

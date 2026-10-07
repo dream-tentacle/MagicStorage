@@ -16,7 +16,7 @@ namespace Verse
         {
             if (!values.TryGetValue(name, out var value))
             {
-                if (name != "MS_CosmicCrafting") throw new Exception("Unknown fixture def: " + name);
+                if (name != "MS_CosmicCrafting" && name != "MS_TakeStorageApparel") throw new Exception("Unknown fixture def: " + name);
                 value = new JobDef() as T; values[name] = value;
             }
             return value;

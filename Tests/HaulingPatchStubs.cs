@@ -44,7 +44,7 @@ namespace Verse.AI
         public Verse.DefModExtension extension;
         public T GetModExtension<T>() where T : Verse.DefModExtension => extension as T;
     }
-    public static class JobMaker
+    public static partial class JobMaker
     {
         public static Job MakeJob(JobDef def, Thing item, Thing destination = null) =>
             new Job { def = def, targetA = item, targetB = destination };

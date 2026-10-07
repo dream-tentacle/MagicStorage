@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_StorageApparelAdapter.label>apparel adapter</MS_StorageApparelAdapter.label>
+  <MS_StorageApparelAdapter.description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Reserves the chosen garment before departure and withdraws it only on arrival. Replaced apparel is dropped normally.\n\nRequires an operational storage network. Serves one colonist at a time and conducts storage connections.</MS_StorageApparelAdapter.description>
   <MS_ConstructionSupplyUnit.label>construction supply unit</MS_ConstructionSupplyUnit.label>
   <MS_ConstructionSupplyUnit.description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells, prioritizing nearer sites. Materials enter building frames directly; colonists still perform the construction work.\n\nRespects materials reserved for other uses and deliveries already on the way. Skips forbidden, burning or obstructed sites. The unit conducts storage connections and stops supplying when its network cannot operate.</MS_ConstructionSupplyUnit.description>
   <MS_StorageCore.label>storage control core</MS_StorageCore.label>

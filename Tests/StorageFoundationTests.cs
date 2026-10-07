@@ -42,6 +42,7 @@ internal static class StorageFoundationTests
             assertions += StorageSupplyShelfTests.Run();
             assertions += StorageResourceCounterTests.Run();
             assertions += StorageWithdrawalTests.Run();
+            assertions += StorageApparelTests.Run();
             Console.WriteLine("PASS: " + assertions + " assertions (production storage, receiver, supply shelf, crafting and construction supply logic; game boundaries stubbed).");
             return 0;
         }

@@ -38,7 +38,11 @@ namespace MagicStorage
             // Completed goods waiting for a free drop cell still count. Otherwise a
             // target-count order could manufacture them again while placement is blocked.
             var pending = new List<IThingHolder>();
-            core.Map.GetComponent<MapComponent_StorageNetworks>().GetChildHolders(pending);
+            var manager = core.Map.GetComponent<MapComponent_StorageNetworks>();
+            manager.GetChildHolders(pending);
+            // A garment waiting for vanilla Wear is still a physical map item.
+            foreach (var adapter in manager.ApparelAdapters)
+                foreach (var thing in adapter.GetDirectlyHeldThings()) Add(thing, order, product, filters, seen, ref count);
             foreach (var holder in pending)
             {
                 var items = holder.GetDirectlyHeldThings();

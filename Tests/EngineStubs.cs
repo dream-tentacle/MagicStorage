@@ -58,7 +58,7 @@ namespace Verse
         public ThingOwner holdingOwner;
         public object ParentHolder => holdingOwner?.Owner;
         public Faction Faction;
-        public Map Map;
+        public Map Map { get; set; }
         public IntVec3 Position;
         public int width = 1, height = 1;
         public string variant;

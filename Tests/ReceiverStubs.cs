@@ -72,7 +72,7 @@ namespace Verse
         public virtual void DeSpawn(DestroyMode mode = DestroyMode.Vanish) { Map?.Ground.Remove(this); Spawned = false; }
         public bool IsForbidden(object faction) => forbidden;
     }
-    public class Building : Thing
+    public partial class Building : Thing
     {
         public new IThingHolder ParentHolder => Map;
         public virtual void ExposeData() { }
