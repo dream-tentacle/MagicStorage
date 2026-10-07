@@ -16,25 +16,52 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EngineStubs.cs" /><Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="CoreContainerStubs.cs" />
+    <Compile Include="ConstructionStubs.cs" />
+    <Compile Include="ConstructionSupplyTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_ConstructionSupplyUnit.cs" />
+    <Compile Include="..\Source\MagicStorage\Construction\ConstructionSupply.cs" />
+    <Compile Include="..\Source\MagicStorage\Construction\ConstructionSite.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
+    <Compile Include="CraftingStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingBatch.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\ICraftingProductionPolicy.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductCounter.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />
+    <Compile Include="CosmicCraftingTests.cs" />
+    <Compile Include="StorageReservationTests.cs" />
+    <Compile Include="StorageTradeTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Trading\StorageTradeTransaction.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingOrder.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingRunPolicy.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingWorkerPolicy.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterialPlanner.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterials.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\MapComponent_CosmicCrafting.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\JobDriver_CosmicCrafting.cs" />
     <Compile Include="JobStubs.cs" />
     <Compile Include="HaulingPatchStubs.cs" />
     <Compile Include="ReceiverStubs.cs" />
+    <Compile Include="SupplyShelfStubs.cs" />
+    <Compile Include="StorageSupplyShelfTests.cs" />
+    <Compile Include="ResourceCounterStubs.cs" />
+    <Compile Include="StorageResourceCounterTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfFilter.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfRestockFailure.cs" />
+    <Compile Include="..\Source\MagicStorage\UI\Alert_StorageShelfRestockFailed.cs" />
+    <Compile Include="AlertStubs.cs" />
     <Compile Include="StorageReceiverTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageReceiver.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReception.cs" />
-    <Compile Include="FoodStubs.cs" />
-    <Compile Include="FoodRequestStubs.cs" />
-    <Compile Include="StorageFoodRequestTests.cs" />
-    <Compile Include="..\Source\MagicStorage\Food\StorageFoodRequest.cs" />
-    <Compile Include="..\Source\MagicStorage\Food\JobDriver_FetchStorageFood.cs" />
-    <Compile Include="..\Source\MagicStorage\Food\StorageFoodThinkNodes.cs" />
-    <Compile Include="StorageFoodTests.cs" />
+    <Compile Include="GameplayStubs.cs" />
+    <Compile Include="PlacementStubs.cs" />
     <Compile Include="WithdrawalStubs.cs" />
     <Compile Include="StorageWithdrawalTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageWithdrawal.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageRecoveryBatch.cs" />
-    <Compile Include="..\Source\MagicStorage\Food\StorageFoodUtility.cs" />
-    <Compile Include="..\Source\MagicStorage\Food\JobDriver_TakeStorageFood.cs" />
     <Compile Include="..\Source\MagicStorage\MagicStorageMod.cs" />
     <Compile Include="..\Source\MagicStorage\Networks\StorageNetwork.cs" />
     <Compile Include="..\Source\MagicStorage\Networks\MapComponent_StorageNetworks.cs" />
@@ -42,6 +69,7 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageIncomingReservations.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageOutgoingReservations.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageReservation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

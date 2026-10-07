@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Craft_ProductionNotice>中断后可继续制作。产物默认优先存入网络，余量放在核心周围；也可为每条任务选择制作后放到工作台周围。</MS_Craft_ProductionNotice>
+  <MS_Craft_DropProductsOnFloor>制作后放到地面</MS_Craft_DropProductsOnFloor>
+  <MS_Craft_DropProductsOnFloorDesc>制作完成后，将全部产物放在工作者脚边、当前工作台周围，不尝试存入网络。切换此选项不会中断制作，对当前这次制作也生效。</MS_Craft_DropProductsOnFloorDesc>
+  <MS_Craft_Progress>制作进度：{0}</MS_Craft_Progress>
+  <MS_Craft_BatchInvalid>本次制作无法继续；删除任务可退回剩余材料</MS_Craft_BatchInvalid>
+  <MS_Craft_Title>宇宙工作台 — 制作清单</MS_Craft_Title>
+  <MS_Craft_Open>制作清单</MS_Craft_Open>
+  <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
+  <MS_Craft_TestNotice>分配测试：材料只预留、不消耗。殖民者会持续工作并正常响应需求；目前不产出物品、不减少次数、不获得经验。</MS_Craft_TestNotice>
+  <MS_Craft_Add>添加制作任务</MS_Craft_Add>
+  <MS_Craft_Suspended>已暂停</MS_Craft_Suspended>
+  <MS_Craft_Locked>尚未解锁</MS_Craft_Locked>
+  <MS_Craft_Satisfied>次数已用完、达到目标或等待恢复</MS_Craft_Satisfied>
+  <MS_Craft_Assigned>执行中：{0}</MS_Craft_Assigned>
+  <MS_Craft_MissingMaterials>材料不足或已被预留</MS_Craft_MissingMaterials>
+  <MS_Craft_NoWorker>没有符合条件且启用对应工作的工作者</MS_Craft_NoWorker>
+  <MS_Craft_NoBench>没有可到达且未被占用的工作台</MS_Craft_NoBench>
+  <MS_Craft_Ready>可进行</MS_Craft_Ready>
+  <MS_Craft_Resume>恢复</MS_Craft_Resume>
+  <MS_Craft_Pause>暂停</MS_Craft_Pause>
+  <MS_Craft_Delete>删除</MS_Craft_Delete>
+  <MS_Craft_WorkTypes>工作类型：{0}</MS_Craft_WorkTypes>
+  <MS_Craft_Mode_RepeatCount>制作 X 次</MS_Craft_Mode_RepeatCount>
+  <MS_Craft_Mode_Forever>永久制作</MS_Craft_Mode_Forever>
+  <MS_Craft_Mode_TargetCount>维持 X 个</MS_Craft_Mode_TargetCount>
+  <MS_Craft_RepeatCount>剩余次数</MS_Craft_RepeatCount>
+  <MS_Craft_TargetCount>目标数量</MS_Craft_TargetCount>
+  <MS_Craft_ProductCount>统计数量：{0}（地图＋当前网络）</MS_Craft_ProductCount>
+  <MS_Craft_AlsoCounts>也统计……</MS_Craft_AlsoCounts>
+  <MS_Craft_AlsoCountsHint>选中的物品也计入“维持 X 个”的数量，每个物品按1个计算。范围包括地图和当前核心网络。配方成品“{0}”始终按任务原有计数条件统计，不受此处选择影响。默认不选。</MS_Craft_AlsoCountsHint>
+  <MS_Craft_PauseSatisfied>满足目标后暂停</MS_Craft_PauseSatisfied>
+  <MS_Craft_Unpause>数量降至此值时恢复</MS_Craft_Unpause>
+  <MS_Craft_Worker>工作者：{0}</MS_Craft_Worker>
+  <MS_Craft_Worker_Anyone>任何工作者</MS_Craft_Worker_Anyone>
+  <MS_Craft_Worker_Slaves>仅奴隶</MS_Craft_Worker_Slaves>
+  <MS_Craft_Worker_Mechs>仅机械体</MS_Craft_Worker_Mechs>
+  <MS_Craft_Worker_NonMechs>非机械体</MS_Craft_Worker_NonMechs>
+  <MS_Craft_AnyMechanitor>任何机械师</MS_Craft_AnyMechanitor>
+  <MS_Craft_Skill>技能范围：{0}</MS_Craft_Skill>
+  <MS_Craft_MinSkill>最低技能</MS_Craft_MinSkill>
+  <MS_Craft_MaxSkill>最高技能</MS_Craft_MaxSkill>
+  <MS_Craft_NamedWorkerHint>与原版相同：指定人物时忽略此技能范围；配方自身的最低技能要求仍然有效。</MS_Craft_NamedWorkerHint>
+  <MS_Craft_Ingredients>材料筛选</MS_Craft_Ingredients>
+  <MS_Craft_IncludeEquipped>计入殖民者装备和随身物品</MS_Craft_IncludeEquipped>
+  <MS_Craft_IncludeTainted>计入死者衣物</MS_Craft_IncludeTainted>
+  <MS_Craft_LimitStuff>只统计允许材料制成的成品</MS_Craft_LimitStuff>
+  <MS_Craft_MinHP>最低耐久度（%）</MS_Craft_MinHP>
+  <MS_Craft_MaxHP>最高耐久度（%）</MS_Craft_MaxHP>
+  <MS_Craft_MinQuality>最低品质：{0}</MS_Craft_MinQuality>
+  <MS_Craft_MaxQuality>最高品质：{0}</MS_Craft_MaxQuality>
+  <MS_Craft_Incapable>无法从事此工作</MS_Craft_Incapable>
+  <MS_Craft_WorkDisabled>未分配此工作</MS_Craft_WorkDisabled>
+</LanguageData>

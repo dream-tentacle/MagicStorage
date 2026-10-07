@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Trade_Command>通过魔法存储与{0}交易</MS_Trade_Command>
+  <MS_Trade_InventoryNotice>魔法存储交易：仅使用核心网络内的物品和白银，买入物品放在地面。</MS_Trade_InventoryNotice>
+  <MS_Trade_Unavailable>无法完成交易：网络物品或白银已不可用，或商人已无法交易。请检查数量或重置清单。</MS_Trade_Unavailable>
+  <MS_Trade_OrbitalCommand>通过魔法存储与{0}进行轨道交易</MS_Trade_OrbitalCommand>
+  <MS_Trade_OrbitalInventoryNotice>魔法存储轨道交易：仅使用信标覆盖核心的网络库存和白银，买入物品由空投舱送达。</MS_Trade_OrbitalInventoryNotice>
+  <MS_Trade_NoCoveredCore>需要通电的轨道贸易信标覆盖可用存储核心</MS_Trade_NoCoveredCore>
+</LanguageData>

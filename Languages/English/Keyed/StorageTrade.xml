@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Trade_Command>Trade with {0} through magic storage</MS_Trade_Command>
+  <MS_Trade_InventoryNotice>Magic storage trade: only core network goods and silver are available. Purchases are delivered on the ground.</MS_Trade_InventoryNotice>
+  <MS_Trade_Unavailable>Cannot complete this trade: network goods or silver are unavailable, or the trader can no longer trade. Check the quantities or reset the list.</MS_Trade_Unavailable>
+  <MS_Trade_OrbitalCommand>Trade with {0} through orbital magic storage</MS_Trade_OrbitalCommand>
+  <MS_Trade_OrbitalInventoryNotice>Magic storage orbital trade: only goods and silver in networks with beacon-covered cores. Purchases arrive in drop pods.</MS_Trade_OrbitalInventoryNotice>
+  <MS_Trade_NoCoveredCore>A powered orbital trade beacon must cover an available storage core</MS_Trade_NoCoveredCore>
+</LanguageData>

@@ -90,7 +90,7 @@ namespace MagicStorage
         public override void SetFaction(Faction newFaction, Pawn recruiter = null)
         {
             base.SetFaction(newFaction, recruiter);
-            if (Spawned) Map.GetComponent<MapComponent_StorageNetworks>().MarkDirty();
+            if (Spawned) Map.GetComponent<MapComponent_StorageNetworks>().NotifyFactionChanged(this);
         }
 
         public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)

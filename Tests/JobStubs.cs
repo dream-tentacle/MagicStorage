@@ -8,11 +8,12 @@ namespace Verse
 {
     public static class Scribe_Values
     {
+        public static void Look<T>(ref T value, string key, T fallback = default(T)) { }
         public static void Look(ref bool value, string key, bool fallback) { }
         public static void Look(ref IntVec3 value, string key) { }
     }
     public class MinifiedThing : Thing { public Thing InnerThing; }
-    public enum PathEndMode { ClosestTouch, Touch, OnCell }
+    public enum PathEndMode { ClosestTouch, Touch, OnCell, InteractionCell }
     public struct LocalTargetInfo
     {
         public Thing Thing;
@@ -46,7 +47,7 @@ namespace Verse
 }
 namespace Verse.AI
 {
-    public enum TargetIndex { A, B, C }
+    public enum TargetIndex { A, B, C, None }
     public enum JobCondition { Succeeded, Incompletable, InterruptForced }
     public class Job
     {
@@ -56,11 +57,20 @@ namespace Verse.AI
         public LocalTargetInfo targetC, targetBCell;
         public bool playerForced, ignoreForbidden, overeat;
         public int count;
+        public RimWorld.WorkGiverDef workGiverDef;
         public LocalTargetInfo GetTarget(TargetIndex index) => index == TargetIndex.A ? targetA : index == TargetIndex.C ? targetC : targetB != null ? (LocalTargetInfo)targetB : targetBCell;
         public void SetTarget(TargetIndex index, Thing thing) { if (index == TargetIndex.A) targetA = thing; else targetB = thing; }
     }
     public partial class Pawn_JobTracker { public JobDriver curDriver; public Job curJob; }
-    public class Toil { public Action initAction; public Pawn actor; }
+    public class Toil
+    {
+        public Action initAction; public Pawn actor;
+        public Action<int> tickIntervalAction;
+        public ToilCompleteMode defaultCompleteMode;
+        public Func<object> activeSkill;
+        public Func<float> ProgressGetter;
+        public TargetIndex ProgressTarget;
+    }
     public abstract class JobDriver
     {
         public Pawn pawn;

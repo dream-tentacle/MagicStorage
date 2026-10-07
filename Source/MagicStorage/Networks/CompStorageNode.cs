@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Verse;
 
 namespace MagicStorage
@@ -7,6 +8,9 @@ namespace MagicStorage
     {
         public int slotCapacity = 64;
         public CompProperties_StorageNode() { compClass = typeof(CompStorageNode); }
+        public override void DrawGhost(IntVec3 center, Rot4 rot, ThingDef thingDef, Color ghostCol,
+            AltitudeLayer drawAltitude, Thing thing = null)
+        { StorageNetworkDrawing.DrawGhost(thingDef, center, rot, ghostCol, thing); }
     }
 
     public sealed class CompStorageNode : ThingComp

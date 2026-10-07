@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_StorageSupplyShelf.label>auto-restocking shelf</MS_StorageSupplyShelf.label>
+  <MS_StorageSupplyShelf.description>A small shelf that restocks from its connected storage network. Choose three item types, quantity limits, and quality, condition and material filters, with at most one stack of each. Limits cannot exceed the normal stack limit; zero pauses restocking for that slot. Colonists can take items just as they would from an ordinary shelf.\n\nStorage priority is configurable and defaults to critical. Priority affects hauling of existing stock. Colonists will not haul items into this shelf; only the connected storage network provides restocking. Colonists can haul stock to storage with a higher priority. Lowering a limit keeps existing stock. When a selection or filter changes, rejected stock returns to the network where possible; excess is placed near the shelf. Reserved or forbidden stacks are left untouched. Restocking stops when the network cannot operate, but existing stock remains available.</MS_StorageSupplyShelf.description>
+</LanguageData>

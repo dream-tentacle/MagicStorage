@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Same graphics, shader and attachment behavior as the native graser beam.
+       Use a separate lifetime so the weapon's maintained beam remains unchanged. -->
+  <ThingDef ParentName="MoteBase" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_Mote_ConstructionSupplyBeam</defName>
+    <thingClass>MoteDualAttached</thingClass>
+    <altitudeLayer>MoteOverhead</altitudeLayer>
+    <drawOffscreen>true</drawOffscreen>
+    <mote>
+      <fadeInTime>0.02</fadeInTime>
+      <solidTime>0.13</solidTime>
+      <fadeOutTime>0.05</fadeOutTime>
+      <needsMaintenance>false</needsMaintenance>
+      <fadeOutUnmaintained>false</fadeOutUnmaintained>
+      <rotateTowardsTarget>true</rotateTowardsTarget>
+      <scaleToConnectTargets>true</scaleToConnectTargets>
+    </mote>
+    <graphicData>
+      <texPath>Things/Mote/GraserBeam</texPath>
+      <graphicClass>Graphic_MoteWithAgeSecs</graphicClass>
+      <shaderType>MoteBeam</shaderType>
+      <shaderParameters>
+        <_ExtraTexA>/Things/Mote/BeamSecondaryNoise_A</_ExtraTexA>
+        <_ExtraTexB>/Things/Mote/BeamSecondaryNoise_B</_ExtraTexB>
+        <_ScrollSpeedA>-4</_ScrollSpeedA>
+        <_ScrollSpeedB>3</_ScrollSpeedB>
+        <_Intensity>2</_Intensity>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+</Defs>

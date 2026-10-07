@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_ConstructionSupplyUse>Automatically supplies construction materials within {0} cells. Colonists perform construction.</MS_ConstructionSupplyUse>
   <MS_NetworkStatus>Storage network: {0}</MS_NetworkStatus>
   <MS_Status_Rebuilding>rebuilding connections</MS_Status_Rebuilding>
   <MS_Status_NoCore>no control core connected</MS_Status_NoCore>
@@ -7,8 +8,7 @@
   <MS_Status_Ready>operational</MS_Status_Ready>
   <MS_NetworkCapacity>Connected units: {0}\nSlots used: {1} / {2}</MS_NetworkCapacity>
   <MS_UnitCapacity>Slots used: {0} / {1}</MS_UnitCapacity>
-  <MS_ManualWithdrawalOnly>Ordinary hauling cannot withdraw stored items. Dedicated outlets can supply their supported needs.</MS_ManualWithdrawalOnly>
-  <MS_FoodOutletUse>Supplies meals, packed food, feeding, animal feed and equipment nutrition. Food is selected for the eater or equipment. Hopper priority must exceed core priority.</MS_FoodOutletUse>
+  <MS_ManualWithdrawalOnly>Ordinary hauling cannot withdraw stored items. Auto-restocking shelves place selected items for colonists to collect.</MS_ManualWithdrawalOnly>
   <MS_ConduitAlreadyPresent>A storage conduit or its construction plan is already here.</MS_ConduitAlreadyPresent>
   <MS_UI_Open>View items</MS_UI_Open>
   <MS_UI_OpenDesc>View all items in connected storage units and withdraw selected quantities around the core.</MS_UI_OpenDesc>
@@ -28,7 +28,7 @@
   <MS_UI_Selected>Selected: {0} entries, {1} items (including selections hidden by filters).</MS_UI_Selected>
   <MS_UI_Forbid>Forbid withdrawn items</MS_UI_Forbid>
   <MS_UI_ForbidTip>Off by default. Prevents immediate restocking, but also prevents ordinary use. Existing ground stacks keep their forbidden status.</MS_UI_ForbidTip>
-  <MS_UI_Hint>Ordinary hauling cannot withdraw items; dedicated outlets supply supported needs. Quantity buttons support the game's adjustment hotkeys.</MS_UI_Hint>
+  <MS_UI_Hint>Ordinary hauling cannot withdraw items; auto-restocking shelves place selected items for colonists to collect. Quantity buttons support the game's adjustment hotkeys.</MS_UI_Hint>
   <MS_UI_Reset>Reset quantities</MS_UI_Reset>
   <MS_UI_Withdraw>Withdraw selected</MS_UI_Withdraw>
   <MS_UI_Close>Close</MS_UI_Close>

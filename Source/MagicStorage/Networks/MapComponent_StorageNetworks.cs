@@ -11,30 +11,30 @@ namespace MagicStorage
         private readonly Dictionary<CompStorageNode, List<IntVec3>> occupied = new Dictionary<CompStorageNode, List<IntVec3>>();
         private readonly List<StorageNetwork> networks = new List<StorageNetwork>();
         private List<StorageRecoveryBatch> recovery = new List<StorageRecoveryBatch>();
+        private ThingOwner<Thing> directlyHeldThings;
         private bool dirty = true;
-        private readonly List<Building_StorageFoodOutlet> foodOutlets = new List<Building_StorageFoodOutlet>();
+        private readonly StorageOutgoingReservations reservations = new StorageOutgoingReservations();
+        private readonly Queue<System.Action> pendingActions = new Queue<System.Action>();
+        internal void NotifyNodeUnavailable(Thing node) => reservations.NotifyNodeUnavailable(node);
+        internal void Defer(System.Action action) => pendingActions.Enqueue(action);
         private readonly List<Building_StorageReceiver> receivers = new List<Building_StorageReceiver>();
-        private readonly Dictionary<Pawn, int> foodRetryAt = new Dictionary<Pawn, int>();
-        internal IReadOnlyList<Building_StorageFoodOutlet> FoodOutlets => foodOutlets;
-        internal bool CanTryFood(Pawn pawn)
-        {
-            if (!foodRetryAt.TryGetValue(pawn, out int retry)) return true;
-            if (Find.TickManager.TicksGame < retry) return false;
-            foodRetryAt.Remove(pawn);
-            return true;
-        }
-        internal void DelayFoodRetry(Pawn pawn) { foodRetryAt[pawn] = Find.TickManager.TicksGame + 250; }
+        private readonly List<Building_StorageUnit> units = new List<Building_StorageUnit>();
+        internal IReadOnlyList<Building_StorageUnit> StorageUnits => units;
+        private readonly List<Building_StorageSupplyShelf> supplyShelves = new List<Building_StorageSupplyShelf>();
+        internal IReadOnlyList<Building_StorageSupplyShelf> SupplyShelves => supplyShelves;
 
         public MapComponent_StorageNetworks(Map map) : base(map) { }
         public IThingHolder ParentHolder => map;
-        public ThingOwner GetDirectlyHeldThings() => null;
+        public ThingOwner GetDirectlyHeldThings() => directlyHeldThings ??
+            (directlyHeldThings = new ThingOwner<Thing>(this, false, LookMode.Deep) { dontTickContents = true });
         public void GetChildHolders(List<IThingHolder> children) { children.AddRange(recovery); }
 
         internal void Register(CompStorageNode node)
         {
             if (!nodes.Add(node)) return;
-            if (node.parent is Building_StorageFoodOutlet outlet) foodOutlets.Add(outlet);
             if (node.parent is Building_StorageReceiver receiver) receivers.Add(receiver);
+            if (node.parent is Building_StorageUnit unit) units.Add(unit);
+            if (node.parent is Building_StorageSupplyShelf shelf) supplyShelves.Add(shelf);
             List<IntVec3> cells = new List<IntVec3>();
             foreach (IntVec3 cell in node.parent.OccupiedRect())
             {
@@ -50,8 +50,10 @@ namespace MagicStorage
         internal void Unregister(CompStorageNode node)
         {
             if (!nodes.Remove(node)) return;
-            if (node.parent is Building_StorageFoodOutlet outlet) foodOutlets.Remove(outlet);
+            NotifyNodeUnavailable(node.parent);
             if (node.parent is Building_StorageReceiver receiver) receivers.Remove(receiver);
+            if (node.parent is Building_StorageUnit unit) units.Remove(unit);
+            if (node.parent is Building_StorageSupplyShelf shelf) supplyShelves.Remove(shelf);
             if (occupied.TryGetValue(node, out var cells))
             {
                 foreach (IntVec3 cell in cells)
@@ -74,6 +76,12 @@ namespace MagicStorage
             foreach (var network in networks) network.Invalidate();
         }
 
+        internal void NotifyFactionChanged(Thing thing)
+        {
+            foreach (var cell in thing.OccupiedRect()) DirtyDrawing(cell);
+            MarkDirty();
+        }
+
         private void DirtyDrawing(IntVec3 cell)
         {
             map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Things, true, false);
@@ -90,6 +98,10 @@ namespace MagicStorage
         public override void MapComponentTick()
         {
             if (dirty) Rebuild();
+            reservations.Validate();
+            reservations.DispatchNotifications();
+            int pending = pendingActions.Count;
+            while (pending-- > 0) pendingActions.Dequeue()();
             foreach (var receiver in receivers) receiver.ProcessIncoming();
             // Only exceptional, pending releases are revisited. Stored inventories never tick.
             if (recovery.Count > 0 && Find.TickManager.TicksGame % 250 == 0)
@@ -110,7 +122,7 @@ namespace MagicStorage
             foreach (var root in nodes)
             {
                 if (!visited.Add(root)) continue;
-                StorageNetwork network = new StorageNetwork();
+                StorageNetwork network = new StorageNetwork(reservations);
                 networks.Add(network);
                 queue.Enqueue(root);
                 while (queue.Count > 0)
@@ -129,12 +141,11 @@ namespace MagicStorage
             dirty = false;
             // Topology can switch a receiver to a different core/priority or disable it.
             NotifyReceiverSettingsChanged();
+            reservations.Validate();
             foreach (Pawn pawn in map.mapPawns.AllPawnsSpawned)
             {
-                if (pawn.jobs?.curDriver is JobDriver_TakeStorageFood foodDriver && !foodDriver.ended)
-                    foodDriver.EnsureReservation();
-                if (pawn.jobs?.curDriver is JobDriver_FetchStorageFood fetchDriver && !fetchDriver.ended)
-                    fetchDriver.EnsureReservation();
+                if (pawn.jobs?.curDriver is IStorageNetworkClient client && !pawn.jobs.curDriver.ended)
+                    client.OnStorageNetworksRebuilt();
             }
         }
 

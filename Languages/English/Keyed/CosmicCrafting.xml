@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Craft_ProductionNotice>Interrupted work can resume. Products default to network storage, with overflow near the core. Each order can instead drop products near its workbench.</MS_Craft_ProductionNotice>
+  <MS_Craft_DropProductsOnFloor>Drop products on floor</MS_Craft_DropProductsOnFloor>
+  <MS_Craft_DropProductsOnFloorDesc>Place all finished products beside the worker at the current workbench, without attempting network storage. Changing this option does not interrupt work and also applies to the current iteration.</MS_Craft_DropProductsOnFloorDesc>
+  <MS_Craft_Progress>Progress: {0}</MS_Craft_Progress>
+  <MS_Craft_BatchInvalid>This iteration cannot continue; delete the order to return remaining ingredients</MS_Craft_BatchInvalid>
+  <MS_Craft_Title>Cosmic workbench — production orders</MS_Craft_Title>
+  <MS_Craft_Open>Production orders</MS_Craft_Open>
+  <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
+  <MS_Craft_TestNotice>Assignment test: ingredients are reserved but never consumed. Workers keep working with normal need interruptions. No products, repeat decrements or skill experience.</MS_Craft_TestNotice>
+  <MS_Craft_Add>Add production order</MS_Craft_Add>
+  <MS_Craft_Suspended>Suspended</MS_Craft_Suspended>
+  <MS_Craft_Locked>Not unlocked</MS_Craft_Locked>
+  <MS_Craft_Satisfied>No repeats remaining, target met or waiting to resume</MS_Craft_Satisfied>
+  <MS_Craft_Assigned>Assigned to {0}</MS_Craft_Assigned>
+  <MS_Craft_MissingMaterials>Ingredients unavailable or reserved</MS_Craft_MissingMaterials>
+  <MS_Craft_NoWorker>No eligible worker with the work type enabled</MS_Craft_NoWorker>
+  <MS_Craft_NoBench>No reachable, available workbench</MS_Craft_NoBench>
+  <MS_Craft_Ready>Ready</MS_Craft_Ready>
+  <MS_Craft_Resume>Resume</MS_Craft_Resume>
+  <MS_Craft_Pause>Suspend</MS_Craft_Pause>
+  <MS_Craft_Delete>Delete</MS_Craft_Delete>
+  <MS_Craft_WorkTypes>Work types: {0}</MS_Craft_WorkTypes>
+  <MS_Craft_Mode_RepeatCount>Do X times</MS_Craft_Mode_RepeatCount>
+  <MS_Craft_Mode_Forever>Do forever</MS_Craft_Mode_Forever>
+  <MS_Craft_Mode_TargetCount>Do until you have X</MS_Craft_Mode_TargetCount>
+  <MS_Craft_RepeatCount>Remaining repeats</MS_Craft_RepeatCount>
+  <MS_Craft_TargetCount>Target count</MS_Craft_TargetCount>
+  <MS_Craft_ProductCount>Counted items: {0} (map + this network)</MS_Craft_ProductCount>
+  <MS_Craft_AlsoCounts>Also counts...</MS_Craft_AlsoCounts>
+  <MS_Craft_AlsoCountsHint>Selected items also count toward the target, one per item, across the map and this core's network. The recipe product, "{0}", always counts under the order's existing count conditions, regardless of selections here. Nothing is selected by default.</MS_Craft_AlsoCountsHint>
+  <MS_Craft_PauseSatisfied>Pause when satisfied</MS_Craft_PauseSatisfied>
+  <MS_Craft_Unpause>Resume at this count</MS_Craft_Unpause>
+  <MS_Craft_Worker>Worker: {0}</MS_Craft_Worker>
+  <MS_Craft_Worker_Anyone>Any worker</MS_Craft_Worker_Anyone>
+  <MS_Craft_Worker_Slaves>Any slave</MS_Craft_Worker_Slaves>
+  <MS_Craft_Worker_Mechs>Any mech</MS_Craft_Worker_Mechs>
+  <MS_Craft_Worker_NonMechs>Any non-mech</MS_Craft_Worker_NonMechs>
+  <MS_Craft_AnyMechanitor>Any mechanitor</MS_Craft_AnyMechanitor>
+  <MS_Craft_Skill>Skill range: {0}</MS_Craft_Skill>
+  <MS_Craft_MinSkill>Minimum skill</MS_Craft_MinSkill>
+  <MS_Craft_MaxSkill>Maximum skill</MS_Craft_MaxSkill>
+  <MS_Craft_NamedWorkerHint>As in vanilla, a named worker ignores this range. The recipe's minimum skill requirements still apply.</MS_Craft_NamedWorkerHint>
+  <MS_Craft_Ingredients>Ingredient filter</MS_Craft_Ingredients>
+  <MS_Craft_IncludeEquipped>Count colonist equipment and inventory</MS_Craft_IncludeEquipped>
+  <MS_Craft_IncludeTainted>Count tainted apparel</MS_Craft_IncludeTainted>
+  <MS_Craft_LimitStuff>Count only products made of allowed ingredients</MS_Craft_LimitStuff>
+  <MS_Craft_MinHP>Minimum hit points (%)</MS_Craft_MinHP>
+  <MS_Craft_MaxHP>Maximum hit points (%)</MS_Craft_MaxHP>
+  <MS_Craft_MinQuality>Minimum quality: {0}</MS_Craft_MinQuality>
+  <MS_Craft_MaxQuality>Maximum quality: {0}</MS_Craft_MaxQuality>
+  <MS_Craft_Incapable>Incapable of this work</MS_Craft_Incapable>
+  <MS_Craft_WorkDisabled>Work not assigned</MS_Craft_WorkDisabled>
+</LanguageData>

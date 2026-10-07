@@ -1,0 +1,18 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion><LangVersion>7.3</LangVersion>
+    <OutputPath>bin\Graphics\</OutputPath><IntermediateOutputPath>obj\Graphics\</IntermediateOutputPath>
+    <AssemblyName>StorageGraphicsTests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup><Reference Include="System" /><Reference Include="System.Core" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="StorageGraphicsStubs.cs" /><Compile Include="StorageGraphicsTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\StorageConduit.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\CompStorageNode.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\StorageConnectionQuery.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\StorageNetworkDrawing.cs" />
+    <Compile Include="..\Source\MagicStorage\Networks\StoragePlanGraphics.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

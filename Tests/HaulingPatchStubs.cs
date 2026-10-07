@@ -8,7 +8,11 @@ namespace Verse
 {
     public class ModContentPack { }
     public class Mod { public Mod(ModContentPack content) { } }
-    public class MapPawns { public List<Pawn> AllPawnsSpawned = new List<Pawn>(); public int ColonistsSpawnedCount = 1; }
+    public class MapPawns
+    {
+        public List<Pawn> AllPawnsSpawned = new List<Pawn>(); public int ColonistsSpawnedCount = 1;
+        public IEnumerable<Pawn> SpawnedPawnsInFaction(Faction faction) => AllPawnsSpawned.FindAll(p => p.Faction == faction);
+    }
 }
 
 namespace RimWorld
@@ -18,7 +22,7 @@ namespace RimWorld
     public enum StoragePriority { Unstored, Low, Normal, Important, Critical }
     public enum HaulMode { ToContainer, ToCellStorage }
     public interface IHaulDestination { }
-    public static class StoreUtility
+    public static partial class StoreUtility
     {
         public static IHaulDestination Destination;
         public static int SearchCount;

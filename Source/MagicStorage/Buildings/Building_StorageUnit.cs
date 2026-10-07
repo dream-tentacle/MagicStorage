@@ -34,7 +34,7 @@ namespace MagicStorage
         public override void SetFaction(Faction newFaction, Pawn recruiter = null)
         {
             base.SetFaction(newFaction, recruiter);
-            if (Spawned) Map.GetComponent<MapComponent_StorageNetworks>().MarkDirty();
+            if (Spawned) Map.GetComponent<MapComponent_StorageNetworks>().NotifyFactionChanged(this);
         }
 
         public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
@@ -49,7 +49,9 @@ namespace MagicStorage
                     Log.Warning("[MagicStorage] Refused to destroy a loaded unit without a map for its contents.");
                     return;
                 }
-                StorageRecoveryBatch batch = releaseMap.GetComponent<MapComponent_StorageNetworks>().CreateRecovery(releaseCell);
+                var manager = releaseMap.GetComponent<MapComponent_StorageNetworks>();
+                manager.NotifyNodeUnavailable(this);
+                StorageRecoveryBatch batch = manager.CreateRecovery(releaseCell);
                 while (Inventory.Contents.Count > 0)
                 {
                     Thing item = Inventory.Contents[Inventory.Contents.Count - 1];

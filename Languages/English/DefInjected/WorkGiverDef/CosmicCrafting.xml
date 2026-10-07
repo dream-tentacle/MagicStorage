@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_CosmicSmithing.label>cosmic workbench smithing</MS_CosmicSmithing.label>
+  <MS_CosmicSmithing.verb>smith at a cosmic workbench</MS_CosmicSmithing.verb>
+  <MS_CosmicSmithing.gerund>working at a cosmic workbench</MS_CosmicSmithing.gerund>
+  <MS_CosmicTailoring.label>cosmic workbench tailoring</MS_CosmicTailoring.label>
+  <MS_CosmicTailoring.verb>tailor at a cosmic workbench</MS_CosmicTailoring.verb>
+  <MS_CosmicTailoring.gerund>working at a cosmic workbench</MS_CosmicTailoring.gerund>
+  <MS_CosmicCooking.label>cosmic workbench cooking</MS_CosmicCooking.label>
+  <MS_CosmicCooking.verb>cook at a cosmic workbench</MS_CosmicCooking.verb>
+  <MS_CosmicCooking.gerund>working at a cosmic workbench</MS_CosmicCooking.gerund>
+  <MS_CosmicArt.label>cosmic workbench art</MS_CosmicArt.label>
+  <MS_CosmicArt.verb>sculpt at a cosmic workbench</MS_CosmicArt.verb>
+  <MS_CosmicArt.gerund>working at a cosmic workbench</MS_CosmicArt.gerund>
+  <MS_CosmicCrafting.label>cosmic workbench crafting</MS_CosmicCrafting.label>
+  <MS_CosmicCrafting.verb>craft at a cosmic workbench</MS_CosmicCrafting.verb>
+  <MS_CosmicCrafting.gerund>working at a cosmic workbench</MS_CosmicCrafting.gerund>
+</LanguageData>

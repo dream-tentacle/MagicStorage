@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JobDef>
+    <defName>MS_TradeWithStorage</defName>
+    <driverClass>MagicStorage.JobDriver_StorageTrade</driverClass>
+    <reportString>正在通过魔法存储与TargetA交易。</reportString>
+  </JobDef>
+  <JobDef>
+    <defName>MS_TradeWithStorageOrbital</defName>
+    <driverClass>MagicStorage.JobDriver_StorageOrbitalTrade</driverClass>
+    <reportString>正在通过魔法存储进行轨道交易。</reportString>
+  </JobDef>
+</Defs>

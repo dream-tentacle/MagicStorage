@@ -25,7 +25,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageCore</defName>
     <label>存储控制核心</label>
-    <description>管理通过存储线连接的存储单元，统一设置接收类型和存储优先级。殖民者将物品送到相连的存储接收器，由核心分配到存储单元。普通搬运不会取出单元内的物品，专用取货口可按对应需求领取。修改筛选条件不会移出已有物品。同一网络只能有一个控制核心。\n\n可在核心的“查看物品”界面选择物品和数量，将其取出到核心周围。</description>
+    <description>管理通过存储线连接的存储单元，统一设置接收类型和存储优先级。殖民者将物品送到相连的存储接收器，由核心分配到存储单元。普通搬运不会取出单元内的物品，自动补货架可将指定物品摆出供殖民者领取。修改筛选条件不会移出已有物品。同一网络只能有一个控制核心。\n\n可在核心的“查看物品”界面选择物品和数量，将其取出到核心周围。</description>
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
     <size>(2,2)</size>
     <rotatable>false</rotatable>
@@ -62,24 +62,6 @@
   </ThingDef>
 
   <ThingDef ParentName="MS_StorageBuildingBase">
-    <defName>MS_StorageFoodOutlet</defName>
-    <label>食物取货口</label>
-    <description>从相连的存储网络提供食物，用于进食、随身备餐、照顾病人和婴儿、给囚犯送饭以及驯服和训练动物。己方动物也可以到此取食。聚会进食和暴食遵循各自的行为规则。还可为营养膏料斗、生长舱和生物塑形舱提供所需食材。\n\n领取者必须到达取货口，食物按实际食用者或设备的需求选择。料斗的存储优先级需高于核心。无法供货时继续寻找原版来源。取货口自身不保存物品，不供应制作任务或远行队装载。</description>
-    <thingClass>MagicStorage.Building_StorageFoodOutlet</thingClass>
-    <size>(1,1)</size>
-    <rotatable>false</rotatable>
-    <graphicData>
-      <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
-      <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>1.25</drawSize>
-      <color>(0.55,1,0.65)</color>
-    </graphicData>
-    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
-    <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
-    <uiOrder>3103</uiOrder>
-  </ThingDef>
-
-  <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageReceiver</defName>
     <label>存储接收器</label>
     <description>接收殖民者搬来的物品，交由相连的控制核心存入存储单元。提供10个暂存堆叠槽位，接收类型和优先级在核心上统一设置。\n\n网络无法工作或没有可用容量时停止接收，已经送到的物品保留在接收位置。暂存物品尚未进入单元，仍按地面物品处理。接收器自身可以传导存储连接。</description>
@@ -103,8 +85,53 @@
     <uiOrder>3104</uiOrder>
   </ThingDef>
 
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_CosmicWorkbench</defName>
+    <label>宇宙工作台</label>
+    <description>执行相连控制核心分配的制作任务。工作台自身可以传导存储连接，每次容纳一名工作者。制作清单和工作者限制在核心上设置。\n\n制作进度在中断后保留，可以由其他符合条件的工作者继续。产物默认优先存入相连的网络，无法存入的物品放在核心周围。也可将任务设为制作后放到工作台周围。</description>
+    <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
+    <building><isMealSource>true</isMealSource></building>
+    <size>(3,1)</size>
+    <rotatable>true</rotatable>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <interactionCellIcon>DiningChair</interactionCellIcon>
+    <canOverlapZones>false</canOverlapZones>
+    <graphicData>
+      <texPath>Things/Building/Production/TableSculpting</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(3.5,1.5)</drawSize>
+      <color>(0.6,0.8,1)</color>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <placeWorkers><li>PlaceWorker_PreventInteractionSpotOverlap</li></placeWorkers>
+    <costList><Steel>100</Steel><ComponentIndustrial>4</ComponentIndustrial></costList>
+    <uiOrder>3105</uiOrder>
+  </ThingDef>
+
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_ConstructionSupplyUnit</defName>
+    <label>建筑供给单元</label>
+    <description>定期从相连的存储网络向半径40格内的己方工地供应建造材料，无需殖民者搬运。材料直接进入建筑框架，施工仍由殖民者完成。优先供应较近的工地。\n\n不会占用已经预留给其他用途的材料，也不会重复供应殖民者正在运来的部分。被禁止、着火或有障碍的工地暂不供料。单元自身可以传导存储连接，网络无法工作时停止供料。</description>
+    <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
+    <tickerType>Rare</tickerType>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>1.25</drawSize>
+      <color>(1,0.8,0.4)</color>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <placeWorkers><li>MagicStorage.PlaceWorker_ConstructionSupply</li></placeWorkers>
+    <costList><Steel>60</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3106</uiOrder>
+  </ThingDef>
+
   <ThingDef ParentName="BuildingBase">
     <defName>MS_StorageConduit</defName>
+    <drawStyleCategory>Conduits</drawStyleCategory>
     <label>存储线</label>
     <description>连接存储控制核心和存储单元的线路。沿上下左右相邻连接，可以铺设在允许下方走线的建筑下面。存储线独立于电网，不传输电力。</description>
     <thingClass>MagicStorage.Building_StorageConduit</thingClass>

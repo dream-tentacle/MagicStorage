@@ -33,12 +33,16 @@ internal static class StorageFoundationTests
         try
         {
             TenUnitCounts(); CapacityAndRollback(); Topology();
+            assertions += CosmicCraftingTests.Run();
+            assertions += ConstructionSupplyTests.Run();
+            assertions += StorageReservationTests.Run();
+            assertions += StorageTradeTests.Run();
             IncomingSlotCompetition(); IncomingMergeCompetition(); IncomingExactAllocation(); IncomingLifecycle();
             assertions += StorageReceiverTests.Run();
-            assertions += StorageFoodTests.Run();
-            assertions += StorageFoodRequestTests.Run();
+            assertions += StorageSupplyShelfTests.Run();
+            assertions += StorageResourceCounterTests.Run();
             assertions += StorageWithdrawalTests.Run();
-            Console.WriteLine("PASS: " + assertions + " assertions (production storage, receiver and food logic; game boundaries stubbed).");
+            Console.WriteLine("PASS: " + assertions + " assertions (production storage, receiver, supply shelf, crafting and construction supply logic; game boundaries stubbed).");
             return 0;
         }
         catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }

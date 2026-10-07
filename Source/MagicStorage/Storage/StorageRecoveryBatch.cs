@@ -12,6 +12,7 @@ namespace MagicStorage
         private IntVec3 origin;
         private bool manualWithdrawal;
         private bool forbidOnRelease;
+        private IntVec3 excludedCell = IntVec3.Invalid;
         internal ThingOwner Contents => contents;
         public bool HasContents => contents != null && contents.Count > 0;
         public bool IsContentsSuspended => true;
@@ -19,6 +20,8 @@ namespace MagicStorage
 
         internal void ConfigureWithdrawal(bool forbid)
         { manualWithdrawal = true; forbidOnRelease = forbid; }
+
+        internal void ExcludeCell(IntVec3 cell) { excludedCell = cell; }
 
         internal long PendingCount
         {
@@ -45,13 +48,14 @@ namespace MagicStorage
             {
                 Thing item = contents[i];
                 if (!manualWithdrawal)
-                    contents.TryDrop(item, origin, map, ThingPlaceMode.Near, out _, playDropSound: false);
+                    contents.TryDrop(item, origin, map, ThingPlaceMode.Near, out _,
+                        nearPlaceValidator: cell => cell != excludedCell, playDropSound: false);
                 else
                 {
                     item.SetForbidden(forbidOnRelease, false);
                     contents.TryDrop(item, origin, map, ThingPlaceMode.Near, out _,
                         placedAction: (placed, count) => placed.SetForbidden(forbidOnRelease, false),
-                        nearPlaceValidator: cell => CanReleaseAt(item, cell, map), playDropSound: false);
+                        nearPlaceValidator: cell => cell != excludedCell && CanReleaseAt(item, cell, map), playDropSound: false);
                 }
             }
         }
@@ -70,6 +74,7 @@ namespace MagicStorage
             Scribe_Values.Look(ref origin, "origin");
             Scribe_Values.Look(ref manualWithdrawal, "manualWithdrawal", false);
             Scribe_Values.Look(ref forbidOnRelease, "forbidOnRelease", false);
+            Scribe_Values.Look(ref excludedCell, "excludedCell", IntVec3.Invalid);
             Scribe_Deep.Look(ref contents, "contents", this);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {

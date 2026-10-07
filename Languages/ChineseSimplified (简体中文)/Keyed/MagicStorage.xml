@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_ConstructionSupplyUse>自动供应半径{0}格内的建造材料，施工由殖民者完成。</MS_ConstructionSupplyUse>
   <MS_NetworkStatus>存储网络：{0}</MS_NetworkStatus>
   <MS_Status_Rebuilding>正在重建连接</MS_Status_Rebuilding>
   <MS_Status_NoCore>未连接控制核心</MS_Status_NoCore>
@@ -7,8 +8,7 @@
   <MS_Status_Ready>可工作</MS_Status_Ready>
   <MS_NetworkCapacity>已连接单元：{0}\n已用槽位：{1} / {2}</MS_NetworkCapacity>
   <MS_UnitCapacity>已用槽位：{0} / {1}</MS_UnitCapacity>
-  <MS_ManualWithdrawalOnly>普通搬运不会取出已存物品，专用取货口可按对应需求领取。</MS_ManualWithdrawalOnly>
-  <MS_FoodOutletUse>供应用餐、备餐、喂食、动物饲料及设备营养。按食用者或设备的需求取货。料斗优先级需高于核心。</MS_FoodOutletUse>
+  <MS_ManualWithdrawalOnly>普通搬运不会取出已存物品，自动补货架可摆出指定物品供殖民者领取。</MS_ManualWithdrawalOnly>
   <MS_ConduitAlreadyPresent>此处已有存储线或其建造计划。</MS_ConduitAlreadyPresent>
   <MS_UI_Open>查看物品</MS_UI_Open>
   <MS_UI_OpenDesc>查看相连存储单元内的所有物品，选择数量后取出到核心周围。</MS_UI_OpenDesc>
@@ -28,7 +28,7 @@
   <MS_UI_Selected>已选择 {0} 项，共 {1} 个物品（包括筛选隐藏的选择）。</MS_UI_Selected>
   <MS_UI_Forbid>取出后设为禁止</MS_UI_Forbid>
   <MS_UI_ForbidTip>默认关闭。禁止可防止殖民者立即搬回，但也会阻止正常取用。不会改变周围已有物品的禁止状态。</MS_UI_ForbidTip>
-  <MS_UI_Hint>普通搬运不会从网络取货；专用取货口可供应对应需求。数量按钮支持原版数量调整快捷键。</MS_UI_Hint>
+  <MS_UI_Hint>普通搬运不会从网络取货；自动补货架可摆出指定物品供殖民者领取。数量按钮支持原版数量调整快捷键。</MS_UI_Hint>
   <MS_UI_Reset>重置数量</MS_UI_Reset>
   <MS_UI_Withdraw>取出所选物品</MS_UI_Withdraw>
   <MS_UI_Close>关闭</MS_UI_Close>

@@ -6,13 +6,19 @@ using System.Collections.Generic;
 namespace RimWorld { public static class MapMeshFlagDefOf { public static object Things; } }
 namespace Verse
 {
+    [AttributeUsage(AttributeTargets.Class)] public sealed class StaticConstructorOnStartupAttribute : Attribute { }
     public enum ThingCategory { Item, Building }
-    public enum LookMode { Deep }
+    public enum LookMode { Deep, Def, Value }
     public enum LoadSaveMode { Inactive, PostLoadInit }
     public static class Scribe { public static LoadSaveMode mode; }
     public static class Scribe_Deep { public static void Look<T>(ref T value, string key, params object[] args) { } }
     public static class Scribe_Collections { public static void Look<T>(ref List<T> value, string key, LookMode mode, params object[] args) { } }
-    public static class Translation { public static string Translate(this string text, params object[] args) => text; }
+    public static class Translation
+    {
+        public static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
+        public static string Translate(this string text, params object[] args) =>
+            Values.TryGetValue(text, out string format) ? string.Format(format, args) : text;
+    }
     public static class Log
     {
         public static readonly List<string> Messages = new List<string>();
@@ -21,11 +27,12 @@ namespace Verse
         public static void Message(string text) { Messages.Add(text); }
         public static void Error(string text) { Errors.Add(text); }
     }
-    public static class Find { public static TickManager TickManager = new TickManager(); }
+    public static class Find { public static TickManager TickManager = new TickManager(); public static WindowStack WindowStack = new WindowStack(); public static Selector Selector = new Selector(); public static readonly List<Map> Maps = new List<Map>(); }
     public class TickManager { public int TicksGame = 1; }
     public partial struct IntVec3 : IEquatable<IntVec3>
     {
         public int x, z;
+        public static readonly IntVec3 Invalid = new IntVec3(-1000, -1000);
         public IntVec3(int x, int z) { this.x = x; this.z = z; }
         public static IntVec3 operator +(IntVec3 a, IntVec3 b) => new IntVec3(a.x + b.x, a.z + b.z);
         public bool Equals(IntVec3 b) => x == b.x && z == b.z;
@@ -70,10 +77,11 @@ namespace Verse
         {
             if (count >= stackCount) { holdingOwner?.Remove(this); if (Spawned) DeSpawn(); return this; }
             stackCount -= count;
-            return new Thing { def = def, stackCount = count, variant = variant };
+            return new Thing { def = def, stackCount = count, variant = variant,
+                Stuff = Stuff, HitPoints = HitPoints, MaxHitPoints = MaxHitPoints, quality = quality, hasQuality = hasQuality };
         }
     }
-    public partial class ThingOwner
+    public partial class ThingOwner : IEnumerable<Thing>
     {
         protected readonly List<Thing> items = new List<Thing>();
         protected int maxStacks = 999999;
@@ -83,6 +91,8 @@ namespace Verse
         public int Count => items.Count;
         public Thing this[int index] => items[index];
         public bool Contains(Thing item) => items.Contains(item);
+        IEnumerator<Thing> IEnumerable<Thing>.GetEnumerator() => items.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
         public virtual int GetCountCanAccept(Thing item, bool merge = true)
         {
             int space = Math.Max(0, maxStacks - Count) * item.def.stackLimit;
@@ -120,7 +130,9 @@ namespace Verse
         public MapDrawer mapDrawer = new MapDrawer();
         public ReservationManager reservationManager = new ReservationManager();
         public object component;
-        public T GetComponent<T>() => (T)component;
+        public MagicStorage.MapComponent_CosmicCrafting craftingComponent;
+        public T GetComponent<T>() => typeof(T) == typeof(MagicStorage.MapComponent_CosmicCrafting)
+            ? (T)(object)(craftingComponent ?? (craftingComponent = new MagicStorage.MapComponent_CosmicCrafting(this))) : (T)component;
         public IThingHolder ParentHolder => null;
         public ThingOwner GetDirectlyHeldThings() => null;
         public void GetChildHolders(List<IThingHolder> list) { }
@@ -139,14 +151,6 @@ namespace MagicStorage
 {
     using Verse;
     public class CompStorageNode { public Thing parent; public StorageNetwork Network; }
-    public class SettingsStub : RimWorld.StorageSettings { }
-    public class Building_StorageCore : Thing
-    {
-        public SettingsStub Settings = new SettingsStub();
-        public CompStorageNode node;
-        public StorageNetwork Network => node?.Network;
-        public bool CanWork => Spawned && Network != null && Network.CanWork;
-    }
     public class Building_StorageUnit : Thing, IThingHolder
     {
         public int SlotCapacity = 64;

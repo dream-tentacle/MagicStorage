@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_StorageSupplyShelf</defName>
+    <label>自动补货架</label>
+    <description>从相连的存储网络自动补充物品的小型货架。可分别指定三种物品及补货上限，并设置品质、耐久和材质条件，每种最多存放一堆。上限不能超过物品的正常堆叠上限，设为0时暂停该位置补货。殖民者可以像使用普通货架一样领取物品。\n\n可设置存储优先级，默认最高。优先级用于现有库存的搬运判断，殖民者不会将物品搬入此架；补货仅由相连的存储网络提供。殖民者可将架上物品搬往更高优先级的储存处。调低补货上限不会移走现有库存。更换指定物品或调整筛选条件后，不符合条件的库存优先送回网络，无法存入的部分放到货架周围。已被预留或禁止的库存暂不移动。网络无法工作时停止补货，现有库存仍可使用。</description>
+    <thingClass>MagicStorage.Building_StorageSupplyShelf</thingClass>
+    <tickerType>Rare</tickerType>
+    <size>(1,1)</size>
+    <rotatable>true</rotatable>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
+    <building>
+      <maxItemsInCell>3</maxItemsInCell>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <fixedStorageSettings>
+        <filter>
+          <disallowNotEverStorable>true</disallowNotEverStorable>
+          <categories><li>Root</li></categories>
+          <disallowedCategories><li>Chunks</li><li>Plants</li><li>Buildings</li></disallowedCategories>
+          <disallowedThingDefs><li MayRequire="Ludeon.RimWorld.Biotech">Wastepack</li></disallowedThingDefs>
+          <specialFiltersToDisallow><li>AllowLargeCorpses</li></specialFiltersToDisallow>
+        </filter>
+      </fixedStorageSettings>
+    </building>
+    <graphicData>
+      <texPath>Things/Building/Furniture/ShelfSmall</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,2)</drawSize>
+      <color>(0.6,0.85,1)</color>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3107</uiOrder>
+  </ThingDef>
+</Defs>

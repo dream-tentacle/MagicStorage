@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_CosmicWorkbench.label>cosmic workbench</MS_CosmicWorkbench.label>
+  <MS_CosmicWorkbench.description>Performs production orders assigned by the connected storage core. Carries storage connections and accommodates one worker. Manage orders and worker restrictions at the core.\n\nProgress survives interruptions and can be continued by another eligible worker. Products default to the connected network, with overflow near the core. Orders can also be set to drop finished products near the workbench.</MS_CosmicWorkbench.description>
+</LanguageData>

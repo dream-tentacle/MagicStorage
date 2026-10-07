@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <WorkGiverDef Name="MS_CosmicCraftingBase" Abstract="True">
+    <giverClass>MagicStorage.WorkGiver_CosmicCrafting</giverClass>
+    <priorityInType>120</priorityInType>
+    <scanThings>false</scanThings>
+    <directOrderable>false</directOrderable>
+    <prioritizeSustains>true</prioritizeSustains>
+    <verb>在宇宙工作台制作</verb>
+    <gerund>在宇宙工作台制作</gerund>
+    <requiredCapacities><li>Manipulation</li></requiredCapacities>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicSmithing</defName><label>宇宙工作台锻造</label><workType>Smithing</workType>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicTailoring</defName><label>宇宙工作台裁缝</label><workType>Tailoring</workType>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicCooking</defName><label>宇宙工作台烹饪</label><workType>Cooking</workType>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicArt</defName><label>宇宙工作台艺术</label><workType>Art</workType>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicCrafting</defName><label>宇宙工作台手工</label><workType>Crafting</workType>
+  </WorkGiverDef>
+</Defs>

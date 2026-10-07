@@ -31,7 +31,7 @@ namespace RimWorld
 {
     public enum TransferAsOneMode { Normal, PodsOrCaravanPacking, InactiveTradeable }
     // Controlled native grouping boundary, not an emulation of every game component.
-    public static class TransferableUtility
+    public static partial class TransferableUtility
     {
         public static int Calls;
         public static TransferAsOneMode LastMode;

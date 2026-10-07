@@ -16,9 +16,13 @@ namespace MagicStorage
         private bool current;
         private bool transferring;
         private readonly StorageIncomingReservations incoming;
-        private readonly StorageOutgoingReservations outgoing = new StorageOutgoingReservations();
+        private readonly StorageOutgoingReservations outgoing;
+        private readonly HashSet<Thing> nodes = new HashSet<Thing>();
 
-        public StorageNetwork() { incoming = new StorageIncomingReservations(units, outgoing.IsReserved); }
+        public StorageNetwork() : this(new StorageOutgoingReservations()) { }
+        internal StorageNetwork(StorageOutgoingReservations reservations)
+        { outgoing = reservations; incoming = new StorageIncomingReservations(units, outgoing.IsReserved); }
+        internal bool ContainsNode(Thing thing) => nodes.Contains(thing);
 
         public StorageNetworkStatus Status => !current ? StorageNetworkStatus.Rebuilding :
             cores.Count == 0 ? StorageNetworkStatus.NoCore :
@@ -39,6 +43,7 @@ namespace MagicStorage
         internal void AddNode(CompStorageNode node)
         {
             node.Network = this;
+            nodes.Add(node.parent);
             if (node.parent is Building_StorageCore core) cores.Add(core);
             if (node.parent is Building_StorageUnit unit) units.Add(unit);
         }
@@ -56,7 +61,7 @@ namespace MagicStorage
             current = true;
         }
 
-        internal void Invalidate() { current = false; incoming.Clear(); outgoing.Clear(); Revision++; }
+        internal void Invalidate() { current = false; incoming.Clear(); Revision++; }
 
         internal void GetMatchingStacks(Predicate<ThingDef> filter, List<Thing> result)
         {
@@ -77,12 +82,16 @@ namespace MagicStorage
             return outgoing.Available(item, owner);
         }
 
-        internal int ReserveOutgoing(object owner, Thing item, int count)
+        internal int ReserveOutgoing(object owner, Thing item, int count, Thing endpoint = null,
+            IStorageReservationClient client = null, Func<bool> usable = null)
         {
             if (transferring) { outgoing.Release(owner); return 0; }
-            return outgoing.Reserve(owner, item, Math.Min(count, AvailableToWithdraw(item, owner)));
+            outgoing.ValidateInventory();
+            return outgoing.Reserve(owner, item, Math.Min(count, AvailableToWithdraw(item, owner)), Core, endpoint, client, usable);
         }
         internal void ReleaseOutgoing(object owner) => outgoing.Release(owner);
+        internal bool HasOutgoingReservation(object owner, Thing item, int count) =>
+            outgoing.CountFor(owner, item) >= count && AvailableToWithdraw(item, owner) >= count;
 
         internal StorageTransferResult TryWithdrawReserved(object owner, Thing item, int count,
             ThingOwner destination, out Thing received)
@@ -91,18 +100,20 @@ namespace MagicStorage
             try
             {
                 if (!CanWork || transferring) return StorageTransferResult.Failed(count, StorageFailure.NetworkUnavailable);
+                outgoing.Validate();
                 if (destination == null || destination.Owner is Building_StorageUnit || count <= 0 ||
                     outgoing.CountFor(owner, item) < count || AvailableToWithdraw(item, owner) < count)
                     return StorageTransferResult.Failed(count, StorageFailure.Reserved);
                 transferring = true;
-                int moved;
+                int moved = 0;
+                var claim = outgoing.BeginCollection(owner);
                 try
                 {
                     // No merge: the receiving job must target this exact split object.
                     moved = StorageTransfer.Move(item.holdingOwner, destination, item, count,
                         Core.Map, Core.Position, out received, false);
                 }
-                finally { transferring = false; }
+                finally { outgoing.FinishCollection(claim, moved == count); transferring = false; }
                 return new StorageTransferResult(count, moved, moved == count ? StorageFailure.None : StorageFailure.InsufficientCapacity);
             }
             finally { outgoing.Release(owner); }
@@ -120,6 +131,7 @@ namespace MagicStorage
 
         internal void NotifyInventoryChanged(Building_StorageUnit unit, ThingDef def)
         {
+            outgoing.ValidateInventory(unit, def);
             if (!current || !units.Contains(unit)) return;
             RefreshDef(def);
         }
