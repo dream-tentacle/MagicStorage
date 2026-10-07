@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+
+  <MS_StorageCore.label>存储控制核心</MS_StorageCore.label>
+  <MS_StorageCore.description>魔法存储的管理核心，在此进行网络内的调度。同一网络只能有一个控制核心。</MS_StorageCore.description>
+
+  <MS_StorageUnit.label>存储单元</MS_StorageUnit.label>
+  <MS_StorageUnit.description>保存物品的存储单元，提供64个堆叠槽位，遵循正常堆叠规则。存储的食物不会腐烂。</MS_StorageUnit.description>
+
+  <MS_StorageReceiver.label>存储接收器</MS_StorageReceiver.label>
+  <MS_StorageReceiver.description>接收殖民者搬来的物品，交由相连的控制核心存入存储单元。</MS_StorageReceiver.description>
+
+  <MS_CosmicWorkbench.label>宇宙工作台</MS_CosmicWorkbench.label>
+  <MS_CosmicWorkbench.description>执行相连控制核心分配的制作任务。产物默认优先存入相连的网络，无法存入的物品放在核心周围。也可将任务设为制作后放到工作台周围。</MS_CosmicWorkbench.description>
+
+  <MS_ConstructionSupplyUnit.label>建筑供给单元</MS_ConstructionSupplyUnit.label>
+  <MS_ConstructionSupplyUnit.description>定期从相连的存储网络向半径40格内的己方工地供应建造材料，无需殖民者搬运，施工仍由殖民者完成。</MS_ConstructionSupplyUnit.description>
+
+  <MS_StorageApparelAdapter.label>衣物适配器</MS_StorageApparelAdapter.label>
+  <MS_StorageApparelAdapter.description>供殖民者从相连的存储网络领取衣物并自动换装。遵循殖民者的衣物政策，按正常换装规则比较网络与地图上的衣物。每次供一名殖民者使用。</MS_StorageApparelAdapter.description>
+
+  <MS_StorageConduit.label>存储线</MS_StorageConduit.label>
+  <MS_StorageConduit.description>连接存储控制核心和存储单元的线路。存储线独立于电网，不传输电力。</MS_StorageConduit.description>
+
+</LanguageData>

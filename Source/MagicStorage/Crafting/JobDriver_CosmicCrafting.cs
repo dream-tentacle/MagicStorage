@@ -56,6 +56,15 @@ namespace MagicStorage
         internal Building_StorageCore Core => job.GetTarget(TargetIndex.B).Thing as Building_StorageCore;
         internal CraftingOrder Order => Core?.Crafting.Find(job.count);
 
+        public override string GetReport()
+        {
+            var recipe = Order?.Recipe;
+            if (recipe == null) return base.GetReport();
+            var product = recipe.specialProducts == null && recipe.products?.Count == 1
+                ? recipe.products[0].thingDef : null;
+            return "MS_Craft_WorkReport".Translate(product?.label ?? recipe.label);
+        }
+
         private void RegisterFinish()
         { if (!finishRegistered) { AddFinishAction(_ => ReleaseAssignment()); finishRegistered = true; } }
         public override bool TryMakePreToilReservations(bool errorOnFailed)

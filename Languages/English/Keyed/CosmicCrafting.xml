@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <MS_Craft_ProductionNotice>Interrupted work can resume. Products default to network storage, with overflow near the core. Each order can instead drop products near its workbench.</MS_Craft_ProductionNotice>
+  <MS_Craft_ProductionNotice>Interrupted work can resume. Products default to network storage, with overflow near the core; they can also be set to drop on the floor.</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>Drop products on floor</MS_Craft_DropProductsOnFloor>
-  <MS_Craft_DropProductsOnFloorDesc>Place all finished products beside the worker at the current workbench, without attempting network storage. Changing this option does not interrupt work and also applies to the current iteration.</MS_Craft_DropProductsOnFloorDesc>
   <MS_Craft_Progress>Progress: {0}</MS_Craft_Progress>
+  <MS_Craft_WorkReport>Producing {0} at a cosmic workbench.</MS_Craft_WorkReport>
   <MS_Craft_BatchInvalid>This iteration cannot continue; delete the order to return remaining ingredients</MS_Craft_BatchInvalid>
   <MS_Craft_Title>Cosmic workbench — production orders</MS_Craft_Title>
   <MS_Craft_Open>Production orders</MS_Craft_Open>
   <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
-  <MS_Craft_TestNotice>Assignment test: ingredients are reserved but never consumed. Workers keep working with normal need interruptions. No products, repeat decrements or skill experience.</MS_Craft_TestNotice>
   <MS_Craft_Add>Add production order</MS_Craft_Add>
+  <MS_Craft_All>All</MS_Craft_All>
+  <MS_Craft_WorkbenchFilter>Workbench: {0}</MS_Craft_WorkbenchFilter>
+  <MS_Craft_NoMatchingOrders>No matching production orders.</MS_Craft_NoMatchingOrders>
+  <MS_Craft_NoMatchingRecipes>No matching recipes.</MS_Craft_NoMatchingRecipes>
   <MS_Craft_Suspended>Suspended</MS_Craft_Suspended>
   <MS_Craft_Locked>Not unlocked</MS_Craft_Locked>
   <MS_Craft_Satisfied>No repeats remaining, target met or waiting to resume</MS_Craft_Satisfied>
@@ -29,7 +32,7 @@
   <MS_Craft_TargetCount>Target count</MS_Craft_TargetCount>
   <MS_Craft_ProductCount>Counted items: {0} (map + this network)</MS_Craft_ProductCount>
   <MS_Craft_AlsoCounts>Also counts...</MS_Craft_AlsoCounts>
-  <MS_Craft_AlsoCountsHint>Selected items also count toward the target, one per item, across the map and this core's network. The recipe product, "{0}", always counts under the order's existing count conditions, regardless of selections here. Nothing is selected by default.</MS_Craft_AlsoCountsHint>
+  <MS_Craft_AlsoCountsHint>Selected items also count toward the "Do until you have X" target.</MS_Craft_AlsoCountsHint>
   <MS_Craft_PauseSatisfied>Pause when satisfied</MS_Craft_PauseSatisfied>
   <MS_Craft_Unpause>Resume at this count</MS_Craft_Unpause>
   <MS_Craft_Worker>Worker: {0}</MS_Craft_Worker>

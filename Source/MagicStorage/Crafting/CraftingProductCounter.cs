@@ -16,7 +16,8 @@ namespace MagicStorage
         {
             if (!CanCount(order.Recipe) || !core.Spawned) return 0;
             var product = order.Recipe.products[0].thingDef;
-            var countedDefs = new HashSet<ThingDef>(order.AdditionalCounts.AllowedThingDefs) { product };
+            var countedDefs = new HashSet<ThingDef> { product };
+            if (order.AdditionalCounts != null) countedDefs.UnionWith(order.AdditionalCounts.AllowedThingDefs);
             var filters = new CraftingProductFilters(order.Recipe);
             var seen = new HashSet<Thing>();
             long count = 0;
@@ -67,7 +68,7 @@ namespace MagicStorage
                 if (filters.Quality && thing.TryGetQuality(out var quality) && !order.Quality.Includes(quality)) return;
                 if (filters.AllowedStuff && order.LimitToAllowedStuff && !order.Ingredients.Allows(thing.Stuff)) return;
             }
-            else if (!order.AdditionalCounts.Allows(thing)) return;
+            else if (order.AdditionalCounts?.Allows(thing) != true) return;
             if (thing.SpawnedOrAnyParentSpawned && thing.PositionHeld.Fogged(thing.MapHeld)) return;
             count += (long)thing.stackCount * (outer == thing ? 1 : outer.stackCount);
         }

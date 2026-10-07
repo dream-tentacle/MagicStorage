@@ -16,6 +16,7 @@ namespace Verse
     public class SkillDef { }
     public class RecipeDef
     {
+        public string label = "test recipe";
         public bool AvailableNow = true, allowMixingIngredients, ignoreIngredientCountTakeEntireStacks, interruptIfIngredientIsRotting, mechanitorOnlyRecipe;
         public RimWorld.ThingFilter fixedIngredientFilter = new RimWorld.ThingFilter(), defaultIngredientFilter;
         public List<IngredientCount> ingredients = new List<IngredientCount>();

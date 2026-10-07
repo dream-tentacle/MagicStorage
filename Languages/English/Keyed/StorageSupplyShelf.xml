@@ -2,10 +2,10 @@
 <LanguageData>
   <MS_Shelf_Configure>Configure restocking</MS_Shelf_Configure>
   <MS_Shelf_Title>Auto-restocking shelf</MS_Shelf_Title>
-  <MS_Shelf_ConfigureDesc>Choose three item types and their restocking limits, with at most one stack of each. The shelf restocks about every 4.17 seconds. Reserved stacks are left untouched.</MS_Shelf_ConfigureDesc>
-  <MS_Shelf_PriorityHint>Priority affects hauling of existing stock. Colonists will not haul items into this shelf; only the connected storage network provides restocking.</MS_Shelf_PriorityHint>
+  <MS_Shelf_ConfigureDesc>Choose three item types and their restocking limits, with at most one stack of each.</MS_Shelf_ConfigureDesc>
+  <MS_Shelf_PriorityHint>Colonists will not haul items into this shelf; only the connected storage network provides restocking.</MS_Shelf_PriorityHint>
   <MS_Shelf_Limit>Restock limit</MS_Shelf_Limit>
-  <MS_Shelf_LimitTip>Restock quantity limit: 0–{0}. Zero pauses restocking for this slot. Lowering the limit keeps existing stock; future restocking uses the new limit after items are taken.</MS_Shelf_LimitTip>
+  <MS_Shelf_LimitTip>Restock quantity limit: 0–{0}. Lowering the limit keeps existing stock.</MS_Shelf_LimitTip>
   <MS_Shelf_Slot>Slot {0}</MS_Shelf_Slot>
   <MS_Shelf_Empty>No item selected</MS_Shelf_Empty>
   <MS_Shelf_Select>Select item</MS_Shelf_Select>
@@ -18,15 +18,15 @@
   <MS_Shelf_AlreadySelected>This item is already assigned to another slot.</MS_Shelf_AlreadySelected>
   <MS_Shelf_Filter>Filters</MS_Shelf_Filter>
   <MS_Shelf_FilterTitle>Filters for slot {0}</MS_Shelf_FilterTitle>
-  <MS_Shelf_FilterHint>Restock only items matching the quality, condition and material filters. Rejected stock returns to the network where possible, or is placed nearby. Reserved or forbidden stock is left untouched.</MS_Shelf_FilterHint>
+  <MS_Shelf_FilterHint>Restock only items matching the quality, condition and material filters. Rejected stock returns to the network where possible, or is placed nearby.</MS_Shelf_FilterHint>
   <MS_Shelf_AnyMaterial>Allow all materials</MS_Shelf_AnyMaterial>
   <MS_Shelf_WarnOnFailure>Warn when restocking fails</MS_Shelf_WarnOnFailure>
-  <MS_Shelf_WarnOnFailureTip>Show an alert when a restocking attempt cannot reach the configured quantity. A zero limit or waiting for a colonist to pick up stock does not trigger an alert. Clears when restocking succeeds.</MS_Shelf_WarnOnFailureTip>
+  <MS_Shelf_WarnOnFailureTip>Show an alert on the right side of the screen when a restocking attempt cannot reach the configured quantity.</MS_Shelf_WarnOnFailureTip>
   <MS_Shelf_AlertTitle>Restocking failed</MS_Shelf_AlertTitle>
   <MS_Shelf_AlertOne>Restocking failed: {0}</MS_Shelf_AlertOne>
   <MS_Shelf_AlertMany>Multiple items failed to restock</MS_Shelf_AlertMany>
   <MS_Shelf_AlertSeparator>, </MS_Shelf_AlertSeparator>
-  <MS_Shelf_AlertExplanation>These slots have restocking warnings enabled and could not reach their configured quantities. Alerts clear when restocking succeeds or warnings are disabled.</MS_Shelf_AlertExplanation>
+  <MS_Shelf_AlertExplanation>These slots have restocking warnings enabled and could not reach their configured quantities.</MS_Shelf_AlertExplanation>
   <MS_Shelf_AlertDetail>{0} (slot {1}): stock {2}/{3}, missing {4}.\nReason: {5}.\n{6}, {8}, at {7}.</MS_Shelf_AlertDetail>
   <MS_Shelf_Failure_NoStock>Insufficient network stock</MS_Shelf_Failure_NoStock>
   <MS_Shelf_Failure_FilterMismatch>No stock matches the quality, condition or material filters</MS_Shelf_Failure_FilterMismatch>

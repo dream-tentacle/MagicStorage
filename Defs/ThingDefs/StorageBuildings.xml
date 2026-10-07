@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Defs>
   <ThingDef Name="MS_StorageBuildingBase" ParentName="BuildingBase" Abstract="True">
     <category>Building</category>
@@ -24,8 +24,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageCore</defName>
-    <label>存储控制核心</label>
-    <description>管理通过存储线连接的存储单元，统一设置接收类型和存储优先级。殖民者将物品送到相连的存储接收器，由核心分配到存储单元。普通搬运不会取出单元内的物品，自动补货架可将指定物品摆出供殖民者领取。修改筛选条件不会移出已有物品。同一网络只能有一个控制核心。\n\n可在核心的“查看物品”界面选择物品和数量，将其取出到核心周围。</description>
+    <label>storage control core</label>
+    <description>The control core of magic storage, coordinating operations within the network. Each network supports only one control core.</description>
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
     <size>(2,2)</size>
     <rotatable>false</rotatable>
@@ -43,8 +43,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageUnit</defName>
-    <label>存储单元</label>
-    <description>保存物品的存储单元，提供64个堆叠槽位。物品遵循正常堆叠规则，存储期间暂停常规更新。断开连接不会清空已有物品。单元自身可以传导存储连接，无需在下方另外铺线。</description>
+    <label>storage unit</label>
+    <description>A storage unit with 64 stack slots, following normal stacking rules. Stored food does not rot.</description>
     <thingClass>MagicStorage.Building_StorageUnit</thingClass>
     <size>(1,2)</size>
     <rotatable>true</rotatable>
@@ -63,8 +63,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageReceiver</defName>
-    <label>存储接收器</label>
-    <description>接收殖民者搬来的物品，交由相连的控制核心存入存储单元。提供10个暂存堆叠槽位，接收类型和优先级在核心上统一设置。\n\n网络无法工作或没有可用容量时停止接收，已经送到的物品保留在接收位置。暂存物品尚未进入单元，仍按地面物品处理。接收器自身可以传导存储连接。</description>
+    <label>storage receiver</label>
+    <description>Receives items hauled by colonists for storage in units by the connected control core.</description>
     <thingClass>MagicStorage.Building_StorageReceiver</thingClass>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
@@ -87,8 +87,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_CosmicWorkbench</defName>
-    <label>宇宙工作台</label>
-    <description>执行相连控制核心分配的制作任务。工作台自身可以传导存储连接，每次容纳一名工作者。制作清单和工作者限制在核心上设置。\n\n制作进度在中断后保留，可以由其他符合条件的工作者继续。产物默认优先存入相连的网络，无法存入的物品放在核心周围。也可将任务设为制作后放到工作台周围。</description>
+    <label>cosmic workbench</label>
+    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. Orders can also be set to drop finished products near the workbench.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <building><isMealSource>true</isMealSource></building>
     <size>(3,1)</size>
@@ -111,8 +111,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_ConstructionSupplyUnit</defName>
-    <label>建筑供给单元</label>
-    <description>定期从相连的存储网络向半径40格内的己方工地供应建造材料，无需殖民者搬运。材料直接进入建筑框架，施工仍由殖民者完成。优先供应较近的工地。\n\n不会占用已经预留给其他用途的材料，也不会重复供应殖民者正在运来的部分。被禁止、着火或有障碍的工地暂不供料。单元自身可以传导存储连接，网络无法工作时停止供料。</description>
+    <label>construction supply unit</label>
+    <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells. No hauling is required; colonists still perform the construction work.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
     <tickerType>Rare</tickerType>
     <size>(1,1)</size>
@@ -131,8 +131,8 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageApparelAdapter</defName>
-    <label>衣物适配器</label>
-    <description>供殖民者从相连的存储网络领取衣物并自动换装。遵循殖民者的衣物政策，按正常换装规则比较网络与地图上的衣物。出发前预留选中的衣物，到达后才从存储单元取出。换下的衣物按正常机制放在地上。\n\n需要连接到可工作的存储网络。每次供一名殖民者使用，自身可以传导存储连接。</description>
+    <label>apparel adapter</label>
+    <description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Serves one colonist at a time.</description>
     <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>
     <tickerType>Rare</tickerType>
     <size>(2,1)</size>
@@ -155,8 +155,8 @@
   <ThingDef ParentName="BuildingBase">
     <defName>MS_StorageConduit</defName>
     <drawStyleCategory>Conduits</drawStyleCategory>
-    <label>存储线</label>
-    <description>连接存储控制核心和存储单元的线路。沿上下左右相邻连接，可以铺设在允许下方走线的建筑下面。存储线独立于电网，不传输电力。</description>
+    <label>storage conduit</label>
+    <description>Connects storage control cores and storage units. Storage conduits form a separate network and do not transmit electricity.</description>
     <thingClass>MagicStorage.Building_StorageConduit</thingClass>
     <category>Building</category>
     <altitudeLayer>Conduits</altitudeLayer>

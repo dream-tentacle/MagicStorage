@@ -47,12 +47,16 @@ namespace MagicStorage
                 ThingDef itemDef = shelf.SelectedDef(slot);
                 Rect row = new Rect(0, 208 + i * 105, rect.width, 97);
                 Widgets.DrawMenuSection(row);
-                Widgets.Label(new Rect(row.x + 10, row.y + 6, row.width - 214, 25), "MS_Shelf_Slot".Translate(slot + 1));
+                Widgets.Label(new Rect(row.x + 10, row.y + 6, 90, 25), "MS_Shelf_Slot".Translate(slot + 1));
                 if (itemDef != null) Widgets.DefIcon(new Rect(10, row.y + 40, 32, 32), itemDef);
                 string label = itemDef?.LabelCap.ToString() ?? "MS_Shelf_Empty".Translate().ToString();
                 Widgets.Label(new Rect(50, row.y + 33, row.width - 260, 28), label);
                 if (itemDef != null)
                 {
+                    StorageShelfFilter filter = shelf.SlotFilter(slot);
+                    Rect warningRect = new Rect(row.x + 110, row.y + 4, row.width - 314, 28);
+                    Widgets.CheckboxLabeled(warningRect, "MS_Shelf_WarnOnFailure".Translate(), ref filter.WarnWhenRestockFails);
+                    TooltipHandler.TipRegion(warningRect, "MS_Shelf_WarnOnFailureTip".Translate());
                     int limit = shelf.RestockLimit(slot);
                     if (displayedDefs[slot] != itemDef) limitBuffers[slot] = limit.ToString();
                     displayedDefs[slot] = itemDef;

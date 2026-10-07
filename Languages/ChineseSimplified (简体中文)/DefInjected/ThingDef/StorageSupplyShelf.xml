@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+
+  <MS_StorageSupplyShelf.label>自动补货架</MS_StorageSupplyShelf.label>
+  <MS_StorageSupplyShelf.description>从相连的存储网络自动补充物品的小型货架，供日常食物、医药等小量取货。\n\n存储优先级用于现有库存的搬运判断，殖民者不会将物品搬入此架。建议优先级不低于核心存储设置，否则容易反复被搬运。</MS_StorageSupplyShelf.description>
+
+</LanguageData>

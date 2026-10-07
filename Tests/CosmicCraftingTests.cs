@@ -13,7 +13,7 @@ internal static class CosmicCraftingTests
     { checks++; if (!Equals(expected, actual)) throw new Exception("Cosmic crafting: " + message + "; expected " + expected + ", got " + actual); }
     internal static int Run()
     {
-        Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); ProductFilterApplicability(); LoadAndBuildings();
+        Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
         ProductionCompletion(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
         ReservationInvalidation();
         CoreContainerSelection();
@@ -371,6 +371,40 @@ internal static class CosmicCraftingTests
         Equal(0L, counter.Count(core, order), "primary product's count conditions cannot be bypassed by selecting it again");
         order.AdditionalCounts.SetAllow(packaged, true);
         Equal(5L, counter.Count(core, order), "substitutes do not inherit primary product quality restrictions");
+    }
+
+    private static void MissingAdditionalCounts()
+    {
+        var f = new Fixture(); var core = f.Core(0).Item1;
+        var product = new ThingDef { useHitPoints = false };
+        var recipe = new RecipeDef { route = f.Giver };
+        recipe.products.Add(new ThingDefCountClass { thingDef = product });
+        var order = core.Crafting.Add(recipe);
+        order.Mode = CraftingRepeatMode.TargetCount; order.TargetCount = 5;
+        order.AdditionalCounts = null;
+        var counter = new MapAndNetworkCraftingProductCounter(); CraftingServices.Products = counter;
+        f.Map.listerThings.Things.Add(new Thing { def = product, stackCount = 3 });
+        // Counting also traverses unrelated held stock; a missing filter must reject it.
+        f.Pawn.carryTracker.innerContainer.TryAdd(new Thing { def = f.Material, stackCount = 99 });
+        Equal(3L, counter.Count(core, order), "missing additional filter still counts primary products and excludes unrelated held items");
+        Equal(true, f.Dispatch.CanRun(core, order), "missing additional filter allows production below target");
+        order.TargetCount = 3;
+        Equal(false, f.Dispatch.CanRun(core, order), "missing additional filter stops production at the primary target");
+        Equal("MS_Craft_Satisfied", f.Dispatch.Status(core, order).ToString(), "list status remains available with a missing additional filter");
+
+        Scribe.mode = LoadSaveMode.PostLoadInit;
+        try { order.ExposeData(); }
+        finally { Scribe.mode = LoadSaveMode.Inactive; }
+        Equal(true, order.AdditionalCounts != null, "post-load initializes a missing additional filter");
+        Equal(0, order.AdditionalCounts.AllowedThingDefs.Count(), "recovered additional filter starts with no selections");
+        Equal(3L, counter.Count(core, order), "post-load initialization preserves primary product counts");
+        var existing = order.AdditionalCounts;
+        existing.SetAllow(f.Material, true);
+        Scribe.mode = LoadSaveMode.PostLoadInit;
+        try { order.ExposeData(); }
+        finally { Scribe.mode = LoadSaveMode.Inactive; }
+        Equal(existing, order.AdditionalCounts, "post-load preserves an existing additional filter");
+        Equal(112L, counter.Count(core, order), "existing selections count carried stock and the fixture's 10 stored materials after post-load");
     }
 
     private static void ProductFilterApplicability()

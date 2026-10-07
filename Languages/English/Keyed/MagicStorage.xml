@@ -27,8 +27,8 @@
   <MS_UI_Empty>No matching items.</MS_UI_Empty>
   <MS_UI_Selected>Selected: {0} entries, {1} items (including selections hidden by filters).</MS_UI_Selected>
   <MS_UI_Forbid>Forbid withdrawn items</MS_UI_Forbid>
-  <MS_UI_ForbidTip>Off by default. Prevents immediate restocking, but also prevents ordinary use. Existing ground stacks keep their forbidden status.</MS_UI_ForbidTip>
-  <MS_UI_Hint>Ordinary hauling cannot withdraw items; auto-restocking shelves place selected items for colonists to collect. Quantity buttons support the game's adjustment hotkeys.</MS_UI_Hint>
+  <MS_UI_ForbidTip>Prevents immediate restocking, but also prevents ordinary use.</MS_UI_ForbidTip>
+  <MS_UI_Hint>Ordinary hauling cannot withdraw items; auto-restocking shelves place selected items for colonists to collect.</MS_UI_Hint>
   <MS_UI_Reset>Reset quantities</MS_UI_Reset>
   <MS_UI_Withdraw>Withdraw selected</MS_UI_Withdraw>
   <MS_UI_Close>Close</MS_UI_Close>
@@ -41,7 +41,7 @@
   <MS_UI_AvailableTip>Quantity available for withdrawal, excluding hauling and collection reservations.</MS_UI_AvailableTip>
   <MS_UI_SelectedTip>Quantity to place around the core on confirmation.</MS_UI_SelectedTip>
   <MS_UI_RemainingTip>Quantity remaining in the network after this withdrawal.</MS_UI_RemainingTip>
-  <MS_UI_QuantityTip>Right arrows increase withdrawal; left arrows decrease it. Double arrows withdraw all or reset to zero. Negative values withdraw from storage. Supports the game's quantity adjustment hotkeys.</MS_UI_QuantityTip>
+  <MS_UI_QuantityTip>Right arrows increase withdrawal; left arrows decrease it.</MS_UI_QuantityTip>
   <MS_ReceiverCapacity>Receiving buffer: {0} / {1} stacks</MS_ReceiverCapacity>
-  <MS_ReceiverUse>Uses the connected core's filter and priority. Delivered items are automatically sent to storage units. Waiting items remain ordinary ground items.</MS_ReceiverUse>
+  <MS_ReceiverUse>Uses the connected core's filter and priority. Delivered items are automatically sent to storage units.</MS_ReceiverUse>
 </LanguageData>

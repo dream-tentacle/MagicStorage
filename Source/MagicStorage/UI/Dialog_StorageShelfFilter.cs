@@ -35,10 +35,6 @@ namespace MagicStorage
             float hintHeight = Text.CalcHeight(hint, rect.width);
             Widgets.Label(new Rect(0, 78, rect.width, hintHeight), hint);
             float y = 78 + hintHeight + 12;
-            Rect warningRect = new Rect(0, y, rect.width, 28);
-            Widgets.CheckboxLabeled(warningRect, "MS_Shelf_WarnOnFailure".Translate(), ref filter.WarnWhenRestockFails);
-            TooltipHandler.TipRegion(warningRect, "MS_Shelf_WarnOnFailureTip".Translate());
-            y += 36;
             if (itemDef.useHitPoints)
             {
                 Widgets.FloatRange(new Rect(0, y, rect.width, 32), 78145300 + slot, ref filter.HitPoints,

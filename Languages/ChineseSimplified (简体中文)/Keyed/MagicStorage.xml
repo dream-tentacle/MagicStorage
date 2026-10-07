@@ -27,8 +27,8 @@
   <MS_UI_Empty>没有符合条件的物品。</MS_UI_Empty>
   <MS_UI_Selected>已选择 {0} 项，共 {1} 个物品（包括筛选隐藏的选择）。</MS_UI_Selected>
   <MS_UI_Forbid>取出后设为禁止</MS_UI_Forbid>
-  <MS_UI_ForbidTip>默认关闭。禁止可防止殖民者立即搬回，但也会阻止正常取用。不会改变周围已有物品的禁止状态。</MS_UI_ForbidTip>
-  <MS_UI_Hint>普通搬运不会从网络取货；自动补货架可摆出指定物品供殖民者领取。数量按钮支持原版数量调整快捷键。</MS_UI_Hint>
+  <MS_UI_ForbidTip>可防止殖民者立即搬回，但也会阻止正常取用。</MS_UI_ForbidTip>
+  <MS_UI_Hint>普通搬运不会从网络取货；自动补货架可摆出指定物品供殖民者领取。</MS_UI_Hint>
   <MS_UI_Reset>重置数量</MS_UI_Reset>
   <MS_UI_Withdraw>取出所选物品</MS_UI_Withdraw>
   <MS_UI_Close>关闭</MS_UI_Close>
@@ -41,7 +41,7 @@
   <MS_UI_AvailableTip>当前可以取出的数量，不包括搬运和取货任务预约的部分。</MS_UI_AvailableTip>
   <MS_UI_SelectedTip>确认后将放到核心周围的数量。</MS_UI_SelectedTip>
   <MS_UI_RemainingTip>本次取出后，网络内剩余的数量。</MS_UI_RemainingTip>
-  <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量。双箭头全部取出或归零。负数表示从网络取出；支持原版数量调整快捷键。</MS_UI_QuantityTip>
+  <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量</MS_UI_QuantityTip>
   <MS_ReceiverCapacity>接收暂存：{0} / {1} 堆</MS_ReceiverCapacity>
-  <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置。送到的物品自动存入单元，等待转存的物品仍按地面物品处理。</MS_ReceiverUse>
+  <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，送到的物品自动存入单元。</MS_ReceiverUse>
 </LanguageData>

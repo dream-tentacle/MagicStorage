@@ -58,6 +58,8 @@ namespace MagicStorage
             Scribe_Values.Look(ref SkillRange, "skillRange", new IntRange(0, 20));
             Scribe_Deep.Look(ref Ingredients, "ingredients");
             Scribe_Deep.Look(ref AdditionalCounts, "additionalCounts");
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && AdditionalCounts == null)
+                AdditionalCounts = new ThingFilter();
             Scribe_Values.Look(ref IncludeEquipped, "includeEquipped");
             Scribe_Values.Look(ref IncludeTainted, "includeTainted", true);
             Scribe_Values.Look(ref LimitToAllowedStuff, "limitToAllowedStuff");

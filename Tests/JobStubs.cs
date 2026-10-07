@@ -84,6 +84,7 @@ namespace Verse.AI
         protected void SetFinalizerJob(Func<JobCondition, Job> factory) { finalizer = factory; }
         public Job GetFinalizerJob(JobCondition condition) => finalizer?.Invoke(condition);
         public virtual bool TryMakePreToilReservations(bool error) => true;
+        public virtual string GetReport() => "";
         protected abstract IEnumerable<Toil> MakeNewToils();
         public virtual void ExposeData() { }
         public void AddFinishAction(Action<JobCondition> action) { finish.Add(action); }

@@ -2,10 +2,10 @@
 <LanguageData>
   <MS_Shelf_Configure>配置补货</MS_Shelf_Configure>
   <MS_Shelf_Title>自动补货架</MS_Shelf_Title>
-  <MS_Shelf_ConfigureDesc>分别指定三种物品及补货上限，每种最多一堆。每隔约4.17秒从网络补货，已被预留的库存暂不改变。</MS_Shelf_ConfigureDesc>
-  <MS_Shelf_PriorityHint>优先级用于现有库存的搬运判断。殖民者不会将物品搬入此架；补货仅由相连的存储网络提供。</MS_Shelf_PriorityHint>
+  <MS_Shelf_ConfigureDesc>分别指定三种物品及补货上限，每种最多一堆</MS_Shelf_ConfigureDesc>
+  <MS_Shelf_PriorityHint>殖民者不会将物品搬入此架；补货仅由相连的存储网络提供。</MS_Shelf_PriorityHint>
   <MS_Shelf_Limit>补货上限</MS_Shelf_Limit>
-  <MS_Shelf_LimitTip>补货数量上限：0～{0}。0表示暂停此位置补货。调低上限不会移走已有库存，待领取后再按新上限补货。</MS_Shelf_LimitTip>
+  <MS_Shelf_LimitTip>补货数量上限：0～{0}。调低上限不会移走已有库存。</MS_Shelf_LimitTip>
   <MS_Shelf_Slot>位置 {0}</MS_Shelf_Slot>
   <MS_Shelf_Empty>未指定物品</MS_Shelf_Empty>
   <MS_Shelf_Select>选择物品</MS_Shelf_Select>
@@ -18,15 +18,15 @@
   <MS_Shelf_AlreadySelected>其他位置已经指定了此物品。</MS_Shelf_AlreadySelected>
   <MS_Shelf_Filter>筛选条件</MS_Shelf_Filter>
   <MS_Shelf_FilterTitle>位置 {0} 的筛选条件</MS_Shelf_FilterTitle>
-  <MS_Shelf_FilterHint>仅补充符合品质、耐久和材质条件的物品。不符合条件的库存优先送回网络，无法存入的放到货架周围。已被预留或禁止的库存暂不移动。</MS_Shelf_FilterHint>
+  <MS_Shelf_FilterHint>仅补充符合品质、耐久和材质条件的物品。不符合条件的库存优先送回网络，无法存入的放到货架周围。</MS_Shelf_FilterHint>
   <MS_Shelf_AnyMaterial>允许所有材质</MS_Shelf_AnyMaterial>
   <MS_Shelf_WarnOnFailure>在无法补货时警告</MS_Shelf_WarnOnFailure>
-  <MS_Shelf_WarnOnFailureTip>尝试补货后仍未达到设定数量时，在右侧显示警报。上限为0或正在等待殖民者领取时不报警。恢复补货后自动消除。</MS_Shelf_WarnOnFailureTip>
+  <MS_Shelf_WarnOnFailureTip>尝试补货后仍未达到设定数量时，在屏幕右侧显示警报。</MS_Shelf_WarnOnFailureTip>
   <MS_Shelf_AlertTitle>补货失败</MS_Shelf_AlertTitle>
   <MS_Shelf_AlertOne>补货失败：{0}</MS_Shelf_AlertOne>
   <MS_Shelf_AlertMany>多个物品补货失败</MS_Shelf_AlertMany>
   <MS_Shelf_AlertSeparator>、</MS_Shelf_AlertSeparator>
-  <MS_Shelf_AlertExplanation>以下开启提醒的补货位置未能补足设定数量。补货恢复或关闭提醒后，警报会自动消除。</MS_Shelf_AlertExplanation>
+  <MS_Shelf_AlertExplanation>以下开启提醒的补货位置未能补足设定数量。</MS_Shelf_AlertExplanation>
   <MS_Shelf_AlertDetail>{0}（位置{1}）：库存 {2}/{3}，缺少 {4}。\n原因：{5}。\n{6}，{8}，坐标 {7}。</MS_Shelf_AlertDetail>
   <MS_Shelf_Failure_NoStock>网络库存不足</MS_Shelf_Failure_NoStock>
   <MS_Shelf_Failure_FilterMismatch>没有符合品质、耐久或材质筛选条件的库存</MS_Shelf_Failure_FilterMismatch>

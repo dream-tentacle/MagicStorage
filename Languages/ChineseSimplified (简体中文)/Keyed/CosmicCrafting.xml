@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <MS_Craft_ProductionNotice>中断后可继续制作。产物默认优先存入网络，余量放在核心周围；也可为每条任务选择制作后放到工作台周围。</MS_Craft_ProductionNotice>
+  <MS_Craft_ProductionNotice>中断后可继续制作。产物默认优先存入网络，存不下则放在核心周围；也可设置为放在地面。</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>制作后放到地面</MS_Craft_DropProductsOnFloor>
-  <MS_Craft_DropProductsOnFloorDesc>制作完成后，将全部产物放在工作者脚边、当前工作台周围，不尝试存入网络。切换此选项不会中断制作，对当前这次制作也生效。</MS_Craft_DropProductsOnFloorDesc>
   <MS_Craft_Progress>制作进度：{0}</MS_Craft_Progress>
+  <MS_Craft_WorkReport>正在宇宙工作台制作{0}。</MS_Craft_WorkReport>
   <MS_Craft_BatchInvalid>本次制作无法继续；删除任务可退回剩余材料</MS_Craft_BatchInvalid>
   <MS_Craft_Title>宇宙工作台 — 制作清单</MS_Craft_Title>
   <MS_Craft_Open>制作清单</MS_Craft_Open>
   <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
-  <MS_Craft_TestNotice>分配测试：材料只预留、不消耗。殖民者会持续工作并正常响应需求；目前不产出物品、不减少次数、不获得经验。</MS_Craft_TestNotice>
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
+  <MS_Craft_All>全部</MS_Craft_All>
+  <MS_Craft_WorkbenchFilter>工作台：{0}</MS_Craft_WorkbenchFilter>
+  <MS_Craft_NoMatchingOrders>没有符合筛选条件的制作任务。</MS_Craft_NoMatchingOrders>
+  <MS_Craft_NoMatchingRecipes>没有符合筛选条件的配方。</MS_Craft_NoMatchingRecipes>
   <MS_Craft_Suspended>已暂停</MS_Craft_Suspended>
   <MS_Craft_Locked>尚未解锁</MS_Craft_Locked>
   <MS_Craft_Satisfied>次数已用完、达到目标或等待恢复</MS_Craft_Satisfied>
@@ -22,14 +25,14 @@
   <MS_Craft_Pause>暂停</MS_Craft_Pause>
   <MS_Craft_Delete>删除</MS_Craft_Delete>
   <MS_Craft_WorkTypes>工作类型：{0}</MS_Craft_WorkTypes>
-  <MS_Craft_Mode_RepeatCount>制作 X 次</MS_Craft_Mode_RepeatCount>
+  <MS_Craft_Mode_RepeatCount>制作X次</MS_Craft_Mode_RepeatCount>
   <MS_Craft_Mode_Forever>永久制作</MS_Craft_Mode_Forever>
-  <MS_Craft_Mode_TargetCount>维持 X 个</MS_Craft_Mode_TargetCount>
+  <MS_Craft_Mode_TargetCount>维持X个</MS_Craft_Mode_TargetCount>
   <MS_Craft_RepeatCount>剩余次数</MS_Craft_RepeatCount>
   <MS_Craft_TargetCount>目标数量</MS_Craft_TargetCount>
   <MS_Craft_ProductCount>统计数量：{0}（地图＋当前网络）</MS_Craft_ProductCount>
   <MS_Craft_AlsoCounts>也统计……</MS_Craft_AlsoCounts>
-  <MS_Craft_AlsoCountsHint>选中的物品也计入“维持 X 个”的数量，每个物品按1个计算。范围包括地图和当前核心网络。配方成品“{0}”始终按任务原有计数条件统计，不受此处选择影响。默认不选。</MS_Craft_AlsoCountsHint>
+  <MS_Craft_AlsoCountsHint>选中的物品也计入“维持X个”的数量</MS_Craft_AlsoCountsHint>
   <MS_Craft_PauseSatisfied>满足目标后暂停</MS_Craft_PauseSatisfied>
   <MS_Craft_Unpause>数量降至此值时恢复</MS_Craft_Unpause>
   <MS_Craft_Worker>工作者：{0}</MS_Craft_Worker>
