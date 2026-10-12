@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>燃料供给器</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="460" height="416" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="460" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H458Q486 458 486 430" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M473 85V417Q473 444 446 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="71" y="68" width="126" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="75" y="72" width="118" height="21" rx="3" fill="#344a5b"/>
+  <path d="M87 82H108M118 82H139" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 82H182" fill="none" stroke="#91afc3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="80" y="153" width="88" height="223" rx="10" fill="#b6c4cd"/>
+  <rect x="85" y="148" width="78" height="214" rx="8" fill="#e1e7eb"/>
+  <rect x="102" y="174" width="44" height="60" rx="4" fill="#bdced9"/>
+  <rect x="113" y="185" width="22" height="38" rx="3" fill="#c5e5f5"/>
+  <rect x="104" y="294" width="4" height="45" rx="1" fill="#7c919f"/>
+  <rect x="115" y="294" width="4" height="45" rx="1" fill="#7c919f"/>
+  <rect x="126" y="294" width="4" height="45" rx="1" fill="#7c919f"/>
+  <rect x="137" y="294" width="4" height="45" rx="1" fill="#7c919f"/>
+  <!-- Rounded sealed fuel-processing chamber, with a sky-blue band and a mechanical cap. -->
+  <path d="M218 170Q218 140 276 133Q359 123 384 165V338Q384 373 304 383Q218 379 218 346Z" fill="#8299a8"/>
+  <rect x="218" y="161" width="166" height="164" rx="37" fill="#b7c8d3"/>
+  <path d="M224 174V313Q223 340 250 351H350Q379 341 378 315V174" fill="#cfdbe2"/>
+  <path d="M358 178V312Q357 337 340 347H351Q379 337 378 312V178Z" fill="#a5bac7"/>
+  <ellipse cx="301" cy="171" rx="83" ry="42" fill="#e6edf1"/>
+  <ellipse cx="301" cy="171" rx="64" ry="28" fill="#bacdd9"/>
+  <ellipse cx="301" cy="167" rx="61" ry="26" fill="#c5e5f5"/>
+  <path d="M248 155Q300 131 354 155" fill="none" stroke="#eaf6fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="287" y="153" width="28" height="24" rx="5" fill="#8ea6b7"/>
+  <rect x="291" y="151" width="20" height="20" rx="4" fill="#dce7ee"/>
+  <path d="M225 244Q301 271 377 244V268Q301 295 225 268Z" fill="#98adbc"/>
+  <path d="M225 246Q301 273 377 246V263Q301 290 225 263Z" fill="#c5e5f5"/>
+  <path d="M231 249Q301 273 371 249" fill="none" stroke="#edf8fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M215 338H387V363Q387 380 365 386H237Q215 380 215 363Z" fill="#b2c2cd"/>
+  <path d="M224 343H378" fill="none" stroke="#edf3f7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="245" y="357" width="112" height="16" rx="4" fill="#8da4b3"/>
+  <rect x="252" y="359" width="98" height="6" rx="2" fill="#496578"/>
+  <path d="M149 384V401Q149 412 164 412H210" fill="none" stroke="#a6bac8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M149 384V401Q149 412 164 412H210" fill="none" stroke="#c5e5f5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="204.0" y="468" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217.0 471H243.0M277.0 471H296.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H458Q486 42 486 70V458Q486 486 458 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

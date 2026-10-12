@@ -8,10 +8,14 @@ namespace MagicStorage
     internal sealed class StorageOutgoingReservations
     {
         private readonly Dictionary<object, StorageReservation> claims = new Dictionary<object, StorageReservation>();
+        private readonly Dictionary<Thing, HashSet<StorageReservation>> byItem = new Dictionary<Thing, HashSet<StorageReservation>>();
+        private readonly Dictionary<Thing, HashSet<StorageReservation>> byNode = new Dictionary<Thing, HashSet<StorageReservation>>();
+        private readonly Dictionary<Thing, long> reservedCounts = new Dictionary<Thing, long>();
         private readonly Queue<StorageReservation> notifications = new Queue<StorageReservation>();
         internal void Release(object owner)
         {
             if (owner == null || !claims.TryGetValue(owner, out var claim)) return;
+            if (claim.State == StorageReservationState.Reserved) RemoveIndex(claim);
             claim.State = StorageReservationState.Released;
             claims.Remove(owner);
         }
@@ -20,10 +24,10 @@ namespace MagicStorage
         internal int Available(Thing item, object except = null)
         {
             if (item == null || item.Destroyed) return 0;
-            long count = item.stackCount;
-            foreach (var pair in claims)
-                if (!ReferenceEquals(pair.Key, except) && pair.Value.Item == item &&
-                    pair.Value.State == StorageReservationState.Reserved) count -= pair.Value.Count;
+            reservedCounts.TryGetValue(item, out long reserved);
+            long count = item.stackCount - reserved;
+            if (except != null && claims.TryGetValue(except, out var claim) &&
+                claim.Item == item && claim.State == StorageReservationState.Reserved) count += claim.Count;
             return (int)Math.Max(0L, count);
         }
         internal bool IsReserved(Thing item) => Available(item) < (item?.stackCount ?? 0);
@@ -36,17 +40,51 @@ namespace MagicStorage
             int count = Math.Min(requested, Available(item, owner));
             if (count <= 0) { Release(owner); return 0; }
             if (existing != null && existing.Item == item && existing.Core == core && existing.Endpoint == endpoint)
-            { existing.Count = count; return count; }
+            { RemoveIndex(existing); existing.Count = count; AddIndex(existing); return count; }
             Release(owner);
-            claims[owner] = new StorageReservation { Owner = owner, Item = item, Count = count,
+            var reservation = new StorageReservation { Owner = owner, Item = item, Count = count,
                 Source = item.holdingOwner.Owner as Building_StorageUnit, Core = core,
                 Endpoint = endpoint, Client = client, Usable = usable };
+            claims[owner] = reservation;
+            AddIndex(reservation);
             return count;
+        }
+
+        private static void AddBucket(Dictionary<Thing, HashSet<StorageReservation>> index, Thing key, StorageReservation claim)
+        {
+            if (key == null) return;
+            if (!index.TryGetValue(key, out var bucket)) index.Add(key, bucket = new HashSet<StorageReservation>());
+            bucket.Add(claim);
+        }
+
+        private static void RemoveBucket(Dictionary<Thing, HashSet<StorageReservation>> index, Thing key, StorageReservation claim)
+        {
+            if (key == null || !index.TryGetValue(key, out var bucket)) return;
+            bucket.Remove(claim);
+            if (bucket.Count == 0) index.Remove(key);
+        }
+
+        private void AddIndex(StorageReservation claim)
+        {
+            AddBucket(byItem, claim.Item, claim);
+            AddBucket(byNode, claim.Source, claim); AddBucket(byNode, claim.Core, claim); AddBucket(byNode, claim.Endpoint, claim);
+            reservedCounts.TryGetValue(claim.Item, out long total);
+            reservedCounts[claim.Item] = total + claim.Count;
+        }
+
+        private void RemoveIndex(StorageReservation claim)
+        {
+            RemoveBucket(byItem, claim.Item, claim);
+            RemoveBucket(byNode, claim.Source, claim); RemoveBucket(byNode, claim.Core, claim); RemoveBucket(byNode, claim.Endpoint, claim);
+            long total = reservedCounts[claim.Item] - claim.Count;
+            if (total == 0) reservedCounts.Remove(claim.Item);
+            else reservedCounts[claim.Item] = total;
         }
 
         private void Invalidate(StorageReservation claim, StorageReservationFailure reason)
         {
             if (claim.State != StorageReservationState.Reserved) return;
+            RemoveIndex(claim);
             claim.State = StorageReservationState.Invalid;
             claim.Failure = reason;
             notifications.Enqueue(claim);
@@ -54,33 +92,30 @@ namespace MagicStorage
 
         internal void NotifyNodeUnavailable(Thing node)
         {
-            foreach (var claim in claims.Values)
-                if (claim.Source == node || claim.Core == node || claim.Endpoint == node)
-                    Invalidate(claim, StorageReservationFailure.NodeUnavailable);
+            if (node == null || !byNode.TryGetValue(node, out var bucket)) return;
+            foreach (var claim in new List<StorageReservation>(bucket))
+                Invalidate(claim, StorageReservationFailure.NodeUnavailable);
         }
 
         // Inventory callbacks only check physical availability; policy/topology checks wait
         // until the graph is current. No user code is called from a ThingOwner mutation.
-        internal void ValidateInventory(Building_StorageUnit source = null, ThingDef def = null)
+        internal void ValidateInventory()
         {
-            if (claims.Count == 0) return;
-            var totals = new Dictionary<Thing, long>();
-            foreach (var claim in claims.Values)
-                if (claim.State == StorageReservationState.Reserved)
-                {
-                    totals.TryGetValue(claim.Item, out long count);
-                    totals[claim.Item] = count + claim.Count;
-                }
-            foreach (var claim in claims.Values)
+            foreach (Thing item in new List<Thing>(byItem.Keys)) ValidateItem(item);
+        }
+
+        internal void ValidateItem(Thing item)
+        {
+            if (item == null || !byItem.TryGetValue(item, out var bucket)) return;
+            long total = reservedCounts[item];
+            foreach (var claim in new List<StorageReservation>(bucket))
             {
-                if (claim.State != StorageReservationState.Reserved ||
-                    (source != null && claim.Source != source) || (def != null && claim.Item.def != def)) continue;
                 if (claim.Source == null || claim.Item.Destroyed || claim.Item.holdingOwner != claim.Source.Inventory.Contents ||
-                    !claim.Source.Inventory.Contents.Contains(claim.Item))
+                    claim.Item.stackCount <= 0)
                     Invalidate(claim, StorageReservationFailure.ItemUnavailable);
                 // If an outside mutation overdraws a stack, invalidate all conflicting
                 // claims rather than arbitrarily favoring dictionary iteration order.
-                else if (totals[claim.Item] > claim.Item.stackCount)
+                else if (total > claim.Item.stackCount)
                     Invalidate(claim, StorageReservationFailure.InsufficientCount);
             }
         }
@@ -105,6 +140,7 @@ namespace MagicStorage
         {
             if (!claims.TryGetValue(owner, out var claim) || claim.State != StorageReservationState.Reserved) return null;
             // The source's normal removal notifications must not invalidate this collection.
+            RemoveIndex(claim);
             claim.State = StorageReservationState.Collecting;
             return claim;
         }

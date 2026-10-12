@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase" MayRequire="keeptpa.NivarianRace">
+    <defName>MS_NivarianCannonExtractor</defName>
+    <label>Nivarian mass driver extractor</label>
+    <description>Supplies an adjacent Nivarian mass driver with materials from the connected magic storage network. Extracts only materials requested by the driver's logistics network and passes them directly to the driver, with no internal storage. Drivers then route and deliver the cargo normally.\n\nRequires power and a working storage network. Place beside a mass driver, including diagonally. Network extraction takes priority; ground intakes supply any remaining demand. Stock reserved by other tasks is not extracted. Cancelled cargo follows the driver's normal handling and may be dropped beside a driver.</description>
+    <thingClass>MagicStorage.Building_NivarianCannonExtractor</thingClass>
+    <tickerType>Normal</tickerType>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/NivarianCannonExtractor/NivarianCannonExtractor</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
+    </graphicData>
+    <comps>
+      <li Class="MagicStorage.CompProperties_StorageNode" />
+      <li Class="CompProperties_Power"><compClass>CompPowerTrader</compClass><basePowerConsumption>50</basePowerConsumption></li>
+      <li Class="CompProperties_Flickable" />
+    </comps>
+    <researchPrerequisites><li>Nivarian_ItemCannonLogistics</li></researchPrerequisites>
+    <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3110</uiOrder>
+  </ThingDef>
+</Defs>

@@ -51,9 +51,11 @@ namespace MagicStorage
             var visible = core.Crafting.Orders.Where(o => listFilter.Matches(o.Recipe)).ToList();
             float workbenchY = 137 + tabsHeight + 8;
             listFilter.DrawWorkbenchButton(new Rect(0, workbenchY, leftWidth, 32),
-                visible.Select(o => o.Recipe), () => scroll = Vector2.zero);
+                core.Crafting.Orders.Select(o => o.Recipe), () => scroll = Vector2.zero);
+            listFilter.DrawSourceButton(new Rect(0, workbenchY + 40, leftWidth, 32),
+                core.Crafting.Orders.Select(o => o.Recipe), () => scroll = Vector2.zero);
             if (!visible.Contains(selected) && (selected != null || visible.Count > 0)) SelectOrder(visible.FirstOrDefault());
-            float listY = workbenchY + 40;
+            float listY = workbenchY + 80;
             DrawOrders(new Rect(0, listY, leftWidth, rect.height - listY - 60), visible);
             if (selected != null && core.Crafting.Orders.Contains(selected))
                 DrawDetails(new Rect(leftWidth + 16, 95, rect.width - leftWidth - 16, rect.height - 155));
@@ -72,10 +74,11 @@ namespace MagicStorage
             {
                 Rect row = new Rect(4, index++ * 132, view.width - 8, 128);
                 if (selected == order) Widgets.DrawHighlightSelected(row);
-                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width, 62)))
+                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, 62)))
                 { SelectOrder(order); }
-                Widgets.Label(new Rect(row.x + 6, row.y + 3, row.width - 12, 28), order.Recipe.LabelCap);
-                Widgets.Label(new Rect(row.x + 6, row.y + 31, row.width - 12, 28),
+                Widgets.Label(new Rect(row.x + 6, row.y + 3, row.width - 48, 28), order.Recipe.LabelCap);
+                Widgets.InfoCardButton(row.xMax - 30, row.y + 5, order.Recipe);
+                Widgets.Label(new Rect(row.x + 6, row.y + 31, row.width - 48, 28),
                     statuses.TryGetValue(order, out var status) ? status : "");
                 Rect progressRect = new Rect(row.x + 6, row.y + 60, row.width - 12, 22);
                 Widgets.FillableBar(progressRect, order.Progress);
@@ -292,11 +295,14 @@ namespace MagicStorage
     {
         private WorkTypeDef workType;
         private ThingDef workbench;
+        private ModContentPack source;
 
-        internal void Reset() { workType = null; workbench = null; }
-        internal bool Matches(RecipeDef recipe) => recipe != null &&
-            (workType == null || CraftingRecipeCatalog.HasType(recipe, workType)) &&
-            (workbench == null || CraftingRecipeCatalog.Workbenches(recipe).Contains(workbench));
+        internal void Reset() { workType = null; workbench = null; source = null; }
+        private bool MatchesWorkType(RecipeDef recipe) => recipe != null &&
+            (workType == null || CraftingRecipeCatalog.HasType(recipe, workType));
+        internal bool Matches(RecipeDef recipe) => MatchesWorkType(recipe) &&
+            (workbench == null || CraftingRecipeCatalog.Workbenches(recipe).Contains(workbench)) &&
+            (source == null || string.Equals(recipe.modContentPack?.PackageId, source.PackageId, StringComparison.OrdinalIgnoreCase));
 
         internal float DrawTabs(Rect rect, Action changed)
         {
@@ -316,7 +322,7 @@ namespace MagicStorage
             return height;
         }
 
-        internal void DrawWorkbenchButton(Rect rect, IEnumerable<RecipeDef> visibleRecipes, Action changed)
+        internal void DrawWorkbenchButton(Rect rect, IEnumerable<RecipeDef> sourceRecipes, Action changed)
         {
             string label = workbench != null ? workbench.LabelCap.ToString() : "MS_Craft_All".Translate().ToString();
             if (!Widgets.ButtonText(rect, "MS_Craft_WorkbenchFilter".Translate(label))) return;
@@ -324,10 +330,36 @@ namespace MagicStorage
             {
                 new FloatMenuOption("MS_Craft_All".Translate(), () => { workbench = null; changed(); })
             };
-            foreach (var table in visibleRecipes.SelectMany(CraftingRecipeCatalog.Workbenches).Distinct().OrderBy(t => t.label))
+            // Menu choices depend only on the work type tab, so selecting a bench
+            // or searching the list cannot remove the other bench choices.
+            foreach (var table in sourceRecipes.Where(MatchesWorkType)
+                .SelectMany(CraftingRecipeCatalog.Workbenches).Distinct().OrderBy(t => t.label))
             {
                 var chosen = table;
                 options.Add(new FloatMenuOption(table.LabelCap, () => { workbench = chosen; changed(); }));
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        // ShortName already falls back to Name in the game's metadata getter.
+        private static string SourceLabel(ModContentPack pack) => pack.ModMetaData?.ShortName ?? pack.Name;
+
+        internal void DrawSourceButton(Rect rect, IEnumerable<RecipeDef> sourceRecipes, Action changed)
+        {
+            string label = source != null ? SourceLabel(source) : "MS_Craft_All".Translate().ToString();
+            if (!Widgets.ButtonText(rect, "MS_Craft_SourceFilter".Translate(label))) return;
+            var options = new List<FloatMenuOption>
+            {
+                new FloatMenuOption("MS_Craft_All".Translate(), () => { source = null; changed(); })
+            };
+            // Core, expansions and mods share the same content-pack identity.
+            // Keep the choices independent of the selected bench/source and search.
+            foreach (var pack in sourceRecipes.Where(MatchesWorkType).Select(r => r.modContentPack)
+                .Where(p => p != null).GroupBy(p => p.PackageId, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First()).OrderBy(SourceLabel, StringComparer.CurrentCultureIgnoreCase))
+            {
+                var chosen = pack;
+                options.Add(new FloatMenuOption(SourceLabel(pack), () => { source = chosen; changed(); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -342,7 +374,10 @@ namespace MagicStorage
         private Vector2 scroll;
         public override Vector2 InitialSize => new Vector2(Math.Min(750, UI.screenWidth), Math.Min(750, UI.screenHeight));
         internal Dialog_CosmicRecipePicker(Action<RecipeDef> add)
-        { this.add = add; recipes = CraftingRecipeCatalog.Available.ToList(); forcePause = true; doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true; }
+        {
+            this.add = add; recipes = CraftingRecipeCatalog.Available.ToList();
+            forcePause = true; doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true;
+        }
         public override void DoWindowContents(Rect rect)
         {
             Widgets.Label(new Rect(0, 0, rect.width - 30, 30), "MS_Craft_Add".Translate());
@@ -353,8 +388,11 @@ namespace MagicStorage
             var visible = recipes.Where(r => CraftingRecipeCatalog.CanAdd(r) && listFilter.Matches(r) &&
                 r.label.IndexOf(search, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
             float workbenchY = 80 + tabsHeight + 8;
-            listFilter.DrawWorkbenchButton(new Rect(0, workbenchY, rect.width, 32), visible, () => scroll = Vector2.zero);
-            float listY = workbenchY + 40;
+            listFilter.DrawWorkbenchButton(new Rect(0, workbenchY, rect.width, 32),
+                recipes.Where(CraftingRecipeCatalog.CanAdd), () => scroll = Vector2.zero);
+            listFilter.DrawSourceButton(new Rect(0, workbenchY + 40, rect.width, 32),
+                recipes.Where(CraftingRecipeCatalog.CanAdd), () => scroll = Vector2.zero);
+            float listY = workbenchY + 80;
             var outer = new Rect(0, listY, rect.width, rect.height - listY - 60);
             Widgets.DrawMenuSection(outer);
             if (visible.Count == 0)
@@ -366,9 +404,11 @@ namespace MagicStorage
             {
                 Rect row = new Rect(0, index++ * 56, view.width, 52);
                 Widgets.DrawHighlightIfMouseover(row);
-                Widgets.Label(new Rect(4, row.y, row.width - 8, 26), recipe.LabelCap);
-                Widgets.Label(new Rect(4, row.y + 26, row.width - 8, 26), CraftingRecipeCatalog.WorkLabels(recipe));
-                if (Widgets.ButtonInvisible(row)) { if (CraftingRecipeCatalog.CanAdd(recipe)) add(recipe); Close(); }
+                Widgets.Label(new Rect(4, row.y, row.width - 44, 26), recipe.LabelCap);
+                Widgets.Label(new Rect(4, row.y + 26, row.width - 44, 26), CraftingRecipeCatalog.WorkLabels(recipe));
+                Widgets.InfoCardButton(row.xMax - 28, row.y + (row.height - 24) / 2, recipe);
+                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, row.height)))
+                { if (CraftingRecipeCatalog.CanAdd(recipe)) add(recipe); Close(); }
             }
             Widgets.EndScrollView();
         }

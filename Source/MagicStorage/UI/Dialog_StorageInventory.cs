@@ -14,6 +14,7 @@ namespace MagicStorage
     {
         private static readonly Texture2D DirectionArrow = ContentFinder<Texture2D>.Get("UI/Widgets/TradeArrow");
         private readonly Building_StorageCore core;
+        private readonly StorageQuantityDrag quantityDrag = new StorageQuantityDrag();
         private readonly QuickSearchWidget search = new QuickSearchWidget();
         private StorageNetwork network;
         private long revision = -1;
@@ -44,6 +45,7 @@ namespace MagicStorage
         }
 
         public override void PostOpen() { base.PostOpen(); Refresh(); }
+        public override void PostClose() { quantityDrag.Reset(); base.PostClose(); }
         public override void Notify_CommonSearchChanged() { ApplyFilter(); }
 
         protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
@@ -65,6 +67,7 @@ namespace MagicStorage
 
         private void ApplyFilter()
         {
+            quantityDrag.Reset();
             visible = entries.Where(entry => search.filter.Matches(entry.Label) &&
                 (category == null || InCategory(entry.ThingDef, category)))
                 .OrderBy(entry => entry, primary.Comparer)
@@ -126,6 +129,7 @@ namespace MagicStorage
             TextAnchor oldAnchor = Text.Anchor;
             bool oldWrap = Text.WordWrap;
             Color oldColor = GUI.color;
+            quantityDrag.BeginGUI(core.CanWork);
             try
             {
                 Text.Font = GameFont.Small;
@@ -133,7 +137,7 @@ namespace MagicStorage
                 DrawList(new Rect(0f, 88f, rect.width, Math.Max(0f, rect.height - 218f)));
                 DrawFooter(rect);
             }
-            finally { Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
+            finally { quantityDrag.EndGUI(); Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
         }
 
         private void DrawHeader(Rect rect)
@@ -170,6 +174,7 @@ namespace MagicStorage
 
         private void DrawList(Rect viewport)
         {
+            quantityDrag.SetViewport(viewport);
             Rect content = new Rect(0, 0, viewport.width - 16, 6 + visible.Count * RowHeight);
             Widgets.BeginScrollView(viewport, ref scroll, content);
             try
@@ -243,16 +248,17 @@ namespace MagicStorage
             if (interactive && row.Requested > 0)
             {
                 Rect left = new Rect(amount.x - (single ? 60 : 30), rect.y, single ? 60 : 30, rect.height);
-                if (Widgets.ButtonText(left, "<")) { row.SetRequested(row.Requested - step); SoundDefOf.Tick_High.PlayOneShotOnCamera(); }
-                if (!single && Widgets.ButtonText(new Rect(amount.x - 60, rect.y, 30, rect.height), "<<"))
-                { row.SetRequested(0); SoundDefOf.Tick_High.PlayOneShotOnCamera(); }
+                quantityDrag.ButtonText(left, "<", row.Representative.thingIDNumber,
+                    () => { row.SetRequested(row.Requested - step); SoundDefOf.Tick_High.PlayOneShotOnCamera(); });
+                if (!single) quantityDrag.ButtonText(new Rect(amount.x - 60, rect.y, 30, rect.height), "<<", row.Representative.thingIDNumber,
+                    () => { row.SetRequested(0); SoundDefOf.Tick_High.PlayOneShotOnCamera(); });
             }
             if (interactive && row.Requested < row.Available)
             {
-                if (Widgets.ButtonText(new Rect(amount.xMax, rect.y, single ? 60 : 30, rect.height), ">"))
-                { row.SetRequested(row.Requested + Math.Min(step, row.Available - row.Requested)); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); }
-                if (!single && Widgets.ButtonText(new Rect(amount.xMax + 30, rect.y, 30, rect.height), ">>"))
-                { row.SetRequested(row.Available); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); }
+                quantityDrag.ButtonText(new Rect(amount.xMax, rect.y, single ? 60 : 30, rect.height), ">", row.Representative.thingIDNumber,
+                    () => { row.SetRequested(row.Requested + Math.Min(step, row.Available - row.Requested)); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); });
+                if (!single) quantityDrag.ButtonText(new Rect(amount.xMax + 30, rect.y, 30, rect.height), ">>", row.Representative.thingIDNumber,
+                    () => { row.SetRequested(row.Available); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); });
             }
             if (row.Requested != 0)
                 GUI.DrawTexture(new Rect(amount.center.x - DirectionArrow.width / 2f, amount.center.y - DirectionArrow.height / 2f,

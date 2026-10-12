@@ -1,0 +1,974 @@
+[
+  {
+    "defname": "MS_StorageCore",
+    "label": "存储控制核心",
+    "direction": "single",
+    "texture": "Textures/Things/Building/StorageCore/StorageCore.png",
+    "footprint": [
+      2.0,
+      2.0
+    ],
+    "draw_size": [
+      2.125,
+      2.125
+    ],
+    "before": {
+      "visible_size": [
+        1.8804931640625,
+        1.8804931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.01446533203125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        61,
+        58,
+        451,
+        448
+      ]
+    },
+    "after": {
+      "visible_size": [
+        2.0,
+        2.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        544,
+        544
+      ],
+      "bounds": [
+        16,
+        16,
+        528,
+        528
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageUnit",
+    "label": "存储单元",
+    "direction": "south",
+    "texture": "Textures/Things/Building/StorageUnit/StorageUnit_south.png",
+    "footprint": [
+      1.0,
+      2.0
+    ],
+    "draw_size": [
+      1.125,
+      2.125
+    ],
+    "before": {
+      "visible_size": [
+        0.984375,
+        2.046875
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.078125
+      ],
+      "canvas": [
+        512,
+        768
+      ],
+      "bounds": [
+        130,
+        102,
+        382,
+        626
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        2.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        544
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        528
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageUnit",
+    "label": "存储单元",
+    "direction": "north",
+    "texture": "Textures/Things/Building/StorageUnit/StorageUnit_north.png",
+    "footprint": [
+      1.0,
+      2.0
+    ],
+    "draw_size": [
+      1.125,
+      2.125
+    ],
+    "before": {
+      "visible_size": [
+        0.984375,
+        2.046875
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.078125
+      ],
+      "canvas": [
+        512,
+        768
+      ],
+      "bounds": [
+        130,
+        102,
+        382,
+        626
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        2.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        544
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        528
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageUnit",
+    "label": "存储单元",
+    "direction": "east",
+    "texture": "Textures/Things/Building/StorageUnit/StorageUnit_east.png",
+    "footprint": [
+      2.0,
+      1.0
+    ],
+    "draw_size": [
+      2.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        2.046875,
+        0.984375
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        768,
+        512
+      ],
+      "bounds": [
+        122,
+        130,
+        646,
+        382
+      ]
+    },
+    "after": {
+      "visible_size": [
+        2.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        544,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        528,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageReceiver",
+    "label": "存储接收器",
+    "direction": "single",
+    "texture": "Textures/Things/Building/StorageReceiver/StorageReceiver.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_CosmicWorkbench",
+    "label": "宇宙工作台",
+    "direction": "south",
+    "texture": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_south.png",
+    "footprint": [
+      3.0,
+      1.0
+    ],
+    "draw_size": [
+      3.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        3.0354817708333335,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        1536,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        1514,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        3.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        800,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        784,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_CosmicWorkbench",
+    "label": "宇宙工作台",
+    "direction": "north",
+    "texture": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_north.png",
+    "footprint": [
+      3.0,
+      1.0
+    ],
+    "draw_size": [
+      3.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        3.0354817708333335,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        1536,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        1514,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        3.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        800,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        784,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_CosmicWorkbench",
+    "label": "宇宙工作台",
+    "direction": "east",
+    "texture": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_east.png",
+    "footprint": [
+      1.0,
+      3.0
+    ],
+    "draw_size": [
+      1.125,
+      3.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        3.0029296875
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.016276041666666668
+      ],
+      "canvas": [
+        512,
+        1536
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        1514
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        3.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        800
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        784
+      ]
+    }
+  },
+  {
+    "defname": "MS_ConstructionSupplyUnit",
+    "label": "建筑供给单元",
+    "direction": "single",
+    "texture": "Textures/Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageApparelAdapter",
+    "label": "衣物适配器",
+    "direction": "south",
+    "texture": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_south.png",
+    "footprint": [
+      2.0,
+      1.0
+    ],
+    "draw_size": [
+      2.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        2.03369140625,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        1024,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        1002,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        2.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        544,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        528,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageApparelAdapter",
+    "label": "衣物适配器",
+    "direction": "north",
+    "texture": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_north.png",
+    "footprint": [
+      2.0,
+      1.0
+    ],
+    "draw_size": [
+      2.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        2.03369140625,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        1024,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        1002,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        2.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        544,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        528,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageApparelAdapter",
+    "label": "衣物适配器",
+    "direction": "east",
+    "texture": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_east.png",
+    "footprint": [
+      1.0,
+      2.0
+    ],
+    "draw_size": [
+      1.125,
+      2.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        2.00048828125
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.0166015625
+      ],
+      "canvas": [
+        512,
+        1024
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        1002
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        2.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        544
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        528
+      ]
+    }
+  },
+  {
+    "defname": "MS_StorageSupplyShelf",
+    "label": "自动补货架",
+    "direction": "single",
+    "texture": "Textures/Things/Building/StorageSupplyShelf/StorageSupplyShelf.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.01953125,
+        0.984375
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.01318359375
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        24,
+        38,
+        488,
+        486
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_TransportSupplier",
+    "label": "物资补给器",
+    "direction": "south",
+    "texture": "Textures/Things/Building/TransportSupplier/TransportSupplier_south.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_TransportSupplier",
+    "label": "物资补给器",
+    "direction": "north",
+    "texture": "Textures/Things/Building/TransportSupplier/TransportSupplier_north.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_TransportSupplier",
+    "label": "物资补给器",
+    "direction": "east",
+    "texture": "Textures/Things/Building/TransportSupplier/TransportSupplier_east.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_FuelSupplier",
+    "label": "燃料供给器",
+    "direction": "single",
+    "texture": "Textures/Things/Building/FuelSupplier/FuelSupplier.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  },
+  {
+    "defname": "MS_NivarianCannonExtractor",
+    "label": "质量驱动器提取口",
+    "direction": "single",
+    "texture": "Textures/Things/Building/NivarianCannonExtractor/NivarianCannonExtractor.png",
+    "footprint": [
+      1.0,
+      1.0
+    ],
+    "draw_size": [
+      1.125,
+      1.125
+    ],
+    "before": {
+      "visible_size": [
+        1.0283203125,
+        0.9931640625
+      ],
+      "center_offset_east_north": [
+        0.0,
+        -0.017578125
+      ],
+      "canvas": [
+        512,
+        512
+      ],
+      "bounds": [
+        22,
+        38,
+        490,
+        490
+      ]
+    },
+    "after": {
+      "visible_size": [
+        1.0,
+        1.0
+      ],
+      "center_offset_east_north": [
+        0.0,
+        0.0
+      ],
+      "canvas": [
+        288,
+        288
+      ],
+      "bounds": [
+        16,
+        16,
+        272,
+        272
+      ]
+    }
+  }
+]

@@ -35,7 +35,6 @@ namespace MagicStorage
                 amount = Math.Min(amount, Math.Max(0, mergeTarget.def.stackLimit - mergeTarget.stackCount));
             }
             if (amount <= 0 || source == destination || !source.Contains(item)) return 0;
-            ThingDef def = item.def;
             Thing part = null;
             try
             {
@@ -54,8 +53,8 @@ namespace MagicStorage
                     if (!part.Destroyed && part.holdingOwner == null && !source.TryAdd(part, false))
                         recoveryMap.GetComponent<MapComponent_StorageNetworks>().PreserveLooseThing(part, recoveryCell);
                 }
-                (source.Owner as Building_StorageUnit)?.Inventory.RefreshDef(def);
-                (destination.Owner as Building_StorageUnit)?.Inventory.RefreshDef(def);
+                (source.Owner as Building_StorageUnit)?.Inventory.RefreshStack(item);
+                (destination.Owner as Building_StorageUnit)?.Inventory.RefreshStack(mergeTarget ?? part);
             }
         }
     }

@@ -7,7 +7,7 @@
     <thingClass>MagicStorage.Building_StorageSupplyShelf</thingClass>
     <tickerType>Rare</tickerType>
     <size>(1,1)</size>
-    <rotatable>true</rotatable>
+    <rotatable>false</rotatable>
     <surfaceType>Item</surfaceType>
     <canOverlapZones>false</canOverlapZones>
     <minifiedDef>MinifiedThing</minifiedDef>
@@ -26,10 +26,12 @@
       </fixedStorageSettings>
     </building>
     <graphicData>
-      <texPath>Things/Building/Furniture/ShelfSmall</texPath>
-      <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(2,2)</drawSize>
-      <color>(0.6,0.85,1)</color>
+      <texPath>Things/Building/StorageSupplyShelf/StorageSupplyShelf</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>

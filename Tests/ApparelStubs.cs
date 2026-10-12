@@ -10,7 +10,7 @@ namespace Verse
 {
     public enum Gender { None, Male, Female }
     public class StageFilter { public bool allowed = true; public bool Has(int stage) => allowed; }
-    public class PawnMindState { public bool traderDismissed; public int nextApparelOptimizeTick; }
+    public class PawnMindState { public bool traderDismissed; public int nextApparelOptimizeTick; public PriorityWork priorityWork = new PriorityWork(); }
     public partial class Pawn
     {
         public PawnMindState mindState = new PawnMindState();

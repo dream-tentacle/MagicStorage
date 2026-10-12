@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_NivarianExtractor_Ready>已连接质量驱动器，等待物流订单</MS_NivarianExtractor_Ready>
+  <MS_NivarianExtractor_Unlinked>未连接到通电的质量驱动器（需要紧邻）</MS_NivarianExtractor_Unlinked>
+  <MS_NivarianExtractor_Offline>提取已停用（需要通电并连接有效的存储网络）</MS_NivarianExtractor_Offline>
+  <MS_NivarianExtractor_Unavailable>涅瓦莲物流兼容未启用</MS_NivarianExtractor_Unavailable>
+</LanguageData>

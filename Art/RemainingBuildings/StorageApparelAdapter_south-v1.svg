@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <title>衣物适配器 — 南向</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="972" height="416" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="972" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H970Q998 458 998 430" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H962Q980 56 984 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M985 85V417Q985 444 958 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Clothing bay with a visible physical hanging garment, not a printed pictogram. -->
+  <rect x="71" y="91" width="605" height="303" rx="17" fill="#a4b7c5"/>
+  <rect x="78" y="98" width="591" height="283" rx="12" fill="#c4d3de"/>
+  <rect x="99" y="119" width="550" height="241" rx="8" fill="#496579"/>
+  <rect x="105" y="149" width="538" height="205" rx="5" fill="#8da7b9"/>
+  <path d="M113 351H635" fill="none" stroke="#b7cddc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M120 144H627" fill="none" stroke="#bed1df" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M125 140H622" fill="none" stroke="#edf4f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M370 140V157M370 157L299 189H441Z" fill="none" stroke="#dce8f0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M338 189L317 192L282 237L306 257L327 235V327Q370 338 414 327V235L435 257L459 237L424 192L402 189L382 211H358Z" fill="#7391a7"/>
+  <path d="M338 180L317 184L282 229L306 247L327 225V314Q370 326 414 314V225L435 247L459 229L424 184L402 180L383 201H358Z" fill="#d4e5f0"/>
+  <path d="M338 180L358 201H383L402 180L389 178Q370 192 350 178Z" fill="#97b3c7"/>
+  <path d="M371 213V304" fill="none" stroke="#adc5d6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M333 306Q370 314 408 306" fill="none" stroke="#edf6fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="87" y="131" width="8" height="195" rx="2" fill="#c5e5f5"/>
+  <rect x="653" y="131" width="8" height="195" rx="2" fill="#c5e5f5"/>
+  <rect x="220" y="372" width="305" height="18" rx="4" fill="#c8d6df"/>
+  <path d="M236 376H509" fill="none" stroke="#f1f6f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="707" y="91" width="240" height="303" rx="14" fill="#aebfcb"/>
+  <rect x="713" y="86" width="228" height="298" rx="12" fill="#e2e9ee"/>
+  <rect x="753" y="108" width="146" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="757" y="112" width="138" height="21" rx="3" fill="#344a5b"/>
+  <path d="M769 122H790M800 122H821" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M836 122H884" fill="none" stroke="#91afc3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="747" y="170" width="160" height="134" rx="7" fill="#c3d2dc"/>
+  <rect x="753" y="176" width="148" height="121" rx="5" fill="#e7edf1"/>
+  <rect x="778" y="274" width="99" height="7" rx="3" fill="#a1b7c7"/>
+  <rect x="747" y="317" width="160" height="39" rx="5" fill="#c3d2dc"/>
+  <path d="M773 337H819" fill="none" stroke="#91aabb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="855" y="331" width="24" height="10" rx="2" fill="#c5e5f5"/>
+  <rect x="460.0" y="468" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M473.0 471H499.0M533.0 471H552.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H970Q998 42 998 70V458Q998 486 970 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>配置补货</title>
+  <desc>三个货架位置与调节滑杆。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 24v80m94-80v80M17 63h94"/>
+    <rect x="26" y="33" width="18" height="30" rx="3"/>
+    <rect x="55" y="33" width="18" height="30" rx="3"/>
+    <rect x="84" y="33" width="18" height="30" rx="3"/>
+    <path d="M31 91h66"/>
+    <rect x="65" y="81" width="12" height="20" rx="3" fill="#63D5ED" stroke="#63D5ED"/>
+  </g>
+</svg>

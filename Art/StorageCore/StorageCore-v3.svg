@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 双翼存储核心</title>
+  <desc>Original twin-wing storage core. Two curved shell modules surround a suspended nucleus and a recessed network spine. Primary accent: RGB(197,229,245), #C5E5F5. Transparent overhead building sprite.</desc>
+  <defs>
+    <radialGradient id="nucleus" cx="33%" cy="26%" r="78%">
+      <stop offset="0" stop-color="#f0f8fc"/>
+      <stop offset="0.38" stop-color="#c5e5f5"/>
+      <stop offset="0.78" stop-color="#92bacc"/>
+      <stop offset="1" stop-color="#557a90"/>
+    </radialGradient>
+    <radialGradient id="ambient">
+      <stop offset="0" stop-color="#c5e5f5" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#c5e5f5" stop-opacity="0"/>
+    </radialGradient>
+    <g id="fastener"><circle r="2.2" fill="#727e87"/><path d="M-1 0H1" stroke="#d8e0e4" stroke-width="0.8"/></g>
+    <path id="wing" d="M226 68C165 70 116 105 94 161C80 195 74 222 77 254C80 290 94 320 119 352L154 395C169 413 188 422 212 421L224 389C201 384 187 370 177 348L158 305C145 278 141 249 148 220L165 166C177 134 197 117 229 109Z"/>
+    <path id="sky-inlay" d="M191 91C151 102 119 131 106 169C95 201 90 224 93 250C96 280 108 306 127 331L161 373C171 385 180 390 194 393L199 380C187 374 179 364 171 349L145 302C133 277 129 247 136 217L153 164C163 133 178 115 202 104Z"/>
+  </defs>
+
+  <!-- Low graphite chassis, visible chiefly in the open channel and front face. -->
+  <g id="chassis">
+    <path d="M222 84H291C350 87 404 130 426 192C448 255 421 323 382 369L348 411C336 427 312 436 292 437H219C195 437 178 429 163 412L128 370C87 321 65 259 85 197C105 132 160 88 222 84Z" fill="#424c55" stroke="#202830" stroke-width="4.5"/>
+    <path d="M174 399C191 410 209 416 230 417H281C304 417 323 410 341 399L330 427C316 438 296 443 276 443H237C214 443 194 437 181 427Z" fill="#58636d" stroke="#252d35" stroke-width="3"/>
+    <path d="M204 432H308" stroke="#2e3842" stroke-width="5"/>
+    <path d="M211 440H233V450H211ZM279 440H301V450H279Z" fill="#303b44"/>
+  </g>
+
+  <!-- Network channel: an elongated cavity, without a large circular metal mount. -->
+  <g id="network-spine">
+    <path d="M236 102H276L300 142L323 208Q335 249 318 298L287 382H224L194 298Q178 250 190 210L212 146Z" fill="#26333f"/>
+    <path d="M222 154C205 187 194 216 195 245C194 284 208 313 225 344M290 154C307 187 318 216 317 245C318 284 304 313 287 344" fill="none" stroke="#435969" stroke-width="6" stroke-linecap="round"/>
+    <path d="M220 169C209 192 202 214 202 235M310 257C308 285 298 311 288 329" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round"/>
+    <path d="M256 123V171M256 320V382" fill="none" stroke="#657f91" stroke-width="3"/>
+    <path d="M248 141H264M248 152H264M248 344H264M248 355H264" stroke="#8aa4b6" stroke-width="2"/>
+  </g>
+
+  <!-- Shallow front faces, consistent with the overhead game camera. -->
+  <g id="shell-front-faces" fill="#9ba8b1" stroke="#28323b" stroke-width="4" stroke-linejoin="round">
+    <path d="M80 253C87 288 100 315 123 344L157 388C172 406 192 415 216 414L211 434C184 435 163 425 148 406L112 363C88 333 77 307 76 276Z"/>
+    <path d="M432 253C425 288 412 315 389 344L355 388C340 406 320 415 296 414L301 434C328 435 349 425 364 406L400 363C424 333 435 307 436 276Z"/>
+  </g>
+
+  <!-- Pearl-grey wings with continuous sky-blue inlays. -->
+  <g id="shells" stroke-linejoin="round">
+    <use href="#wing" fill="#d8dfe3" stroke="#252f38" stroke-width="4.5"/>
+    <use href="#wing" transform="translate(512 0) scale(-1 1)" fill="#d8dfe3" stroke="#252f38" stroke-width="4.5"/>
+    <path d="M216 77C163 82 121 116 103 164C91 195 84 223 87 250M296 77C349 82 391 116 409 164C421 195 428 223 425 250" fill="none" stroke="#f2f5f6" stroke-width="3.5" stroke-linecap="round"/>
+    <use href="#sky-inlay" fill="#c5e5f5" stroke="#a1bbc9" stroke-width="1.2"/>
+    <use href="#sky-inlay" transform="translate(512 0) scale(-1 1)" fill="#c5e5f5" stroke="#a1bbc9" stroke-width="1.2"/>
+    <path d="M153 173C137 217 132 246 143 280M359 173C375 217 380 246 369 280" fill="none" stroke="#b0bcc3" stroke-width="2"/>
+    <path d="M161 334L178 368Q188 384 208 389M351 334L334 368Q324 384 304 389" fill="none" stroke="#a8b5be" stroke-width="3"/>
+    <path d="M83 240L135 247M377 247L429 240" fill="none" stroke="#b4c0c8" stroke-width="1.5"/>
+    <use href="#fastener" x="170" y="112"/><use href="#fastener" x="342" y="112"/>
+    <use href="#fastener" x="113" y="262"/><use href="#fastener" x="399" y="262"/>
+    <use href="#fastener" x="188" y="404"/><use href="#fastener" x="324" y="404"/>
+  </g>
+
+  <!-- Compact controller, carrying a simple three-node network emblem. -->
+  <g id="rear-controller">
+    <path d="M225 78H287L299 99L288 126H224L213 99Z" fill="#9eafb9" stroke="#303c46" stroke-width="3"/>
+    <path d="M228 80H284L292 94H220Z" fill="#dce5ea"/>
+    <path d="M228 96H284L281 117H231Z" fill="#394f60"/>
+    <path d="M256 103V112M240 103H272M240 103V109M272 103V109" fill="none" stroke="#90b3ca" stroke-width="1.5"/>
+    <circle cx="240" cy="103" r="2.4" fill="#c5e5f5"/>
+    <circle cx="256" cy="112" r="2.4" fill="#c5e5f5"/>
+    <circle cx="272" cy="103" r="2.4" fill="#c5e5f5"/>
+  </g>
+
+  <!-- A suspended round nucleus with two offset energy arcs. -->
+  <g id="suspended-core">
+    <ellipse cx="256" cy="247" rx="70" ry="75" fill="url(#ambient)"/>
+    <ellipse cx="256" cy="302" rx="38" ry="10" fill="#172630" opacity="0.65"/>
+    <path d="M214 221C223 197 253 187 277 201C297 213 305 243 295 267" fill="none" stroke="#779aaf" stroke-width="4" stroke-linecap="round"/>
+    <path d="M219 216C231 199 252 196 268 202" fill="none" stroke="#c5e5f5" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="256" cy="247" r="40" fill="#294454" stroke="#192a37" stroke-width="2"/>
+    <circle cx="256" cy="244" r="38" fill="url(#nucleus)"/>
+    <path d="M226 234C232 220 244 215 254 217" fill="none" stroke="#edf8fd" stroke-width="3" stroke-linecap="round"/>
+    <path d="M284 255C279 267 268 275 257 275" fill="none" stroke="#688ea6" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M210 254C218 274 244 287 270 282C294 277 307 263 311 246" fill="none" stroke="#547489" stroke-width="5" stroke-linecap="round"/>
+    <path d="M219 267C234 281 255 284 271 279C287 275 297 267 302 258" fill="none" stroke="#c5e5f5" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="221" cy="199" r="3" fill="#c5e5f5"/>
+    <circle cx="300" cy="287" r="2.5" fill="#c5e5f5"/>
+  </g>
+
+  <!-- Forward network connector. -->
+  <g id="forward-link">
+    <path d="M232 372H280L293 398L285 418H227L219 398Z" fill="#a9bac4" stroke="#303e49" stroke-width="3"/>
+    <path d="M234 374H278L284 389H228Z" fill="#e2e8eb"/>
+    <path d="M230 395H282L277 409H235Z" fill="#4b6273"/>
+    <path d="M237 400H247M251 400H261M265 400H275" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

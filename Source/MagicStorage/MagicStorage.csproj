@@ -65,6 +65,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MagicStorageMod.cs" />
+    <Compile Include="Compatibility\IStorageCompatibility.cs" />
+    <Compile Include="Compatibility\CompatibilityManager.cs" />
+    <Compile Include="Compatibility\MonolynCompatibility.cs" />
+    <Compile Include="Compatibility\NivarianCannonApi.cs" />
+    <Compile Include="Compatibility\NivarianCannonCompatibility.cs" />
+    <Compile Include="Buildings\Building_NivarianCannonExtractor.cs" />
+    <Compile Include="Buildings\Building_TransportSupplier.cs" />
+    <Compile Include="Buildings\Building_FuelSupplier.cs" />
+    <Compile Include="Storage\StorageFuelSupply.cs" />
+    <Compile Include="Storage\StorageTransportExchange.cs" />
+    <Compile Include="UI\Dialog_TransportSupplier.cs" />
+    <Compile Include="UI\Dialog_SupplierSupply.cs" />
+    <Compile Include="UI\StorageQuantityDrag.cs" />
+    <Compile Include="MagicStorageSettings.cs" />
     <Compile Include="Buildings\Building_StorageApparelAdapter.cs" />
     <Compile Include="Apparel\StorageApparelPolicy.cs" />
     <Compile Include="Apparel\JobGiver_OptimizeStorageApparel.cs" />
@@ -111,6 +125,7 @@
     <Compile Include="Storage\StorageReservation.cs" />
     <Compile Include="Buildings\Building_StorageReceiver.cs" />
     <Compile Include="Storage\StorageReception.cs" />
+    <Compile Include="Storage\StorageReceiverHaulingPatches.cs" />
     <Compile Include="Networks\StorageNetwork.cs" />
     <Compile Include="Networks\CompStorageNode.cs" />
     <Compile Include="Networks\StorageConnectionQuery.cs" />

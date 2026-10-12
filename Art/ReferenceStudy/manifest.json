@@ -1,0 +1,1218 @@
+[
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3668590852",
+    "name": "sbz_WastepackAtomizer_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3668590852\\Textures\\Things\\Building\\Misc\\sbz_WastepackAtomizer_south.png",
+    "size": [
+      192,
+      384
+    ],
+    "content_bbox": [
+      26,
+      52,
+      167,
+      333
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3668590852",
+    "name": "sbz_WastepackAtomizer_north.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3668590852\\Textures\\Things\\Building\\Misc\\sbz_WastepackAtomizer_north.png",
+    "size": [
+      192,
+      384
+    ],
+    "content_bbox": [
+      25,
+      52,
+      167,
+      332
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3668590852",
+    "name": "sbz_WastepackAtomizer_east.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3668590852\\Textures\\Things\\Building\\Misc\\sbz_WastepackAtomizer_east.png",
+    "size": [
+      384,
+      192
+    ],
+    "content_bbox": [
+      52,
+      2,
+      332,
+      167
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3668590852",
+    "name": "sbz_WastepackAtomizerUI.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3668590852\\Textures\\Things\\Building\\Misc\\sbz_WastepackAtomizerUI.png",
+    "size": [
+      192,
+      384
+    ],
+    "content_bbox": [
+      26,
+      52,
+      167,
+      332
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_CorpseFridge.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_CorpseFridge.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      128,
+      108,
+      385,
+      385
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_DoubleChestFridge_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_DoubleChestFridge_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      128,
+      172,
+      385,
+      320
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_DoubleWallFridge_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_DoubleWallFridge_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      128,
+      192,
+      385,
+      320
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_FridgeUI.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_FridgeUI.png",
+    "size": [
+      256,
+      256
+    ],
+    "content_bbox": [
+      64,
+      6,
+      193,
+      251
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_LargeFridgeUI.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_LargeFridgeUI.png",
+    "size": [
+      256,
+      256
+    ],
+    "content_bbox": [
+      0,
+      6,
+      256,
+      251
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_SingleChestFridge_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_SingleChestFridge_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      192,
+      172,
+      321,
+      320
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_SingleWallFridge_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_SingleWallFridge_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      192,
+      192,
+      320,
+      320
+    ]
+  },
+  {
+    "title": "SBZ / machinery and refrigeration",
+    "mod": "3486264784",
+    "name": "sbz_LargeFridge_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3486264784\\Textures\\Things\\Building\\Storage\\Fridge\\sbz_LargeFridge_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      128,
+      76,
+      385,
+      321
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_bed_double_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_bed_double_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      246,
+      227,
+      453,
+      468
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_bed_Single_B_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_bed_Single_B_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      294,
+      226,
+      405,
+      469
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_cabinet_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_cabinet_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      312,
+      325,
+      387,
+      420
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_cabinet_B_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_cabinet_B_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      297,
+      261,
+      402,
+      417
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_cabinet_C_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_cabinet_C_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      297,
+      262,
+      402,
+      417
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_cabinet_D_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_cabinet_D_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      247,
+      311,
+      452,
+      417
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_chair_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_chair_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      317,
+      310,
+      382,
+      414
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_chair_D_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_chair_D_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      315,
+      299,
+      384,
+      416
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_Cooler_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_Cooler_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      301,
+      292,
+      394,
+      423
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_TV_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_TV_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      212,
+      254,
+      487,
+      380
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_table_A2x2_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_table_A2x2_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      247,
+      247,
+      452,
+      477
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_table_B2x2.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_table_B2x2.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      247,
+      247,
+      452,
+      477
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_table_lamp_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_table_lamp_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      301,
+      296,
+      343,
+      359
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_StreetLamp.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_StreetLamp.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      339,
+      46,
+      360,
+      361
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_partition_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_partition_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      344,
+      289,
+      355,
+      404
+    ]
+  },
+  {
+    "title": "Daily furniture / 16 varied objects",
+    "mod": "3024562670",
+    "name": "ADH_TableStyling_A_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3024562670\\Textures\\Buildings\\ADH_TableStyling_A_south.png",
+    "size": [
+      700,
+      700
+    ],
+    "content_bbox": [
+      198,
+      253,
+      501,
+      403
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_Bed_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_Bed_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      179,
+      31,
+      461,
+      592
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_BedV_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_BedV_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      179,
+      31,
+      461,
+      592
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_Cabinet_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_Cabinet_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      69,
+      134,
+      571,
+      576
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_CabinetV_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_CabinetV_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      69,
+      134,
+      571,
+      576
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_Bookcase_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_Bookcase_south.png",
+    "size": [
+      512,
+      384
+    ],
+    "content_bbox": [
+      86,
+      93,
+      426,
+      302
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_Lockers_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_Lockers_south.png",
+    "size": [
+      320,
+      320
+    ],
+    "content_bbox": [
+      32,
+      9,
+      288,
+      320
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_SchoolDesk_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_SchoolDesk_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      82,
+      223,
+      558,
+      533
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_HolographicInstrument_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_HolographicInstrument_south.png",
+    "size": [
+      320,
+      320
+    ],
+    "content_bbox": [
+      80,
+      32,
+      240,
+      306
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_BigTelevision_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_BigTelevision_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      69,
+      203,
+      571,
+      544
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_FloorLamp_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_FloorLamp_south.png",
+    "size": [
+      320,
+      320
+    ],
+    "content_bbox": [
+      98,
+      9,
+      222,
+      291
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_CoralSpecimens_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_CoralSpecimens_south.png",
+    "size": [
+      320,
+      320
+    ],
+    "content_bbox": [
+      55,
+      14,
+      278,
+      320
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_BigTable_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\furniture_5SpaceBasefurniture\\MUS_SpaceBase_BigTable_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      82,
+      80,
+      558,
+      598
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_CompactBattery.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\Module_1SpaceBaseFoundation\\MUS_SpaceBase_CompactBattery.png",
+    "size": [
+      320,
+      320
+    ],
+    "content_bbox": [
+      42,
+      4,
+      278,
+      306
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_MachineryModule_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\Module_1SpaceBaseFoundation\\MUS_SpaceBase_MachineryModule_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      124,
+      116,
+      388,
+      324
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_ConnectModule_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\Module_1SpaceBaseFoundation\\MUS_SpaceBase_ConnectModule_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      120,
+      22,
+      392,
+      455
+    ]
+  },
+  {
+    "title": "Space Base / furniture and modules",
+    "mod": "3523916780",
+    "name": "MUS_SpaceBase_SolarGeneratorModule_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3523916780\\Textures\\Module_1SpaceBaseFoundation\\MUS_SpaceBase_SolarGeneratorModule_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      125,
+      39,
+      387,
+      392
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_3dprinter_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\AUTo\\UFLI_3dprinter_south.png",
+    "size": [
+      1280,
+      1280
+    ],
+    "content_bbox": [
+      111,
+      287,
+      1173,
+      994
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_3dprinter_gantry_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\AUTo\\UFLI_3dprinter_gantry_south.png",
+    "size": [
+      1280,
+      1280
+    ],
+    "content_bbox": [
+      589,
+      233,
+      689,
+      958
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Robotarm_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Other\\UFLI_Robotarm_south.png",
+    "size": [
+      768,
+      768
+    ],
+    "content_bbox": [
+      213,
+      113,
+      602,
+      669
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Brainwasher_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\Special\\UFLI_Brainwasher_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      222,
+      13,
+      489,
+      608
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_InfiniteNutrientPasteDispenser_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Other\\UFLI_InfiniteNutrientPasteDispenser_south.png",
+    "size": [
+      256,
+      256
+    ],
+    "content_bbox": [
+      0,
+      0,
+      256,
+      256
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Washingmachine_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Other\\UFLI_Washingmachine_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      139,
+      112,
+      373,
+      384
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Butcher_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\Kitchen\\UFLI_Butcher_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      79,
+      243,
+      561,
+      420
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Sink_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\Kitchen\\UFLI_Sink_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      79,
+      211,
+      561,
+      420
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_SteamOven_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\Kitchen\\UFLI_SteamOven_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      236,
+      183,
+      404,
+      420
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_stove_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Production\\Kitchen\\UFLI_stove_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      79,
+      234,
+      561,
+      420
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Shelf_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Shelf_south.png",
+    "size": [
+      512,
+      384
+    ],
+    "content_bbox": [
+      84,
+      97,
+      429,
+      306
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Bookcase_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Bookcase_south.png",
+    "size": [
+      512,
+      384
+    ],
+    "content_bbox": [
+      97,
+      97,
+      410,
+      306
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Refrigerator_AS_Base_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Refrigerator_AS\\UFLI_Refrigerator_AS_Base_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      182,
+      186,
+      450,
+      580
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Garbagebin_AS_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Garbagebin_AS\\UFLI_Garbagebin_AS_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      29,
+      114,
+      611,
+      555
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Wardrobe_AS_Base_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Wardrobe_AS\\UFLI_Wardrobe_AS_Base_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      57,
+      186,
+      586,
+      581
+    ]
+  },
+  {
+    "title": "UF Light Industries / machinery and storage",
+    "mod": "3651799915",
+    "name": "UFLI_Container_1X2_AS_Base_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Storage\\UFLI_Container_AS\\UFLI_Container_1X2_AS_Base_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      120,
+      226,
+      519,
+      477
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_Bed_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\BedRoom\\UFLI_Bed_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      124,
+      6,
+      391,
+      509
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_4PBed_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\BedRoom\\UFLI_4PBed_south.png",
+    "size": [
+      1024,
+      512
+    ],
+    "content_bbox": [
+      77,
+      6,
+      946,
+      509
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_CabinetA_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\BedRoom\\UFLI_CabinetA_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      57,
+      186,
+      586,
+      580
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_CabinetF_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\BedRoom\\UFLI_CabinetF_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      182,
+      186,
+      450,
+      580
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_CouchDouble_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Chair\\UFLI_CouchDouble_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      41,
+      148,
+      472,
+      410
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_Beach_lounger_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Chair\\UFLI_Beach_lounger_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      148,
+      43,
+      362,
+      465
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_desk_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Table\\UFLI_desk_south.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      0,
+      0,
+      512,
+      512
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_2X2_Table.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Table\\UFLI_2X2_Table.png",
+    "size": [
+      512,
+      512
+    ],
+    "content_bbox": [
+      0,
+      0,
+      512,
+      512
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_ChessTable.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Joy\\UFLI_ChessTable.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      123,
+      105,
+      505,
+      564
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_Telescope.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Joy\\UFLI_Telescope.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      88,
+      101,
+      547,
+      559
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_Radar_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_Radar_south.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "content_bbox": [
+      82,
+      0,
+      843,
+      1008
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_CeleTech.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_CeleTech.png",
+    "size": [
+      768,
+      768
+    ],
+    "content_bbox": [
+      143,
+      141,
+      594,
+      702
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_Decoration_Big_Holographic_south.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_Decoration_Big_Holographic_south.png",
+    "size": [
+      640,
+      640
+    ],
+    "content_bbox": [
+      0,
+      0,
+      640,
+      640
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_HolographicBase.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_Holographic\\UFLI_HolographicBase.png",
+    "size": [
+      256,
+      256
+    ],
+    "content_bbox": [
+      0,
+      0,
+      256,
+      256
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_ArchonexushFountain.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_ArchonexushFountain.png",
+    "size": [
+      768,
+      768
+    ],
+    "content_bbox": [
+      91,
+      124,
+      676,
+      671
+    ]
+  },
+  {
+    "title": "UF Light Industries / furniture and devices",
+    "mod": "3651799915",
+    "name": "UFLI_AGravefountain.png",
+    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100\\3651799915\\Textures\\Things\\Building\\Decoration\\UFLI_AGravefountain.png",
+    "size": [
+      768,
+      768
+    ],
+    "content_bbox": [
+      182,
+      188,
+      587,
+      611
+    ]
+  }
+]

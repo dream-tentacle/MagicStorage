@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768">
+  <title>魔法存储 — 存储单元，南向精简版</title>
+  <desc>Original 1×2 storage module in the StorageCore-v10 visual family. Two sealed interchangeable storage cartridges, pearl-grey shell, restrained industrial service details and RGB(197,229,245) sky-blue accents. Only the outer silhouette has a pure-black 4-unit contour. Transparent background.</desc>
+  <defs>
+    <!-- Cartridge lids share construction, not a copied texture. -->
+    <g id="cartridge">
+      <rect x="154" y="184" width="204" height="164" rx="9" fill="#a9bbc6"/>
+      <rect x="157" y="187" width="198" height="152" rx="7" fill="#e1e7eb" stroke="#b3c1ca" stroke-width="1.5"/>
+      <path d="M168 190H343" fill="none" stroke="#f4f7f8" stroke-width="2"/>
+      <path d="M351 197V327Q351 336 341 336H166" fill="none" stroke="#c7d2d9" stroke-width="2"/>
+      <!-- Sky-blue side insert identifies an interchangeable storage cartridge. -->
+      <path d="M165 204H175V318H165Z" fill="#c5e5f5"/>
+      <path d="M167 207V309" stroke="#e7f4fb" stroke-width="1.5"/>
+      <!-- A shallow pull sits at the near edge of the lid. -->
+      <rect x="232" y="316" width="49" height="8" rx="2" fill="#aabdc9"/>
+      <rect x="236" y="319" width="41" height="3" rx="1" fill="#728e9f"/>
+      <path d="M157 340H355" stroke="#8fa6b4" stroke-width="2"/>
+    </g>
+  </defs>
+
+  <!-- Low rounded cabinet, with a shallow south-facing front. -->
+  <g id="base">
+    <rect x="132" y="124" width="248" height="500" rx="24" fill="#798893"/>
+    <path d="M134 592Q134 621 160 622H352Q378 621 378 592" fill="none" stroke="#52616c" stroke-width="6"/>
+    <rect x="200" y="607" width="113" height="8" rx="4" fill="#344756"/>
+    <path d="M212 611H226M233 611H247M254 611H268" stroke="#a2bcca" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M287 611H301" stroke="#c5e5f5" stroke-width="2.7" stroke-linecap="round"/>
+  </g>
+
+  <g id="housing">
+    <rect x="132" y="104" width="248" height="494" rx="24" fill="#d8dfe3"/>
+    <path d="M132 574Q132 598 156 598H356Q380 598 380 574" fill="none" stroke="#25313c" stroke-width="4"/>
+    <path d="M142 264V132Q142 115 160 115H352Q367 115 369 130" fill="none" stroke="#f2f5f6" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M370 142V567Q370 588 350 588H159" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- One centred control strip provides a quiet rear accent. -->
+  <g id="rear-panel" transform="translate(-28 0)">
+    <rect x="214" y="126" width="141" height="29" rx="6" fill="#aebdc6"/>
+    <rect x="217" y="129" width="135" height="23" rx="4" fill="#344a5b"/>
+    <path d="M228 136H242M228 142H238" stroke="#9bbccb" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="252" y="135" width="16" height="7" rx="1" fill="#c5e5f5"/>
+    <rect x="272" y="135" width="16" height="7" rx="1" fill="#c5e5f5"/>
+    <rect x="292" y="135" width="16" height="7" rx="1" fill="#9fbcca"/>
+  </g>
+
+  <g id="storage-cartridges">
+    <use href="#cartridge"/>
+    <use href="#cartridge" transform="translate(0 183)"/>
+  </g>
+
+  <!-- Only a small cooling grille remains on the near apron. -->
+  <g id="service-apron">
+    <path d="M325 555H331V575H325ZM335 555H341V575H335ZM345 555H351V575H345Z" fill="#6b8293"/>
+    <path d="M325 578H351" stroke="#c5e5f5" stroke-width="2.5"/>
+  </g>
+
+  <!-- Black is reserved for this single, uniformly weighted outside contour. -->
+  <path d="M156 104H356Q380 104 380 128V600Q380 624 356 624H156Q132 624 132 600V128Q132 104 156 104Z" fill="none" stroke="#000000" stroke-width="4"/>
+</svg>

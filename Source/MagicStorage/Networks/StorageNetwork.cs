@@ -11,13 +11,18 @@ namespace MagicStorage
     {
         private readonly List<Building_StorageCore> cores = new List<Building_StorageCore>();
         private readonly List<Building_StorageUnit> units = new List<Building_StorageUnit>();
-        private readonly Dictionary<ThingDef, List<Thing>> byDef = new Dictionary<ThingDef, List<Thing>>();
+        // Buckets reference persistent container indexes; topology never copies all stacks.
+        private readonly Dictionary<ThingDef, HashSet<Building_StorageUnit>> byDef = new Dictionary<ThingDef, HashSet<Building_StorageUnit>>();
         private readonly Dictionary<ThingDef, long> counts = new Dictionary<ThingDef, long>();
         private bool current;
         private bool transferring;
         private readonly StorageIncomingReservations incoming;
         private readonly StorageOutgoingReservations outgoing;
         private readonly HashSet<Thing> nodes = new HashSet<Thing>();
+        private readonly List<CompStorageNode> members = new List<CompStorageNode>();
+        private static readonly IComparer<Building_StorageUnit> unitOrder =
+            Comparer<Building_StorageUnit>.Create((a, b) => a.thingIDNumber.CompareTo(b.thingIDNumber));
+        internal int NodeCount => members.Count;
 
         public StorageNetwork() : this(new StorageOutgoingReservations()) { }
         internal StorageNetwork(StorageOutgoingReservations reservations)
@@ -42,23 +47,30 @@ namespace MagicStorage
 
         internal void AddNode(CompStorageNode node)
         {
+            if (!nodes.Add(node.parent)) return;
+            members.Add(node);
             node.Network = this;
-            nodes.Add(node.parent);
-            if (node.parent is Building_StorageCore core) cores.Add(core);
-            if (node.parent is Building_StorageUnit unit) units.Add(unit);
+            if (node.parent is Building_StorageCore core) { cores.Add(core); incoming.Clear(); }
+            if (node.parent is Building_StorageUnit unit)
+            {
+                int index = units.BinarySearch(unit, unitOrder);
+                units.Insert(index < 0 ? ~index : index, unit);
+                foreach (var def in unit.Inventory.IndexedDefs)
+                    AddInventoryCount(unit, def, unit.Inventory.GetTotalCount(def));
+            }
+            Revision++;
         }
 
         internal void FinishRebuild()
         {
-            units.Sort((a, b) => a.thingIDNumber.CompareTo(b.thingIDNumber));
-            HashSet<ThingDef> defs = new HashSet<ThingDef>();
-            foreach (var unit in units)
-            {
-                unit.Inventory.RebuildIndex();
-                foreach (var def in unit.Inventory.IndexedDefs) defs.Add(def);
-            }
-            foreach (var def in defs) RefreshDef(def);
             current = true;
+        }
+
+        internal void Absorb(StorageNetwork other)
+        {
+            incoming.Clear();
+            other.Invalidate();
+            foreach (var node in other.members) AddNode(node);
         }
 
         internal void Invalidate() { current = false; incoming.Clear(); Revision++; }
@@ -66,19 +78,21 @@ namespace MagicStorage
         internal void GetMatchingStacks(Predicate<ThingDef> filter, List<Thing> result)
         {
             if (!CanWork) return;
-            foreach (var pair in byDef) if (filter(pair.Key)) result.AddRange(pair.Value);
+            foreach (var pair in byDef)
+                if (filter(pair.Key)) foreach (var unit in pair.Value) unit.Inventory.GetStacks(pair.Key, result);
         }
 
         internal void GetAllStacks(List<Thing> result)
         {
             if (!current) return;
-            foreach (var stacks in byDef.Values) result.AddRange(stacks);
+            foreach (var pair in byDef)
+                foreach (var unit in pair.Value) unit.Inventory.GetStacks(pair.Key, result);
         }
 
         internal int AvailableToWithdraw(Thing item, object owner = null)
         {
             if (!CanWork || item == null || item.Destroyed || incoming.IsStackReserved(item) ||
-                !(item.holdingOwner?.Owner is Building_StorageUnit unit) || !units.Contains(unit)) return 0;
+                !(item.holdingOwner?.Owner is Building_StorageUnit unit) || !nodes.Contains(unit)) return 0;
             return outgoing.Available(item, owner);
         }
 
@@ -126,28 +140,28 @@ namespace MagicStorage
 
         public void GetStacks(ThingDef def, List<Thing> result)
         {
-            if (current && def != null && byDef.TryGetValue(def, out var stacks)) result.AddRange(stacks);
+            if (current && def != null && byDef.TryGetValue(def, out var bucket))
+                foreach (var unit in bucket) unit.Inventory.GetStacks(def, result);
         }
 
-        internal void NotifyInventoryChanged(Building_StorageUnit unit, ThingDef def)
+        internal void NotifyInventoryChanged(Building_StorageUnit unit, ThingDef def, int delta, Thing item)
         {
-            outgoing.ValidateInventory(unit, def);
-            if (!current || !units.Contains(unit)) return;
-            RefreshDef(def);
-        }
-
-        private void RefreshDef(ThingDef def)
-        {
-            List<Thing> stacks = new List<Thing>();
-            long count = 0;
-            foreach (var unit in units)
-            {
-                count += unit.Inventory.GetTotalCount(def);
-                unit.Inventory.GetStacks(def, stacks);
-            }
-            if (count == 0) { counts.Remove(def); byDef.Remove(def); }
-            else { counts[def] = count; byDef[def] = stacks; }
+            outgoing.ValidateItem(item);
+            if (!current || !nodes.Contains(unit)) return;
+            AddInventoryCount(unit, def, delta);
             Revision++;
+        }
+
+        private void AddInventoryCount(Building_StorageUnit unit, ThingDef def, long delta)
+        {
+            counts.TryGetValue(def, out long previous);
+            long total = previous + delta;
+            if (total == 0) { counts.Remove(def); byDef.Remove(def); return; }
+            counts[def] = total;
+            if (!byDef.TryGetValue(def, out var bucket))
+                byDef.Add(def, bucket = new HashSet<Building_StorageUnit>());
+            if (unit.Inventory.GetTotalCount(def) > 0) bucket.Add(unit);
+            else bucket.Remove(unit);
         }
 
         public int GetCountCanAccept(Thing item)
@@ -205,7 +219,7 @@ namespace MagicStorage
         {
             if (!CanWork || transferring) return StorageTransferResult.Failed(count, StorageFailure.NetworkUnavailable);
             if (item == null || count <= 0 || destination == null || destination.Owner is Building_StorageUnit ||
-                !(item.holdingOwner?.Owner is Building_StorageUnit unit) || !units.Contains(unit))
+                !(item.holdingOwner?.Owner is Building_StorageUnit unit) || !nodes.Contains(unit))
                 return StorageTransferResult.Failed(count, StorageFailure.InvalidSource);
             // Keep incoming stack claims stable; the future withdrawal UI can retry once delivery ends.
             if (incoming.IsStackReserved(item)) return StorageTransferResult.Failed(count, StorageFailure.Reserved);

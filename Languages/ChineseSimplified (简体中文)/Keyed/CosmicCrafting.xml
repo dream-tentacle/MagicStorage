@@ -11,6 +11,7 @@
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
   <MS_Craft_All>全部</MS_Craft_All>
   <MS_Craft_WorkbenchFilter>工作台：{0}</MS_Craft_WorkbenchFilter>
+  <MS_Craft_SourceFilter>来源：{0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>没有符合筛选条件的制作任务。</MS_Craft_NoMatchingOrders>
   <MS_Craft_NoMatchingRecipes>没有符合筛选条件的配方。</MS_Craft_NoMatchingRecipes>
   <MS_Craft_Suspended>已暂停</MS_Craft_Suspended>
@@ -20,6 +21,8 @@
   <MS_Craft_MissingMaterials>材料不足或已被预留</MS_Craft_MissingMaterials>
   <MS_Craft_NoWorker>没有符合条件且启用对应工作的工作者</MS_Craft_NoWorker>
   <MS_Craft_NoBench>没有可到达且未被占用的工作台</MS_Craft_NoBench>
+  <MS_Craft_NoOrdersForWorkType>没有此类工作的制作任务</MS_Craft_NoOrdersForWorkType>
+  <MS_Craft_SelectedWorkerNotAllowed>此殖民者未启用对应工作，或不符合任务的技能与工作者条件</MS_Craft_SelectedWorkerNotAllowed>
   <MS_Craft_Ready>可进行</MS_Craft_Ready>
   <MS_Craft_Resume>恢复</MS_Craft_Resume>
   <MS_Craft_Pause>暂停</MS_Craft_Pause>

@@ -1,8 +1,16 @@
 // UI boundaries only; the core building and its holder implementation are production code.
+namespace UnityEngine { public class Texture2D { } }
 namespace Verse
 {
+    public static class ContentFinder<T> where T : new()
+    { public static T Get(string path, bool reportFailure = true) => new T(); }
     public interface IThingHolderTickable { bool ShouldTickContents { get; } }
-    public class Gizmo { }
+    public class Gizmo
+    {
+        public bool disabled;
+        public string disabledReason;
+        public void Disable(string reason = null) { disabled = true; disabledReason = reason; }
+    }
     public class Command_Action : Gizmo
     {
         public string defaultLabel, defaultDesc;

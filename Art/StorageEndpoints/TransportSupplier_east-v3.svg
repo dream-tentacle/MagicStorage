@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 物资补给器，东向第三稿</title>
+  <desc>A flat material supplier with recessed sky-blue guide channels pointing east. Soft bevels integrate the directional motif into the working surface. Pearl-grey housing, RGB(197,229,245) accents, and a uniform black outer contour.</desc>
+
+  <rect x="26" y="72" width="460" height="414" rx="28" fill="#798893"/>
+  <path d="M29 449Q29 480 58 482H455Q482 480 482 449" fill="none" stroke="#52616c" stroke-width="6"/>
+  <rect x="26" y="42" width="460" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H458Q486 458 486 430" fill="none" stroke="#25313c" stroke-width="4"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 72" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M473 85V418Q473 444 446 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round"/>
+
+  <rect x="193" y="64" width="126" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="197" y="68" width="118" height="21" rx="3" fill="#344a5b"/>
+  <path d="M209 78H229M239 78H259" stroke="#c5e5f5" stroke-width="3"/>
+  <path d="M277 78H302" stroke="#91afc3" stroke-width="2"/>
+
+  <!-- A bevelled working plate, with the accent frame interrupted at the front. -->
+  <rect x="65" y="116" width="382" height="293" rx="21" fill="#a4b4bf"/>
+  <rect x="70" y="122" width="372" height="281" rx="17" fill="#c5e5f5"/>
+  <rect x="82" y="133" width="348" height="270" rx="13" fill="#cbd7de"/>
+  <rect x="86" y="137" width="340" height="261" rx="11" fill="#e0e7eb"/>
+  <path d="M99 141H413" stroke="#f1f5f7" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Recessed guide channel and transfer seam, oriented east. -->
+  <g transform="translate(0 3)">
+    <path d="M256 179V275M184 274L244 330Q256 342 268 330L328 274" transform="rotate(-90 256 262)" fill="none" stroke="#f4f7f8" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M256 179V275M184 274L244 330Q256 342 268 330L328 274" transform="rotate(-90 256 262)" fill="none" stroke="#96adbd" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(0 2)">
+    <path d="M256 179V275M184 274L244 330Q256 342 268 330L328 274" transform="rotate(-90 256 262)" fill="none" stroke="#c5e5f5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <path d="M256 184V269" transform="rotate(-90 256 262)" stroke="#e4f3fb" stroke-width="3" stroke-linecap="round"/>
+  <g transform="rotate(-90 256 262)">
+    <rect x="194" y="370" width="124" height="12" rx="6" fill="#adbdc8"/>
+    <rect x="202" y="372" width="108" height="5" rx="2.5" fill="#617d90"/>
+    <path d="M208 380H304" stroke="#f1f5f7" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <rect x="204" y="468" width="105" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217 471H243M277 471H296" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M54 42H458Q486 42 486 70V458Q486 486 458 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8"/>
+</svg>

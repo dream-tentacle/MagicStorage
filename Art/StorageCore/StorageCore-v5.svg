@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 圆角方形存储核心</title>
+  <desc>Original rounded-square storage control core. Pearl-grey segmented shell, two sky-blue corner inlays and a suspended spherical nucleus inside a rounded-square well. Primary accent: RGB(197,229,245), #C5E5F5. Transparent overhead building sprite.</desc>
+  <defs>
+    <radialGradient id="nucleus" cx="33%" cy="26%" r="78%">
+      <stop offset="0" stop-color="#f0f8fc"/>
+      <stop offset="0.38" stop-color="#c5e5f5"/>
+      <stop offset="0.78" stop-color="#92bacc"/>
+      <stop offset="1" stop-color="#557a90"/>
+    </radialGradient>
+    <radialGradient id="ambient">
+      <stop offset="0" stop-color="#c5e5f5" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#c5e5f5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Compact rounded-square silhouette and shallow front face. -->
+  <g id="base">
+    <rect x="64" y="80" width="384" height="366" rx="36" fill="#798893" stroke="#26313b" stroke-width="4.5"/>
+    <path d="M66 401Q67 441 103 444H409Q446 441 446 401" fill="none" stroke="#52616c" stroke-width="7"/>
+    <path d="M104 447H408" stroke="#293641" stroke-width="4"/>
+    <rect x="185" y="427" width="142" height="9" rx="4.5" fill="#344756"/>
+    <path d="M204 431H220M228 431H244M252 431H268" stroke="#a2bcca" stroke-width="2" stroke-linecap="round"/>
+    <path d="M291 431H308" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g id="outer-shell">
+    <rect x="64" y="60" width="384" height="360" rx="35" fill="#d8dfe3" stroke="#25313c" stroke-width="4.5"/>
+    <path d="M76 235V98Q76 72 103 72H406Q432 72 436 98" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M437 108V383Q437 408 410 409H105Q86 409 79 397" fill="none" stroke="#a8b6bf" stroke-width="5" stroke-linecap="round"/>
+    <!-- Subtle offset panel seams keep the casing individual without busy machinery. -->
+    <path d="M224 72V112Q224 124 209 124H146Q125 124 125 145V229H76" fill="none" stroke="#b5c2ca" stroke-width="1.8"/>
+    <path d="M288 408V379Q288 367 303 367H372Q387 367 387 349V274H436" fill="none" stroke="#b5c2ca" stroke-width="1.8"/>
+    <path d="M76 303H118Q126 303 133 311M379 169Q386 177 395 177H437" fill="none" stroke="#bdc8cf" stroke-width="1.5"/>
+  </g>
+
+  <!-- Two broad, offset corner inlays establish the sky-blue identity. -->
+  <g id="sky-inlays" fill="#c5e5f5" stroke="#a9c4d2" stroke-width="1.2">
+    <path d="M110 87H202V105H118Q108 105 108 118V208H90V117Q90 87 110 87Z"/>
+    <path d="M310 373H391Q402 373 402 360V291H420V361Q420 391 396 391H310Z"/>
+  </g>
+  <path d="M95 194V119Q95 94 115 94H189M324 385H394Q414 385 414 360V306" fill="none" stroke="#e6f4fa" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Small rear controller, integrated into the casing. -->
+  <g id="controller">
+    <rect x="256" y="86" width="136" height="35" rx="11" fill="#aebdc6"/>
+    <rect x="259" y="89" width="130" height="29" rx="8" fill="#344a5b"/>
+    <path d="M273 100H285M273 106H282" stroke="#9bbccb" stroke-width="2" stroke-linecap="round"/>
+    <path d="M304 101H325L335 108H370" fill="none" stroke="#849fb2" stroke-width="1.5"/>
+    <circle cx="305" cy="101" r="2.5" fill="#c5e5f5"/>
+    <circle cx="335" cy="108" r="2.5" fill="#c5e5f5"/>
+    <circle cx="369" cy="108" r="2.5" fill="#c5e5f5"/>
+    <path d="M380 98V108" stroke="#587185" stroke-width="2"/>
+  </g>
+
+  <!-- The inner well repeats the square footprint with generous corner radii. -->
+  <g id="core-well">
+    <rect x="139" y="133" width="234" height="232" rx="62" fill="#bcc8cf"/>
+    <rect x="146" y="139" width="220" height="218" rx="56" fill="#647b8b" stroke="#465d6e" stroke-width="2.5"/>
+    <path d="M154 208V197Q154 147 205 147H305" fill="none" stroke="#e5edf1" stroke-width="3" stroke-linecap="round"/>
+    <path d="M358 286V299Q358 348 306 348H207" fill="none" stroke="#485e6e" stroke-width="4" stroke-linecap="round"/>
+    <rect x="158" y="151" width="196" height="194" rx="48" fill="#263744"/>
+    <!-- Broken corner guides echo the two exterior inlays. -->
+    <path d="M173 222V201Q173 168 207 168H229M339 275V295Q339 329 305 329H282" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round"/>
+    <path d="M285 167H303Q339 167 339 199M227 330H207Q173 330 173 298" fill="none" stroke="#56758a" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Round suspended nucleus retained from the preceding design. -->
+  <g id="suspended-core" transform="translate(0 3)">
+    <ellipse cx="256" cy="247" rx="70" ry="75" fill="url(#ambient)"/>
+    <ellipse cx="256" cy="302" rx="38" ry="10" fill="#172630" opacity="0.65"/>
+    <path d="M214 221C223 197 253 187 277 201C297 213 305 243 295 267" fill="none" stroke="#779aaf" stroke-width="4" stroke-linecap="round"/>
+    <path d="M219 216C231 199 252 196 268 202" fill="none" stroke="#c5e5f5" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="256" cy="247" r="40" fill="#294454" stroke="#192a37" stroke-width="2"/>
+    <circle cx="256" cy="244" r="38" fill="url(#nucleus)"/>
+    <path d="M226 234C232 220 244 215 254 217" fill="none" stroke="#edf8fd" stroke-width="3" stroke-linecap="round"/>
+    <path d="M284 255C279 267 268 275 257 275" fill="none" stroke="#688ea6" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M210 254C218 274 244 287 270 282C294 277 307 263 311 246" fill="none" stroke="#547489" stroke-width="5" stroke-linecap="round"/>
+    <path d="M219 267C234 281 255 284 271 279C287 275 297 267 302 258" fill="none" stroke="#c5e5f5" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="221" cy="199" r="3" fill="#c5e5f5"/>
+    <circle cx="300" cy="287" r="2.5" fill="#c5e5f5"/>
+  </g>
+
+</svg>

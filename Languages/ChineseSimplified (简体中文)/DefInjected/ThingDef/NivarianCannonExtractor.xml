@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_NivarianCannonExtractor.label>涅瓦莲质量驱动器提取口</MS_NivarianCannonExtractor.label>
+  <MS_NivarianCannonExtractor.description>将相连魔法存储网络中的材料供给相邻的涅瓦莲质量驱动器。根据质量驱动器物流网络的订单按需提取，直接交给驱动器，自身不储存物品。货物随后由驱动器正常中继运输和交付。\n\n需要通电并连接有效的存储网络。必须紧邻质量驱动器，可沿边或对角相邻。优先从存储网络提取，剩余需求由地面入料口补足。已被其他任务预留的物品不会被提取。已交给驱动器的货物若订单取消，按驱动器原有规则处理，可能在驱动器旁落地。</MS_NivarianCannonExtractor.description>
+</LanguageData>

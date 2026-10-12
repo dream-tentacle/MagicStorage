@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_NivarianExtractor_Ready>Connected to a mass driver; waiting for logistics orders</MS_NivarianExtractor_Ready>
+  <MS_NivarianExtractor_Unlinked>No powered mass driver connected (place directly adjacent)</MS_NivarianExtractor_Unlinked>
+  <MS_NivarianExtractor_Offline>Extraction inactive (requires power and a working storage network)</MS_NivarianExtractor_Offline>
+  <MS_NivarianExtractor_Unavailable>Nivarian logistics integration unavailable</MS_NivarianExtractor_Unavailable>
+</LanguageData>

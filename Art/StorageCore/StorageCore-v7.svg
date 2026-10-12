@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 圆角方形存储核心</title>
+  <desc>Original rounded-square storage control core. Pearl-grey segmented shell, sky-blue inlays and an exposed spherical nucleus suspended over a three-point cradle. Primary accent: RGB(197,229,245), #C5E5F5. Transparent overhead building sprite.</desc>
+  <defs>
+    <radialGradient id="nucleus" cx="37%" cy="30%" r="76%">
+      <stop offset="0" stop-color="#e0f1fa"/>
+      <stop offset="0.5" stop-color="#c5e5f5"/>
+      <stop offset="1" stop-color="#8faec2"/>
+    </radialGradient>
+    <radialGradient id="ambient">
+      <stop offset="0" stop-color="#c5e5f5" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#c5e5f5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Compact rounded-square silhouette and shallow front face. -->
+  <g id="base">
+    <rect x="64" y="80" width="384" height="366" rx="36" fill="#798893" stroke="#26313b" stroke-width="4.5"/>
+    <path d="M66 401Q67 441 103 444H409Q446 441 446 401" fill="none" stroke="#52616c" stroke-width="7"/>
+    <path d="M104 447H408" stroke="#293641" stroke-width="4"/>
+    <rect x="185" y="427" width="142" height="9" rx="4.5" fill="#344756"/>
+    <path d="M204 431H220M228 431H244M252 431H268" stroke="#a2bcca" stroke-width="2" stroke-linecap="round"/>
+    <path d="M291 431H308" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g id="outer-shell">
+    <rect x="64" y="60" width="384" height="360" rx="35" fill="#d8dfe3" stroke="#25313c" stroke-width="4.5"/>
+    <path d="M76 235V98Q76 72 103 72H406Q432 72 436 98" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M437 108V383Q437 408 410 409H105Q86 409 79 397" fill="none" stroke="#a8b6bf" stroke-width="5" stroke-linecap="round"/>
+    <!-- Subtle offset panel seams keep the casing individual without busy machinery. -->
+    <path d="M224 72V112Q224 124 209 124H146Q125 124 125 145V229H76" fill="none" stroke="#b5c2ca" stroke-width="1.8"/>
+    <path d="M288 408V379Q288 367 303 367H372Q387 367 387 349V274H436" fill="none" stroke="#b5c2ca" stroke-width="1.8"/>
+    <path d="M76 303H118Q126 303 133 311M379 169Q386 177 395 177H437" fill="none" stroke="#bdc8cf" stroke-width="1.5"/>
+  </g>
+
+  <!-- Two broad, offset corner inlays establish the sky-blue identity. -->
+  <g id="sky-inlays" fill="#c5e5f5" stroke="#a9c4d2" stroke-width="1.2">
+    <path d="M110 87H202V105H118Q108 105 108 118V208H90V117Q90 87 110 87Z"/>
+    <path d="M310 373H391Q402 373 402 360V291H420V361Q420 391 396 391H310Z"/>
+  </g>
+  <path d="M95 194V119Q95 94 115 94H189M324 385H394Q414 385 414 360V306" fill="none" stroke="#e6f4fa" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Small rear controller, integrated into the casing. -->
+  <g id="controller">
+    <rect x="256" y="86" width="136" height="35" rx="11" fill="#aebdc6"/>
+    <rect x="259" y="89" width="130" height="29" rx="8" fill="#344a5b"/>
+    <path d="M273 100H285M273 106H282" stroke="#9bbccb" stroke-width="2" stroke-linecap="round"/>
+    <path d="M304 101H325L335 108H370" fill="none" stroke="#849fb2" stroke-width="1.5"/>
+    <circle cx="305" cy="101" r="2.5" fill="#c5e5f5"/>
+    <circle cx="335" cy="108" r="2.5" fill="#c5e5f5"/>
+    <circle cx="369" cy="108" r="2.5" fill="#c5e5f5"/>
+    <path d="M380 98V108" stroke="#587185" stroke-width="2"/>
+  </g>
+
+  <!-- Open three-point cradle on the top panel; no enclosing door or deep recess. -->
+  <g id="core-cradle">
+    <!-- Surface channels connect the core to the rear controller and front network port. -->
+    <path d="M319 124V148Q319 159 308 159H269Q256 159 256 174M188 303V330Q188 342 202 342H240Q256 342 256 357V414M324 302V327H353" fill="none" stroke="#a7bbc8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M319 124V148Q319 159 308 159H269Q256 159 256 174M188 303V330Q188 342 202 342H240Q256 342 256 357V414M324 302V327H353" fill="none" stroke="#c5e5f5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Slim structural rails leave the casing surface visible between the supports. -->
+    <path d="M256 185L189 292H323Z" fill="none" stroke="#b1bfc8" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M256 185L189 292H323Z" fill="none" stroke="#edf2f4" stroke-width="1.5" stroke-linejoin="round"/>
+    <ellipse cx="256" cy="290" rx="60" ry="20" fill="#b4c3cd"/>
+    <ellipse cx="256" cy="285" rx="57" ry="18" fill="#49657a"/>
+    <path d="M205 288C218 302 291 302 307 288" fill="none" stroke="#c5e5f5" stroke-width="2"/>
+    <!-- Three low field emitters, deliberately separate from the sphere. -->
+    <path d="M245 172H267V201Q256 208 245 201Z" fill="#829ba9" stroke="#526f80" stroke-width="2"/>
+    <rect x="245" y="169" width="22" height="16" rx="4" fill="#d4e3eb" stroke="#7893a4" stroke-width="1.5"/>
+    <path d="M250 175H262" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round"/>
+    <path d="M176 284H201V310Q188 316 176 310Z" fill="#829ba9" stroke="#526f80" stroke-width="2"/>
+    <rect x="176" y="278" width="25" height="17" rx="4" fill="#d4e3eb" stroke="#7893a4" stroke-width="1.5"/>
+    <path d="M182 284H195" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round"/>
+    <path d="M311 284H336V310Q324 316 311 310Z" fill="#829ba9" stroke="#526f80" stroke-width="2"/>
+    <rect x="311" y="278" width="25" height="17" rx="4" fill="#d4e3eb" stroke="#7893a4" stroke-width="1.5"/>
+    <path d="M317 284H330" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Larger, softly shaded nucleus with a separate inclined energy orbit. -->
+  <g id="suspended-core" transform="translate(0 3)">
+    <ellipse cx="256" cy="247" rx="78" ry="77" fill="url(#ambient)"/>
+    <ellipse cx="256" cy="283" rx="32" ry="7" fill="#20384a" opacity="0.35"/>
+    <!-- The back orbit is occluded by the sphere, rather than tracing its edge. -->
+    <path d="M200 264C187 247 207 222 238 212C268 202 297 207 309 226" fill="none" stroke="#7393a9" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M201 247C208 233 223 223 238 218" fill="none" stroke="#c5e5f5" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="256" cy="246" r="48" fill="#48687d" stroke="#243e50" stroke-width="2"/>
+    <circle cx="256" cy="244" r="46" fill="url(#nucleus)"/>
+    <!-- A broad translucent light patch replaces the hard specular crescent. -->
+    <path d="M216 235C219 215 240 201 259 204C239 209 225 220 216 235Z" fill="#f0f8fc" opacity="0.3"/>
+    <path d="M265 282C282 278 293 265 297 251C294 270 282 284 265 287Z" fill="#7195ae" opacity="0.3"/>
+    <!-- One foreground sweep describes the orbit's depth and remains legible at 128 px. -->
+    <path d="M200 264C215 281 251 283 284 268C303 260 315 247 313 235" fill="none" stroke="#496b83" stroke-width="5" stroke-linecap="round"/>
+    <path d="M202 261C217 277 251 279 283 264C299 257 309 247 310 239" fill="none" stroke="#c5e5f5" stroke-width="2.7" stroke-linecap="round"/>
+  </g>
+
+</svg>

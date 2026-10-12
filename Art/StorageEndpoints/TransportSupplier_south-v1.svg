@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 物资补给器，南向设计稿</title>
+  <desc>Original 1×1 material supplier, south view. Closed material chamber and a projecting delivery mouth on the south edge indicate the output direction. Pearl-grey shell with RGB(197,229,245) accents and a uniform black outer contour.</desc>
+  <!-- Compact cabinet with an outlet protruding from the front edge. -->
+  <rect x="26" y="65" width="460" height="381" rx="24" fill="#798893"/>
+  <rect x="26" y="38" width="460" height="389" rx="24" fill="#d8dfe3"/>
+  <path d="M26 403Q26 427 50 427H462Q486 427 486 403" fill="none" stroke="#25313c" stroke-width="4"/>
+  <path d="M39 174V73Q39 51 62 51H450Q470 51 473 69" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M473 83V390Q473 414 450 414H62" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Rear controls and a restrained colour insert. -->
+  <rect x="68" y="65" width="82" height="38" rx="3" fill="#c3ced5"/>
+  <rect x="75" y="73" width="25" height="20" fill="#c5e5f5"/>
+  <path d="M111 80H139M111 88H130" stroke="#a4b7c4" stroke-width="2"/>
+  <rect x="278" y="66" width="158" height="33" rx="5" fill="#aebdc6"/>
+  <rect x="282" y="70" width="150" height="25" rx="3" fill="#344a5b"/>
+  <path d="M293 80H314M293 87H307" stroke="#a6c1d0" stroke-width="2"/>
+  <rect x="327" y="79" width="21" height="8" fill="#c5e5f5"/>
+  <rect x="355" y="79" width="21" height="8" fill="#9fbacb"/>
+  <path d="M393 84H418" stroke="#c5e5f5" stroke-width="2"/>
+  <path d="M40 122H472" stroke="#bfccd4" stroke-width="1.5"/>
+
+  <!-- A closed material chamber keeps this terminal distinct from the receiving tray. -->
+  <rect x="72" y="144" width="368" height="184" rx="10" fill="#adbfca"/>
+  <rect x="77" y="149" width="358" height="169" rx="7" fill="#e0e7eb" stroke="#bdcbd3" stroke-width="1.5"/>
+  <path d="M88 152H424" stroke="#f1f5f7" stroke-width="2"/>
+  <rect x="91" y="165" width="10" height="138" fill="#c5e5f5"/>
+  <rect x="227" y="298" width="59" height="7" rx="2" fill="#9fb4c2"/>
+  <rect x="232" y="300" width="49" height="3" rx="1" fill="#6e8b9d"/>
+
+  <!-- Small side cooling features leave the main surface quiet. -->
+  <path d="M70 355H76V394H70ZM80 355H86V394H80ZM90 355H96V394H90Z" fill="#6b8293"/>
+  <rect x="397" y="361" width="40" height="26" rx="2" fill="#c4d0d8"/>
+  <rect x="403" y="367" width="28" height="14" fill="#c5e5f5"/>
+
+  <!-- Three short guides and a broad mouth point towards the southern target. -->
+  <path d="M189 331H211V373H189ZM245 331H267V373H245ZM301 331H323V373H301Z" fill="#a9bfcc"/>
+  <path d="M197 334H203V370H197ZM253 334H259V370H253ZM309 334H315V370H309Z" fill="#c5e5f5"/>
+  <path d="M183 368H329L343 391V482Q343 496 329 496H183Q169 496 169 482V391Z" fill="#8198a8"/>
+  <path d="M184 371H328L338 392H174Z" fill="#d5e0e7"/>
+  <rect x="187" y="394" width="138" height="84" rx="4" fill="#3a5265"/>
+  <path d="M194 401H318V430H194Z" fill="#263c4e"/>
+  <path d="M194 433H318V469H194Z" fill="#658699"/>
+  <path d="M203 434V469M256 434V469M309 434V469" stroke="#a9c3d3" stroke-width="3"/>
+  <path d="M178 479H334V491H178Z" fill="#afc3cf"/>
+  <path d="M185 482H327" stroke="#c5e5f5" stroke-width="3"/>
+  <path d="M50 38H462Q486 38 486 62V422Q486 446 462 446H343V482Q343 496 329 496H183Q169 496 169 482V446H50Q26 446 26 422V62Q26 38 50 38Z" fill="none" stroke="#000000" stroke-width="8"/>
+</svg>

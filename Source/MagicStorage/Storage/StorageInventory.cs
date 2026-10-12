@@ -11,6 +11,9 @@ namespace MagicStorage
         private StorageThingOwner contents;
         private readonly Dictionary<ThingDef, List<Thing>> byDef = new Dictionary<ThingDef, List<Thing>>();
         private readonly Dictionary<ThingDef, long> counts = new Dictionary<ThingDef, long>();
+        private sealed class StackRecord
+        { internal ThingDef Def; internal int Count, Index; }
+        private readonly Dictionary<Thing, StackRecord> indexed = new Dictionary<Thing, StackRecord>();
 
         public StorageInventory(Building_StorageUnit unit)
         {
@@ -35,37 +38,50 @@ namespace MagicStorage
                 result.AddRange(stacks);
         }
 
-        internal void RefreshDef(ThingDef def)
+        internal void RefreshStack(Thing item)
         {
-            if (def == null) return;
-            List<Thing> stacks = new List<Thing>();
-            long count = 0;
-            for (int i = 0; i < contents.Count; i++)
+            if (item == null) return;
+            indexed.TryGetValue(item, out var record);
+            bool held = !item.Destroyed && item.stackCount > 0 && item.holdingOwner == contents;
+            if (record != null && (!held || record.Def != item.def))
             {
-                Thing thing = contents[i];
-                if (thing.def == def && !thing.Destroyed)
-                {
-                    stacks.Add(thing);
-                    count += thing.stackCount;
-                }
+                var stacks = byDef[record.Def];
+                Thing last = stacks[stacks.Count - 1];
+                stacks[record.Index] = last;
+                indexed[last].Index = record.Index;
+                stacks.RemoveAt(stacks.Count - 1);
+                if (stacks.Count == 0) byDef.Remove(record.Def);
+                indexed.Remove(item);
+                ChangeCount(item, record.Def, -record.Count);
+                record = null;
             }
-            if (stacks.Count == 0)
+            if (!held) return;
+            if (record == null)
             {
-                byDef.Remove(def);
-                counts.Remove(def);
+                if (!byDef.TryGetValue(item.def, out var stacks))
+                    byDef.Add(item.def, stacks = new List<Thing>());
+                record = new StackRecord { Def = item.def, Index = stacks.Count };
+                indexed.Add(item, record);
+                stacks.Add(item);
             }
-            else
-            {
-                byDef[def] = stacks;
-                counts[def] = count;
-            }
-            unit.Network?.NotifyInventoryChanged(unit, def);
+            int delta = item.stackCount - record.Count;
+            record.Count = item.stackCount;
+            if (delta != 0) ChangeCount(item, record.Def, delta);
+        }
+
+        private void ChangeCount(Thing item, ThingDef def, int delta)
+        {
+            long total = GetTotalCount(def) + delta;
+            if (total == 0) counts.Remove(def);
+            else counts[def] = total;
+            unit.Network?.NotifyInventoryChanged(unit, def, delta, item);
         }
 
         internal void RebuildIndex()
         {
             byDef.Clear();
             counts.Clear();
+            indexed.Clear();
             for (int i = 0; i < contents.Count; i++)
             {
                 Thing thing = contents[i];
@@ -73,6 +89,7 @@ namespace MagicStorage
                 if (!byDef.TryGetValue(thing.def, out List<Thing> stacks))
                     byDef.Add(thing.def, stacks = new List<Thing>());
                 stacks.Add(thing);
+                indexed.Add(thing, new StackRecord { Def = thing.def, Count = thing.stackCount, Index = stacks.Count - 1 });
                 counts[thing.def] = GetTotalCount(thing.def) + thing.stackCount;
             }
         }
@@ -103,17 +120,37 @@ namespace MagicStorage
         public override int GetCountCanAccept(Thing item, bool canMergeWithExistingStacks = true)
         {
             if (item == null || item.Destroyed || item.stackCount <= 0 ||
-                item.def.category != ThingCategory.Item || item.def.destroyOnDrop) return 0;
+                item.def.category != ThingCategory.Item || item.def.destroyOnDrop || item.def.stackLimit <= 0) return 0;
             maxStacks = unit.SlotCapacity;
-            return base.GetCountCanAccept(item, canMergeWithExistingStacks);
+            long space = (long)Math.Max(0, maxStacks - Count) * item.def.stackLimit;
+            if (canMergeWithExistingStacks)
+            {
+                var stacks = new List<Thing>();
+                unit.Inventory.GetStacks(item.def, stacks);
+                foreach (Thing stack in stacks)
+                    if (stack.CanStackWith(item)) space += Math.Max(0, stack.def.stackLimit - stack.stackCount);
+            }
+            return (int)Math.Min(item.stackCount, space);
         }
 
         public override bool TryAdd(Thing item, bool canMergeWithExistingStacks = true)
         {
             if (item == null || item.Spawned || item.stackCount > item.def.stackLimit ||
                 GetCountCanAccept(item, canMergeWithExistingStacks) < item.stackCount) return false;
-            try { return base.TryAdd(item, canMergeWithExistingStacks); }
-            finally { unit.Inventory.RefreshDef(item.def); }
+            if (item.holdingOwner != null) return false;
+            if (canMergeWithExistingStacks)
+            {
+                var stacks = new List<Thing>();
+                unit.Inventory.GetStacks(item.def, stacks);
+                foreach (Thing stack in stacks)
+                {
+                    if (!stack.CanStackWith(item)) continue;
+                    try { stack.TryAbsorbStack(item, true); }
+                    finally { unit.Inventory.RefreshStack(stack); }
+                    if (item.Destroyed || item.stackCount <= 0) return true;
+                }
+            }
+            return base.TryAdd(item, false);
         }
 
         public override int TryAdd(Thing item, int count, bool canMergeWithExistingStacks = true)
@@ -121,19 +158,19 @@ namespace MagicStorage
             if (item == null || item.Spawned) return 0;
             int accepted = Math.Min(count, Math.Min(item.def.stackLimit, GetCountCanAccept(item, canMergeWithExistingStacks)));
             try { return base.TryAdd(item, accepted, canMergeWithExistingStacks); }
-            finally { unit.Inventory.RefreshDef(item.def); }
+            finally { unit.Inventory.RefreshStack(item); }
         }
 
         protected override void NotifyAdded(Thing item)
         {
             base.NotifyAdded(item);
-            unit.Inventory.RefreshDef(item.def);
+            unit.Inventory.RefreshStack(item);
         }
 
         protected override void NotifyRemoved(Thing item)
         {
             base.NotifyRemoved(item);
-            unit.Inventory.RefreshDef(item.def);
+            unit.Inventory.RefreshStack(item);
         }
     }
 }

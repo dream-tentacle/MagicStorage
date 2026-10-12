@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>查看物品</title>
+  <desc>存储箱与放大镜。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 43 53 24l36 19-36 20Z"/>
+    <path d="M17 43v40l36 20V63m36-20v15"/>
+    <path d="m35 34 36 20v12"/>
+    <circle cx="87" cy="83" r="21" fill="#263746" stroke="#63D5ED"/>
+    <path d="m102 99 13 14" stroke="#63D5ED" stroke-width="8"/>
+  </g>
+</svg>

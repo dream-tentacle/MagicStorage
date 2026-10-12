@@ -1,4 +1,4 @@
-// Controlled native job boundary. No hauling patches are installed by the mod.
+// Controlled native job factory boundary; the mod leaves job creation unchanged.
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -7,7 +7,13 @@ using Verse;
 namespace Verse
 {
     public class ModContentPack { }
-    public class Mod { public Mod(ModContentPack content) { } }
+    public class Mod
+    {
+        public Mod(ModContentPack content) { }
+        public T GetSettings<T>() where T : ModSettings, new() => new T();
+        public virtual string SettingsCategory() => "";
+        public virtual void DoSettingsWindowContents(UnityEngine.Rect rect) { }
+    }
     public class MapPawns
     {
         public List<Pawn> AllPawnsSpawned = new List<Pawn>(); public int ColonistsSpawnedCount = 1;
@@ -20,7 +26,7 @@ namespace RimWorld
     public sealed class DefOfAttribute : Attribute { }
     public static class DefOfHelper { public static void EnsureInitializedInCtor(Type type) { } }
     public enum StoragePriority { Unstored, Low, Normal, Important, Critical }
-    public enum HaulMode { ToContainer, ToCellStorage }
+    public enum HaulMode { ToContainer, ToCellStorage, ToCellNonStorage }
     public interface IHaulDestination { }
     public static partial class StoreUtility
     {

@@ -6,6 +6,7 @@ using Verse;
 
 namespace Verse
 {
+    public static class GenTicks { public const int TicksPerRealSecond = 60; }
     public static class Scribe_Values
     {
         public static void Look<T>(ref T value, string key, T fallback = default(T)) { }
@@ -35,10 +36,29 @@ namespace Verse
     }
     public class Pawn_CarryTracker
     {
+        private readonly Pawn pawn;
+        public Pawn_CarryTracker(Pawn pawn = null) { this.pawn = pawn; }
         public int MaxStackSpaceEver(ThingDef def) => def.stackLimit;
         public int AvailableStackSpace(ThingDef def) => Math.Max(0, MaxStackSpaceEver(def) - (CarriedThing?.stackCount ?? 0));
         public ThingOwner innerContainer = new ThingOwner(null);
         public Thing CarriedThing => innerContainer.Count > 0 ? innerContainer[0] : null;
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public bool TryDropCarriedThing(IntVec3 dropLoc, ThingPlaceMode mode, out Thing resultingThing,
+            Action<Thing, int> placedAction = null) =>
+            innerContainer.TryDrop(CarriedThing, dropLoc, pawn.Map, mode, out resultingThing, placedAction);
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public bool TryDropCarriedThing(IntVec3 dropLoc, int count, ThingPlaceMode mode, out Thing resultingThing,
+            Action<Thing, int> placedAction = null)
+        {
+            Thing carried = CarriedThing;
+            if (count >= carried.stackCount)
+                return innerContainer.TryDrop(carried, dropLoc, pawn.Map, mode, out resultingThing, placedAction);
+            Thing part = carried.SplitOff(count);
+            innerContainer.TryAdd(part, false);
+            bool result = innerContainer.TryDrop(part, dropLoc, pawn.Map, mode, out resultingThing, placedAction);
+            if (innerContainer.Contains(part)) carried.TryAbsorbStack(part, true);
+            return result;
+        }
     }
     public partial class ReservationManager
     {
@@ -85,6 +105,7 @@ namespace Verse.AI
         public Job GetFinalizerJob(JobCondition condition) => finalizer?.Invoke(condition);
         public virtual bool TryMakePreToilReservations(bool error) => true;
         public virtual string GetReport() => "";
+        public virtual bool? IsSameJobAs(Job other) => null;
         protected abstract IEnumerable<Toil> MakeNewToils();
         public virtual void ExposeData() { }
         public void AddFinishAction(Action<JobCondition> action) { finish.Add(action); }

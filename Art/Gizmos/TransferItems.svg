@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>转移物品</title>
+  <desc>存储箱与双向转移箭头。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M35 31 64 16l29 15-29 16Z"/>
+    <path d="M35 31v28l29 16 29-16V31M64 47v28"/>
+    <path d="M20 97h86m-13-13 13 13-13 13M33 84 20 97l13 13" stroke="#63D5ED" stroke-width="8"/>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="1024" viewBox="0 0 512 1024">
+  <title>衣物适配器 — 东向</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="460" height="928" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="460" height="928" rx="28" fill="#d8dfe3"/>
+  <path d="M26 942Q26 970 54 970H458Q486 970 486 942" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M473 85V929Q473 956 446 956H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="98" y="70" width="296" height="592" rx="17" fill="#a4b7c5"/>
+  <rect x="105" y="76" width="282" height="580" rx="12" fill="#e2e9ee"/>
+  <rect x="129" y="103" width="210" height="526" rx="8" fill="#bbcedc"/>
+  <rect x="135" y="109" width="198" height="514" rx="6" fill="#d8e3eb"/>
+  <path d="M142 119V611" fill="none" stroke="#eff5f9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M142 366H325" fill="none" stroke="#b1c5d3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="356" y="120" width="19" height="493" rx="5" fill="#829eb2"/>
+  <rect x="358" y="125" width="8" height="483" rx="3" fill="#c5e5f5"/>
+  <rect x="373" y="133" width="10" height="467" rx="3" fill="#c4d5e1"/>
+  <rect x="229" y="354" width="11" height="49" rx="3" fill="#9db5c7"/>
+  <rect x="98" y="708" width="296" height="228" rx="14" fill="#aebfcb"/>
+  <rect x="105" y="702" width="282" height="224" rx="12" fill="#e2e9ee"/>
+  <rect x="170" y="727" width="146" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="174" y="731" width="138" height="21" rx="3" fill="#344a5b"/>
+  <path d="M186 741H207M217 741H238" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M253 741H301" fill="none" stroke="#91afc3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="146" y="789" width="199" height="95" rx="7" fill="#bdcfdc"/>
+  <rect x="152" y="795" width="187" height="83" rx="5" fill="#dae4ec"/>
+  <rect x="221" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="232" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="243" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="254" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="265" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="276" y="899" width="4" height="12" rx="1" fill="#7c919f"/>
+  <rect x="204.0" y="980" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217.0 983H243.0M277.0 983H296.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H458Q486 42 486 70V970Q486 998 458 998H54Q26 998 26 970V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

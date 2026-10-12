@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 物资补给器，南向第二稿</title>
+  <desc>Material supplier based on this mod's temporary TransportSupplier_south texture: a flat square panel with a prominent black arrow pointing forwards. Original pearl-grey housing and RGB(197,229,245) accents match the storage family. The outer contour is uniformly black.</desc>
+
+  <!-- Flat square terminal, preserving the silhouette of the user's temporary texture. -->
+  <rect x="26" y="72" width="460" height="414" rx="28" fill="#798893"/>
+  <path d="M29 449Q29 480 58 482H455Q482 480 482 449" fill="none" stroke="#52616c" stroke-width="6"/>
+  <rect x="26" y="42" width="460" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H458Q486 458 486 430" fill="none" stroke="#25313c" stroke-width="4"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 72" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M473 85V418Q473 444 446 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- One small status strip, secondary to the directional symbol. -->
+  <rect x="193" y="64" width="126" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="197" y="68" width="118" height="21" rx="3" fill="#344a5b"/>
+  <path d="M209 78H229M239 78H259" stroke="#c5e5f5" stroke-width="3"/>
+  <path d="M277 78H302" stroke="#91afc3" stroke-width="2"/>
+
+  <!-- A sky-blue border echoes the temporary graphic's blue frame. -->
+  <rect x="65" y="116" width="382" height="293" rx="11" fill="#adc3d0"/>
+  <rect x="69" y="120" width="374" height="283" rx="8" fill="#c5e5f5"/>
+  <rect x="80" y="131" width="352" height="261" rx="5" fill="#e5ecef"/>
+  <path d="M83 134H429" stroke="#f6f8f9" stroke-width="2"/>
+  <!-- Same unmistakable forward arrow, redrawn as an editable filled SVG path. -->
+  <path d="M242 162H270V305L319 256L339 276L256 359L173 276L193 256L242 305Z" fill="#000000"/>
+
+  <!-- Short front strip repeats the other network terminals' construction. -->
+  <rect x="204" y="468" width="105" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217 471H243M277 471H296" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M54 42H458Q486 42 486 70V458Q486 486 458 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8"/>
+</svg>

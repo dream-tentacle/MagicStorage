@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using MagicStorage;
 using RimWorld;
 using Verse;
@@ -29,6 +30,7 @@ internal static class StorageReceiverTests
             Core.node = new CompStorageNode { parent = Core };
             Unit.node = new CompStorageNode { parent = Unit };
             Receiver.node = new CompStorageNode { parent = Receiver };
+            Map.haulDestinationManager.SlotParents[Receiver.Position] = Receiver;
             Manager.Register(Core.node); Manager.Register(Unit.node); Manager.Register(Receiver.node);
             Manager.FinalizeInit(); Tick();
         }
@@ -38,7 +40,8 @@ internal static class StorageReceiverTests
         {
             var item = new Thing { def = def, stackCount = count, variant = variant, Map = Map,
                 Position = Receiver.Position, Spawned = true };
-            Map.Ground.Add(item); Receiver.Notify_ReceivedThing(item); return item;
+            Map.Ground.Add(item); Receiver.Notify_ReceivedThing(item);
+            return item;
         }
         internal long Pending()
         {
@@ -50,14 +53,16 @@ internal static class StorageReceiverTests
 
     internal static int Run()
     {
+        RuntimeHelpers.RunClassConstructor(typeof(StorageReceiverHaulingPatches).TypeHandle);
         NativeBoundary(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
+        CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks();
         return assertions;
     }
 
     private static void NativeBoundary()
     {
         new MagicStorageMod(new ModContentPack());
-        Equal(0, Log.Errors.Count, "bootstrap needs no hauling patches");
+        Equal(0, Log.Errors.Count, "bootstrap has no patch errors");
         Equal(true, Log.Messages.Exists(s => s.Contains("receivers use native hauling")), "native hauling bootstrap");
         var f = new Fixture();
         Equal(true, (object)f.Receiver is ISlotGroupParent, "receiver exposes native slot group");
@@ -144,6 +149,85 @@ internal static class StorageReceiverTests
         Equal(true, item.Spawned, "another job's reserved object left alone");
         f.Map.reservationManager.Reserved.Clear(); f.Tick(60);
         Equal(10L, f.Core.Network.GetTotalCount(f.X), "released item enters storage");
+    }
+
+    private static bool GoodCell(Fixture f, Thing item, IntVec3? cell = null) =>
+        StoreUtility.IsGoodStoreCell(cell ?? f.Receiver.Position, f.Map, item, null, Faction.OfPlayer);
+
+    private static void CapacityPlanning()
+    {
+        var f = new Fixture(1);
+        f.Unit.Inventory.Contents.TryAdd(new Thing { def = f.X, stackCount = 70 });
+        Equal(true, GoodCell(f, new Thing { def = f.X, stackCount = 20 }), "partial merge space permits destination");
+        Equal(false, GoodCell(f, new Thing { def = f.Y }), "full slots reject incompatible item at planning");
+        f.Unit.Inventory.Contents[0].stackCount = 75;
+        Equal(false, GoodCell(f, new Thing { def = f.X }), "full stacks reject same item at planning");
+        Equal(true, GoodCell(f, new Thing { def = f.X }, new IntVec3(5, 5)), "other storage cells retain native behavior");
+        var empty = new Fixture();
+        empty.Map.ShelfBlocked = true;
+        Equal(false, GoodCell(empty, new Thing { def = empty.X }), "native blockers still checked");
+        empty.Map.ShelfBlocked = false; empty.Core.Settings.allow = false;
+        Equal(false, GoodCell(empty, new Thing { def = empty.X }), "core filter rejects destination");
+        empty.Core.Settings.allow = true; empty.Manager.Unregister(empty.Core.node); empty.Tick();
+        Equal(false, GoodCell(empty, new Thing { def = empty.X }), "offline receiver excluded");
+    }
+
+    private static void AutomaticIntake()
+    {
+        var f = new Fixture(); var loose = f.Deliver(f.X, 10);
+        f.Tick();
+        Equal(false, loose.Spawned, "ordinary drop automatically stored without hauling signal");
+        Equal(10L, f.Core.Network.GetTotalCount(f.X), "ordinary drop quantity stored");
+        f.Tick(200);
+        f.Deliver(f.X, 2); f.Tick();
+        Equal(12L, f.Core.Network.GetTotalCount(f.X), "intake still works after more than three seconds");
+
+        var full = new Fixture(1);
+        full.Unit.Inventory.Contents.TryAdd(new Thing { def = full.X, stackCount = 75 });
+        var waiting = full.Deliver(full.Y, 3); full.Tick(200);
+        Equal(true, waiting.Spawned, "full network leaves ordinary drop safe on surface");
+        full.Core.Network.TryTransferTo(full.Unit.Inventory.Contents[0], 75, new ThingOwner(null));
+        full.Tick(60);
+        Equal(3L, full.Core.Network.GetTotalCount(full.Y), "waiting drop enters storage when space opens without a new haul");
+    }
+
+    private static Pawn Hauler(Fixture f)
+    {
+        var pawn = new Pawn { Map = f.Map, Spawned = true, Faction = Faction.OfPlayer };
+        pawn.carryTracker = new Pawn_CarryTracker(pawn);
+        // Inventory unloading mods can use the native placement toil without setting ToCellStorage.
+        pawn.jobs.curJob = new Verse.AI.Job { haulMode = HaulMode.ToCellNonStorage, targetBCell = f.Receiver.Position };
+        return pawn;
+    }
+
+    private static void DeliveryCallbacks()
+    {
+        var f = new Fixture(); var oldStack = f.Deliver(f.X, 10); var pawn = Hauler(f);
+        pawn.carryTracker.innerContainer.TryAdd(new Thing { def = f.X, stackCount = 5 });
+        int placedCount = 0; Thing callbackThing = null;
+        Equal(true, pawn.carryTracker.TryDropCarriedThing(f.Receiver.Position, ThingPlaceMode.Direct, out var result,
+            (item, count) => { placedCount += count; callbackThing = item; }), "merge delivery succeeds");
+        Equal(oldStack, result, "native merge uses existing stack");
+        Equal(oldStack, callbackThing, "original placement callback preserved");
+        Equal(5, placedCount, "callback preserves actual delivered count");
+        Equal(true, oldStack.Spawned, "drop callback defers intake");
+        f.Tick(); Equal(15L, f.Core.Network.GetTotalCount(f.X), "merged delivery stored without hauling mode requirement");
+
+        var counted = new Fixture(); pawn = Hauler(counted);
+        pawn.carryTracker.innerContainer.TryAdd(new Thing { def = counted.X, stackCount = 10 });
+        Equal(true, pawn.carryTracker.TryDropCarriedThing(counted.Receiver.Position, 3, ThingPlaceMode.Direct,
+            out result), "counted drop succeeds");
+        Equal(7, pawn.carryTracker.CarriedThing.stackCount, "counted drop keeps undelivered cargo");
+        counted.Tick(); Equal(3L, counted.Core.Network.GetTotalCount(counted.X), "counted delivery stored without intake signal");
+
+        var partial = new Fixture(); var stack = partial.Deliver(partial.X, 70);
+        partial.Deliver(partial.Y, 1); partial.Deliver(new ThingDef(), 1);
+        pawn = Hauler(partial); pawn.carryTracker.innerContainer.TryAdd(new Thing { def = partial.X, stackCount = 10 });
+        Equal(false, pawn.carryTracker.TryDropCarriedThing(partial.Receiver.Position, ThingPlaceMode.Direct,
+            out result), "partly placed delivery reports false at placement boundary");
+        Equal(75, stack.stackCount, "part of delivery merged before placement failed");
+        Equal(5, pawn.carryTracker.CarriedThing.stackCount, "undelivered partial quantity stays carried");
+        partial.Tick(); Equal(75L, partial.Core.Network.GetTotalCount(partial.X), "partly successful drop stored without intake signal");
     }
 
     private static void Removal()

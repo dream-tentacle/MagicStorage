@@ -13,6 +13,7 @@ namespace MagicStorage
         private readonly Dictionary<WorkTypeDef, int> lastCoreIds = new Dictionary<WorkTypeDef, int>();
         private readonly Dictionary<CraftingOrder, JobDriver_CosmicCrafting> assignments = new Dictionary<CraftingOrder, JobDriver_CosmicCrafting>();
         public MapComponent_CosmicCrafting(Map map) : base(map) { }
+        internal IEnumerable<Thing> Workbenches => benches.Where(b => b.Spawned && b.Map == map);
         internal void Register(Building_StorageCore core) { if (!cores.Contains(core)) { cores.Add(core); cores.Sort((a,b) => a.thingIDNumber.CompareTo(b.thingIDNumber)); } }
         internal void Register(Building_CosmicWorkbench bench) { if (!benches.Contains(bench)) benches.Add(bench); }
         internal void Unregister(Building_StorageCore core) { cores.Remove(core); CancelWhere(d => d.Core == core); }
@@ -36,12 +37,22 @@ namespace MagicStorage
             if (order.Mode == CraftingRepeatMode.TargetCount && !CraftingServices.Products.CanCount(order.Recipe)) return false;
             return order.ShouldRun(order.Mode == CraftingRepeatMode.TargetCount ? CraftingServices.Products.Count(core, order) : 0);
         }
+        internal bool CanClaimOrder(Building_StorageCore core, CraftingOrder order, Pawn pawn, WorkGiverDef giver) =>
+            core != null && order != null && giver != null && CanRun(core, order) && AssignedWorker(order) == null &&
+            CraftingServices.Workers.Allows(order, pawn, giver.workType);
+
+        internal bool CanStartOrder(JobDriver_CosmicCrafting driver)
+        {
+            var core = driver.Core; var order = driver.Order;
+            return CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef) &&
+                (order.Batch != null || CraftingServices.Materials.TryPlan(core.Network, order, out _));
+        }
+
         internal bool TryClaim(JobDriver_CosmicCrafting driver, out CraftingMaterialLease lease)
         {
             lease = null;
             var core = driver.Core; var order = driver.Order;
-            if (order == null || core == null || !CanRun(core, order) || AssignedWorker(order) != null ||
-                !CraftingServices.Workers.Allows(order, driver.pawn, driver.job.workGiverDef.workType)) return false;
+            if (!CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef)) return false;
             if (order.Batch == null)
             {
                 if (!CraftingServices.Materials.TryPlan(core.Network, order, out var plan)) return false;
@@ -66,22 +77,66 @@ namespace MagicStorage
             {
                 var core = cores[(start + n) % cores.Count];
                 if (!core.CanWork || core.Faction != pawn.Faction) continue;
-                foreach (var order in core.Crafting.Orders)
-                {
-                    if (AssignedWorker(order) != null || !CraftingRecipeCatalog.HasType(order.Recipe, giver.workType) ||
-                        !CanRun(core, order) || !CraftingServices.Workers.Allows(order, pawn, giver.workType) ||
-                        (order.Batch == null && !CraftingServices.Materials.TryPlan(core.Network, order, out _))) continue;
-                    var bench = FindBench(pawn, core.Network);
-                    if (bench == null) break;
-                    var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed("MS_CosmicCrafting"), bench, core);
-                    job.count = order.Id;
-                    job.workGiverDef = giver;
-                    lastCoreIds[giver.workType] = core.thingIDNumber;
-                    return job;
-                }
+                var order = FindOrder(pawn, giver, core, out _);
+                if (order == null) continue;
+                var bench = FindBench(pawn, core.Network);
+                if (bench == null) continue;
+                lastCoreIds[giver.workType] = core.thingIDNumber;
+                return MakeJob(giver, bench, core, order);
             }
             return null;
         }
+        private CraftingOrder FindOrder(Pawn pawn, WorkGiverDef giver, Building_StorageCore core, out string reason)
+        {
+            reason = null;
+            foreach (var order in core.Crafting.Orders)
+            {
+                if (!CraftingRecipeCatalog.HasType(order.Recipe, giver.workType)) continue;
+                string failure = null;
+                var worker = AssignedWorker(order);
+                if (worker != null) failure = "MS_Craft_Assigned".Translate(worker.LabelShortCap);
+                else if (!CanRun(core, order)) failure = Status(core, order);
+                else if (!CraftingServices.Workers.Allows(order, pawn, giver.workType))
+                    failure = "MS_Craft_SelectedWorkerNotAllowed".Translate();
+                else if (order.Batch == null && !CraftingServices.Materials.TryPlan(core.Network, order, out _))
+                    failure = "MS_Craft_MissingMaterials".Translate();
+                if (failure == null) return order;
+                if (reason == null) reason = failure;
+            }
+            if (reason == null) reason = "MS_Craft_NoOrdersForWorkType".Translate();
+            return null;
+        }
+        private static Job MakeJob(WorkGiverDef giver, Building_CosmicWorkbench bench, Building_StorageCore core, CraftingOrder order)
+        {
+            var job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed("MS_CosmicCrafting"), bench, core);
+            job.count = order.Id;
+            job.workGiverDef = giver;
+            return job;
+        }
+        internal Job FindJobOnBench(Pawn pawn, WorkGiverDef giver, Building_CosmicWorkbench bench)
+        {
+            if (bench == null || !bench.Spawned || bench.Map != map || bench.Faction != pawn.Faction) return null;
+            // Pawn-level eligibility takes precedence over occupied benches/orders.
+            // Vanilla cannot report this itself when our scanner returns no job.
+            if (pawn.WorkTypeIsDisabled(giver.workType))
+            { JobFailReason.Is("MS_Craft_Incapable".Translate()); return null; }
+            if (pawn.workSettings == null || !pawn.workSettings.WorkIsActive(giver.workType))
+            { JobFailReason.Is("MS_Craft_WorkDisabled".Translate()); return null; }
+            map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            var network = bench.Network;
+            if (network?.CanWork != true)
+            { JobFailReason.Is(StorageNetwork.StatusLabel(network)); return null; }
+            // Return the actual running job so vanilla can display "already working".
+            if (pawn.jobs.curDriver is JobDriver_CosmicCrafting active && !active.ended &&
+                active.Bench == bench && pawn.CurJob.workGiverDef == giver && active.CanContinue()) return pawn.CurJob;
+            if (!CanUseBench(pawn, bench, network))
+            { JobFailReason.Is("MS_Craft_NoBench".Translate()); return null; }
+            var order = FindOrder(pawn, giver, network.Core, out string reason);
+            if (order == null) { JobFailReason.Is(reason); return null; }
+            return MakeJob(giver, bench, network.Core, order);
+        }
+        internal Job FindPrioritizedJob(Pawn pawn, WorkGiverDef giver, IntVec3 cell) =>
+            FindJobOnBench(pawn, giver, benches.FirstOrDefault(b => b.Spawned && b.Map == map && b.OccupiedRect().Contains(cell)));
         internal static bool CanUseBench(Pawn pawn, Building_CosmicWorkbench bench, StorageNetwork network)
         {
             return bench != null && bench.Spawned && bench.Network == network && network != null && network.CanWork &&
@@ -129,8 +184,23 @@ namespace MagicStorage
         }
     }
 
-    public sealed class WorkGiver_CosmicCrafting : WorkGiver
+    public sealed class WorkGiver_CosmicCrafting : WorkGiver_Scanner
     {
-        public override Job NonScanJob(Pawn pawn) => pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().FindJob(pawn, def);
+        public override PathEndMode PathEndMode => PathEndMode.InteractionCell;
+        public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn) =>
+            pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().Workbenches;
+        public override Job JobOnThing(Pawn pawn, Thing thing, bool forced = false) =>
+            pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().FindJobOnBench(pawn, def, thing as Building_CosmicWorkbench);
+        public override Job NonScanJob(Pawn pawn)
+        {
+            var dispatcher = pawn.Map?.GetComponent<MapComponent_CosmicCrafting>();
+            if (dispatcher == null) return null;
+            // Vanilla asks NonScanJob before scanning the prioritized cell. Restrict
+            // that entry point too, or subsequent orders could switch workbenches.
+            var priority = pawn.mindState.priorityWork;
+            if (priority.IsPrioritized && priority.WorkGiver?.workType == def.workType)
+                return dispatcher.FindPrioritizedJob(pawn, def, priority.Cell);
+            return dispatcher.FindJob(pawn, def);
+        }
     }
 }

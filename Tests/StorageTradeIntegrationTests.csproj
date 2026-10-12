@@ -6,6 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath>bin\Trading\</OutputPath>
     <AssemblyName>StorageTradeIntegrationTests</AssemblyName>
+    <DefineConstants>$(DefineConstants);TRADING_STUB_RECT</DefineConstants>
     <StartupObject>StorageTradeIntegrationTests</StartupObject>
     <IntermediateOutputPath>obj\Trading\</IntermediateOutputPath>
   </PropertyGroup>
@@ -19,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EngineStubs.cs" />
+    <Compile Include="ModSettingsStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\MagicStorageSettings.cs" />
     <Compile Include="StorageFoundationTests.cs" />
     <Compile Include="CoreContainerStubs.cs" />
     <Compile Include="ApparelStubs.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="StorageReceiverTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageReceiver.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReception.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageReceiverHaulingPatches.cs" />
     <Compile Include="GameplayStubs.cs" />
     <Compile Include="PlacementStubs.cs" />
     <Compile Include="WithdrawalStubs.cs" />

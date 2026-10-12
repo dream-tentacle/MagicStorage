@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_FuelSupply_Use>自动为半径{0}格内己方建筑补料，遵循原版补料阈值及自动补充开关。</MS_FuelSupply_Use>
+  <MS_FuelSupply_Immediate>立即补充</MS_FuelSupply_Immediate>
+  <MS_FuelSupply_ImmediateDesc>立即从网络为半径{0}格内的己方建筑补料一次，只跳过百分比阈值。仍遵循目标建筑的自动补充开关、燃料过滤、目标量及其他补料限制，不使用已预留的燃料。</MS_FuelSupply_ImmediateDesc>
+</LanguageData>

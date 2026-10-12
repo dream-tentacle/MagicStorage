@@ -6,6 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath>bin\</OutputPath>
     <AssemblyName>StorageFoundationTests</AssemblyName>
+    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" /><Reference Include="System.Core" />
@@ -16,6 +17,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EngineStubs.cs" /><Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="StorageIndexTests.cs" />
+    <Compile Include="MonolynCompatibilityStubs.cs" />
+    <Compile Include="MonolynCompatibilityTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\MonolynCompatibility.cs" />
+    <Compile Include="ModSettingsStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\MagicStorageSettings.cs" />
     <Compile Include="CoreContainerStubs.cs" />
     <Compile Include="ApparelStubs.cs" />
     <Compile Include="StorageApparelTests.cs" />
@@ -62,9 +70,22 @@
     <Compile Include="StorageReceiverTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageReceiver.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReception.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageReceiverHaulingPatches.cs" />
     <Compile Include="GameplayStubs.cs" />
     <Compile Include="PlacementStubs.cs" />
     <Compile Include="WithdrawalStubs.cs" />
+    <Compile Include="TransportSupplierStubs.cs" />
+    <Compile Include="TransportSupplierTests.cs" />
+    <Compile Include="FuelSupplierTests.cs" />
+    <Compile Include="NivarianCannonStubs.cs" />
+    <Compile Include="NivarianCannonTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\NivarianCannonApi.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\NivarianCannonCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_NivarianCannonExtractor.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_FuelSupplier.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageFuelSupply.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_TransportSupplier.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransportExchange.cs" />
     <Compile Include="StorageWithdrawalTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageWithdrawal.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageRecoveryBatch.cs" />

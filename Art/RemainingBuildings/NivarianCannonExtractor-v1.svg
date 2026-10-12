@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>涅瓦莲质量驱动器提取口</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="460" height="416" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="460" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H458Q486 458 486 430" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M473 85V417Q473 444 446 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="193" y="65" width="126" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="197" y="69" width="118" height="21" rx="3" fill="#344a5b"/>
+  <path d="M209 79H230M240 79H261" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M276 79H304" fill="none" stroke="#91afc3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M125 129H387L410 153V365L387 392H125L102 365V153Z" fill="#a7b9c5"/>
+  <path d="M129 133H383L398 152V354L382 376H130L114 354V152Z" fill="#e0e7eb"/>
+  <ellipse cx="256" cy="273" rx="137" ry="118" fill="#8199a9"/>
+  <ellipse cx="256" cy="253" rx="137" ry="118" fill="#c4d4df"/>
+  <ellipse cx="256" cy="253" rx="117" ry="99" fill="#e6edf2"/>
+  <ellipse cx="256" cy="253" rx="98" ry="83" fill="#506c80"/>
+  <ellipse cx="256" cy="269" rx="92" ry="66" fill="#819daf"/>
+  <path d="M176 245Q256 293 336 245V290Q256 338 176 290Z" fill="#a4bdcd"/>
+  <path d="M183 291Q256 331 329 291" fill="none" stroke="#c5e5f5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M151 220Q168 164 219 150M293 150Q342 164 361 220" fill="none" stroke="#c5e5f5" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="113" y="227" width="34" height="65" rx="5" fill="#91a8b8"/>
+  <rect x="116" y="221" width="28" height="61" rx="4" fill="#d8e4eb"/>
+  <rect x="123" y="235" width="14" height="30" rx="2" fill="#c5e5f5"/>
+  <rect x="365" y="227" width="34" height="65" rx="5" fill="#91a8b8"/>
+  <rect x="368" y="221" width="28" height="61" rx="4" fill="#d8e4eb"/>
+  <rect x="375" y="235" width="14" height="30" rx="2" fill="#c5e5f5"/>
+  <rect x="220" y="363" width="72" height="37" rx="6" fill="#9ab0c0"/>
+  <rect x="224" y="359" width="64" height="32" rx="5" fill="#d8e4eb"/>
+  <rect x="237" y="371" width="38" height="7" rx="2" fill="#c5e5f5"/>
+  <rect x="204.0" y="468" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217.0 471H243.0M277.0 471H296.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H458Q486 42 486 70V458Q486 486 458 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

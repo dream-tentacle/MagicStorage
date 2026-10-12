@@ -11,6 +11,7 @@
   <MS_Craft_Add>Add production order</MS_Craft_Add>
   <MS_Craft_All>All</MS_Craft_All>
   <MS_Craft_WorkbenchFilter>Workbench: {0}</MS_Craft_WorkbenchFilter>
+  <MS_Craft_SourceFilter>Source: {0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>No matching production orders.</MS_Craft_NoMatchingOrders>
   <MS_Craft_NoMatchingRecipes>No matching recipes.</MS_Craft_NoMatchingRecipes>
   <MS_Craft_Suspended>Suspended</MS_Craft_Suspended>
@@ -20,6 +21,8 @@
   <MS_Craft_MissingMaterials>Ingredients unavailable or reserved</MS_Craft_MissingMaterials>
   <MS_Craft_NoWorker>No eligible worker with the work type enabled</MS_Craft_NoWorker>
   <MS_Craft_NoBench>No reachable, available workbench</MS_Craft_NoBench>
+  <MS_Craft_NoOrdersForWorkType>No production orders for this work type</MS_Craft_NoOrdersForWorkType>
+  <MS_Craft_SelectedWorkerNotAllowed>This pawn is not assigned to this work type or does not meet the order's skill and worker restrictions</MS_Craft_SelectedWorkerNotAllowed>
   <MS_Craft_Ready>Ready</MS_Craft_Ready>
   <MS_Craft_Resume>Resume</MS_Craft_Resume>
   <MS_Craft_Pause>Suspend</MS_Craft_Pause>

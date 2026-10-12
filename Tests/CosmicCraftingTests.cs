@@ -17,7 +17,214 @@ internal static class CosmicCraftingTests
         ProductionCompletion(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
         ReservationInvalidation();
         CoreContainerSelection();
+        BenchSelectionAndPriority();
+        OrderedJobPreflight();
+        WorkerFailurePrecedesOccupation();
+        FixedCostMaterials();
+        VanillaMaterialSelection();
         return checks;
+    }
+    private sealed class AdjustedIngredientWorker : RecipeWorker
+    {
+        internal int Calls;
+        public override float GetIngredientCount(IngredientCount ingredient, Bill bill)
+        { Calls++; return ingredient.GetBaseCount() * 2; }
+    }
+    private static void FixedCostMaterials()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        var unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner;
+        unit.SlotCapacity = 64; a.Item3.holdingOwner.Remove(a.Item3);
+        // Generated fixed-cost recipes can leave both recipe-wide filters empty.
+        order.Recipe.fixedIngredientFilter.Allowed.Clear(); order.Ingredients.Allowed.Clear();
+        order.Recipe.ingredients.Clear();
+        var defs = new[] { new ThingDef(), new ThingDef(), new ThingDef(), new ThingDef() };
+        int[] available = { 793, 214, 300, 44 }, required = { 200, 20, 50, 4 };
+        for (int i = 0; i < defs.Length; i++)
+        {
+            var ingredient = new IngredientCount { count = required[i] }; ingredient.filter.Allowed.Add(defs[i]);
+            order.Recipe.ingredients.Add(ingredient);
+            int remaining = available[i];
+            while (remaining > 0)
+            {
+                int count = Math.Min(remaining, defs[i].stackLimit);
+                Equal(true, unit.Inventory.Contents.TryAdd(new Thing { def = defs[i], stackCount = count }), "fixed-cost stock stored");
+                remaining -= count;
+            }
+        }
+        var policy = new NetworkCraftingMaterialPolicy();
+        Equal(true, policy.TryPlan(a.Item1.Network, order, out var plan), "all four fixed ingredients survive empty recipe-wide filters");
+        for (int i = 0; i < defs.Length; i++)
+            Equal(required[i], plan.Where(p => p.Key.def == defs[i]).Sum(p => p.Value), "fixed ingredient quantity across stacks");
+        var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        for (int i = 0; i < defs.Length; i++)
+            Equal(required[i], order.Batch.Ingredients.Where(t => t.def == defs[i]).Sum(t => t.stackCount), "fixed-cost job collects exact ingredient count");
+        driver.EndJobWith(JobCondition.InterruptForced);
+
+        // Variable ingredients continue to respect both the recipe and player filters.
+        f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1);
+        order.Recipe.ingredients[0].filter.Allowed.Add(new ThingDef());
+        order.Ingredients.Allowed.Clear();
+        Equal(false, policy.TryPlan(a.Item1.Network, order, out _), "non-fixed ingredient respects player exclusion");
+        order.Ingredients.Allowed.Add(f.Material); order.Recipe.fixedIngredientFilter.Allowed.Clear();
+        Equal(false, policy.TryPlan(a.Item1.Network, order, out _), "non-fixed ingredient respects recipe-wide exclusion");
+        order.Recipe.fixedIngredientFilter.Allowed.Add(f.Material);
+        Equal(true, policy.TryPlan(a.Item1.Network, order, out _), "variable ingredient allowed by both filters");
+
+        var worker = new AdjustedIngredientWorker(); order.Recipe.Worker = worker;
+        Equal(false, policy.TryPlan(a.Item1.Network, order, out _), "no-mix custom worker count requires twelve instead of six");
+        Equal(true, worker.Calls > 0, "no-mix quantity calls the vanilla worker count hook");
+        order.Recipe.allowMixingIngredients = true;
+        Equal(true, policy.TryPlan(a.Item1.Network, order, out plan), "vanilla mixed branch uses the base ingredient value");
+        Equal(6, plan.Values.Sum(), "mixed quantity follows vanilla's base-count branch");
+    }
+    private static void VanillaMaterialSelection()
+    {
+        var stocks = new List<CraftingMaterialStock<string>>
+        {
+            new CraftingMaterialStock<string> { Item = "nearA", Kind = "A", Count = 1, Value = 1 },
+            new CraftingMaterialStock<string> { Item = "nearB", Kind = "B", Count = 10, Value = 1 },
+            new CraftingMaterialStock<string> { Item = "farA", Kind = "A", Count = 9, Value = 1 }
+        };
+        var needs = new List<CraftingMaterialNeed<string>> { new CraftingMaterialNeed<string> { Value = 10, Allows = _ => true } };
+        Equal(true, CraftingMaterialPlanner.TryPlan(stocks, needs, false, false, out var plan), "no-mix aggregates all stacks before selecting a def");
+        Equal(false, plan.ContainsKey("nearB"), "first encountered sufficient def wins even when its later stack is farther away");
+        Equal(9, plan["farA"], "selected def draws from multiple stacks");
+        needs.Add(new CraftingMaterialNeed<string> { Value = 100, Allows = _ => false });
+        Equal(true, CraftingMaterialPlanner.TryPlan(stocks, needs, false, true, out plan), "whole-stack branch ignores count and succeeds after first usable stack");
+        Equal(1, plan.Count, "whole-stack branch chooses only the first usable stack");
+        Equal(1, plan["nearA"], "whole-stack branch accepts a stack smaller than the declared need");
+        needs.RemoveAt(1); needs[0].Value = 2;
+        Equal(true, CraftingMaterialPlanner.TryPlan(stocks, needs, true, true, out plan), "mixed branch ignores whole-stack flag");
+        Equal(2, plan.Values.Sum(), "mixed branch takes only the quantity required");
+
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 4);
+        var otherDef = new ThingDef(); var ingredient = order.Recipe.ingredients[0]; ingredient.filter.Allowed.Add(otherDef);
+        order.Recipe.fixedIngredientFilter.Allowed.Add(otherDef); order.Ingredients.Allowed.Add(otherDef);
+        order.Recipe.IngredientValueGetter.Values[f.Material] = 2;
+        var farUnit = new Building_StorageUnit(); f.Register(farUnit, 3);
+        var cheaperFar = new Thing { def = otherDef, stackCount = 10 }; farUnit.Inventory.Contents.TryAdd(cheaperFar);
+        f.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+        var policy = new NetworkCraftingMaterialPolicy();
+        Equal(true, policy.TryPlan(a.Item1.Network, order, out var planThings), "no-mix plans nearby higher-value material");
+        Equal(true, planThings.ContainsKey(a.Item3), "no-mix orders by distance before value");
+        Equal(2, planThings[a.Item3], "no-mix rounds the converted quantity once per ingredient def");
+        order.Recipe.allowMixingIngredients = true;
+        Equal(true, policy.TryPlan(a.Item1.Network, order, out planThings), "mixed branch plans lower-value material");
+        Equal(true, planThings.ContainsKey(cheaperFar), "mixed branch orders by value before distance");
+        Equal(4, planThings[cheaperFar], "mixed branch uses value-weighted ingredient amounts");
+    }
+    private static void WorkerFailurePrecedesOccupation()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        var scanner = new WorkGiver_CosmicCrafting { def = f.Giver };
+        var driver = f.Start(scanner.JobOnThing(f.Pawn, a.Item2, true));
+        var other = new Pawn { Spawned = true, Map = f.Map, Faction = Faction.OfPlayer };
+        other.workSettings.Unassigned.Add(f.Type);
+        f.Map.reservationManager.Reserved.Add(a.Item2);
+        JobFailReason.Clear();
+        Equal(null, scanner.JobOnThing(other, a.Item2, true), "unassigned pawn cannot use occupied bench");
+        Equal("MS_Craft_WorkDisabled", JobFailReason.Reason, "work not assigned takes precedence over bench occupation");
+        f.Map.reservationManager.Reserved.Remove(a.Item2);
+        Equal(null, scanner.JobOnThing(other, a.Item2, true), "unassigned pawn cannot take occupied order");
+        Equal("MS_Craft_WorkDisabled", JobFailReason.Reason, "work not assigned takes precedence over assigned order");
+        other.workSettings.Disabled.Add(f.Type);
+        Equal(null, scanner.JobOnThing(other, a.Item2, true), "incapable pawn cannot take occupied order");
+        Equal("MS_Craft_Incapable", JobFailReason.Reason, "inherent inability is distinguished from work not assigned");
+        other.workSettings.Disabled.Clear(); other.workSettings.Unassigned.Clear();
+        Equal(null, scanner.JobOnThing(other, a.Item2, true), "eligible pawn still cannot take occupied order");
+        Equal("MS_Craft_Assigned", JobFailReason.Reason, "eligible pawn still receives the occupation reason");
+        Equal(f.Pawn.CurJob, scanner.JobOnThing(f.Pawn, a.Item2, true), "actual worker is still recognized as already working");
+        Equal(f.Pawn, f.Dispatch.AssignedWorker(order), "menu checks do not disturb the existing worker");
+        driver.EndJobWith(JobCondition.InterruptForced);
+    }
+    private static void OrderedJobPreflight()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        var scanner = new WorkGiver_CosmicCrafting { def = f.Giver };
+        var job = scanner.JobOnThing(f.Pawn, a.Item2, true);
+        job.playerForced = true;
+        // Job.TryMakePreToilReservations uses GetCachedDriver before the job starts.
+        // Pawn_JobTracker.StartJob then creates a different driver using MakeDriver.
+        var cachedDriver = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+        Equal(true, cachedDriver.TryMakePreToilReservations(true), "vanilla ordered-job preflight succeeds");
+        Equal(null, f.Dispatch.AssignedWorker(order), "temporary cached driver must not claim the order");
+        Equal(10, a.Item1.Network.AvailableToWithdraw(a.Item3), "temporary cached driver must not reserve network materials");
+        f.Pawn.mindState.priorityWork.Set(a.Item2.Position, f.Giver);
+        var actualDriver = f.Start(job);
+        Equal(f.Pawn, f.Dispatch.AssignedWorker(order), "actual driver claims the ordered job");
+        Equal(true, actualDriver.CanContinue(), "ordered work continues after preflight and actual start");
+        Equal(6, order.Batch.Ingredients[0].stackCount, "actual driver collects the required materials");
+        actualDriver.EndJobWith(JobCondition.InterruptForced);
+        Equal(null, f.Dispatch.AssignedWorker(order), "actual driver releases its own assignment");
+    }
+    private static void BenchSelectionAndPriority()
+    {
+        var f = new Fixture(); var a = f.Core(0); var b = f.Core(10);
+        var first = f.Order(a.Item1); var second = f.Order(a.Item1, 4); f.Order(b.Item1);
+        var extraBench = new Building_CosmicWorkbench(); f.Register(extraBench, 3); f.Dispatch.Register(extraBench);
+        var scanner = new WorkGiver_CosmicCrafting { def = f.Giver };
+        Equal(true, scanner.PotentialWorkThingsGlobal(f.Pawn).Contains(extraBench), "clicked workbench is exposed to vanilla menu");
+        Equal(null, scanner.JobOnThing(f.Pawn, a.Item1, true), "core does not offer workbench jobs");
+        var preview = scanner.JobOnThing(f.Pawn, extraBench, true);
+        Equal(extraBench, preview.targetA, "right click fixes the selected bench even when another is closer");
+        Equal(first.Id, preview.count, "right click respects order sequence");
+        Equal(null, f.Dispatch.AssignedWorker(first), "menu preview does not assign worker");
+        Equal(10, a.Item1.Network.AvailableToWithdraw(a.Item3), "menu preview does not reserve materials");
+        first.Suspended = true;
+        Equal(second.Id, scanner.JobOnThing(f.Pawn, extraBench, true).count, "suspended earlier order is skipped");
+        first.Suspended = false;
+        var otherGiver = new WorkGiverDef { workType = new WorkTypeDef() };
+        second.Recipe.route = otherGiver;
+        var otherScanner = new WorkGiver_CosmicCrafting { def = otherGiver };
+        var otherJob = otherScanner.JobOnThing(f.Pawn, extraBench, true);
+        Equal(second.Id, otherJob.count, "other category selects its own order");
+        var previewDriver = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = preview };
+        Equal(false, previewDriver.IsSameJobAs(otherJob), "different categories on same bench are different jobs");
+        Equal(true, previewDriver.IsSameJobAs(scanner.JobOnThing(f.Pawn, extraBench, true)), "same bench and order match");
+        second.Recipe.route = f.Giver;
+        Equal(false, previewDriver.IsSameJobAs(JobFor(second)), "different orders on same bench are different jobs");
+
+        a.Item2.width = 3;
+        f.Pawn.mindState.priorityWork.Set(a.Item2.Position + new IntVec3(1, 0), f.Giver);
+        Equal(a.Item2, scanner.NonScanJob(f.Pawn).targetA, "priority recognizes any occupied cell of the selected bench");
+        var driver = f.Start(scanner.NonScanJob(f.Pawn));
+        a.Item2.width = 1;
+        Equal(f.Pawn.CurJob, scanner.JobOnThing(f.Pawn, a.Item2, true), "menu recognizes the already running order");
+        f.Pawn.mindState.priorityWork.Set(extraBench.Position, f.Giver);
+        Equal(extraBench, scanner.NonScanJob(f.Pawn).targetA, "priority overrides automatic keep-current-job on another bench");
+        driver.EndJobWith(JobCondition.InterruptForced); f.Pawn.jobs.curDriver = null; f.Pawn.jobs.curJob = null;
+        first.Suspended = true; second.Suspended = true;
+        JobFailReason.Clear();
+        Equal(null, scanner.NonScanJob(f.Pawn), "no selected-network order cannot fall back to another network");
+        Equal("MS_Craft_Suspended", JobFailReason.Reason, "unavailable order supplies menu failure reason");
+        f.Pawn.mindState.priorityWork.Clear();
+        Equal(b.Item1, scanner.NonScanJob(f.Pawn).targetB, "ordinary work still searches other networks");
+        first.Suspended = false;
+        f.Pawn.mindState.priorityWork.Set(extraBench.Position, f.Giver);
+        f.Pawn.Unreachable.Add(extraBench);
+        Equal(null, scanner.NonScanJob(f.Pawn), "priority cannot substitute a reachable bench for an unreachable selected one");
+        f.Pawn.Unreachable.Clear();
+        f.Pawn.workSettings.Disabled.Add(f.Type);
+        Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work respects work settings");
+        Equal("MS_Craft_Incapable", JobFailReason.Reason, "inherent work disability explains unavailable work");
+        f.Pawn.workSettings.Disabled.Clear(); first.Worker = new Pawn();
+        Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work respects named worker");
+        first.Worker = null; first.Recipe.minimumSkill = 20;
+        Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work respects mandatory recipe skill");
+        first.Recipe.minimumSkill = 0; first.Batch.Cancel(); first.Batch = null; a.Item3.stackCount = 0;
+        Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work requires available materials");
+        Equal("MS_Craft_MissingMaterials", JobFailReason.Reason, "missing ingredients explain unavailable work");
+        Equal(null, new WorkGiver_CosmicCrafting { def = new WorkGiverDef { workType = new WorkTypeDef() } }
+            .JobOnThing(f.Pawn, extraBench, true), "missing category offers no executable job");
+        Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "missing category supplies menu failure reason");
+
+        Job JobFor(CraftingOrder order)
+        {
+            var job = JobMaker.MakeJob(preview.def, extraBench, a.Item1);
+            job.count = order.Id; job.workGiverDef = f.Giver;
+            return job;
+        }
     }
     private static void CoreContainerSelection()
     {

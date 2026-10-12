@@ -105,7 +105,7 @@ namespace MagicStorage
                 {
                     defaultLabel = "MS_Craft_Open".Translate(),
                     defaultDesc = "MS_Craft_OpenDesc".Translate(),
-                    icon = def.uiIcon,
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/CraftingList"),
                     action = () => Find.WindowStack.Add(new Dialog_CosmicCrafting(this))
                 };
             if (Spawned && Faction == Faction.OfPlayer)
@@ -113,7 +113,7 @@ namespace MagicStorage
                 {
                     defaultLabel = "MS_UI_Open".Translate(),
                     defaultDesc = "MS_UI_OpenDesc".Translate(),
-                    icon = def.uiIcon,
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Inventory"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageInventory(this))
                 };
         }

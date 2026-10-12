@@ -22,7 +22,9 @@ namespace MagicStorage
             var types = new HashSet<WorkTypeDef>(workTypes);
             foreach (var giver in DefDatabase<WorkGiverDef>.AllDefsListForReading)
             {
-                if (giver.giverClass != typeof(WorkGiver_DoBill) || !types.Contains(giver.workType) || giver.fixedBillGiverDefs == null) continue;
+                // Production sources are described by their work type and bill tables;
+                // mods can replace the work giver implementation without changing either.
+                if (!types.Contains(giver.workType) || giver.fixedBillGiverDefs == null) continue;
                 foreach (var table in giver.fixedBillGiverDefs)
                 {
                     if (table.thingClass == null || !typeof(Building_WorkTable).IsAssignableFrom(table.thingClass) ||
@@ -53,5 +55,6 @@ namespace MagicStorage
         internal static bool Supports(RecipeDef recipe) => Routes(recipe).Count > 0;
         internal static bool HasType(RecipeDef recipe, WorkTypeDef type) => Routes(recipe).Any(w => w.workType == type);
         internal static string WorkLabels(RecipeDef recipe) => string.Join(" / ", Routes(recipe).Select(w => w.workType.LabelCap.ToString()).Distinct());
+
     }
 }

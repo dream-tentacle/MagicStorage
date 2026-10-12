@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>切换供给模式</title>
+  <desc>相反方向的两条循环箭头。</desc>
+  <g stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 49a40 40 0 0 1 75-6m-1-23 1 23-23-1" stroke="#E7EEF6"/>
+    <path d="M102 79a40 40 0 0 1-75 6m1 23-1-23 23 1" stroke="#63D5ED"/>
+  </g>
+</svg>

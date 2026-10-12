@@ -56,6 +56,11 @@ namespace MagicStorage
         internal Building_StorageCore Core => job.GetTarget(TargetIndex.B).Thing as Building_StorageCore;
         internal CraftingOrder Order => Core?.Crafting.Find(job.count);
 
+        public override bool? IsSameJobAs(Job other) => other != null && job.def == other.def &&
+            job.workGiverDef == other.workGiverDef && job.count == other.count &&
+            job.GetTarget(TargetIndex.A).Thing == other.GetTarget(TargetIndex.A).Thing &&
+            job.GetTarget(TargetIndex.B).Thing == other.GetTarget(TargetIndex.B).Thing;
+
         public override string GetReport()
         {
             var recipe = Order?.Recipe;
@@ -75,6 +80,11 @@ namespace MagicStorage
             if (!MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network)) return false;
             if (!pawn.Reserve(Bench, job, 1, -1, null, errorOnFailed) ||
                 !pawn.ReserveSittableOrSpot(Bench.InteractionCell, job, errorOnFailed)) return false;
+            // Ordered jobs first run this on Job.GetCachedDriver, then StartJob
+            // creates a new driver. Only the actual current driver may own a
+            // network lease or assignment; the cached driver only checks eligibility.
+            if (pawn.jobs.curDriver != this)
+                return pawn.Map.GetComponent<MapComponent_CosmicCrafting>().CanStartOrder(this);
             return EnsureAssignment();
         }
         private bool EnsureAssignment()

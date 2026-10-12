@@ -87,9 +87,10 @@ namespace Verse
         protected int maxStacks = 999999;
         public bool dontTickContents;
         public IThingHolder Owner;
+        public int IndexReads;
         public ThingOwner(IThingHolder owner) { Owner = owner; }
         public int Count => items.Count;
-        public Thing this[int index] => items[index];
+        public Thing this[int index] { get { IndexReads++; return items[index]; } }
         public bool Contains(Thing item) => items.Contains(item);
         IEnumerator<Thing> IEnumerable<Thing>.GetEnumerator() => items.GetEnumerator();
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
@@ -153,7 +154,12 @@ namespace MagicStorage
     public class CompStorageNode { public Thing parent; public StorageNetwork Network; }
     public class Building_StorageUnit : Thing, IThingHolder
     {
-        public int SlotCapacity = 64;
+        private int? slotCapacityOverride;
+        public int SlotCapacity
+        {
+            get => slotCapacityOverride ?? MagicStorageMod.Settings.StorageUnitSlots;
+            set => slotCapacityOverride = value;
+        }
         public CompStorageNode node;
         public StorageNetwork Network => node?.Network;
         public StorageInventory Inventory;

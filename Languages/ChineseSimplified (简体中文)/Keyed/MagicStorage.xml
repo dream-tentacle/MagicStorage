@@ -41,7 +41,11 @@
   <MS_UI_AvailableTip>当前可以取出的数量，不包括搬运和取货任务预约的部分。</MS_UI_AvailableTip>
   <MS_UI_SelectedTip>确认后将放到核心周围的数量。</MS_UI_SelectedTip>
   <MS_UI_RemainingTip>本次取出后，网络内剩余的数量。</MS_UI_RemainingTip>
-  <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量</MS_UI_QuantityTip>
+  <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量。按住左键拖过多行箭头可批量调整，每行在同一次拖拽中只触发一次。</MS_UI_QuantityTip>
   <MS_ReceiverCapacity>接收暂存：{0} / {1} 堆</MS_ReceiverCapacity>
-  <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，送到的物品自动存入单元。</MS_ReceiverUse>
+  <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，表面符合条件的物品自动存入单元。</MS_ReceiverUse>
+  <MS_SettingsCategory>魔法存储</MS_SettingsCategory>
+  <MS_SettingsUnitSlots>每个存储单元的槽位上限</MS_SettingsUnitSlots>
+  <MS_SettingsUnitSlotsHelp>范围：6–1000，默认：64。立即应用于现有和新建存储单元。调低上限不会移除已有物品；超出容量时无法新增堆叠，仍可补入未满的兼容堆叠。</MS_SettingsUnitSlotsHelp>
+  <MS_SettingsRestoreDefaults>恢复默认值</MS_SettingsRestoreDefaults>
 </LanguageData>

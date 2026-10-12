@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>制作清单</title>
+  <desc>清单与小锤，供存储核心和宇宙工作台共用。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M69 17H28a7 7 0 0 0-7 7v80a7 7 0 0 0 7 7h49a7 7 0 0 0 7-7V83"/>
+    <path d="M35 38h5m11 0h14M35 59h5m11 0h12M35 80h5m11 0h9"/>
+    <path d="m61 96 32-40" stroke="#63D5ED" stroke-width="9"/>
+    <path d="m85 30 28 22-12 15-28-22Z" fill="#263746"/>
+  </g>
+</svg>

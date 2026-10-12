@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>存储线 — 十六种连接形态</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <defs>
+  <clipPath id="tile-0"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-1"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-2"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-3"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-4"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-5"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-6"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-7"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-8"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-9"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-10"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-11"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-12"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-13"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-14"><rect width="256" height="256"/></clipPath>
+  <clipPath id="tile-15"><rect width="256" height="256"/></clipPath>
+  </defs>
+  <g transform="translate(0 768)">
+  <g clip-path="url(#tile-0)">
+  <rect x="114" y="114" width="28" height="28" rx="7" fill="#000000"/>
+  <rect x="117" y="117" width="22" height="22" rx="5" fill="#a5bac8"/>
+  <rect x="122" y="122" width="12" height="12" rx="3" fill="#c5e5f5"/>
+  </g>
+  </g>
+  <g transform="translate(256 768)">
+  <g clip-path="url(#tile-1)">
+  <path d="M128 128L128 -8" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(512 768)">
+  <g clip-path="url(#tile-2)">
+  <path d="M128 128L264 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(768 768)">
+  <g clip-path="url(#tile-3)">
+  <path d="M128 128L128 -8 M128 128L264 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(0 512)">
+  <g clip-path="url(#tile-4)">
+  <path d="M128 128L128 264" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(256 512)">
+  <g clip-path="url(#tile-5)">
+  <path d="M128 128L128 -8 M128 128L128 264" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(512 512)">
+  <g clip-path="url(#tile-6)">
+  <path d="M128 128L264 128 M128 128L128 264" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(768 512)">
+  <g clip-path="url(#tile-7)">
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(0 256)">
+  <g clip-path="url(#tile-8)">
+  <path d="M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(256 256)">
+  <g clip-path="url(#tile-9)">
+  <path d="M128 128L128 -8 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(512 256)">
+  <g clip-path="url(#tile-10)">
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(768 256)">
+  <g clip-path="url(#tile-11)">
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(0 0)">
+  <g clip-path="url(#tile-12)">
+  <path d="M128 128L128 264 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 264 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(256 0)">
+  <g clip-path="url(#tile-13)">
+  <path d="M128 128L128 -8 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(512 0)">
+  <g clip-path="url(#tile-14)">
+  <path d="M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+  <g transform="translate(768 0)">
+  <g clip-path="url(#tile-15)">
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L128 -8 M128 128L264 128 M128 128L128 264 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  </g>
+</svg>

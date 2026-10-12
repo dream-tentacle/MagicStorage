@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_FuelSupply_Use>Supplies fuel to friendly buildings within {0} cells, following their normal refueling threshold and automatic refueling toggle.</MS_FuelSupply_Use>
+  <MS_FuelSupply_Immediate>Supply now</MS_FuelSupply_Immediate>
+  <MS_FuelSupply_ImmediateDesc>Immediately refuel friendly buildings within {0} cells from the network once, skipping only percentage thresholds. Respects each target's automatic refueling toggle, fuel filter, target level, other refueling restrictions and reserved stock.</MS_FuelSupply_ImmediateDesc>
+</LanguageData>

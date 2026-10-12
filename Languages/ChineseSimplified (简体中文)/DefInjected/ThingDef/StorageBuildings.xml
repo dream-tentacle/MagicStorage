@@ -5,13 +5,13 @@
   <MS_StorageCore.description>魔法存储的管理核心，在此进行网络内的调度。同一网络只能有一个控制核心。</MS_StorageCore.description>
 
   <MS_StorageUnit.label>存储单元</MS_StorageUnit.label>
-  <MS_StorageUnit.description>保存物品的存储单元，提供64个堆叠槽位，遵循正常堆叠规则。存储的食物不会腐烂。</MS_StorageUnit.description>
+  <MS_StorageUnit.description>保存物品的存储单元，遵循正常堆叠规则。默认提供64个堆叠槽位，可在模组设置中调整为6至1000个。存储的食物不会腐烂。</MS_StorageUnit.description>
 
   <MS_StorageReceiver.label>存储接收器</MS_StorageReceiver.label>
-  <MS_StorageReceiver.description>接收殖民者搬来的物品，交由相连的控制核心存入存储单元。</MS_StorageReceiver.description>
+  <MS_StorageReceiver.description>接收殖民者搬来的物品，交由相连的控制核心存入存储单元。网络有空间接收该物品时，殖民者才会选择此处作为搬运目标。\n\n（会吸入表面所有符合存储过滤的物品，因此建议勿紧贴核心放置，否则主动取出物品时会吸回去）</MS_StorageReceiver.description>
 
   <MS_CosmicWorkbench.label>宇宙工作台</MS_CosmicWorkbench.label>
-  <MS_CosmicWorkbench.description>执行相连控制核心分配的制作任务。产物默认优先存入相连的网络，无法存入的物品放在核心周围。也可将任务设为制作后放到工作台周围。</MS_CosmicWorkbench.description>
+  <MS_CosmicWorkbench.description>执行相连控制核心分配的制作任务。产物默认优先存入相连的网络，无法存入的物品放在核心周围。若产物不符合核心的存储筛选条件，产出后会掉落在核心位置。也可将任务设为制作后放到工作台周围。</MS_CosmicWorkbench.description>
 
   <MS_ConstructionSupplyUnit.label>建筑供给单元</MS_ConstructionSupplyUnit.label>
   <MS_ConstructionSupplyUnit.description>定期从相连的存储网络向半径40格内的己方工地供应建造材料，无需殖民者搬运，施工仍由殖民者完成。</MS_ConstructionSupplyUnit.description>

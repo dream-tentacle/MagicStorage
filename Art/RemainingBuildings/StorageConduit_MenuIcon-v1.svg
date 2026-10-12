@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>存储线 — 图标</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#a5bac8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 128L264 128 M128 128L-8 128" fill="none" stroke="#e8f5fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

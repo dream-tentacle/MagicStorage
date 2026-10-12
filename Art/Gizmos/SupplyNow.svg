@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>立即供应物资</title>
+  <desc>存储箱与向外送出的箭头。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 42 48 26l31 16-31 17Z"/>
+    <path d="M17 42v42l31 17 31-17V42M48 59v42"/>
+    <path d="m33 34 31 17v13"/>
+    <path d="M64 72h48m-16-16 16 16-16 16" stroke="#263746" stroke-width="15"/>
+    <path d="M64 72h48m-16-16 16 16-16 16" stroke="#63D5ED" stroke-width="8"/>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Transport_Open>Transfer items</MS_Transport_Open>
+  <MS_Transport_OpenDesc>Transfer items between the storage network and this material supplier in either direction.</MS_Transport_OpenDesc>
+  <MS_Transport_Title>Material supplier · Transfer items</MS_Transport_Title>
+  <MS_Transport_NetworkColumn>Storage network\nCurrent → After transfer</MS_Transport_NetworkColumn>
+  <MS_Transport_SupplyColumn>Material supplier\nCurrent → After transfer</MS_Transport_SupplyColumn>
+  <MS_Transport_ChangeColumn>← Return to network    Load supplier →</MS_Transport_ChangeColumn>
+  <MS_Transport_CapacityRule>Mass limit: {0} kg (set when this window opens)</MS_Transport_CapacityRule>
+  <MS_Transport_Available>Available from the network: {0}. Items reserved by other tasks cannot be transferred.</MS_Transport_Available>
+  <MS_Transport_SupplyTip>Items currently in the supplier and the quantity after confirmation.</MS_Transport_SupplyTip>
+  <MS_Transport_QuantityTip>Positive quantities load the supplier; negative quantities return items to the network. Arrows adjust quantities; double arrows transfer all items in that direction. &gt;M fills this item's quantity up to the mass limit, accounting for existing cargo and other selections; the double arrow returns at the limit. Hold the left mouse button and drag across arrow buttons to adjust multiple rows, once per row per drag.</MS_Transport_QuantityTip>
+  <MS_Transport_Mass>Supplier mass: {0} → {1} kg    Limit: {2} kg (including selections hidden by filters)</MS_Transport_Mass>
+  <MS_Transport_Overweight>The supplier would exceed its mass limit. Reduce incoming quantities or return some items to the network before confirming.</MS_Transport_Overweight>
+  <MS_Transport_Hint>Confirm executes all selections; cancel moves nothing. The supplier delivers to the transporter or refuelable building directly ahead once per second. Excess or incompatible items stay in the supplier.</MS_Transport_Hint>
+  <MS_Transport_Unavailable>Items or network status changed, and the full transfer could not be completed. The list has been refreshed. Check both inventories before retrying.</MS_Transport_Unavailable>
+  <MS_Transport_NetworkCannotAccept>The network's storage filter or remaining stack slots cannot accept all returning items. This transfer was cancelled.</MS_Transport_NetworkCannotAccept>
+  <MS_Transport_Refreshed>The network or inventory changed. The list was refreshed and transfer quantities were reset.</MS_Transport_Refreshed>
+  <MS_Transport_Contents>Internal cargo: {0} stacks, {1} kg</MS_Transport_Contents>
+  <MS_Transport_NoTarget>No transporter or refuelable building directly ahead; waiting to supply.</MS_Transport_NoTarget>
+  <MS_Transport_Target>Ahead: {0} ({1} / {2} kg)</MS_Transport_Target>
+  <MS_Transport_FuelTarget>Ahead: {0} (fuel {1} / {2})</MS_Transport_FuelTarget>
+  <MS_Transport_SwitchMode>Switch supply mode</MS_Transport_SwitchMode>
+  <MS_Transport_SwitchModeDesc>Switch between manual storage and continuous supply. Empty the supplier's own contents before switching.</MS_Transport_SwitchModeDesc>
+  <MS_Transport_ModeBlocked>Empty this material supplier's own contents first.</MS_Transport_ModeBlocked>
+  <MS_Transport_ManualMode>Supply mode: Manual storage</MS_Transport_ManualMode>
+  <MS_Transport_DirectMode>Supply mode: Continuous supply</MS_Transport_DirectMode>
+  <MS_Transport_Configure>Select supply items</MS_Transport_Configure>
+  <MS_Transport_ConfigureTitle>Material supplier · Continuous supply</MS_Transport_ConfigureTitle>
+  <MS_Transport_DirectHint>Select up to three item types to send directly from the network once per second. The supplier stores nothing. Higher rows have priority; unavailable or incompatible items are skipped. Items reserved by other tasks are excluded.</MS_Transport_DirectHint>
+  <MS_Transport_PrioritySlot>Priority {0}</MS_Transport_PrioritySlot>
+  <MS_Transport_PickTitle>Select an item for priority {0}</MS_Transport_PickTitle>
+  <MS_Transport_PickHint>Select one item type per slot. Higher slots are supplied first; duplicate selections are not allowed.</MS_Transport_PickHint>
+  <MS_Transport_ImmediateDesc>Immediately supply the target directly ahead once, using the current mode's item source. Refueling skips only percentage thresholds, respecting each target's automatic refueling toggle, fuel filter, target level, other refueling restrictions and reserved stock.</MS_Transport_ImmediateDesc>
+  <MS_Transport_ImmediateEmpty>The material supplier has no items to supply.</MS_Transport_ImmediateEmpty>
+</LanguageData>

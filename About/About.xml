@@ -7,7 +7,7 @@
 		<li>1.6</li>
 	</supportedVersions>
 	<packageId>mjcg.magicstorage</packageId>
-	<description>通过控制核心和存储线管理多个存储单元。\n可以使用宇宙工作台制作配方。\n可以在自动补货架满足日常小量取货。\n可以通过新增选项进行贸易。\n\n不支持手术、机械族孕育的自动取货。\n组建远行队、空投仓、穿梭机时，必须手动从核心取出物品。建议在核心周围设置低优先级储存区方便管理。</description>
+	<description>通过控制核心和存储线管理多个存储单元。\n可以使用宇宙工作台制作配方。\n可以在自动补货架满足日常小量取货。\n可以通过新增选项进行贸易。\n\n不支持手术、机械族孕育的自动取货。\n组建远行队时，必须手动从核心取出物品。建议在核心周围设置低优先级储存区方便管理。</description>
 	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>

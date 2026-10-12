@@ -8,7 +8,7 @@ namespace MagicStorage
     public enum CraftingRepeatMode { RepeatCount, Forever, TargetCount }
     public enum CraftingWorkerKind { Anyone, Slaves, Mechs, NonMechs }
 
-    // Owned by a core. No Bill, BillStack or vanilla worktable is constructed.
+    // Orders and batches are owned by a core, outside the vanilla BillStack/worktable pipeline.
     public sealed class CraftingOrder : IExposable
     {
         public int Id;

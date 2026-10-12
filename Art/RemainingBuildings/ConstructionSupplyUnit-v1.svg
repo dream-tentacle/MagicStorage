@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>建筑供给单元</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="460" height="416" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="460" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H458Q486 458 486 430" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H450Q468 56 472 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M473 85V417Q473 444 446 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="193" y="65" width="126" height="29" rx="5" fill="#aebdc6"/>
+  <rect x="197" y="69" width="118" height="21" rx="3" fill="#344a5b"/>
+  <path d="M209 79H230M240 79H261" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M276 79H304" fill="none" stroke="#91afc3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Raised material-transfer housing and recessed layered aperture. -->
+  <path d="M130 136H382L405 160V364L380 392H132L107 364V160Z" fill="#849ba9"/>
+  <path d="M130 125H382L405 149V346L380 374H132L107 346V149Z" fill="#c5d0d8"/>
+  <path d="M132 132H378L393 149V341L376 362H136L119 341V149Z" fill="#e1e7eb"/>
+  <path d="M153 173H359L375 192V301L355 327H157L137 301V192Z" fill="#617d90"/>
+  <path d="M157 182H355L363 195V296L349 313H163L149 296V195Z" fill="#adc1ce"/>
+  <path d="M151 195H361V212H151Z" fill="#456176"/>
+  <path d="M155 224H357V235H155ZM155 264H357V275H155Z" fill="#849faf"/>
+  <path d="M160 225H352M160 265H352" fill="none" stroke="#d5e3ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="125" y="344" width="262" height="15" rx="3" fill="#c5e5f5"/>
+  <path d="M136 347H376" fill="none" stroke="#edf6fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="63" y="160" width="30" height="216" rx="7" fill="#acbcc6"/>
+  <rect x="65" y="156" width="26" height="208" rx="6" fill="#dce5ea"/>
+  <rect x="73" y="184" width="10" height="134" rx="2" fill="#c5e5f5"/>
+  <rect x="419" y="160" width="30" height="216" rx="7" fill="#acbcc6"/>
+  <rect x="421" y="156" width="26" height="208" rx="6" fill="#dce5ea"/>
+  <rect x="429" y="184" width="10" height="134" rx="2" fill="#c5e5f5"/>
+  <rect x="173" y="401" width="166" height="27" rx="5" fill="#bac9d2"/>
+  <path d="M190 410H322" fill="none" stroke="#f1f5f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M205 421H307" fill="none" stroke="#8da3b2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="204.0" y="468" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M217.0 471H243.0M277.0 471H296.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H458Q486 42 486 70V458Q486 486 458 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

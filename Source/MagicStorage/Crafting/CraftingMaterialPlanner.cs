@@ -16,6 +16,7 @@ namespace MagicStorage
     {
         internal double Value;
         internal Predicate<T> Allows;
+        internal Func<T, int> CountRequired;
     }
     internal static class CraftingMaterialPlanner
     {
@@ -23,6 +24,16 @@ namespace MagicStorage
             bool mix, bool wholeStacks, out Dictionary<T, int> result)
         {
             result = new Dictionary<T, int>();
+            // Vanilla's no-mix whole-stack branch takes the first usable stack and
+            // succeeds immediately, regardless of the declared ingredient count.
+            // The allow-mix branch uses normal quantities even with this flag set.
+            if (!mix && wholeStacks && needs.Count > 0)
+            {
+                foreach (var stock in stocks)
+                    if (stock.Count > 0 && needs[0].Allows(stock.Item))
+                    { result.Add(stock.Item, stock.Count); return true; }
+                return false;
+            }
             int[] used = new int[stocks.Count];
             var selectionOrder = new List<int>();
             foreach (var need in needs)
@@ -32,14 +43,18 @@ namespace MagicStorage
                 object kind = null;
                 if (!mix)
                 {
-                    var totals = new Dictionary<object, double>();
-                    foreach (int i in Enumerable.Range(0, stocks.Count))
+                    // Vanilla groups all available stacks by def in encounter
+                    // order before choosing the first def with enough units.
+                    foreach (var group in Enumerable.Range(0, stocks.Count).GroupBy(i => stocks[i].Kind))
                     {
-                        var stock = stocks[i];
-                        if (stock.Value <= 0 || !need.Allows(stock.Item)) continue;
-                        if (!totals.ContainsKey(stock.Kind)) totals[stock.Kind] = 0;
-                        totals[stock.Kind] += Math.Max(0, stock.Count - used[i]) * stock.Value;
-                        if (totals[stock.Kind] + 0.0001 >= left) { kind = stock.Kind; break; }
+                        int first = group.Where(i => stocks[i].Value > 0 && need.Allows(stocks[i].Item) && stocks[i].Count > used[i])
+                            .DefaultIfEmpty(-1).First();
+                        if (first < 0) continue;
+                        var stock = stocks[first];
+                        int required = need.CountRequired != null ? need.CountRequired(stock.Item) : (int)Math.Ceiling(left / stock.Value);
+                        long available = group.Where(i => need.Allows(stocks[i].Item))
+                            .Sum(i => (long)Math.Max(0, stocks[i].Count - used[i]));
+                        if (available >= required) { kind = stock.Kind; left = required; break; }
                     }
                     if (kind == null) return false;
                 }
@@ -48,9 +63,9 @@ namespace MagicStorage
                     var stock = stocks[i];
                     if (stock.Value <= 0 || !need.Allows(stock.Item) || (!mix && !Equals(stock.Kind, kind))) continue;
                     int available = Math.Max(0, stock.Count - used[i]);
-                    int take = wholeStacks ? available : (int)Math.Min(available, Math.Ceiling(left / stock.Value));
+                    int take = (int)Math.Min(available, mix ? Math.Ceiling(left / stock.Value) : left);
                     if (take > 0 && used[i] == 0) selectionOrder.Add(i);
-                    used[i] += take; left -= take * stock.Value;
+                    used[i] += take; left -= take * (mix ? stock.Value : 1d);
                 }
                 if (left > 0.0001) return false;
             }

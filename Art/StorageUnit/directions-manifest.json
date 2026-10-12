@@ -1,0 +1,17 @@
+[
+  {
+    "stem": "StorageUnit_south-v2",
+    "width": 512,
+    "height": 768
+  },
+  {
+    "stem": "StorageUnit_north-v2",
+    "width": 512,
+    "height": 768
+  },
+  {
+    "stem": "StorageUnit_east-v2",
+    "width": 768,
+    "height": 512
+  }
+]

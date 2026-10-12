@@ -10,7 +10,7 @@ namespace MagicStorage
         private int dataVersion = 1;
         public StorageInventory Inventory => inventory ?? (inventory = new StorageInventory(this));
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
-        public int SlotCapacity => GetComp<CompStorageNode>()?.SlotCapacity ?? 64;
+        public int SlotCapacity => MagicStorageMod.Settings.StorageUnitSlots;
         public bool ShouldTickContents => false;
         public bool IsContentsSuspended => true;
         public ThingOwner GetDirectlyHeldThings() => Inventory.Contents;
@@ -27,7 +27,6 @@ namespace MagicStorage
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 Inventory.Contents.dontTickContents = true;
-                Inventory.RebuildIndex();
             }
         }
 

@@ -12,9 +12,10 @@ namespace Verse
         public string LabelNoCount => variant ?? "item";
         public Thing GetInnerIfMinified() => this is MinifiedThing minified ? minified.InnerThing : this;
         public void SetForbidden(bool value, bool warn = true) { forbidden = value; }
-        public T TryGetComp<T>() where T : class => new RimWorld.CompForbiddable { parent = this } as T;
+        public T TryGetComp<T>() where T : class =>
+            (this as ThingWithComps)?.AllComps.Find(comp => comp is T) as T ?? new RimWorld.CompForbiddable { parent = this } as T;
     }
-    public class ThingComp { }
+    public class ThingComp { public Thing parent; }
     public class ThingWithComps : Thing { public List<ThingComp> AllComps = new List<ThingComp>(); }
     public partial class Map
     {
@@ -42,5 +43,5 @@ namespace RimWorld
         }
     }
     public class CompForbiddable : ThingComp
-    { public Thing parent; public bool Forbidden => parent.forbidden; }
+    { public new Thing parent; public bool Forbidden => parent.forbidden; }
 }

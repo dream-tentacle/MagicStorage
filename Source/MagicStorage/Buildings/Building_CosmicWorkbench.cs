@@ -18,7 +18,7 @@ namespace MagicStorage
             {
                 defaultLabel = "MS_Craft_Open".Translate(),
                 defaultDesc = "MS_Craft_OpenDesc".Translate(),
-                icon = def.uiIcon,
+                icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/CraftingList"),
                 action = () =>
                 {
                     if (!Spawned || Faction != Faction.OfPlayer) return;

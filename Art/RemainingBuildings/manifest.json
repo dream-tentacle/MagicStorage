@@ -1,0 +1,100 @@
+[
+  {
+    "stem": "ConstructionSupplyUnit-v1",
+    "label": "建筑供给单元",
+    "width": 512,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "FuelSupplier-v1",
+    "label": "燃料供给器",
+    "width": 512,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "NivarianCannonExtractor-v1",
+    "label": "涅瓦莲质量驱动器提取口",
+    "width": 512,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "CosmicWorkbench_south-v1",
+    "label": "宇宙工作台 — 南向",
+    "width": 1536,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "CosmicWorkbench_north-v1",
+    "label": "宇宙工作台 — 北向",
+    "width": 1536,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "CosmicWorkbench_east-v1",
+    "label": "宇宙工作台 — 东向",
+    "width": 512,
+    "height": 1536,
+    "category": "building"
+  },
+  {
+    "stem": "StorageApparelAdapter_south-v1",
+    "label": "衣物适配器 — 南向",
+    "width": 1024,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "StorageApparelAdapter_north-v1",
+    "label": "衣物适配器 — 北向",
+    "width": 1024,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "StorageApparelAdapter_east-v1",
+    "label": "衣物适配器 — 东向",
+    "width": 512,
+    "height": 1024,
+    "category": "building"
+  },
+  {
+    "stem": "StorageConduit_Atlas-v1",
+    "label": "存储线 — 十六种连接形态",
+    "width": 1024,
+    "height": 1024,
+    "category": "atlas"
+  },
+  {
+    "stem": "StorageConduit_MenuIcon-v1",
+    "label": "存储线 — 图标",
+    "width": 256,
+    "height": 256,
+    "category": "icon"
+  },
+  {
+    "stem": "StorageApparelAdapter_south-v2",
+    "label": "衣物适配器 — 南向第二稿",
+    "width": 1024,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "StorageApparelAdapter_north-v2",
+    "label": "衣物适配器 — 北向第二稿",
+    "width": 1024,
+    "height": 512,
+    "category": "building"
+  },
+  {
+    "stem": "StorageApparelAdapter_east-v2",
+    "label": "衣物适配器 — 东向第二稿",
+    "width": 512,
+    "height": 1024,
+    "category": "building"
+  }
+]

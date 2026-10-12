@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 自动补货架，南向设计稿</title>
+  <desc>Original 1×1 automatically restocking shelf, south view. Two open shelves, substantial side supports and a discreet rear stock indicator. Pearl-grey housing with RGB(197,229,245) accents. Black is reserved for the outer contour.</desc>
+  <!-- Back and side frame, overhead south projection. -->
+  <path d="M56 42H456Q484 42 484 70V461Q484 482 463 482H432V446H80V482H49Q28 482 28 461V70Q28 42 56 42Z" fill="#8a9ba7"/>
+  <path d="M80 116H432V428H80Z" fill="#435a6d"/>
+  <rect x="28" y="42" width="456" height="90" rx="26" fill="#d8dfe3"/>
+  <path d="M44 103V72Q44 56 62 56H450Q467 56 471 72" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M55 128H457" stroke="#a3b5c1" stroke-width="5"/>
+  <rect x="70" y="67" width="68" height="33" rx="2" fill="#c3ced5"/>
+  <rect x="77" y="74" width="21" height="17" fill="#c5e5f5"/>
+  <path d="M107 80H129M107 87H123" stroke="#9db2c0" stroke-width="2"/>
+  <rect x="339" y="68" width="100" height="24" rx="3" fill="#aebdc6"/>
+  <rect x="343" y="72" width="92" height="16" rx="2" fill="#344a5b"/>
+  <path d="M354 80H377M386 80H409" stroke="#c5e5f5" stroke-width="3"/>
+
+  <!-- Upper shelf: empty stock surface and a shallow forward lip. -->
+  <path d="M75 169H437V268H75Z" fill="#8fa6b6"/>
+  <path d="M79 173H433V192H79Z" fill="#587487"/>
+  <path d="M82 193H430V256H82Z" fill="#a6bbc8"/>
+  <path d="M82 193H430" stroke="#bdcdd6" stroke-width="2"/>
+  <path d="M75 255H437V276H75Z" fill="#cdd8df"/>
+  <path d="M79 258H433" stroke="#ecf2f5" stroke-width="2"/>
+  <path d="M75 274H437" stroke="#809bab" stroke-width="3"/>
+  <path d="M192 269H227" stroke="#c5e5f5" stroke-width="3"/>
+
+  <!-- Lower shelf, open at the front. -->
+  <path d="M75 308H437V418H75Z" fill="#849ead"/>
+  <path d="M80 312H432V334H80Z" fill="#567284"/>
+  <path d="M82 335H430V402H82Z" fill="#a4bac7"/>
+  <path d="M82 335H430" stroke="#bfced7" stroke-width="2"/>
+  <path d="M75 402H437V426H75Z" fill="#cdd8df"/>
+  <path d="M80 406H432" stroke="#ecf2f5" stroke-width="2"/>
+  <path d="M75 424H437" stroke="#7995a7" stroke-width="3"/>
+
+  <!-- Solid side posts continue into the feet. -->
+  <path d="M28 113H78V453H80V482H49Q28 482 28 461Z" fill="#d8dfe3"/>
+  <path d="M434 113H484V461Q484 482 463 482H432V453H434Z" fill="#d8dfe3"/>
+  <path d="M35 126H44V446H35Z" fill="#eff3f5"/>
+  <path d="M470 126H478V447H470Z" fill="#adbdc7"/>
+  <path d="M54 347H65V405H54ZM447 347H458V405H447Z" fill="#c5e5f5"/>
+  <path d="M31 453H76V477H48Q32 477 31 461ZM436 453H481V461Q480 477 464 477H436Z" fill="#798e9c"/>
+  <path d="M81 444H431" stroke="#526b7f" stroke-width="4"/>
+  <path d="M56 42H456Q484 42 484 70V461Q484 482 463 482H432V446H80V482H49Q28 482 28 461V70Q28 42 56 42Z" fill="none" stroke="#000000" stroke-width="8"/>
+</svg>

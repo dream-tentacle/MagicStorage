@@ -1,0 +1,18 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>7.3</LangVersion>
+    <OutputPath>bin\QuantityDrag\</OutputPath>
+    <IntermediateOutputPath>obj\QuantityDrag\</IntermediateOutputPath>
+    <AssemblyName>QuantityDragTests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup><Reference Include="System" /><Reference Include="System.Core" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="QuantityDragStubs.cs" />
+    <Compile Include="QuantityDragTests.cs" />
+    <Compile Include="..\Source\MagicStorage\UI\StorageQuantityDrag.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

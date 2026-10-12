@@ -20,12 +20,14 @@ namespace RimWorld
     {
         private Map map;
         public int EligibilityChecks;
+        public int Updates;
         public Dictionary<ThingDef, int> AllCountedAmounts { get; } = new Dictionary<ThingDef, int>();
         public ResourceCounter(Map map) { this.map = map; }
         public int GetCount(ThingDef def) => AllCountedAmounts.TryGetValue(def, out int count) ? count : 0;
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void UpdateResourceCounts()
         {
+            Updates++;
             AllCountedAmounts.Clear();
             foreach (ThingDef def in map.ResourceDefs) AllCountedAmounts.Add(def, 0);
             foreach (Thing stored in map.NativeStoredResources)

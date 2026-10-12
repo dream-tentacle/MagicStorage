@@ -7,7 +7,7 @@
     <passability>PassThroughOnly</passability>
     <pathCost>40</pathCost>
     <fillPercent>0.5</fillPercent>
-    <designationCategory>Misc</designationCategory>
+    <designationCategory>MS_MagicStorage</designationCategory>
     <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
     <constructEffect>ConstructMetal</constructEffect>
     <repairEffect>Repair</repairEffect>
@@ -33,10 +33,12 @@
     <surfaceType>None</surfaceType>
     <disableImpassableShotOverConfigError>true</disableImpassableShotOverConfigError>
     <graphicData>
-      <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
+      <texPath>Things/Building/StorageCore/StorageCore</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>2.46875</drawSize>
-      <color>(0.65,0.85,1)</color>
+      <drawSize>(2.125,2.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <inspectorTabs><li>ITab_Storage</li></inspectorTabs>
@@ -47,19 +49,22 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageUnit</defName>
     <label>storage unit</label>
-    <description>A storage unit with 64 stack slots, following normal stacking rules. Stored food does not rot.</description>
+    <description>A storage unit following normal stacking rules. It provides 64 stack slots by default, adjustable from 6 to 1000 in the mod settings. Stored food does not rot.</description>
     <thingClass>MagicStorage.Building_StorageUnit</thingClass>
     <size>(1,2)</size>
     <rotatable>true</rotatable>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
     <graphicData>
-      <texPath>Things/Building/Power/Battery</texPath>
+      <texPath>Things/Building/StorageUnit/StorageUnit</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(2,3)</drawSize>
-      <color>(0.6,0.85,1)</color>
+      <drawSize>(1.125,2.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <allowFlip>true</allowFlip>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
-    <comps><li Class="MagicStorage.CompProperties_StorageNode"><slotCapacity>64</slotCapacity></li></comps>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <costList><Steel>60</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
     <uiOrder>3101</uiOrder>
   </ThingDef>
@@ -67,7 +72,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageReceiver</defName>
     <label>storage receiver</label>
-    <description>Receives items hauled by colonists for storage in units by the connected control core.</description>
+    <description>Receives items hauled by colonists for storage in units by the connected control core. Haulers only select the receiver when its network has space for the item.\n\n(It absorbs all items on its surface that match the storage filter, so placing it directly next to the core is not recommended; otherwise, manually withdrawn items may be absorbed back into storage.)</description>
     <thingClass>MagicStorage.Building_StorageReceiver</thingClass>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
@@ -78,10 +83,12 @@
       <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
     </building>
     <graphicData>
-      <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
+      <texPath>Things/Building/StorageReceiver/StorageReceiver</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>1.25</drawSize>
-      <color>(0.55,0.8,1)</color>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
@@ -91,7 +98,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_CosmicWorkbench</defName>
     <label>cosmic workbench</label>
-    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. Orders can also be set to drop finished products near the workbench.</description>
+    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. If a product does not pass the core's storage filter, it is dropped at the core after production. Orders can also be set to drop finished products near the workbench.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <building><isMealSource>true</isMealSource></building>
     <size>(3,1)</size>
@@ -101,10 +108,13 @@
     <interactionCellIcon>DiningChair</interactionCellIcon>
     <canOverlapZones>false</canOverlapZones>
     <graphicData>
-      <texPath>Things/Building/Production/TableSculpting</texPath>
+      <texPath>Things/Building/CosmicWorkbench/CosmicWorkbench</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(3.5,1.5)</drawSize>
-      <color>(0.6,0.8,1)</color>
+      <drawSize>(3.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <allowFlip>true</allowFlip>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <placeWorkers><li>PlaceWorker_PreventInteractionSpotOverlap</li></placeWorkers>
@@ -121,10 +131,12 @@
     <size>(1,1)</size>
     <rotatable>false</rotatable>
     <graphicData>
-      <texPath>Things/Building/Misc/MultiAnalyzer</texPath>
+      <texPath>Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>1.25</drawSize>
-      <color>(1,0.8,0.4)</color>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <placeWorkers><li>MagicStorage.PlaceWorker_ConstructionSupply</li></placeWorkers>
@@ -144,10 +156,13 @@
     <interactionCellOffset>(0,0,-1)</interactionCellOffset>
     <canOverlapZones>false</canOverlapZones>
     <graphicData>
-      <texPath>Things/Building/Furniture/Dresser</texPath>
+      <texPath>Things/Building/StorageApparelAdapter/StorageApparelAdapter</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(2,1)</drawSize>
-      <color>(0.6,0.8,1)</color>
+      <drawSize>(2.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <allowFlip>true</allowFlip>
+      <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <placeWorkers><li>PlaceWorker_PreventInteractionSpotOverlap</li></placeWorkers>
@@ -167,7 +182,7 @@
     <rotatable>false</rotatable>
     <clearBuildingArea>false</clearBuildingArea>
     <passability>Standable</passability>
-    <designationCategory>Misc</designationCategory>
+    <designationCategory>MS_MagicStorage</designationCategory>
     <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
     <drawerType>MapMeshOnly</drawerType>
     <building>

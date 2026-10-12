@@ -171,7 +171,7 @@ namespace MagicStorage
                 {
                     defaultLabel = "MS_Shelf_Configure".Translate(),
                     defaultDesc = "MS_Shelf_ConfigureDesc".Translate(),
-                    icon = def.uiIcon,
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/ConfigureShelf"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageSupplyShelf(this))
                 };
         }

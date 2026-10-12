@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_FuelSupplier</defName>
+    <label>fuel supplier</label>
+    <description>Automatically supplies fuel from the connected storage network to friendly buildings within 20 cells. Follows each building's fuel filter and automatic refueling toggle. No hauling or internal storage is required. Fuel reserved by other tasks remains in the network.\n\nUses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.</description>
+    <thingClass>MagicStorage.Building_FuelSupplier</thingClass>
+    <tickerType>Normal</tickerType>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/FuelSupplier/FuelSupplier</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(1,1,1)</color>
+      <drawRotated>false</drawRotated>
+      <drawOffset>(0,0,0)</drawOffset>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <placeWorkers><li>MagicStorage.PlaceWorker_FuelSupplier</li></placeWorkers>
+    <costList><Steel>60</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3109</uiOrder>
+  </ThingDef>
+</Defs>

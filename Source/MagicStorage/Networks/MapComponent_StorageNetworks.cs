@@ -9,10 +9,11 @@ namespace MagicStorage
         private readonly HashSet<CompStorageNode> nodes = new HashSet<CompStorageNode>();
         private readonly Dictionary<IntVec3, List<CompStorageNode>> grid = new Dictionary<IntVec3, List<CompStorageNode>>();
         private readonly Dictionary<CompStorageNode, List<IntVec3>> occupied = new Dictionary<CompStorageNode, List<IntVec3>>();
-        private readonly List<StorageNetwork> networks = new List<StorageNetwork>();
+        private readonly HashSet<StorageNetwork> networks = new HashSet<StorageNetwork>();
         private List<StorageRecoveryBatch> recovery = new List<StorageRecoveryBatch>();
         private ThingOwner<Thing> directlyHeldThings;
         private bool dirty = true;
+        private bool topologyChanged;
         private readonly StorageOutgoingReservations reservations = new StorageOutgoingReservations();
         private readonly Queue<System.Action> pendingActions = new Queue<System.Action>();
         internal void NotifyNodeUnavailable(Thing node) => reservations.NotifyNodeUnavailable(node);
@@ -47,7 +48,7 @@ namespace MagicStorage
                 DirtyDrawing(cell);
             }
             occupied.Add(node, cells);
-            MarkDirty();
+            if (!dirty) ConnectIncrementally(node, cells);
         }
 
         internal void Unregister(CompStorageNode node)
@@ -80,6 +81,42 @@ namespace MagicStorage
             foreach (var network in networks) network.Invalidate();
         }
 
+        private void ConnectIncrementally(CompStorageNode node, List<IntVec3> cells)
+        {
+            var adjacent = new HashSet<StorageNetwork>();
+            foreach (var cell in cells)
+            {
+                CollectAdjacent(cell, node, adjacent);
+                foreach (var direction in GenAdj.CardinalDirections)
+                    CollectAdjacent(cell + direction, node, adjacent);
+            }
+            StorageNetwork target = null;
+            foreach (var network in adjacent)
+                if (target == null || network.NodeCount > target.NodeCount) target = network;
+            if (target == null)
+            {
+                target = new StorageNetwork(reservations);
+                networks.Add(target);
+            }
+            target.AddNode(node);
+            foreach (var network in adjacent)
+                if (network != target)
+                {
+                    target.Absorb(network);
+                    networks.Remove(network);
+                }
+            target.FinishRebuild();
+            topologyChanged = true;
+        }
+
+        private void CollectAdjacent(IntVec3 cell, CompStorageNode added, HashSet<StorageNetwork> result)
+        {
+            if (!grid.TryGetValue(cell, out var list)) return;
+            foreach (var node in list)
+                if (node != added && node.parent.Faction == added.parent.Faction && node.Network != null)
+                    result.Add(node.Network);
+        }
+
         internal void NotifyFactionChanged(Thing thing)
         {
             foreach (var cell in thing.OccupiedRect()) DirtyDrawing(cell);
@@ -102,6 +139,7 @@ namespace MagicStorage
         public override void MapComponentTick()
         {
             if (dirty) Rebuild();
+            else if (topologyChanged) FinishTopologyChange();
             reservations.Validate();
             reservations.DispatchNotifications();
             int pending = pendingActions.Count;
@@ -143,6 +181,12 @@ namespace MagicStorage
                 network.FinishRebuild();
             }
             dirty = false;
+            FinishTopologyChange();
+        }
+
+        private void FinishTopologyChange()
+        {
+            topologyChanged = false;
             // Topology can switch a receiver to a different core/priority or disable it.
             NotifyReceiverSettingsChanged();
             reservations.Validate();
@@ -159,7 +203,11 @@ namespace MagicStorage
             foreach (var receiver in receivers) receiver.Notify_SettingsChanged();
         }
 
-        internal void EnsureCurrent() { if (dirty) Rebuild(); }
+        internal void EnsureCurrent()
+        {
+            if (dirty) Rebuild();
+            else if (topologyChanged) FinishTopologyChange();
+        }
 
         private void EnqueueAt(IntVec3 cell, CompStorageNode root, HashSet<CompStorageNode> visited, Queue<CompStorageNode> queue)
         {

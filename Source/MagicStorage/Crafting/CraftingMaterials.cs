@@ -16,16 +16,30 @@ namespace MagicStorage
             allocations = null;
             if (network == null || !network.CanWork) return false;
             var recipe = order.Recipe;
+            // A read-only argument for vanilla ingredient helpers, never registered
+            // in a BillStack. The parameterless constructor does not allocate a bill ID.
+            var bill = new Bill_Production { recipe = recipe, ingredientFilter = order.Ingredients };
             var things = new List<Thing>();
-            network.GetMatchingStacks(d => recipe.fixedIngredientFilter.Allows(d), things);
-            var stocks = things.Where(t => !t.Destroyed && (!recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh))
+            // WorkGiver_DoBill.IsUsableIngredient accepts fixed recipe ingredients
+            // before consulting the recipe-wide and player-selected filters.
+            network.GetMatchingStacks(d => bill.IsFixedOrAllowedIngredient(d) &&
+                recipe.ingredients.Any(i => i.filter.Allows(d)), things);
+            var stocks = things.Where(t => !t.Destroyed && bill.IsFixedOrAllowedIngredient(t) &&
+                    recipe.ingredients.Any(i => i.filter.Allows(t)) &&
+                    (!recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh))
                 .Select(t => new CraftingMaterialStock<Thing> { Item = t, Kind = t.def,
                     Count = network.AvailableToWithdraw(t), Value = recipe.IngredientValueGetter.ValuePerUnitOf(t.def) })
-                .Where(s => s.Count > 0 && (!recipe.ignoreIngredientCountTakeEntireStacks || s.Count == s.Item.stackCount))
-                .OrderBy(s => s.Value).ThenBy(s => s.Item.thingIDNumber).ToList();
+                .Where(s => s.Count > 0 && (recipe.allowMixingIngredients ||
+                    !recipe.ignoreIngredientCountTakeEntireStacks || s.Count == s.Item.stackCount))
+                // Match vanilla's distance order for no-mix and value-then-distance
+                // order for mix. The core is the material destination of this network.
+                .OrderBy(s => recipe.allowMixingIngredients ? s.Value : 0d)
+                .ThenBy(s => s.Item.PositionHeld.DistanceToSquared(network.Core.Position))
+                .ThenBy(s => s.Item.thingIDNumber).ToList();
             var needs = recipe.ingredients.Select(ingredient => new CraftingMaterialNeed<Thing>
             {
                 Value = ingredient.GetBaseCount(),
+                CountRequired = t => ingredient.CountRequiredOfFor(t.def, recipe, bill),
                 Allows = t => ingredient.filter.Allows(t) && (ingredient.IsFixedIngredient || order.Ingredients.Allows(t))
             }).ToList();
             return CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,

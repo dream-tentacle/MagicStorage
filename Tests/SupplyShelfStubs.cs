@@ -25,7 +25,8 @@ namespace RimWorld
 {
     public static partial class StoreUtility
     {
-        public static bool IsGoodStoreCell(IntVec3 position, Map map, Thing item, Pawn carrier, Faction faction) => !map.ShelfBlocked;
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public static bool IsGoodStoreCell(IntVec3 c, Map map, Thing t, Pawn carrier, Faction faction) => !map.ShelfBlocked;
     }
 }
 namespace MagicStorage

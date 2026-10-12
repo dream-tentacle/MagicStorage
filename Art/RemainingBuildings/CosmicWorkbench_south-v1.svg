@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="512" viewBox="0 0 1536 512">
+  <title>宇宙工作台 — 南向</title>
+  <desc>Original Magic Storage design study. Pearl-grey industrial casing, restrained sky-blue RGB(197,229,245) inlays, and a uniform black exterior contour. Interior edges use muted blue-grey.</desc>
+  <rect x="26" y="70" width="1484" height="416" rx="28" fill="#798893"/>
+  <rect x="26" y="42" width="1484" height="416" rx="28" fill="#d8dfe3"/>
+  <path d="M26 430Q26 458 54 458H1482Q1510 458 1510 430" fill="none" stroke="#25313c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 200V76Q40 56 61 56H1474Q1492 56 1496 73" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1497 85V417Q1497 444 1470 444H63" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Broad working surface with a quiet central fabrication bed. -->
+  <rect x="72" y="88" width="1392" height="294" rx="18" fill="#a4b7c4"/>
+  <rect x="77" y="83" width="1382" height="289" rx="16" fill="#e4ebef"/>
+  <path d="M96 89H1437" fill="none" stroke="#f7f9fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M422 103V346M1221 103V346" fill="none" stroke="#b1c2ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="110" y="142" width="263" height="171" rx="12" fill="#9fb4c2"/>
+  <rect x="119" y="151" width="245" height="150" rx="8" fill="#6e8b9f"/>
+  <rect x="129" y="162" width="225" height="130" rx="5" fill="#b6cbd9"/>
+  <path d="M151 179V193M332 179V193M151 262V276H183M300 276H332V262" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="176" y="325" width="135" height="12" rx="3" fill="#bdccd6"/>
+  <path d="M186 327H301" fill="none" stroke="#f4f7f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="463" y="130" width="710" height="204" rx="13" fill="#bbcbd6"/>
+  <rect x="469" y="136" width="698" height="190" rx="10" fill="#d2e2ec"/>
+  <path d="M487 143H1148" fill="none" stroke="#edf5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M489 175V156H534M1102 156H1147V175M489 287V307H534M1102 307H1147V287" fill="none" stroke="#8aa5b8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="691" y="118" width="252" height="12" rx="3" fill="#adc0cd"/>
+  <rect x="691" y="333" width="252" height="12" rx="3" fill="#adc0cd"/>
+  <path d="M711 124H758M876 124H923M711 339H758M876 339H923" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1260" y="124" width="155" height="116" rx="9" fill="#a6bac8"/>
+  <rect x="1267" y="130" width="141" height="103" rx="6" fill="#3f596d"/>
+  <path d="M1287 153H1324M1287 165H1314M1287 191H1390" fill="none" stroke="#8eafc5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1340" y="148" width="45" height="27" rx="3" fill="#c5e5f5"/>
+  <path d="M1333 212H1388" fill="none" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1268" y="262" width="141" height="74" rx="7" fill="#c7d5de"/>
+  <path d="M1290 285H1387M1290 309H1353" fill="none" stroke="#9bb2c2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1371" y="302" width="17" height="10" rx="2" fill="#c5e5f5"/>
+  <rect x="716.0" y="468" width="104" height="7" rx="3.5" fill="#344756"/>
+  <path d="M729.0 471H755.0M789.0 471H808.0" fill="none" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 42H1482Q1510 42 1510 70V458Q1510 486 1482 486H54Q26 486 26 458V70Q26 42 54 42Z" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

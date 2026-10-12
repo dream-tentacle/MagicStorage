@@ -84,7 +84,12 @@ namespace MagicStorage
     public sealed class Dialog_StorageShelfItemPicker : Window
     {
         private const float RowHeight = 26;
-        private readonly Building_StorageSupplyShelf shelf;
+        private readonly Thing owner;
+        private readonly Func<int, ThingDef> selectedDef;
+        private readonly Func<ThingDef, bool> canSelect;
+        private readonly Func<int, ThingDef, bool> setSelection;
+        private readonly ThingFilter selectionFilter;
+        private readonly string titleKey, hintKey;
         private readonly int slot;
         private readonly QuickSearchWidget search = new QuickSearchWidget();
         private readonly HashSet<ThingCategoryDef> opened = new HashSet<ThingCategoryDef>();
@@ -100,10 +105,20 @@ namespace MagicStorage
         }
         public override Vector2 InitialSize => new Vector2(Math.Min(650, UI.screenWidth), Math.Min(760, UI.screenHeight));
         public Dialog_StorageShelfItemPicker(Building_StorageSupplyShelf shelf, int slot)
+            : this(shelf, slot, shelf.SelectedDef, shelf.CanSelect, shelf.SetSelection,
+                  shelf.GetParentStoreSettings().filter, "MS_Shelf_PickTitle", "MS_Shelf_PickHint") { }
+        public Dialog_StorageShelfItemPicker(Building_TransportSupplier supplier, int slot)
+            : this(supplier, slot, supplier.SelectedDef, supplier.CanSelect, supplier.SetSelection,
+                  StorageSettings.EverStorableFixedSettings().filter, "MS_Transport_PickTitle", "MS_Transport_PickHint") { }
+        private Dialog_StorageShelfItemPicker(Thing owner, int slot, Func<int, ThingDef> selectedDef,
+            Func<ThingDef, bool> canSelect, Func<int, ThingDef, bool> setSelection, ThingFilter selectionFilter,
+            string titleKey, string hintKey)
         {
-            this.shelf = shelf; this.slot = slot;
+            this.owner = owner; this.slot = slot; this.selectedDef = selectedDef;
+            this.canSelect = canSelect; this.setSelection = setSelection; this.selectionFilter = selectionFilter;
+            this.titleKey = titleKey; this.hintKey = hintKey;
             doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true;
-            ThingDef selected = shelf.SelectedDef(slot);
+            ThingDef selected = selectedDef(slot);
             if (selected?.thingCategories != null)
                 foreach (ThingCategoryDef category in selected.thingCategories)
                 {
@@ -113,14 +128,14 @@ namespace MagicStorage
         }
         public override void DoWindowContents(Rect rect)
         {
-            if (!shelf.Spawned) { Close(); return; }
+            if (!owner.Spawned) { Close(); return; }
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(0, 0, rect.width - 30, 36), "MS_Shelf_PickTitle".Translate(slot + 1));
+            Widgets.Label(new Rect(0, 0, rect.width - 30, 36), titleKey.Translate(slot + 1));
             Text.Font = GameFont.Small;
-            Widgets.Label(new Rect(0, 40, rect.width, 44), "MS_Shelf_PickHint".Translate());
+            Widgets.Label(new Rect(0, 40, rect.width, 44), hintKey.Translate());
             search.OnGUI(new Rect(4, 91, rect.width - 8, 24), () => scroll = Vector2.zero);
             matchingCategories.Clear(); rows.Clear();
-            ThingCategoryDef root = shelf.GetParentStoreSettings().filter.DisplayRootCategory.catDef;
+            ThingCategoryDef root = selectionFilter.DisplayRootCategory.catDef;
             AddChildren(root, 0, false);
             search.noResultsMatched = !rows.Any(r => r.Item != null);
             Rect listRect = new Rect(0, 125, rect.width, rect.height - 185);
@@ -134,7 +149,7 @@ namespace MagicStorage
             }
             Widgets.EndScrollView();
         }
-        private bool Visible(ThingDef itemDef) => shelf.CanSelect(itemDef) && !Find.HiddenItemsManager.Hidden(itemDef);
+        private bool Visible(ThingDef itemDef) => canSelect(itemDef) && !Find.HiddenItemsManager.Hidden(itemDef);
         private bool CategoryMatches(ThingCategoryDef category)
         {
             if (matchingCategories.TryGetValue(category, out bool value)) return value;
@@ -170,8 +185,8 @@ namespace MagicStorage
                 return;
             }
             bool elsewhere = Enumerable.Range(0, Building_StorageSupplyShelf.SlotCount)
-                .Any(i => i != slot && shelf.SelectedDef(i) == row.Item);
-            if (shelf.SelectedDef(slot) == row.Item) Widgets.DrawHighlightSelected(rect);
+                .Any(i => i != slot && selectedDef(i) == row.Item);
+            if (selectedDef(slot) == row.Item) Widgets.DrawHighlightSelected(rect);
             else if (!elsewhere) Widgets.DrawHighlightIfMouseover(rect);
             Color previous = GUI.color;
             if (elsewhere) GUI.color = Color.gray;
@@ -180,7 +195,7 @@ namespace MagicStorage
             GUI.color = previous;
             TooltipHandler.TipRegion(rect, row.Item.DescriptionDetailed +
                 (elsewhere ? "\n\n" + "MS_Shelf_AlreadySelected".Translate().ToString() : ""));
-            if (!elsewhere && Widgets.ButtonInvisible(rect) && shelf.SetSelection(slot, row.Item)) Close();
+            if (!elsewhere && Widgets.ButtonInvisible(rect) && setSelection(slot, row.Item)) Close();
         }
     }
 }

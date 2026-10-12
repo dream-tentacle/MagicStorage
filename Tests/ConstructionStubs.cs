@@ -27,7 +27,7 @@ namespace Verse
     { public UnityEngine.Vector3 ToVector3Shifted() => new UnityEngine.Vector3(x+0.5f, 0f, z+0.5f); }
     public static class CenterUtility
     { public static UnityEngine.Vector3 TrueCenter(this Thing thing) => new UnityEngine.Vector3(thing.Position.x+thing.width*0.5f, 0f, thing.Position.z+thing.height*0.5f); }
-    public struct Rot4 { public int value; }
+    public partial struct Rot4 { public int value; }
     public class Graphic { }
     public class Graphic_Random : Graphic { }
     public class TerrainDef { }
@@ -51,7 +51,7 @@ namespace Verse
         public bool IsSelected(Thing thing) => Selected == thing;
         public void Select(Thing thing, bool playSound, bool forceDesignatorDeselect) { Selected = thing; }
     }
-    public static class GenDraw
+    public static partial class GenDraw
     {
         public static float Radius;
         public static void DrawRadiusRing(IntVec3 center, float radius) { Radius = radius; }

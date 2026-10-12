@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 存储控制核心</title>
+  <desc>2×2 industrial storage control core. Original artwork: pale metal housing, recessed cyan core, rear control display and yellow service markings. Transparent background; orthographic overhead view with a shallow front face.</desc>
+  <defs>
+    <clipPath id="glass"><ellipse cx="264" cy="247" rx="72" ry="65"/></clipPath>
+    <radialGradient id="core-energy" cx="34%" cy="26%" r="76%">
+      <stop offset="0" stop-color="#e3fff6"/>
+      <stop offset="0.28" stop-color="#a0efe7"/>
+      <stop offset="0.67" stop-color="#50becb"/>
+      <stop offset="1" stop-color="#286879"/>
+    </radialGradient>
+    <radialGradient id="core-halo">
+      <stop offset="0" stop-color="#73e5da" stop-opacity="0.24"/>
+      <stop offset="0.65" stop-color="#60c8cc" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#60c8cc" stop-opacity="0"/>
+    </radialGradient>
+    <g id="screw">
+      <rect x="-2.5" y="-2.5" width="5" height="5" rx="0.6" fill="#767676"/>
+      <path d="M-1.4 0H1.4" fill="none" stroke="#bfbfbf" stroke-width="1"/>
+    </g>
+    <g id="terminal-node">
+      <rect x="-5" y="-4" width="10" height="8" rx="1" fill="none" stroke="#77dce1" stroke-width="1.5"/>
+      <path d="M-2 7H2M0 4V7" fill="none" stroke="#77dce1" stroke-width="1.5"/>
+    </g>
+  </defs>
+
+  <!-- Footing and shallow front face. All shading is painted into the asset. -->
+  <g id="base">
+    <path d="M75 408H437V449L426 460H88L75 448Z" fill="#292c2c" stroke="#171a1b" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M86 434H115V461H90L86 455ZM398 434H427V455L422 461H398Z" fill="#424645"/>
+    <path d="M62 359H450V432L437 445H76L62 431Z" fill="#9a9a9a" stroke="#171a1b" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M64 388H448V408H64Z" fill="#bbbbbb"/>
+    <path d="M64 426H448L437 445H76L64 432Z" fill="#595959"/>
+    <path d="M65 427H126L137 437H65Z" fill="#eab73c"/>
+    <path d="M381 428H438L429 437H381Z" fill="#858585"/>
+    <rect x="176" y="409" width="150" height="16" rx="2" fill="#6c6c6c"/>
+    <path d="M186 414H259M186 419H259" stroke="#434343" stroke-width="2"/>
+    <rect x="278" y="413" width="17" height="5" fill="#77c4c7"/>
+    <rect x="300" y="413" width="15" height="5" fill="#343c39"/>
+  </g>
+
+  <!-- Main housing: broad quiet surfaces and a strong chamfered silhouette. -->
+  <g id="housing">
+    <path d="M80 53H432L451 72V381L434 399H79L61 381V72Z" fill="#d8d8d8" stroke="#171a1b" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M80 59H430L445 74H69Z" fill="#f1f1f1"/>
+    <path d="M68 74H76V367L87 391H79L68 380Z" fill="#c2c2c2"/>
+    <path d="M436 75H445V380L432 391H423L436 368Z" fill="#acacac"/>
+    <path d="M77 365H431L421 391H88Z" fill="#a9a9a9"/>
+    <path d="M77 76H434V137H77Z" fill="#c6c6c6"/>
+    <path d="M77 137H434" stroke="#a1a1a1" stroke-width="2"/>
+    <path d="M86 145H425V354H86Z" fill="#e1e1e1"/>
+    <path d="M91 149H419" stroke="#f3f3f3" stroke-width="2"/>
+    <path d="M88 355H425" stroke="#c6c6c6" stroke-width="2"/>
+    <path d="M99 150V342M409 150V342" fill="none" stroke="#cbcbcb" stroke-width="1.5"/>
+    <use href="#screw" x="87" y="72"/><use href="#screw" x="425" y="72"/>
+    <use href="#screw" x="87" y="379"/><use href="#screw" x="425" y="379"/>
+  </g>
+
+  <!-- Rear display: a network diagram communicates the core's control role. -->
+  <g id="control-display">
+    <path d="M103 73H262L268 79V126H97V79Z" fill="#777777"/>
+    <path d="M104 77H260L264 81V122H101V81Z" fill="#222c2c" stroke="#484848" stroke-width="2"/>
+    <path d="M106 82H258" stroke="#53635d" stroke-width="2"/>
+    <path d="M107 87H145V90H107ZM107 95H128V97H107ZM107 103H134V105H107" fill="#82dade"/>
+    <path d="M140 95H149V105H140Z" fill="#42686a"/>
+    <path d="M168 106H197V92H226V106H251" fill="none" stroke="#468e94" stroke-width="1.5"/>
+    <use href="#terminal-node" x="169" y="105"/>
+    <use href="#terminal-node" x="198" y="91"/>
+    <use href="#terminal-node" x="226" y="105"/>
+    <rect x="244" y="88" width="10" height="4" fill="#b0eeee"/>
+    <path d="M110 113H128M132 113H140M145 113H150" stroke="#4a8e91" stroke-width="2"/>
+    <path d="M105 125H259" stroke="#efefef" stroke-width="2"/>
+  </g>
+
+  <!-- Rear maintenance module. -->
+  <g id="rear-service">
+    <path d="M282 78H411V123H282Z" fill="#b2b2b2" stroke="#979797" stroke-width="1.5"/>
+    <path d="M285 81H407" stroke="#e0e0e0" stroke-width="2"/>
+    <rect x="291" y="90" width="64" height="23" fill="#9c9c9c"/>
+    <path d="M299 94V109M306 94V109M313 94V109M320 94V109M327 94V109M334 94V109M341 94V109M348 94V109" stroke="#595959" stroke-width="3"/>
+    <path d="M367 90H396V106H367Z" fill="#d6d6d6"/>
+    <path d="M373 111H392" stroke="#767676" stroke-width="2"/>
+    <use href="#screw" x="404" y="116"/>
+  </g>
+
+  <!-- Side cooling panels. -->
+  <g id="side-panels">
+    <path d="M80 181H111V321H80Z" fill="#bababa"/>
+    <path d="M85 186H106V317H85Z" fill="#777777"/>
+    <path d="M87 195H104M87 207H104M87 219H104M87 231H104M87 243H104M87 255H104M87 267H104M87 279H104M87 291H104M87 303H104" stroke="#414141" stroke-width="4"/>
+    <path d="M414 181H432V321H414Z" fill="#bababa"/>
+    <path d="M418 190H428V310H418Z" fill="#585858"/>
+    <path d="M419 201H427M419 218H427M419 235H427M419 252H427M419 269H427M419 286H427M419 303H427" stroke="#b1b1b1" stroke-width="2"/>
+  </g>
+
+  <!-- Core mount: concentric solid bevels, inset glass and four retaining shoes. -->
+  <g id="core-mount">
+    <ellipse cx="264" cy="252" rx="116" ry="104" fill="#a5a5a5"/>
+    <ellipse cx="264" cy="245" rx="115" ry="102" fill="#939393" stroke="#373737" stroke-width="4"/>
+    <ellipse cx="264" cy="241" rx="109" ry="96" fill="#c4c4c4"/>
+    <path d="M158 231A109 96 0 0 1 367 215" fill="none" stroke="#efefef" stroke-width="4"/>
+    <path d="M169 295A109 96 0 0 0 364 282" fill="none" stroke="#737373" stroke-width="5"/>
+    <ellipse cx="264" cy="241" rx="94" ry="83" fill="#7a7a7a" stroke="#9b9b9b" stroke-width="2"/>
+    <ellipse cx="264" cy="245" rx="85" ry="75" fill="#303f3a" stroke="#26352f" stroke-width="3"/>
+    <path d="M184 228A85 75 0 0 1 310 180M344 245A85 75 0 0 1 218 310" fill="none" stroke="#67bac0" stroke-width="3"/>
+    <ellipse cx="264" cy="247" rx="74" ry="67" fill="#5a8c8b"/>
+    <ellipse cx="264" cy="247" rx="72" ry="65" fill="#243f40"/>
+
+    <g id="contained-core" clip-path="url(#glass)">
+      <!-- Curved energy flow and a smooth luminous nucleus replace the faceted cube. -->
+      <ellipse cx="264" cy="248" rx="65" ry="59" fill="url(#core-halo)"/>
+      <ellipse cx="264" cy="278" rx="37" ry="11" fill="#152f35" opacity="0.55"/>
+      <path d="M212 245C209 224 228 207 255 206C282 204 307 215 316 234" fill="none" stroke="#417c81" stroke-width="6" stroke-linecap="round"/>
+      <path d="M213 237C217 219 235 210 255 210C276 209 294 214 306 225" fill="none" stroke="#7cced1" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M315 251C314 273 294 289 267 290C242 292 218 281 211 264" fill="none" stroke="#427b83" stroke-width="6" stroke-linecap="round"/>
+      <path d="M309 265C298 281 280 286 263 286C245 286 231 281 223 274" fill="none" stroke="#72c5cc" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="264" cy="246" rx="35" ry="33" fill="#203d47"/>
+      <ellipse cx="264" cy="244" rx="33" ry="31" fill="url(#core-energy)"/>
+      <path d="M238 235C242 224 251 218 261 219" fill="none" stroke="#dcfff6" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+      <path d="M287 251C284 262 275 269 266 270" fill="none" stroke="#3a8496" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+      <path d="M207 223C212 209 223 199 237 195" fill="none" stroke="#a8dfd5" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+      <path d="M322 264C318 280 306 291 293 295" fill="none" stroke="#6aacae" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+    </g>
+
+    <!-- Brackets overlap the ring, keeping the core visibly contained. -->
+    <path d="M250 145H278V179L273 187H255L250 179Z" fill="#b5b5b5" stroke="#414141" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M254 147H274V177H254Z" fill="#dddddd"/>
+    <path d="M253 176H275V183H253Z" fill="#858585"/>
+    <path d="M250 307H278V336H250Z" fill="#a1a1a1" stroke="#414141" stroke-width="2.5"/>
+    <path d="M254 310H274V329H254Z" fill="#cdcdcd"/>
+    <path d="M153 230H181L190 236V251L181 256H153Z" fill="#b8b8b8" stroke="#414141" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M155 233H180V249H155Z" fill="#dbdbdb"/>
+    <path d="M348 230H375V256H348L339 250V237Z" fill="#a6a6a6" stroke="#414141" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M350 233H372V249H350Z" fill="#cdcdcd"/>
+    <use href="#screw" x="264" y="159"/><use href="#screw" x="264" y="321"/>
+    <use href="#screw" x="165" y="241"/><use href="#screw" x="363" y="241"/>
+  </g>
+
+  <!-- A low service panel finishes the foreground without competing with the core. -->
+  <g id="front-service">
+    <path d="M144 356H385V382H144Z" fill="#c1c1c1" stroke="#9a9a9a" stroke-width="1.5"/>
+    <path d="M147 358H382" stroke="#e7e7e7" stroke-width="2"/>
+    <path d="M191 364H315V373H191Z" fill="#949494"/>
+    <path d="M199 366H280V370H199Z" fill="#5b5b5b"/>
+    <path d="M287 366H294V370H287ZM298 366H305V370H298Z" fill="#c9c9c9"/>
+    <path d="M333 362H351L356 374H328Z" fill="#e9b43e" stroke="#696969" stroke-width="1"/>
+    <path d="M339 364V369M339 371V372" stroke="#424242" stroke-width="2"/>
+    <use href="#screw" x="152" y="374"/><use href="#screw" x="377" y="374"/>
+    <path d="M106 350H125V353H106M115 357H125V360H115" stroke="#989898" stroke-width="1.5"/>
+  </g>
+</svg>

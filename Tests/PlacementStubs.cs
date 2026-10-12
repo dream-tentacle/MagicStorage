@@ -20,8 +20,13 @@ namespace Verse
                 if (map.DropBudget < item.stackCount) return false;
                 foreach (Thing existing in map.Ground)
                     if (existing.Spawned && existing.Position == position && existing.CanStackWith(item) &&
-                        existing.def.stackLimit - existing.stackCount >= item.stackCount)
-                    { map.DropBudget -= item.stackCount; existing.TryAbsorbStack(item, true); result = existing; return true; }
+                        existing.def.stackLimit > existing.stackCount)
+                    {
+                        int merged = Math.Min(item.stackCount, existing.def.stackLimit - existing.stackCount);
+                        map.DropBudget -= merged; existing.TryAbsorbStack(item, true); result = existing;
+                        placedAction?.Invoke(existing, merged);
+                        if (item.Destroyed) return true;
+                    }
                 if (map.Ground.FindAll(t => t.Spawned && t.Position == position).Count >= 3) return false;
             }
             int count = Math.Min(item.stackCount, map.DropBudget);

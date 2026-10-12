@@ -38,7 +38,8 @@ namespace RimWorld
         public ThingFilter filter = new ThingFilter();
         public StorageSettings(object owner = null) { }
         public bool AllowedToAccept(Thing item) => allow;
-        public static StorageSettings EverStorableFixedSettings() => new StorageSettings();
+        private static readonly StorageSettings everStorable = new StorageSettings();
+        public static StorageSettings EverStorableFixedSettings() => everStorable;
     }
     public class SlotGroup
     {
@@ -59,6 +60,8 @@ namespace RimWorld
     {
         public readonly List<IHaulSource> AllHaulSourcesListForReading = new List<IHaulSource>();
         public int Sorts;
+        public readonly Dictionary<IntVec3, ISlotGroupParent> SlotParents = new Dictionary<IntVec3, ISlotGroupParent>();
+        public ISlotGroupParent SlotGroupParentAt(IntVec3 cell) => SlotParents.TryGetValue(cell, out var parent) ? parent : null;
         public void Notify_HaulDestinationChangedPriority() { Sorts++; }
     }
     public class ListerHaulables { public void Notify_SlotGroupChanged(SlotGroup group) { } }
@@ -80,8 +83,13 @@ namespace Verse
         public virtual IEnumerable<Gizmo> GetGizmos() { yield break; }
         public CompStorageNode node;
         public int MaxItemsInCell => 10;
+#if TRANSPORT_SUPPLIER_TESTS
+        public new string LabelCap => "receiver";
+#else
         public string LabelCap => "receiver";
-        public T GetComp<T>() where T : class => node as T;
+#endif
+        public readonly List<ThingComp> TestComps = new List<ThingComp>();
+        public T GetComp<T>() where T : class => node as T ?? TestComps.Find(comp => comp is T) as T;
         public virtual void SpawnSetup(Map map, bool respawningAfterLoad) { Map = map; Spawned = true; }
         public virtual void SetFaction(Faction faction, Pawn recruiter = null) { Faction = faction; }
         public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)

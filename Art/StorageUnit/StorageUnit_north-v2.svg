@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768">
+  <title>魔法存储 — 存储单元，北向精简版</title>
+  <desc>Original Magic Storage 1×2 storage unit. Two closed interchangeable cartridge lids, restrained RGB(197,229,245) sky-blue accents and a uniform pure-black exterior contour. Casing depth and highlights remain consistent between views.</desc>
+  <g id="base">
+    <rect x="132" y="124" width="248" height="500" rx="24" fill="#798893" />
+    <path d="M134 592Q134 621 160 622H352Q378 621 378 592" fill="none" stroke="#52616c" stroke-width="6" />
+    <rect x="200" y="607" width="113" height="8" rx="4" fill="#344756" />
+    <path d="M212 611H226M233 611H247M254 611H268" stroke="#a2bcca" stroke-width="1.8" stroke-linecap="round" />
+    <path d="M287 611H301" stroke="#c5e5f5" stroke-width="2.7" stroke-linecap="round" />
+  </g>
+  <g id="housing">
+    <rect x="132" y="104" width="248" height="494" rx="24" fill="#d8dfe3" />
+    <path d="M132 574Q132 598 156 598H356Q380 598 380 574" fill="none" stroke="#25313c" stroke-width="4" />
+    <path d="M142 264V132Q142 115 160 115H352Q367 115 369 130" fill="none" stroke="#f2f5f6" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M370 142V567Q370 588 350 588H159" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round" />
+  </g>
+  <g id="rear-panel" transform="translate(-28 421)">
+    <rect x="214" y="126" width="141" height="29" rx="6" fill="#aebdc6" />
+    <rect x="217" y="129" width="135" height="23" rx="4" fill="#344a5b" />
+    <path d="M228 136H242M228 142H238" stroke="#9bbccb" stroke-width="1.8" stroke-linecap="round" />
+    <rect x="252" y="135" width="16" height="7" rx="1" fill="#c5e5f5" />
+    <rect x="272" y="135" width="16" height="7" rx="1" fill="#c5e5f5" />
+    <rect x="292" y="135" width="16" height="7" rx="1" fill="#9fbcca" />
+  </g>
+  <g id="storage-cartridges">
+    <use href="#north-cartridge" />
+    <use href="#north-cartridge" transform="translate(0 183)" />
+  </g>
+  <g id="service-apron" transform="translate(-164 -428)">
+    <path d="M325 555H331V575H325ZM335 555H341V575H335ZM345 555H351V575H345Z" fill="#6b8293" />
+    <path d="M325 578H351" stroke="#c5e5f5" stroke-width="2.5" />
+  </g>
+  <path d="M156 104H356Q380 104 380 128V600Q380 624 356 624H156Q132 624 132 600V128Q132 104 156 104Z" fill="none" stroke="#000000" stroke-width="4" />
+  <defs>
+    <g id="north-cartridge">
+      <rect x="154" y="171" width="204" height="164" fill="#a9bbc6" rx="9" />
+      <rect x="157" y="174" width="198" height="152" fill="#e1e7eb" rx="7" stroke="#b3c1ca" stroke-width="1.5" />
+      <path d="M168 177H343" fill="none" stroke="#f4f7f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M351 184V314Q351 323 341 323H166" fill="none" stroke="#c7d2d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="337" y="190" width="10" height="114" fill="#c5e5f5" rx="0" />
+      <path d="M339 193V295" fill="none" stroke="#e7f4fb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="231" y="190" width="49" height="8" fill="#aabdc9" rx="2" />
+      <rect x="235" y="193" width="41" height="3" fill="#728e9f" rx="1" />
+      <path d="M157 327H355" fill="none" stroke="#8fa6b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </defs>
+</svg>
