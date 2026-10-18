@@ -148,20 +148,20 @@ internal static class StorageApparelTests
         Equal<Job>(null, driver.GetFinalizerJob(JobCondition.InterruptForced), "failed retrieval does not schedule Wear");
         var native = new NativeWearBoundary { pawn = f.Pawn, job = wear };
         f.Pawn.jobs.curJob = wear; f.Pawn.jobs.curDriver = native;
-        f.Adapter.TickRare(); Equal(true, f.Adapter.HasApparel, "active native Wear retains staged garment");
+        f.Adapter.RefreshApparel(); Equal(true, f.Adapter.HasApparel, "active native Wear retains staged garment");
         Equal(true, ((IApparelSource)f.Adapter).RemoveApparel(f.Item), "native apparel-source removal supported");
         Equal(false, f.Adapter.HasApparel, "native wearing consumes temporary buffer");
         Equal(0L, new MapAndNetworkCraftingProductCounter().Count(f.Core, countOrder), "garment removed for wearing is not counted twice");
         Equal<ThingOwner>(null, f.Item.holdingOwner, "source releases object for original apparel tracker");
 
-        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Adapter.TickRare();
+        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Adapter.RefreshApparel();
         Equal(false, f.Adapter.HasApparel, "abandoned handoff reclaimed");
         Equal(true, f.Unit.Inventory.Contents.Contains(f.Item), "interrupted Wear returns original garment to network");
         Equal(1L, f.Core.Network.GetTotalCount(f.Def), "returned garment indexed once");
-        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Core.Settings.allow = false; f.Adapter.TickRare();
+        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Core.Settings.allow = false; f.Adapter.RefreshApparel();
         Equal(false, f.Adapter.HasApparel, "filter-rejected return frees adapter");
         Equal(f.Item, f.Map.Ground.Single(), "rejected garment safely drops near adapter");
-        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Core.Settings.allow = false; f.Map.DropBudget = 0; f.Adapter.TickRare();
+        f = new Fixture(); driver = f.Start(); driver.RunTestToils(); f.Core.Settings.allow = false; f.Map.DropBudget = 0; f.Adapter.RefreshApparel();
         Equal(1L, f.Pending(), "blocked ground return saved in recovery");
         Equal(false, f.Adapter.HasApparel, "recovery owns item instead of busy adapter");
         f.Map.DropBudget = int.MaxValue; Find.TickManager.TicksGame = 1250; f.Manager.MapComponentTick();

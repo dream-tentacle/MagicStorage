@@ -168,12 +168,13 @@ internal static class FuelSupplierTests
     }
     private static void NetworkAndTicking()
     {
-        var f = new Fixture(); f.Store(30); var target = f.Target(3); int originalTick = Find.TickManager.TicksGame;
+        var f = new Fixture(); var target = f.Target(3); int originalTick = Find.TickManager.TicksGame;
         try
         {
-            Find.TickManager.TicksGame = 59 - f.Supplier.thingIDNumber;
-            f.Supplier.RunTransportTestTick(); Equal(0f, target.Fuel, "no scan between hash intervals");
-            Find.TickManager.TicksGame++; f.Supplier.RunTransportTestTick(); Equal(10f, target.Fuel, "periodic hash tick supplies fuel");
+            Find.TickManager.TicksGame = 0; f.Supplier.RunTransportTestTick(); f.Store(30);
+            Find.TickManager.TicksGame = 59;
+            f.Supplier.RunTransportTestTick(); Equal(0f, target.Fuel, "no scan between configured refresh intervals");
+            Find.TickManager.TicksGame++; f.Supplier.RunTransportTestTick(); Equal(10f, target.Fuel, "configured periodic tick supplies fuel");
         }
         finally { Find.TickManager.TicksGame = originalTick; }
         target.Fuel = 0; f.Manager.Unregister(f.Supplier.node); f.Supplier.SupplyFuel();

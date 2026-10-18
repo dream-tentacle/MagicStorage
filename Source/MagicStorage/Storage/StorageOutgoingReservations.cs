@@ -101,22 +101,40 @@ namespace MagicStorage
         // until the graph is current. No user code is called from a ThingOwner mutation.
         internal void ValidateInventory()
         {
+            if (byItem.Count == 0) return;
             foreach (Thing item in new List<Thing>(byItem.Keys)) ValidateItem(item);
+        }
+
+        internal void ValidateInventoryFor(object owner, Thing item)
+        {
+            if (owner != null && claims.TryGetValue(owner, out var claim) && claim.Item != item)
+                ValidateItem(claim.Item);
+            ValidateItem(item);
+        }
+
+        private static StorageReservationFailure? InventoryFailure(StorageReservation claim, long total)
+        {
+            if (claim.Source == null || claim.Item.Destroyed || claim.Item.holdingOwner != claim.Source.Inventory.Contents ||
+                claim.Item.stackCount <= 0) return StorageReservationFailure.ItemUnavailable;
+            return total > claim.Item.stackCount ? StorageReservationFailure.InsufficientCount : (StorageReservationFailure?)null;
         }
 
         internal void ValidateItem(Thing item)
         {
             if (item == null || !byItem.TryGetValue(item, out var bucket)) return;
             long total = reservedCounts[item];
+            // Valid inventory never mutates the bucket: avoid allocating a snapshot
+            // on every count change, reservation request and collection.
+            bool invalid = false;
+            foreach (var claim in bucket)
+                if (InventoryFailure(claim, total).HasValue) { invalid = true; break; }
+            if (!invalid) return;
             foreach (var claim in new List<StorageReservation>(bucket))
             {
-                if (claim.Source == null || claim.Item.Destroyed || claim.Item.holdingOwner != claim.Source.Inventory.Contents ||
-                    claim.Item.stackCount <= 0)
-                    Invalidate(claim, StorageReservationFailure.ItemUnavailable);
                 // If an outside mutation overdraws a stack, invalidate all conflicting
                 // claims rather than arbitrarily favoring dictionary iteration order.
-                else if (total > claim.Item.stackCount)
-                    Invalidate(claim, StorageReservationFailure.InsufficientCount);
+                var failure = InventoryFailure(claim, total);
+                if (failure.HasValue) Invalidate(claim, failure.Value);
             }
         }
 
@@ -125,15 +143,25 @@ namespace MagicStorage
             if (claims.Count == 0) return;
             ValidateInventory();
             foreach (var claim in new List<StorageReservation>(claims.Values))
-            {
-                if (claim.State != StorageReservationState.Reserved) continue;
-                var network = claim.Core?.Network;
-                if (network == null || !network.CanWork || network.Core != claim.Core || claim.Source.Network != network ||
-                    (claim.Endpoint != null && !network.ContainsNode(claim.Endpoint)))
-                    Invalidate(claim, StorageReservationFailure.NetworkUnavailable);
-                else if (claim.Usable != null && !claim.Usable())
-                    Invalidate(claim, StorageReservationFailure.PolicyChanged);
-            }
+                ValidatePolicy(claim);
+        }
+
+        internal void Validate(object owner)
+        {
+            if (owner == null || !claims.TryGetValue(owner, out var claim) || claim.State != StorageReservationState.Reserved) return;
+            ValidateItem(claim.Item);
+            ValidatePolicy(claim);
+        }
+
+        private void ValidatePolicy(StorageReservation claim)
+        {
+            if (claim.State != StorageReservationState.Reserved) return;
+            var network = claim.Core?.Network;
+            if (network == null || !network.CanWork || network.Core != claim.Core || claim.Source.Network != network ||
+                (claim.Endpoint != null && !network.ContainsNode(claim.Endpoint)))
+                Invalidate(claim, StorageReservationFailure.NetworkUnavailable);
+            else if (claim.Usable != null && !claim.Usable())
+                Invalidate(claim, StorageReservationFailure.PolicyChanged);
         }
 
         internal StorageReservation BeginCollection(object owner)

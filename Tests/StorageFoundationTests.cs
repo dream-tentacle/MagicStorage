@@ -24,7 +24,8 @@ internal static class StorageFoundationTests
     }
     private static Map NewMap()
     { var map = new Map(); map.component = new MapComponent_StorageNetworks(map); return map; }
-    private static void Tick(Map map) => map.GetComponent<MapComponent_StorageNetworks>().MapComponentTick();
+    private static void Tick(Map map)
+    { Find.TickManager.TicksGame += 60; map.GetComponent<MapComponent_StorageNetworks>().MapComponentTick(); }
     private static StorageTransferResult Deposit(StorageNetwork net, Thing item, int count)
     { var carry = new ThingOwner(null); carry.TryAdd(item, false); return net.TryStore(carry, item, count); }
 
@@ -55,6 +56,7 @@ internal static class StorageFoundationTests
 #endif
             assertions += StorageApparelTests.Run();
             AdjustableCapacity();
+            assertions += StorageRefreshTests.Run();
             Console.WriteLine("PASS: " + assertions + " assertions (production storage, receiver, supply shelf, crafting and construction supply logic; game boundaries stubbed).");
             return 0;
         }
@@ -98,29 +100,29 @@ internal static class StorageFoundationTests
         try
         {
             Equal(64, settings.StorageUnitSlots, "default unit capacity setting");
-            settings.StorageUnitSlots = 1;
-            Equal(6, settings.StorageUnitSlots, "settings enforce lower bound");
+            settings.StorageUnitSlots = 0;
+            Equal(1, settings.StorageUnitSlots, "settings enforce lower bound");
             settings.StorageUnitSlots = int.MaxValue;
-            Equal(1000, settings.StorageUnitSlots, "settings enforce upper bound");
+            Equal(10000, settings.StorageUnitSlots, "settings enforce upper bound");
             settings.StorageUnitSlots = 64;
             var map = NewMap(); var core = Register(map, new Building_StorageCore(), 0);
             var unit = new Building_StorageUnit(); Register(map, unit, 1); Tick(map);
             Deposit(core.Network, Item(X, 50, "0"), 50);
             for (int i = 1; i < 7; i++) Deposit(core.Network, Item(X, 1, i.ToString()), 1);
             Equal(7, unit.Inventory.UsedSlots, "seven distinct stacks stored before lowering limit");
-            settings.StorageUnitSlots = 6;
-            Equal(6, unit.SlotCapacity, "existing unit immediately follows setting");
-            Equal(6L, core.Network.SlotCapacity, "existing network reports new capacity");
+            settings.StorageUnitSlots = 1;
+            Equal(1, unit.SlotCapacity, "existing unit immediately follows setting");
+            Equal(1L, core.Network.SlotCapacity, "existing network reports new capacity");
             Equal(56L, core.Network.GetTotalCount(X), "lowering limit preserves all quantities");
             Equal(7, unit.Inventory.UsedSlots, "lowering limit preserves all stacks");
             Equal(0, Deposit(core.Network, Item(Y, 1), 1).Transferred, "over-capacity network blocks new stacks");
             Equal(false, unit.Inventory.Contents.TryAdd(Item(Y, 1)), "container enforces lowered capacity too");
             Equal(25, Deposit(core.Network, Item(X, 25, "0"), 25).Transferred, "over-capacity unit permits compatible merging");
             Equal(81L, core.Network.GetTotalCount(X), "merge refreshes quantity without losing old stacks");
-            settings.StorageUnitSlots = 1000;
-            Equal(1000L, core.Network.SlotCapacity, "increasing setting expands existing network");
+            settings.StorageUnitSlots = 10000;
+            Equal(10000L, core.Network.SlotCapacity, "increasing setting expands existing network");
             Equal(75, Deposit(core.Network, Item(Y, 75), 75).Transferred, "increased capacity accepts new stacks");
-            Equal(1000, new Building_StorageUnit().SlotCapacity, "new unit follows same setting");
+            Equal(10000, new Building_StorageUnit().SlotCapacity, "new unit follows same setting");
         }
         finally { settings.StorageUnitSlots = original; }
     }

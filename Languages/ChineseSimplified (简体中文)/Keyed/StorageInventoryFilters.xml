@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_UI_ModFilter>Mod：{0}</MS_UI_ModFilter>
+  <MS_UI_ModAll>全部</MS_UI_ModAll>
+  <MS_UI_FilterCategories>物品分类</MS_UI_FilterCategories>
+  <MS_UI_FilterCustom>自定义筛选</MS_UI_FilterCustom>
+  <MS_UI_FilterCreate>新建筛选规则</MS_UI_FilterCreate>
+  <MS_UI_FilterName>名称</MS_UI_FilterName>
+  <MS_UI_FilterDefaultName>筛选规则{0}</MS_UI_FilterDefaultName>
+  <MS_UI_FilterReset>重置筛选条件</MS_UI_FilterReset>
+  <MS_UI_FilterControls>左键切换白名单，右键切换黑名单。黑名单优先；多个白名单匹配任意一项即可。</MS_UI_FilterControls>
+  <MS_UI_FilterModeOff>未启用</MS_UI_FilterModeOff>
+  <MS_UI_FilterModeInclude>白名单</MS_UI_FilterModeInclude>
+  <MS_UI_FilterModeExclude>黑名单</MS_UI_FilterModeExclude>
+  <MS_UI_SelectAllCurrent>全选当前</MS_UI_SelectAllCurrent>
+  <MS_UI_FilterChooseIcon>选择图标</MS_UI_FilterChooseIcon>
+  <MS_UI_FilterIconAutomatic>自动选择图标</MS_UI_FilterIconAutomatic>
+  <MS_UI_FilterIconHint>选择任意可储存物品作为图标，不影响规则允许的物品范围。</MS_UI_FilterIconHint>
+  <MS_UI_FilterDeleteMode>切换删除模式。点击红叉删除对应的自定义规则，再次点击减号退出。</MS_UI_FilterDeleteMode>
+  <MS_UI_FilterDeleteRule>删除自定义规则：{0}</MS_UI_FilterDeleteRule>
+  <MS_UI_FilterEdit>编辑筛选规则</MS_UI_FilterEdit>
+  <MS_UI_FilterEditMode>切换编辑模式。点击自定义规则修改名称、筛选条件和图标，再次点击此按钮退出。</MS_UI_FilterEditMode>
+  <MS_UI_FilterEditRule>编辑自定义规则：{0}</MS_UI_FilterEditRule>
+</LanguageData>

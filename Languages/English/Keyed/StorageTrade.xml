@@ -6,4 +6,6 @@
   <MS_Trade_OrbitalCommand>Trade with {0} through orbital magic storage</MS_Trade_OrbitalCommand>
   <MS_Trade_OrbitalInventoryNotice>Magic storage orbital trade: only goods and silver in networks with beacon-covered cores. Purchases arrive in drop pods.</MS_Trade_OrbitalInventoryNotice>
   <MS_Trade_NoCoveredCore>A powered orbital trade beacon must cover an available storage core</MS_Trade_NoCoveredCore>
+  <MS_Trade_VanillaWarning>You are using the vanilla trade option! To trade items stored in magic storage, choose the other trade option.</MS_Trade_VanillaWarning>
+  <MS_Trade_DoNotShowAgain>Don't show again</MS_Trade_DoNotShowAgain>
 </LanguageData>

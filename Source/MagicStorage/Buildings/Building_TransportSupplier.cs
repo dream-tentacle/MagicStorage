@@ -8,6 +8,7 @@ namespace MagicStorage
 {
     public sealed class Building_TransportSupplier : Building, IThingHolder, IThingHolderTickable, ISuspendableThingHolder
     {
+        private StorageRefreshTimer refreshTimer;
         public const int SlotCount = 3;
         private bool directSupply;
         private List<ThingDef> selections = new List<ThingDef> { null, null, null };
@@ -72,7 +73,7 @@ namespace MagicStorage
         protected override void Tick()
         {
             base.Tick();
-            if (Spawned && Faction == Faction.OfPlayer && Find.TickManager.TicksGame % 60 == 0)
+            if (Spawned && Faction == Faction.OfPlayer && refreshTimer.IsDue(StorageRefreshTask.TransportSupply, Find.TickManager.TicksGame))
                 SupplyTransporter();
         }
 

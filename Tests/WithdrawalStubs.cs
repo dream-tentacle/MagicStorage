@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Verse;
 namespace Verse
 {
@@ -10,7 +11,9 @@ namespace Verse
     {
         public int HitPoints = 100;
         public string LabelNoCount => variant ?? "item";
-        public Thing GetInnerIfMinified() => this is MinifiedThing minified ? minified.InnerThing : this;
+        public static int InnerLookups;
+        public Thing GetInnerIfMinified()
+        { InnerLookups++; return this is MinifiedThing minified ? minified.InnerThing : this; }
         public void SetForbidden(bool value, bool warn = true) { forbidden = value; }
         public T TryGetComp<T>() where T : class =>
             (this as ThingWithComps)?.AllComps.Find(comp => comp is T) as T ?? new RimWorld.CompForbiddable { parent = this } as T;
@@ -21,11 +24,17 @@ namespace Verse
     {
         public int DropBudget = int.MaxValue;
         public List<Thing> Ground = new List<Thing>();
+        public bool UseCellThingLists;
     }
     public partial struct IntVec3
     {
         public bool InBounds(Map map) => true;
-        public List<Thing> GetThingList(Map map) => map.Ground;
+        public List<Thing> GetThingList(Map map)
+        {
+            IntVec3 cell = this;
+            return map.UseCellThingLists
+                ? map.Ground.FindAll(thing => thing.Spawned && thing.OccupiedRect().Contains(cell)) : map.Ground;
+        }
     }
 }
 namespace RimWorld

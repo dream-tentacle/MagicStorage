@@ -12,6 +12,7 @@ namespace MagicStorage
         internal readonly List<Thing> SupplyStacks = new List<Thing>();
         internal long NetworkCount, Available, SupplyCount, Change;
         internal string Buffer = "0";
+        internal event Action SelectionChanged;
         internal Thing Representative => NetworkStacks.Count > 0 ? NetworkStacks[0] : SupplyStacks[0];
         public override Thing AnyThing => Representative.GetInnerIfMinified();
         internal long NetworkAfter => NetworkCount - Change;
@@ -19,13 +20,16 @@ namespace MagicStorage
 
         internal void SetChange(long value)
         {
-            Change = Math.Max(-SupplyCount, Math.Min(value, Available));
+            long next = Math.Max(-SupplyCount, Math.Min(value, Available));
+            bool changed = next != Change;
+            Change = next;
             Buffer = Change.ToString(CultureInfo.InvariantCulture);
+            if (changed) SelectionChanged?.Invoke();
         }
 
         internal void EditChange(string value)
         {
-            if (value == "" || value == "-" || value == "+") { Buffer = value; Change = 0; return; }
+            if (value == "" || value == "-" || value == "+") { SetChange(0); Buffer = value; return; }
             if (long.TryParse(value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long parsed)) SetChange(parsed);
         }
     }
@@ -82,13 +86,14 @@ namespace MagicStorage
 
         // Use each actual stack's stat; native grouping can combine items with different mass.
         internal static double ProjectedMass(Building_TransportSupplier supplier, StorageNetwork network,
-            IList<StorageTransportRow> rows, StorageTransportRow excludedRow = null)
+            IList<StorageTransportRow> rows, StorageTransportRow excludedRow = null,
+            double? storedMass = null, Func<Thing, double> massOf = null)
         {
-            double mass = supplier.StoredMass;
+            double mass = storedMass ?? supplier.StoredMass;
             foreach (var row in rows)
             {
                 if (row == excludedRow || row.Change == 0) continue;
-                double changeMass = ChangeMass(supplier, network, row, row.Change);
+                double changeMass = ChangeMass(supplier, network, row, row.Change, massOf);
                 if (double.IsPositiveInfinity(changeMass)) return changeMass;
                 mass += changeMass;
             }
@@ -96,7 +101,7 @@ namespace MagicStorage
         }
 
         private static double ChangeMass(Building_TransportSupplier supplier, StorageNetwork network,
-            StorageTransportRow row, long change)
+            StorageTransportRow row, long change, Func<Thing, double> massOf = null)
         {
             if (change == 0) return 0;
             double mass = 0;
@@ -106,7 +111,7 @@ namespace MagicStorage
                 long available = change >= 0 ? network?.AvailableToWithdraw(item) ?? 0 :
                     supplier.Contents.Contains(item) && !item.Destroyed ? item.stackCount : 0;
                 long count = Math.Min(remaining, available);
-                if (count > 0) mass += (change >= 0 ? 1 : -1) * UnitMass(item) * count;
+                if (count > 0) mass += (change >= 0 ? 1 : -1) * (massOf == null ? UnitMass(item) : massOf(item)) * count;
                 remaining -= count;
                 if (remaining == 0) return mass;
             }
@@ -116,18 +121,19 @@ namespace MagicStorage
         // The mass stopping point includes existing cargo and every other row's selection.
         // Search actual stack masses in the same order used when executing the exchange.
         internal static long MassLimitChange(Building_TransportSupplier supplier, StorageNetwork network,
-            IList<StorageTransportRow> rows, StorageTransportRow row, double capacity)
+            IList<StorageTransportRow> rows, StorageTransportRow row, double capacity,
+            double? storedMass = null, Func<Thing, double> massOf = null)
         {
-            double otherMass = ProjectedMass(supplier, network, rows, row);
+            double otherMass = ProjectedMass(supplier, network, rows, row, storedMass, massOf);
             double tolerance = MassTolerance;
             foreach (Thing item in row.NetworkStacks)
             {
-                double mass = UnitMass(item);
+                double mass = massOf == null ? UnitMass(item) : massOf(item);
                 if (mass > 0) tolerance = Math.Min(tolerance, mass * 0.000001);
             }
             foreach (Thing item in row.SupplyStacks)
             {
-                double mass = UnitMass(item);
+                double mass = massOf == null ? UnitMass(item) : massOf(item);
                 if (mass > 0) tolerance = Math.Min(tolerance, mass * 0.000001);
             }
             long lower = -row.SupplyCount, upper = row.Available;
@@ -135,7 +141,7 @@ namespace MagicStorage
             {
                 long distance = upper - lower;
                 long middle = lower + distance / 2 + distance % 2;
-                double mass = otherMass + ChangeMass(supplier, network, row, middle);
+                double mass = otherMass + ChangeMass(supplier, network, row, middle, massOf);
                 if (mass <= capacity + tolerance) lower = middle;
                 else upper = middle - 1;
             }

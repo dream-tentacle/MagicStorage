@@ -14,6 +14,15 @@ namespace MagicStorage
         private readonly ThingFilter nativeFilter = new ThingFilter();
         private ThingDef filteredDef;
 
+        internal StorageShelfFilter Clone() => new StorageShelfFilter
+        {
+            Quality = Quality,
+            HitPoints = HitPoints,
+            AnyMaterial = AnyMaterial,
+            WarnWhenRestockFails = WarnWhenRestockFails,
+            Materials = new List<ThingDef>(Materials)
+        };
+
         public bool Allows(Thing item)
         {
             if (item == null || item.Destroyed) return false;

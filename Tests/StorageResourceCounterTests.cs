@@ -43,19 +43,20 @@ internal static class StorageResourceCounterTests
     internal static int Run()
     {
         RuntimeHelpers.RunClassConstructor(typeof(StorageResourceCounter).TypeHandle);
-        CountingAndEligibility(); OwnershipAndTopology(); TransfersAndClaims();
+        CountingAndEligibility(); OwnershipAndTopology(); TransfersAndClaims(); IndexedCounting();
         return assertions;
     }
     private static void CountingAndEligibility()
     {
         var f = new Fixture();
+        f.Food.rottable = new CompProperties_Rottable { rotDestroys = false };
         f.Map.NativeStoredResources.Add(new Thing { def = f.Food, stackCount = 10 });
         Thing first = f.Store(f.First, f.Food, 20);
         f.Store(f.Second, f.Food, 30); f.Store(f.First, f.Medicine, 4);
         f.Counter.UpdateResourceCounts();
         Equal(60, f.Counter.GetCount(f.Food), "native ground stock plus two units");
         Equal(4, f.Counter.GetCount(f.Medicine), "network-only resource added");
-        Equal(4, f.Counter.EligibilityChecks, "native eligibility used for stored items");
+        Equal(3, f.Counter.EligibilityChecks, "only resources surviving rot need per-stack native eligibility");
         f.Counter.UpdateResourceCounts();
         Equal(60, f.Counter.GetCount(f.Food), "refresh does not accumulate previous additions");
         f.Map.ExcludedResources.Add(first); f.Counter.UpdateResourceCounts();
@@ -69,7 +70,8 @@ internal static class StorageResourceCounterTests
         Equal(false, f.Counter.AllCountedAmounts.ContainsKey(missing), "native resource catalog retained");
         Equal(60, f.Counter.GetCount(f.Food), "unrelated definitions do not change totals");
         f.Map.NativeStoredResources.Add(new MinifiedThing { InnerThing = new Thing { def = f.Medicine, stackCount = 2 } });
-        var packed = new MinifiedThing { InnerThing = new Thing { def = f.Medicine, stackCount = 3 } };
+        var packed = new MinifiedThing { def = new ThingDef { CountAsResource = false, thingClass = typeof(MinifiedThing) },
+            InnerThing = new Thing { def = f.Medicine, stackCount = 3 } };
         f.First.Inventory.Contents.TryAdd(packed, false); f.Counter.UpdateResourceCounts();
         Equal(9, f.Counter.GetCount(f.Medicine), "minified inner resource follows native count convention");
         f.Map.NativeStoredResources.Clear();
@@ -118,5 +120,59 @@ internal static class StorageResourceCounterTests
         Equal(28, f.Counter.GetCount(f.Food), "consumed ground stock disappears from total");
         f.Store(f.Second, f.Food, 5); f.Counter.UpdateResourceCounts();
         Equal(33, f.Counter.GetCount(f.Food), "newly stored stock appears on refresh");
+    }
+
+    private sealed class PackedResource : MinifiedThing { }
+
+    private static void IndexedCounting()
+    {
+        var f = new Fixture();
+        f.First.SlotCapacity = 10020;
+        f.Food.rottable = new CompProperties_Rottable { rotDestroys = true };
+        for (int i = 0; i < 10000; i++) f.Store(f.First, f.Food, 2);
+        f.Store(f.First, f.Medicine, 7);
+        var surviving = new ThingDef { rottable = new CompProperties_Rottable { rotDestroys = false } };
+        f.Map.ResourceDefs.Add(surviving);
+        f.Store(f.First, surviving, 3);
+        Thing rotten = f.Store(f.First, surviving, 5);
+        f.Map.ExcludedResources.Add(rotten);
+        var packedDef = new ThingDef { CountAsResource = false, thingClass = typeof(PackedResource) };
+        var packed = new PackedResource { def = packedDef, stackCount = 2,
+            InnerThing = new Thing { def = f.Medicine, stackCount = 4 } };
+        f.First.Inventory.Contents.TryAdd(packed, false);
+        Thing.InnerLookups = 0;
+        f.Counter.EligibilityChecks = 0;
+        f.Counter.UpdateResourceCounts();
+        Equal(20000, f.Counter.GetCount(f.Food), "ten thousand rot-destroying food stacks counted from index");
+        Equal(11, f.Counter.GetCount(f.Medicine), "ordinary stock plus packed inner quantity, without multiplying outer count");
+        Equal(3, f.Counter.GetCount(surviving), "rotten surviving resource excluded");
+        Equal(3, Thing.InnerLookups, "only surviving-rot and minified buckets inspect individual stacks");
+        Equal(3, f.Counter.EligibilityChecks, "indexed resources bypass per-stack native calls");
+
+        // A state-only change must be visible even when the quantity index has not changed.
+        f.Map.ExcludedResources.Remove(rotten);
+        f.Counter.UpdateResourceCounts();
+        Equal(8, f.Counter.GetCount(surviving), "surviving resource state rechecked without quantity change");
+        f.Map.ExcludedResources.Add(packed.InnerThing);
+        f.Counter.UpdateResourceCounts();
+        Equal(7, f.Counter.GetCount(f.Medicine), "packed inner resource retains native eligibility");
+        f.Map.ExcludedResources.Clear();
+
+        f.Store(f.Second, f.Medicine, 13);
+        f.Map.Fog.Add(f.First.Position);
+        Thing.InnerLookups = 0;
+        f.Counter.UpdateResourceCounts();
+        Equal(0, f.Counter.GetCount(f.Food), "fogged unit excluded before indexed addition");
+        Equal(13, f.Counter.GetCount(f.Medicine), "unfogged unit counted independently");
+        Equal(0, Thing.InnerLookups, "fogged unit contents never inspected");
+        f.Map.Fog.Clear();
+
+        f.First.Inventory.RebuildIndex();
+        f.Counter.UpdateResourceCounts();
+        Equal(20000, f.Counter.GetCount(f.Food), "rebuilt inventory index produces same resource count");
+        Equal(24, f.Counter.GetCount(f.Medicine), "unfogging restores ordinary and packed resource counts");
+        rotten.Destroy();
+        f.Counter.UpdateResourceCounts();
+        Equal(3, f.Counter.GetCount(surviving), "destroyed surviving resource removed from index");
     }
 }

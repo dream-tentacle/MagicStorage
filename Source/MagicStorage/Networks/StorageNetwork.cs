@@ -23,6 +23,7 @@ namespace MagicStorage
         private static readonly IComparer<Building_StorageUnit> unitOrder =
             Comparer<Building_StorageUnit>.Create((a, b) => a.thingIDNumber.CompareTo(b.thingIDNumber));
         internal int NodeCount => members.Count;
+        internal IReadOnlyList<CompStorageNode> Members => members;
 
         public StorageNetwork() : this(new StorageOutgoingReservations()) { }
         internal StorageNetwork(StorageOutgoingReservations reservations)
@@ -78,6 +79,14 @@ namespace MagicStorage
         internal void GetMatchingStacks(Predicate<ThingDef> filter, List<Thing> result)
         {
             if (!CanWork) return;
+            GetStoredStacksMatching(filter, result);
+        }
+
+        // Physical inventory queries also work in a current network with missing/duplicate cores,
+        // matching GetAllStacks. Callers that consume items still use GetMatchingStacks.
+        internal void GetStoredStacksMatching(Predicate<ThingDef> filter, List<Thing> result)
+        {
+            if (!current) return;
             foreach (var pair in byDef)
                 if (filter(pair.Key)) foreach (var unit in pair.Value) unit.Inventory.GetStacks(pair.Key, result);
         }
@@ -87,6 +96,15 @@ namespace MagicStorage
             if (!current) return;
             foreach (var pair in byDef)
                 foreach (var unit in pair.Value) unit.Inventory.GetStacks(pair.Key, result);
+        }
+
+        internal void VisitStoredStacksMatching(Predicate<ThingDef> filter, Predicate<Thing> visit)
+        {
+            if (!current) return;
+            foreach (var pair in byDef)
+                if (filter(pair.Key))
+                    foreach (var unit in pair.Value)
+                        if (!unit.Inventory.VisitStacks(pair.Key, visit)) return;
         }
 
         internal int AvailableToWithdraw(Thing item, object owner = null)
@@ -100,7 +118,7 @@ namespace MagicStorage
             IStorageReservationClient client = null, Func<bool> usable = null)
         {
             if (transferring) { outgoing.Release(owner); return 0; }
-            outgoing.ValidateInventory();
+            outgoing.ValidateInventoryFor(owner, item);
             return outgoing.Reserve(owner, item, Math.Min(count, AvailableToWithdraw(item, owner)), Core, endpoint, client, usable);
         }
         internal void ReleaseOutgoing(object owner) => outgoing.Release(owner);
@@ -114,7 +132,7 @@ namespace MagicStorage
             try
             {
                 if (!CanWork || transferring) return StorageTransferResult.Failed(count, StorageFailure.NetworkUnavailable);
-                outgoing.Validate();
+                outgoing.Validate(owner);
                 if (destination == null || destination.Owner is Building_StorageUnit || count <= 0 ||
                     outgoing.CountFor(owner, item) < count || AvailableToWithdraw(item, owner) < count)
                     return StorageTransferResult.Failed(count, StorageFailure.Reserved);
@@ -142,6 +160,28 @@ namespace MagicStorage
         {
             if (current && def != null && byDef.TryGetValue(def, out var bucket))
                 foreach (var unit in bucket) unit.Inventory.GetStacks(def, result);
+        }
+
+        // Transfer callers may remove or return the yielded stack. Snapshot only
+        // the units; a removed stack's slot is filled from the end of its bucket.
+        // Revisit that slot, and never yield the same reference twice after rollback.
+        internal IEnumerable<Thing> EnumerateStacksForTransfer(ThingDef def)
+        {
+            if (!CanWork || def == null || !byDef.TryGetValue(def, out var bucket)) yield break;
+            var sourceUnits = new List<Building_StorageUnit>(bucket);
+            var visited = new HashSet<Thing>();
+            foreach (var unit in sourceUnits)
+            {
+                int index = 0;
+                Thing item;
+                while ((item = unit.Inventory.StackAt(def, index)) != null)
+                {
+                    if (!CanWork) yield break;
+                    if (unit.Network != this) break;
+                    if (visited.Add(item)) yield return item;
+                    if (unit.Inventory.StackAt(def, index) == item) index++;
+                }
+            }
         }
 
         internal void NotifyInventoryChanged(Building_StorageUnit unit, ThingDef def, int delta, Thing item)

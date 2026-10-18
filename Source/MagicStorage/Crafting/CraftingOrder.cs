@@ -27,7 +27,12 @@ namespace MagicStorage
         public QualityRange Quality = QualityRange.All;
         public int Revision;
         public CraftingBatch Batch;
+        // Runtime-only failure cache; no background refresh or inventory invalidation.
+        internal int? LastMaterialFailureTick;
         public float Progress => Batch?.Progress ?? 0f;
+        // A paused order only needs to distinguish counts above its resume threshold.
+        internal long ProductCountLimit => PauseWhenSatisfied && Paused
+            ? Math.Min((long)TargetCount, (long)UnpauseAt + 1) : TargetCount;
 
         public CraftingOrder() { }
         public CraftingOrder(int id, RecipeDef recipe)
@@ -95,6 +100,29 @@ namespace MagicStorage
             int index = orders.IndexOf(order), target = index + delta;
             if (index < 0 || target < 0 || target >= orders.Count) return;
             orders.RemoveAt(index); orders.Insert(target, order);
+        }
+        internal void Reorder(int from, int insertionIndex) => Reorder(orders, from, insertionIndex);
+
+        internal void Reorder(IReadOnlyList<CraftingOrder> visible, int from, int insertionIndex)
+        {
+            // Native ReorderableWidget supplies an insertion slot in the list before removal.
+            if (visible == null || from < 0 || from >= visible.Count || insertionIndex < 0 || insertionIndex > visible.Count) return;
+            int target = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
+            if (target == from) return;
+            var positions = new List<int>();
+            foreach (var order in visible)
+            {
+                int position = orders.IndexOf(order);
+                // Reject stale or duplicate snapshots before changing any order.
+                if (position < 0 || (positions.Count > 0 && position <= positions[positions.Count - 1])) return;
+                positions.Add(position);
+            }
+            var reordered = new List<CraftingOrder>(visible);
+            var moved = reordered[from];
+            reordered.RemoveAt(from);
+            reordered.Insert(target, moved);
+            // Write back only the visible slots, leaving every hidden task in its original position.
+            for (int i = 0; i < positions.Count; i++) orders[positions[i]] = reordered[i];
         }
         public void ExposeData()
         {

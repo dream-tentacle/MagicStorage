@@ -31,11 +31,13 @@ namespace Verse
     public class Graphic { }
     public class Graphic_Random : Graphic { }
     public class TerrainDef { }
-    public class BuildingProperties { public bool isAttachment; public RimWorld.StorageSettings fixedStorageSettings; }
+    public class BuildingProperties { public bool isAttachment, isPowerConduit; public RimWorld.StorageSettings fixedStorageSettings; }
     public partial class ThingDef
     {
         public object entityDefToBuild;
         public bool IsBlueprint, IsFrame, CanHaveFaction = true;
+        public bool EverTransmitsPower, destroyable = true;
+        public int ConstructionWidth = 1, ConstructionHeight = 1;
         public BuildingProperties building;
     }
     public partial class Thing
@@ -60,7 +62,20 @@ namespace Verse
     { public virtual void DrawGhost(ThingDef def, IntVec3 center, Rot4 rot, UnityEngine.Color ghostCol, Thing thing = null) { } }
     public static class GenSpawn
     {
-        public static void WipeExistingThings(IntVec3 position, Rot4 rotation, ThingDef def, Map map, DestroyMode mode) { map.Wipes++; }
+        // Controlled conduit replacement boundary; other native wipe rules are not modeled.
+        public static bool SpawningWipes(ThingDef newDef, ThingDef oldDef) => oldDef.destroyable &&
+            (newDef.IsFrame && newDef.entityDefToBuild is ThingDef builtDef ? builtDef : newDef).EverTransmitsPower &&
+            oldDef.building?.isPowerConduit == true;
+        public static void WipeExistingThings(IntVec3 position, Rot4 rotation, ThingDef def, Map map, DestroyMode mode)
+        {
+            map.Wipes++;
+            foreach (Thing thing in map.Ground.ToArray())
+                if (thing.Spawned && thing.Position.x >= position.x && thing.Position.x < position.x + def.ConstructionWidth &&
+                    thing.Position.z >= position.z && thing.Position.z < position.z + def.ConstructionHeight && SpawningWipes(def, thing.def))
+                {
+                    thing.DeSpawn(); thing.Destroy(); map.listerThings.Things.Remove(thing);
+                }
+        }
         public static Thing Spawn(Thing thing, IntVec3 position, Map map, Rot4 rotation)
         {
             thing.Position = position; thing.Map = map; thing.Rotation = rotation; thing.Spawned = true;
@@ -124,8 +139,9 @@ namespace RimWorld
         protected override Thing MakeSolidThing(out bool shouldSelect)
         {
             FactoryCalls++; shouldSelect = false;
-            Made = new Frame { Costs = Costs, Stuff = Stuff, Style = Style, Glower = Glower,
-                def = new ThingDef { entityDefToBuild = def.entityDefToBuild, IsFrame = true } };
+            Made = new Frame { Costs = Costs, Stuff = Stuff, Style = Style, Glower = Glower, width = width, height = height,
+                def = new ThingDef { entityDefToBuild = def.entityDefToBuild, IsFrame = true,
+                    ConstructionWidth = width, ConstructionHeight = height } };
             Map.enrouteManager.SendReservations(this, Made);
             return Made;
         }
@@ -159,8 +175,12 @@ namespace RimWorld
     public static class GenConstruct
     {
         public static readonly Dictionary<Thing, Thing> Blockers = new Dictionary<Thing, Thing>();
+        public static readonly Dictionary<Thing, List<Thing>> AdditionalBlockers = new Dictionary<Thing, List<Thing>>();
         public static readonly Dictionary<Thing, Thing> Walls = new Dictionary<Thing, Thing>();
         public static Thing FirstBlockingThing(Thing site, Pawn ignore) => Blockers.TryGetValue(site, out var blocker) ? blocker : null;
+        public static bool BlocksConstruction(Thing site, Thing thing) =>
+            (Blockers.TryGetValue(site, out var first) && first == thing) ||
+            (AdditionalBlockers.TryGetValue(site, out var others) && others.Contains(thing));
         public static Thing GetWallAttachedTo(Thing site) => Walls.TryGetValue(site, out var wall) ? wall : null;
     }
 }

@@ -14,7 +14,6 @@ namespace MagicStorage
     {
         private static readonly Texture2D DirectionArrow = ContentFinder<Texture2D>.Get("UI/Widgets/TradeArrow");
         private readonly Building_StorageCore core;
-        private readonly StorageQuantityDrag quantityDrag = new StorageQuantityDrag();
         private readonly QuickSearchWidget search = new QuickSearchWidget();
         private StorageNetwork network;
         private long revision = -1;
@@ -23,53 +22,77 @@ namespace MagicStorage
         private List<StorageInventoryEntry> visible = new List<StorageInventoryEntry>();
         private TransferableSorterDef primary = TransferableSorterDefOf.Category;
         private TransferableSorterDef secondary = TransferableSorterDefOf.MarketValue;
-        private ThingCategoryDef category;
+        private ModContentPack selectedSource;
+        private readonly List<StorageInventoryRule> customRules;
+        private readonly List<StorageInventoryFilterOption> filterOptions = new List<StorageInventoryFilterOption>();
+        private readonly Dictionary<StorageInventoryRule, ThingDef> ruleIcons = new Dictionary<StorageInventoryRule, ThingDef>();
+        private readonly int defaultFilterCount;
+        private Vector2 filterScroll;
+        private enum RuleAction { None, Delete, Edit }
+        private RuleAction ruleAction;
         private Vector2 scroll;
         private bool forbid;
         private string feedback = "";
         private const float RowHeight = 30f;
         private const float QuantityWidth = 240f;
-        public override Vector2 InitialSize => new Vector2(Math.Min(1024f, UI.screenWidth), UI.screenHeight);
+        public override Vector2 InitialSize => new Vector2(Math.Min(1340f, UI.screenWidth), UI.screenHeight);
         public override QuickSearchWidget CommonSearchWidget => search;
 
         public Dialog_StorageInventory(Building_StorageCore core)
         {
             this.core = core;
+            customRules = MagicStorageMod.Settings.InventoryFilters;
+            foreach (var root in DefDatabase<ThingCategoryDef>.AllDefsListForReading.Where(def => def.resourceReadoutRoot))
+                filterOptions.Add(new StorageInventoryFilterOption(root));
+            defaultFilterCount = filterOptions.Count;
+            foreach (var rule in customRules) filterOptions.Add(new StorageInventoryFilterOption(rule));
             forcePause = true;
             absorbInputAroundWindow = true;
             closeOnClickedOutside = false;
             soundAppear = SoundDefOf.CommsWindow_Open;
             soundClose = SoundDefOf.CommsWindow_Close;
-            commonSearchWidgetOffset.x += 18f;
-            commonSearchWidgetOffset.y -= 18f;
         }
 
         public override void PostOpen() { base.PostOpen(); Refresh(); }
-        public override void PostClose() { quantityDrag.Reset(); base.PostClose(); }
         public override void Notify_CommonSearchChanged() { ApplyFilter(); }
 
         protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
         {
-            // At narrower UI resolutions, keep search above the centered button group.
-            if (inRect.width < 950f) return new Rect(inRect.x, inRect.y + inRect.height - 86f, 200f, 24f);
-            return base.QuickSearchWidgetRect(winRect, inRect);
+            return new Rect(inRect.x + 8f, inRect.y + 8f, SidebarWidth(inRect.width) - 56f, 24f);
         }
 
-        private void Refresh()
+        private static float SidebarWidth(float width) => Math.Min(260f, width * 0.25f);
+
+        private void Refresh(bool preserveSelections = false)
         {
+            var selectedStacks = new Dictionary<Thing, long>();
+            if (preserveSelections && network != null)
+                foreach (var row in rows)
+                {
+                    long remaining = row.Requested;
+                    foreach (Thing item in row.Stacks)
+                    {
+                        long count = Math.Min(remaining, network.AvailableToWithdraw(item));
+                        selectedStacks[item] = count;
+                        remaining -= count;
+                    }
+                }
             if (core.Spawned) core.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             network = core.Network;
             revision = network?.Revision ?? -1;
-            rows = StorageWithdrawal.Snapshot(network);
+            rows = StorageWithdrawal.Snapshot(network, (left, right) =>
+                customRules.All(rule => rule.Filter.Allows(left) == rule.Filter.Allows(right)));
+            if (preserveSelections)
+                foreach (var row in rows)
+                    row.SetRequested(row.Stacks.Sum(item => selectedStacks.TryGetValue(item, out long count) ? count : 0L));
             entries = rows.Select(row => new StorageInventoryEntry(row)).ToList();
             ApplyFilter();
         }
 
         private void ApplyFilter()
         {
-            quantityDrag.Reset();
             visible = entries.Where(entry => search.filter.Matches(entry.Label) &&
-                (category == null || InCategory(entry.ThingDef, category)))
+                StorageInventoryFilters.Allows(entry.Row.Representative, filterOptions, selectedSource))
                 .OrderBy(entry => entry, primary.Comparer)
                 .ThenBy(entry => entry, secondary.Comparer)
                 .ThenBy(entry => TransferableUIUtility.DefaultListOrderPriority(entry.ThingDef))
@@ -78,31 +101,6 @@ namespace MagicStorage
                 .ThenBy(entry => entry.AnyThing.HitPoints).ToList();
             search.noResultsMatched = visible.Count == 0;
             scroll = Vector2.zero;
-        }
-
-        private static bool InCategory(ThingDef def, ThingCategoryDef wanted)
-        {
-            if (def.thingCategories == null) return false;
-            foreach (var leaf in def.thingCategories)
-                for (var current = leaf; current != null; current = current.parent)
-                    if (current == wanted) return true;
-            return false;
-        }
-
-        private void ChooseCategory()
-        {
-            var categories = new HashSet<ThingCategoryDef>();
-            foreach (var entry in entries)
-                if (entry.ThingDef.thingCategories != null)
-                    foreach (var leaf in entry.ThingDef.thingCategories)
-                        for (var current = leaf; current != null; current = current.parent) categories.Add(current);
-            var options = new List<FloatMenuOption> { new FloatMenuOption("MS_UI_AllCategories".Translate(), () => { category = null; ApplyFilter(); }) };
-            foreach (var entry in categories.OrderBy(c => c.label))
-            {
-                var selected = entry;
-                options.Add(new FloatMenuOption(entry.LabelCap, () => { category = selected; ApplyFilter(); }));
-            }
-            Find.WindowStack.Add(new FloatMenu(options));
         }
 
         private void ChooseSorter(bool first)
@@ -120,6 +118,25 @@ namespace MagicStorage
             Find.WindowStack.Add(new FloatMenu(options));
         }
 
+        private static string SourceLabel(ModContentPack source) => source.ModMetaData?.ShortName ?? source.Name;
+
+        private void ChooseSource()
+        {
+            var options = new List<FloatMenuOption>
+            {
+                new FloatMenuOption("MS_UI_ModAll".Translate(), () => { selectedSource = null; ApplyFilter(); })
+            };
+            // Use all network entries so category, rule and search filters cannot hide source choices.
+            foreach (var source in entries.Select(entry => StorageInventoryFilters.SourceOf(entry.Row.Representative))
+                .Where(pack => pack != null).GroupBy(pack => pack.PackageId, StringComparer.OrdinalIgnoreCase)
+                .Select(group => group.First()).OrderBy(SourceLabel, StringComparer.CurrentCultureIgnoreCase))
+            {
+                var chosen = source;
+                options.Add(new FloatMenuOption(SourceLabel(source), () => { selectedSource = chosen; ApplyFilter(); }));
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
         public override void DoWindowContents(Rect rect)
         {
             if (!core.Spawned || core.Destroyed || core.Faction != Faction.OfPlayer) { Close(); return; }
@@ -129,15 +146,159 @@ namespace MagicStorage
             TextAnchor oldAnchor = Text.Anchor;
             bool oldWrap = Text.WordWrap;
             Color oldColor = GUI.color;
-            quantityDrag.BeginGUI(core.CanWork);
             try
             {
                 Text.Font = GameFont.Small;
-                DrawHeader(rect);
-                DrawList(new Rect(0f, 88f, rect.width, Math.Max(0f, rect.height - 218f)));
-                DrawFooter(rect);
+                float sidebarWidth = SidebarWidth(rect.width);
+                DrawFilters(new Rect(0f, 0f, sidebarWidth, rect.height));
+                Rect inventory = new Rect(sidebarWidth + 16f, 0f, rect.width - sidebarWidth - 16f, rect.height);
+                Widgets.BeginGroup(inventory);
+                try
+                {
+                    Rect local = inventory.AtZero();
+                    DrawHeader(local);
+                    DrawList(new Rect(0f, 88f, local.width, Math.Max(0f, local.height - 218f)));
+                    DrawFooter(local);
+                }
+                finally { Widgets.EndGroup(); }
             }
-            finally { quantityDrag.EndGUI(); Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
+            finally { Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
+        }
+
+        private void DrawFilters(Rect rect)
+        {
+            Rect reset = new Rect(rect.width - 36f, 6f, 30f, 30f);
+            Widgets.DrawHighlightIfMouseover(reset);
+            GUI.DrawTexture(reset.ContractedBy(4f), TexButton.Reload);
+            TooltipHandler.TipRegion(reset, "MS_UI_FilterReset".Translate());
+            if (Widgets.ButtonInvisible(reset))
+            {
+                search.Reset();
+                selectedSource = null;
+                ruleAction = RuleAction.None;
+                foreach (var option in filterOptions) option.Mode = StorageInventoryFilterMode.Off;
+                ApplyFilter();
+            }
+            Rect viewport = new Rect(0f, 46f, rect.width, Math.Max(0f, rect.height - 46f));
+            Widgets.DrawMenuSection(viewport);
+            const float step = 52f;
+            float width = viewport.width - 24f;
+            int columns = Math.Max(1, (int)(width / step));
+            int defaultRows = (defaultFilterCount + columns - 1) / columns;
+            float customY = 30f + defaultRows * step + 16f;
+            int customRows = (customRules.Count + 3 + columns - 1) / columns;
+            Rect content = new Rect(0f, 0f, width, Math.Max(viewport.height - 8f, customY + 30f + customRows * step));
+            StorageInventoryRule selectedRule = null;
+            Widgets.BeginScrollView(viewport.ContractedBy(4f), ref filterScroll, content);
+            try
+            {
+                Text.Font = GameFont.Tiny;
+                Widgets.Label(new Rect(8f, 4f, width - 8f, 24f), "MS_UI_FilterCategories".Translate());
+                Widgets.DrawLineHorizontal(8f, customY - 8f, width - 16f);
+                Widgets.Label(new Rect(8f, customY, width - 8f, 24f), "MS_UI_FilterCustom".Translate());
+                Text.Font = GameFont.Small;
+                for (int i = 0; i < filterOptions.Count; i++)
+                {
+                    bool isDefault = i < defaultFilterCount;
+                    int index = isDefault ? i : i - defaultFilterCount;
+                    float y = isDefault ? 30f : customY + 30f;
+                    if (DrawFilterButton(new Rect(8f + index % columns * step, y + index / columns * step, 44f, 44f), filterOptions[i]))
+                        selectedRule = filterOptions[i].Rule;
+                }
+                int addIndex = customRules.Count;
+                Rect add = new Rect(8f + addIndex % columns * step, customY + 30f + addIndex / columns * step, 44f, 44f);
+                if (DrawRuleTool(add, TexButton.Plus, "MS_UI_FilterCreate".Translate()))
+                {
+                    ruleAction = RuleAction.None;
+                    OpenRuleEditor();
+                }
+                int minusIndex = addIndex + 1;
+                Rect minus = new Rect(8f + minusIndex % columns * step, customY + 30f + minusIndex / columns * step, 44f, 44f);
+                if (DrawRuleTool(minus, TexButton.Minus, "MS_UI_FilterDeleteMode".Translate(),
+                    ruleAction == RuleAction.Delete ? Color.red : Color.white))
+                    ruleAction = ruleAction == RuleAction.Delete ? RuleAction.None : RuleAction.Delete;
+                int editIndex = addIndex + 2;
+                Rect edit = new Rect(8f + editIndex % columns * step, customY + 30f + editIndex / columns * step, 44f, 44f);
+                if (DrawRuleTool(edit, TexButton.Rename, "MS_UI_FilterEditMode".Translate(),
+                    ruleAction == RuleAction.Edit ? Color.green : Color.white))
+                    ruleAction = ruleAction == RuleAction.Edit ? RuleAction.None : RuleAction.Edit;
+            }
+            finally { Widgets.EndScrollView(); }
+            // Change the lists only after all filter buttons have finished drawing.
+            if (selectedRule != null && ruleAction == RuleAction.Edit) OpenRuleEditor(selectedRule);
+            else if (selectedRule != null && ruleAction == RuleAction.Delete && customRules.Remove(selectedRule))
+            {
+                filterOptions.RemoveAll(option => option.Rule == selectedRule);
+                ruleIcons.Remove(selectedRule);
+                MagicStorageMod.Settings.Write();
+                if (customRules.Count == 0) ruleAction = RuleAction.None;
+                Refresh(true);
+            }
+        }
+
+        private void OpenRuleEditor(StorageInventoryRule existingRule = null)
+        {
+            Find.WindowStack.Add(new Dialog_StorageInventoryRule(core.Map, customRules.Count + 1, rule =>
+            {
+                if (existingRule == null)
+                {
+                    customRules.Add(rule);
+                    filterOptions.Add(new StorageInventoryFilterOption(rule));
+                }
+                ruleIcons.Remove(rule);
+                MagicStorageMod.Settings.Write();
+                Refresh(true);
+            }, existingRule));
+        }
+
+        private static bool DrawRuleTool(Rect rect, Texture2D icon, TaggedString tooltip, Color? color = null)
+        {
+            Widgets.DrawBoxSolid(rect, new Color(0.25f, 0.25f, 0.25f));
+            Widgets.DrawHighlightIfMouseover(rect);
+            Color previous = GUI.color;
+            GUI.color = color ?? Color.white;
+            GUI.DrawTexture(rect.ContractedBy(10f), icon);
+            GUI.color = previous;
+            TooltipHandler.TipRegion(rect, tooltip);
+            return Widgets.ButtonInvisible(rect);
+        }
+
+        private bool DrawFilterButton(Rect rect, StorageInventoryFilterOption option)
+        {
+            if (ruleAction != RuleAction.None && option.Rule != null)
+            {
+                bool deleting = ruleAction == RuleAction.Delete;
+                return DrawRuleTool(rect, deleting ? TexButton.CloseXBig : TexButton.Rename,
+                    (deleting ? "MS_UI_FilterDeleteRule" : "MS_UI_FilterEditRule").Translate(option.Rule.Name),
+                    deleting ? Color.red : Color.white);
+            }
+            Color color = option.Mode == StorageInventoryFilterMode.Include ? new Color(0.24f, 0.48f, 0.16f) :
+                option.Mode == StorageInventoryFilterMode.Exclude ? new Color(0.58f, 0.18f, 0.18f) : new Color(0.25f, 0.25f, 0.25f);
+            Widgets.DrawBoxSolid(rect, color);
+            Widgets.DrawHighlightIfMouseover(rect);
+            if (option.Category != null) GUI.DrawTexture(rect.ContractedBy(6f), option.Category.icon);
+            else
+            {
+                if (!ruleIcons.TryGetValue(option.Rule, out ThingDef icon))
+                {
+                    icon = option.Rule.ResolveIcon();
+                    ruleIcons.Add(option.Rule, icon);
+                }
+                if (icon != null) Widgets.ThingIcon(rect.ContractedBy(6f), icon);
+                else GUI.DrawTexture(rect.ContractedBy(10f), TexButton.CategorizedResourceReadout);
+            }
+            string name = option.Category?.LabelCap.ToString() ?? option.Rule.Name;
+            string mode = ("MS_UI_FilterMode" + option.Mode).Translate();
+            TooltipHandler.TipRegion(rect, name + "\n" + mode + "\n" + "MS_UI_FilterControls".Translate());
+            if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&
+                (Event.current.button == 0 || Event.current.button == 1))
+            {
+                option.Toggle(Event.current.button == 1);
+                Event.current.Use();
+                ApplyFilter();
+                SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+            }
+            return false;
         }
 
         private void DrawHeader(Rect rect)
@@ -148,14 +309,20 @@ namespace MagicStorage
             Text.Anchor = TextAnchor.UpperLeft;
             if (Widgets.ButtonText(new Rect(70, 0, 130, 27), primary.LabelCap.ToString().Truncate(128))) ChooseSorter(true);
             if (Widgets.ButtonText(new Rect(210, 0, 130, 27), secondary.LabelCap.ToString().Truncate(128))) ChooseSorter(false);
+            float modWidth = Math.Min(190f, Math.Max(110f, rect.width - 560f));
+            var modRect = new Rect(350f, 0f, modWidth, 27f);
+            string modLabel = "MS_UI_ModFilter".Translate(selectedSource != null ? SourceLabel(selectedSource) : "MS_UI_ModAll".Translate().ToString());
+            if (Widgets.ButtonText(modRect, modLabel.Truncate(modWidth - 8f))) ChooseSource();
+            TooltipHandler.TipRegion(modRect, modLabel);
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.UpperRight;
-            Widgets.Label(new Rect(350, 0, rect.width - 350, 30), "MS_UI_Title".Translate());
+            float titleX = modRect.xMax + 10f;
+            float titleWidth = Math.Max(0f, rect.width - titleX);
+            Widgets.Label(new Rect(titleX, 0, titleWidth, 30), "MS_UI_Title".Translate().ToString().Truncate(titleWidth));
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
-            if (Widgets.ButtonText(new Rect(0, 30, 195, 25), (category?.LabelCap.ToString() ?? "MS_UI_AllCategories".Translate().ToString()).Truncate(190))) ChooseCategory();
             Text.Anchor = TextAnchor.MiddleRight;
-            Widgets.Label(new Rect(205, 29, rect.width - 205, 27), "MS_UI_Capacity".Translate(network?.UnitCount ?? 0, network?.UsedSlots ?? 0, network?.SlotCapacity ?? 0));
+            Widgets.Label(new Rect(0, 29, rect.width, 27), "MS_UI_Capacity".Translate(network?.UnitCount ?? 0, network?.UsedSlots ?? 0, network?.SlotCapacity ?? 0));
             float quantityX = rect.width - 16f - 175f - QuantityWidth;
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleLeft;
@@ -174,7 +341,6 @@ namespace MagicStorage
 
         private void DrawList(Rect viewport)
         {
-            quantityDrag.SetViewport(viewport);
             Rect content = new Rect(0, 0, viewport.width - 16, 6 + visible.Count * RowHeight);
             Widgets.BeginScrollView(viewport, ref scroll, content);
             try
@@ -248,16 +414,16 @@ namespace MagicStorage
             if (interactive && row.Requested > 0)
             {
                 Rect left = new Rect(amount.x - (single ? 60 : 30), rect.y, single ? 60 : 30, rect.height);
-                quantityDrag.ButtonText(left, "<", row.Representative.thingIDNumber,
+                StorageQuantityDrag.ButtonText(left, "<", row.Representative.thingIDNumber,
                     () => { row.SetRequested(row.Requested - step); SoundDefOf.Tick_High.PlayOneShotOnCamera(); });
-                if (!single) quantityDrag.ButtonText(new Rect(amount.x - 60, rect.y, 30, rect.height), "<<", row.Representative.thingIDNumber,
+                if (!single) StorageQuantityDrag.ButtonText(new Rect(amount.x - 60, rect.y, 30, rect.height), "<<", row.Representative.thingIDNumber,
                     () => { row.SetRequested(0); SoundDefOf.Tick_High.PlayOneShotOnCamera(); });
             }
             if (interactive && row.Requested < row.Available)
             {
-                quantityDrag.ButtonText(new Rect(amount.xMax, rect.y, single ? 60 : 30, rect.height), ">", row.Representative.thingIDNumber,
+                StorageQuantityDrag.ButtonText(new Rect(amount.xMax, rect.y, single ? 60 : 30, rect.height), ">", row.Representative.thingIDNumber,
                     () => { row.SetRequested(row.Requested + Math.Min(step, row.Available - row.Requested)); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); });
-                if (!single) quantityDrag.ButtonText(new Rect(amount.xMax + 30, rect.y, 30, rect.height), ">>", row.Representative.thingIDNumber,
+                if (!single) StorageQuantityDrag.ButtonText(new Rect(amount.xMax + 30, rect.y, 30, rect.height), ">>", row.Representative.thingIDNumber,
                     () => { row.SetRequested(row.Available); SoundDefOf.Tick_Low.PlayOneShotOnCamera(); });
             }
             if (row.Requested != 0)
@@ -275,11 +441,12 @@ namespace MagicStorage
             TooltipHandler.TipRegion(new Rect(rect.width - 285, y, 285, 26), "MS_UI_ForbidTip".Translate());
             string status = !core.CanWork ? StorageNetwork.StatusLabel(network) : feedback.Length > 0 ? feedback : "MS_UI_Hint".Translate().ToString();
             Text.Font = GameFont.Tiny;
-            Widgets.Label(new Rect(rect.width < 950 ? 210 : 0, y + 28, rect.width - (rect.width < 950 ? 210 : 0), 37), status);
+            Widgets.Label(new Rect(0, y + 28, rect.width, 37), status);
             Text.Font = GameFont.Small;
-            float center = rect.width / 2;
-            Rect accept = new Rect(center - 80, rect.height - 55, 160, 40);
-            if (Widgets.ButtonText(new Rect(accept.x - 170, accept.y, 160, 40), "ResetButton".Translate()))
+            float buttonWidth = Math.Min(160f, (rect.width - 30f) / 4f);
+            float buttonStart = (rect.width - buttonWidth * 4f - 30f) / 2f;
+            Rect accept = new Rect(buttonStart + buttonWidth + 10f, rect.height - 55, buttonWidth, 40);
+            if (Widgets.ButtonText(new Rect(buttonStart, accept.y, buttonWidth, 40), "ResetButton".Translate()))
             {
                 foreach (var row in rows) row.SetRequested(0);
                 feedback = ""; ApplyFilter(); GUI.FocusControl(null); SoundDefOf.Tick_Low.PlayOneShotOnCamera();
@@ -306,8 +473,20 @@ namespace MagicStorage
                 }
                 Event.current.Use();
             }
-            if (Widgets.ButtonText(new Rect(accept.xMax + 10, accept.y, 160, 40), "CancelButton".Translate()))
+            if (Widgets.ButtonText(new Rect(accept.xMax + 10f, accept.y, buttonWidth, 40), "CancelButton".Translate()))
             { Close(); Event.current.Use(); }
+            GUI.enabled = enabled && core.CanWork && visible.Count > 0;
+            try
+            {
+                if (Widgets.ButtonText(new Rect(accept.xMax + buttonWidth + 20f, accept.y, buttonWidth, 40),
+                    "MS_UI_SelectAllCurrent".Translate()))
+                {
+                    foreach (var entry in visible) entry.Row.SetRequested(entry.Row.Available);
+                    GUI.FocusControl(null);
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                }
+            }
+            finally { GUI.enabled = enabled; }
         }
     }
 }

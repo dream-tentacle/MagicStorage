@@ -47,6 +47,7 @@ internal static class StorageIndexTests
     {
         LocalChanges(); RebuildWithoutInventoryScan(); IncrementalMergeAndSplit(); LoadIndexReconstruction();
         ReservationIndexQueries(); TwoCoreMergeInvalidatesClaims(); MixedMutations();
+        PartialStackLifecycle(); PartialStackAdmissionCost();
         return assertions;
     }
 
@@ -67,6 +68,80 @@ internal static class StorageIndexTests
         Equal(2, stacks.Count, "swap deletion retains remaining nodes");
         Equal(true, stacks.Contains(third), "swapped node remains indexed");
         Equal(0, f.Unit.Inventory.Contents.IndexReads, "local changes never scan unrelated inventory slots");
+    }
+
+    private static int PartialCount(StorageInventory inventory, ThingDef def)
+    {
+        var stacks = new List<Thing>(); inventory.GetPartialStacks(def, stacks); return stacks.Count;
+    }
+
+    private static void PartialStackLifecycle()
+    {
+        var f = new Fixture(); var def = new ThingDef();
+        Thing first = f.Store(def, 70), middle = f.Store(def, 71), last = f.Store(def, 72);
+        Equal(3, PartialCount(f.Unit.Inventory, def), "new partial stacks enter index");
+        f.Unit.Inventory.Contents.Remove(middle);
+        Equal(2, PartialCount(f.Unit.Inventory, def), "middle removal swaps final partial stack into its place");
+        Equal(true, f.Unit.Inventory.Contents.TryAdd(new Thing { def = def, stackCount = 8 }), "merge traverses snapshot while partial index removes full stacks");
+        Equal(75, first.stackCount, "first partial filled"); Equal(75, last.stackCount, "swapped partial also filled");
+        Equal(0, PartialCount(f.Unit.Inventory, def), "full stacks leave partial index");
+        Equal(10, f.Core.Network.TryTransferTo(first, 10, new ThingOwner(null)).Transferred, "partially withdraw from full stack");
+        Equal(1, PartialCount(f.Unit.Inventory, def), "partial withdrawal reintroduces formerly full stack");
+        Equal(true, f.Unit.Inventory.Contents.TryAdd(new Thing { def = def, stackCount = 10 }), "new goods find reopened merge space");
+        Equal(0, PartialCount(f.Unit.Inventory, def), "refilled stack removed again");
+        f.Unit.Inventory.Contents.Remove(last);
+        Equal(0, PartialCount(f.Unit.Inventory, def), "removing full stack leaves no stale candidates");
+        first.stackCount = 20; f.Unit.Inventory.RefreshStack(first); f.Unit.Inventory.RefreshStack(first);
+        Equal(1, PartialCount(f.Unit.Inventory, def), "repeated refresh never duplicates a partial stack");
+        var replacementDef = new ThingDef(); first.def = replacementDef; f.Unit.Inventory.RefreshStack(first);
+        Equal(0, PartialCount(f.Unit.Inventory, def), "changed def leaves old candidate bucket");
+        Equal(1, PartialCount(f.Unit.Inventory, replacementDef), "changed def enters new candidate bucket");
+        first.stackCount = 75; f.Unit.Inventory.RebuildIndex(); f.Manager.MarkDirty(); f.Manager.EnsureCurrent();
+        Equal(0, PartialCount(f.Unit.Inventory, replacementDef), "load rebuild excludes full stacks");
+        first.stackCount = 40; f.Unit.Inventory.RebuildIndex(); f.Manager.MarkDirty(); f.Manager.EnsureCurrent();
+        Equal(1, PartialCount(f.Unit.Inventory, replacementDef), "load rebuild restores partial candidates");
+        first.Destroyed = true; f.Unit.Inventory.RefreshStack(first);
+        Equal(0, PartialCount(f.Unit.Inventory, replacementDef), "destroyed stack leaves candidate index");
+
+        f = new Fixture(); def = new ThingDef(); first = f.Store(def, 20, "A");
+        Thing.StackChecks = 0;
+        Equal(5, f.Unit.Inventory.Contents.GetCountCanAccept(new Thing { def = def, stackCount = 5 }), "free slot provides sufficient capacity");
+        Equal(0, Thing.StackChecks, "enough empty space skips compatibility scan");
+        f.Unit.SlotCapacity = 1;
+        Equal(0, f.Core.Network.GetCountCanAccept(new Thing { def = def, variant = "B", stackCount = 1 }), "same def with incompatible state cannot merge");
+        first.variant = "B";
+        Equal(1, f.Core.Network.GetCountCanAccept(new Thing { def = def, variant = "B", stackCount = 1 }), "compatibility is checked live without changing quantity or index");
+    }
+
+    private static void PartialStackAdmissionCost()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Unit.SlotCapacity = 10003;
+        for (int i = 0; i < 10000; i++) f.Store(def, 75);
+        Thing first = f.Store(def, 70); f.Store(def, 71); f.Store(def, 72);
+        var incoming = new Thing { def = def, stackCount = 13 };
+        f.Unit.Inventory.Contents.IndexReads = 0; Thing.StackChecks = 0;
+        Equal(12, f.Core.Network.GetCountCanAccept(incoming), "network sums the three partial stacks only");
+        Equal(3, Thing.StackChecks, "ten thousand full stacks never enter admission compatibility checks");
+        Thing.StackChecks = 0;
+        Equal(1, f.Unit.Inventory.Contents.GetCountCanAccept(new Thing { def = def, stackCount = 1 }), "container accepts target from first candidate");
+        Equal(1, Thing.StackChecks, "capacity scan stops as soon as enough space is found");
+        var claim = new object(); Thing.StackChecks = 0;
+        Equal(12, f.Core.Network.ReserveIncoming(claim, incoming, 12), "reservation uses all unclaimed partial space");
+        Equal(3, Thing.StackChecks, "reservation does not inspect full stacks");
+        Thing.StackChecks = 0;
+        Equal(0, f.Core.Network.GetCountCanAccept(incoming), "fully claimed candidates cannot be reused");
+        Equal(0, Thing.StackChecks, "fully claimed space skips compatibility calls");
+        Equal(3, PartialCount(f.Unit.Inventory, def), "reservations do not remove physical partial candidates");
+        f.Core.Network.ReleaseIncoming(claim);
+        var outgoing = new object(); f.Core.Network.ReserveOutgoing(outgoing, first, 1);
+        Equal(7, f.Core.Network.GetCountCanAccept(incoming), "outgoing-reserved partial stack excluded from new merges");
+        f.Core.Network.ReleaseOutgoing(outgoing);
+        Thing.StackChecks = 0;
+        Equal(true, f.Unit.Inventory.Contents.TryAdd(new Thing { def = def, stackCount = 12 }), "direct container merge fills all three candidates");
+        Equal(true, Thing.StackChecks <= 9, "capacity and merging never revisit ten thousand full stacks");
+        Equal(0, PartialCount(f.Unit.Inventory, def), "all filled candidates removed without skipping swapped entries");
+        Equal(750225L, f.Core.Network.GetTotalCount(def), "large merge preserves exact indexed total");
+        Equal(0, f.Unit.Inventory.Contents.IndexReads, "admission and merge do not scan physical container slots");
     }
 
     private static void RebuildWithoutInventoryScan()
@@ -125,9 +200,18 @@ internal static class StorageIndexTests
             foreach (var type in defs)
             {
                 long expected = 0;
-                foreach (Thing item in f.Unit.Inventory.Contents) if (item.def == type) expected += item.stackCount;
+                var expectedPartial = new HashSet<Thing>();
+                foreach (Thing item in f.Unit.Inventory.Contents)
+                    if (item.def == type)
+                    {
+                        expected += item.stackCount;
+                        if (!item.Destroyed && item.stackCount > 0 && item.stackCount < item.def.stackLimit) expectedPartial.Add(item);
+                    }
                 Equal(expected, f.Unit.Inventory.GetTotalCount(type), "unit summary matches independent physical inventory");
                 Equal(expected, f.Core.Network.GetTotalCount(type), "network summary matches independent physical inventory");
+                var actualPartial = new List<Thing>(); f.Unit.Inventory.GetPartialStacks(type, actualPartial);
+                Equal(expectedPartial.Count, actualPartial.Count, "mixed mutations never duplicate or omit partial candidates");
+                Equal(true, expectedPartial.SetEquals(actualPartial), "partial candidates match independent physical inventory");
             }
         }
     }

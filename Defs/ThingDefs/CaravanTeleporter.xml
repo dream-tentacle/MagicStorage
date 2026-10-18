@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_CaravanTeleporter</defName>
+    <label>caravan teleporter</label>
+    <description>Forms a caravan using supplies from the connected magic storage network. Choose people, animals, items and travel supplies in the caravan formation menu. Once confirmed, the selected supplies are transferred to the caravan's inventories and its members depart immediately, without hauling, gathering or walking to the map edge. Members retain their equipment and inventories; anything they are carrying in their hands stays on the map.</description>
+    <thingClass>MagicStorage.Building_CaravanTeleporter</thingClass>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/StorageReceiver/StorageReceiver</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.125,1.125)</drawSize>
+      <color>(0.7,0.8,1)</color>
+      <drawRotated>false</drawRotated>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <costList><Steel>60</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3111</uiOrder>
+  </ThingDef>
+</Defs>

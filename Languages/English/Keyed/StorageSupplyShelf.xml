@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Shelf_Configure>Configure restocking</MS_Shelf_Configure>
+  <MS_Shelf_CopyPreset>Copy preset</MS_Shelf_CopyPreset>
+  <MS_Shelf_CopyPresetDesc>Copy this shelf's items, restocking limits, filters, restocking warnings and priority.</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_PastePreset>Paste preset</MS_Shelf_PastePreset>
+  <MS_Shelf_PastePresetDesc>Apply the copied preset to the selected restocking shelves, replacing their current settings. Supports multiple selected shelves.</MS_Shelf_PastePresetDesc>
+  <MS_Shelf_NeedCopiedPreset>Copy a preset first</MS_Shelf_NeedCopiedPreset>
   <MS_Shelf_Title>Auto-restocking shelf</MS_Shelf_Title>
   <MS_Shelf_ConfigureDesc>Choose three item types and their restocking limits, with at most one stack of each.</MS_Shelf_ConfigureDesc>
   <MS_Shelf_PriorityHint>Colonists will not haul items into this shelf; only the connected storage network provides restocking.</MS_Shelf_PriorityHint>

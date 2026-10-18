@@ -4,15 +4,16 @@ using Verse;
 
 namespace MagicStorage
 {
-    // Only contents is saved. Both indexes can always be rebuilt from the real stacks.
+    // Only contents is saved. Derived indexes can always be rebuilt from the real stacks.
     public sealed class StorageInventory : IExposable
     {
         private readonly Building_StorageUnit unit;
         private StorageThingOwner contents;
         private readonly Dictionary<ThingDef, List<Thing>> byDef = new Dictionary<ThingDef, List<Thing>>();
+        private readonly Dictionary<ThingDef, List<Thing>> partialStacks = new Dictionary<ThingDef, List<Thing>>();
         private readonly Dictionary<ThingDef, long> counts = new Dictionary<ThingDef, long>();
         private sealed class StackRecord
-        { internal ThingDef Def; internal int Count, Index; }
+        { internal ThingDef Def; internal int Count, Index; internal int PartialIndex = -1; }
         private readonly Dictionary<Thing, StackRecord> indexed = new Dictionary<Thing, StackRecord>();
 
         public StorageInventory(Building_StorageUnit unit)
@@ -38,6 +39,58 @@ namespace MagicStorage
                 result.AddRange(stacks);
         }
 
+        internal Thing StackAt(ThingDef def, int index) => byDef.TryGetValue(def, out var stacks) &&
+            index >= 0 && index < stacks.Count ? stacks[index] : null;
+
+        // Copy only candidates. Merging changes this index as stacks become full.
+        internal void GetPartialStacks(ThingDef def, List<Thing> result)
+        {
+            if (def != null && partialStacks.TryGetValue(def, out var stacks)) result.AddRange(stacks);
+        }
+
+        internal int GetCountCanMerge(Thing item, int requested)
+        {
+            if (requested <= 0 || !partialStacks.TryGetValue(item.def, out var stacks)) return 0;
+            int remaining = requested;
+            foreach (Thing stack in stacks)
+            {
+                if (!stack.CanStackWith(item)) continue;
+                remaining -= Math.Min(remaining, Math.Max(0, stack.def.stackLimit - stack.stackCount));
+                if (remaining == 0) break;
+            }
+            return requested - remaining;
+        }
+
+        private void RemovePartial(StackRecord record)
+        {
+            if (record.PartialIndex < 0) return;
+            var stacks = partialStacks[record.Def];
+            Thing last = stacks[stacks.Count - 1];
+            stacks[record.PartialIndex] = last;
+            indexed[last].PartialIndex = record.PartialIndex;
+            stacks.RemoveAt(stacks.Count - 1);
+            if (stacks.Count == 0) partialStacks.Remove(record.Def);
+            record.PartialIndex = -1;
+        }
+
+        private void RefreshPartial(Thing item, StackRecord record)
+        {
+            if (item.stackCount >= item.def.stackLimit) { RemovePartial(record); return; }
+            if (record.PartialIndex >= 0) return;
+            if (!partialStacks.TryGetValue(record.Def, out var stacks))
+                partialStacks.Add(record.Def, stacks = new List<Thing>());
+            record.PartialIndex = stacks.Count;
+            stacks.Add(item);
+        }
+
+        // Read-only traversal can stop inside a bucket without copying its remaining stacks.
+        internal bool VisitStacks(ThingDef def, Predicate<Thing> visit)
+        {
+            if (def != null && byDef.TryGetValue(def, out List<Thing> stacks))
+                foreach (Thing stack in stacks) if (!visit(stack)) return false;
+            return true;
+        }
+
         internal void RefreshStack(Thing item)
         {
             if (item == null) return;
@@ -45,6 +98,7 @@ namespace MagicStorage
             bool held = !item.Destroyed && item.stackCount > 0 && item.holdingOwner == contents;
             if (record != null && (!held || record.Def != item.def))
             {
+                RemovePartial(record);
                 var stacks = byDef[record.Def];
                 Thing last = stacks[stacks.Count - 1];
                 stacks[record.Index] = last;
@@ -66,6 +120,7 @@ namespace MagicStorage
             }
             int delta = item.stackCount - record.Count;
             record.Count = item.stackCount;
+            RefreshPartial(item, record);
             if (delta != 0) ChangeCount(item, record.Def, delta);
         }
 
@@ -80,16 +135,19 @@ namespace MagicStorage
         internal void RebuildIndex()
         {
             byDef.Clear();
+            partialStacks.Clear();
             counts.Clear();
             indexed.Clear();
             for (int i = 0; i < contents.Count; i++)
             {
                 Thing thing = contents[i];
-                if (thing == null || thing.Destroyed) continue;
+                if (thing == null || thing.Destroyed || thing.stackCount <= 0) continue;
                 if (!byDef.TryGetValue(thing.def, out List<Thing> stacks))
                     byDef.Add(thing.def, stacks = new List<Thing>());
                 stacks.Add(thing);
-                indexed.Add(thing, new StackRecord { Def = thing.def, Count = thing.stackCount, Index = stacks.Count - 1 });
+                var record = new StackRecord { Def = thing.def, Count = thing.stackCount, Index = stacks.Count - 1 };
+                indexed.Add(thing, record);
+                RefreshPartial(thing, record);
                 counts[thing.def] = GetTotalCount(thing.def) + thing.stackCount;
             }
         }
@@ -123,13 +181,9 @@ namespace MagicStorage
                 item.def.category != ThingCategory.Item || item.def.destroyOnDrop || item.def.stackLimit <= 0) return 0;
             maxStacks = unit.SlotCapacity;
             long space = (long)Math.Max(0, maxStacks - Count) * item.def.stackLimit;
+            if (space >= item.stackCount) return item.stackCount;
             if (canMergeWithExistingStacks)
-            {
-                var stacks = new List<Thing>();
-                unit.Inventory.GetStacks(item.def, stacks);
-                foreach (Thing stack in stacks)
-                    if (stack.CanStackWith(item)) space += Math.Max(0, stack.def.stackLimit - stack.stackCount);
-            }
+                space += unit.Inventory.GetCountCanMerge(item, (int)(item.stackCount - space));
             return (int)Math.Min(item.stackCount, space);
         }
 
@@ -141,7 +195,7 @@ namespace MagicStorage
             if (canMergeWithExistingStacks)
             {
                 var stacks = new List<Thing>();
-                unit.Inventory.GetStacks(item.def, stacks);
+                unit.Inventory.GetPartialStacks(item.def, stacks);
                 foreach (Thing stack in stacks)
                 {
                     if (!stack.CanStackWith(item)) continue;

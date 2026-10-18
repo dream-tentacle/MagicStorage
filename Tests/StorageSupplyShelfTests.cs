@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using MagicStorage;
 using RimWorld;
 using Verse;
@@ -44,7 +45,7 @@ internal static class StorageSupplyShelfTests
             Unit.Inventory.Contents.TryAdd(item, false); return item;
         }
         internal Thing Stock(ThingDef def) => Shelf.GetSlotGroup().HeldThings.FirstOrDefault(t => t.def == def);
-        internal void Tick() => Shelf.TickRare();
+        internal void Tick() => Shelf.RefreshSupply();
         internal long Pending()
         {
             var holders = new List<IThingHolder>(); Manager.GetChildHolders(holders);
@@ -53,8 +54,151 @@ internal static class StorageSupplyShelfTests
     }
     internal static int Run()
     {
+        PresetClipboard();
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
+        StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
         return assertions;
+    }
+
+    private static Command_Action PresetCommand(Building_StorageSupplyShelf shelf, string key) =>
+        shelf.GetGizmos().OfType<Command_Action>().Single(command => command.defaultLabel == key.Translate());
+
+    private static void PresetClipboard()
+    {
+        Translation.Values["MS_Shelf_NeedCopiedPreset"] = "需要先复制预设";
+        var f = new Fixture();
+        Command_Action paste = PresetCommand(f.Shelf, "MS_Shelf_PastePreset");
+        Equal(true, paste.disabled, "paste starts disabled without a copied preset");
+        Equal("需要先复制预设", paste.disabledReason, "disabled paste explains the required copy");
+        f.Shelf.SetSelection(0, f.X); f.Shelf.SetRestockLimit(0, 12);
+        f.Shelf.SetSelection(1, f.Y); f.Shelf.SetRestockLimit(1, 0);
+        f.Shelf.GetStoreSettings().Priority = StoragePriority.Low;
+        StorageShelfFilter sourceFilter = f.Shelf.SlotFilter(0);
+        var steel = new ThingDef();
+        sourceFilter.Quality.min = QualityCategory.Excellent;
+        sourceFilter.HitPoints = new FloatRange(0.6f, 0.9f);
+        sourceFilter.AnyMaterial = false; sourceFilter.Materials.Add(steel);
+        sourceFilter.WarnWhenRestockFails = true;
+        Command_Action copy = PresetCommand(f.Shelf, "MS_Shelf_CopyPreset");
+        Equal(false, copy.alsoClickIfOtherInGroupClicked, "grouped copy snapshots only its representative shelf");
+        copy.action();
+
+        // Changes after copying must not alter the clipboard snapshot.
+        sourceFilter.Materials.Clear(); sourceFilter.Quality.min = QualityCategory.Awful;
+        f.Shelf.SetSelection(0, f.Z); f.Shelf.GetStoreSettings().Priority = StoragePriority.Critical;
+        var targets = new[]
+        {
+            new Building_StorageSupplyShelf { def = f.Shelf.def, Faction = Faction.OfPlayer },
+            new Building_StorageSupplyShelf { def = f.Shelf.def, Faction = Faction.OfPlayer }
+        };
+        foreach (Building_StorageSupplyShelf target in targets)
+        {
+            target.SetSelection(0, f.Y); target.SetSelection(1, f.X); target.SetSelection(2, f.Z);
+            paste = PresetCommand(target, "MS_Shelf_PastePreset");
+            Equal(false, paste.disabled, "copied preset enables paste on other shelves");
+            Equal(true, paste.alsoClickIfOtherInGroupClicked, "paste participates in native multi-selection group activation");
+            paste.action();
+            Equal(f.X, target.SelectedDef(0), "paste replaces swapped first selection");
+            Equal(f.Y, target.SelectedDef(1), "paste replaces swapped second selection");
+            Equal<ThingDef>(null, target.SelectedDef(2), "empty preset slot clears previous selection");
+            Equal(12, target.RestockLimit(0), "copied restock quantity retained");
+            Equal(0, target.RestockLimit(1), "paused restocking retained");
+            Equal(StoragePriority.Low, target.GetStoreSettings().Priority, "copied priority retained");
+            StorageShelfFilter filter = target.SlotFilter(0);
+            Equal(QualityCategory.Excellent, filter.Quality.min, "quality snapshot survives source edits");
+            Equal(0.6f, filter.HitPoints.min, "minimum condition retained");
+            Equal(0.9f, filter.HitPoints.max, "maximum condition retained");
+            Equal(false, filter.AnyMaterial, "material restriction retained");
+            Equal(steel, filter.Materials.Single(), "material snapshot survives source edits");
+            Equal(true, filter.WarnWhenRestockFails, "restock warning preference retained");
+        }
+        targets[0].SlotFilter(0).Materials.Clear(); targets[0].SetRestockLimit(0, 1);
+        Equal(steel, targets[1].SlotFilter(0).Materials.Single(), "pasted shelves have independent material lists");
+        PresetCommand(targets[0], "MS_Shelf_PastePreset").action();
+        Equal(steel, targets[0].SlotFilter(0).Materials.Single(), "editing a pasted shelf leaves clipboard reusable");
+        Equal(12, targets[0].RestockLimit(0), "repeated paste restores snapshot quantity");
+        var empty = new Building_StorageSupplyShelf { def = f.Shelf.def, Faction = Faction.OfPlayer };
+        PresetCommand(empty, "MS_Shelf_CopyPreset").action();
+        PresetCommand(targets[0], "MS_Shelf_PastePreset").action();
+        Equal(true, Enumerable.Range(0, 3).All(slot => targets[0].SelectedDef(slot) == null), "copying an empty shelf replaces the previous clipboard preset");
+    }
+
+    private static long copiedStackReferences;
+    private static void BeforeSnapshot(List<Thing> result, out int __state) { __state = result.Count; }
+    private static void AfterSnapshot(List<Thing> result, int __state) { copiedStackReferences += result.Count - __state; }
+
+    private static void StreamingRefill()
+    {
+        const string patchId = "magicstorage.tests.shelf-snapshots";
+        var harmony = new Harmony(patchId);
+        harmony.Patch(AccessTools.Method(typeof(StorageNetwork), nameof(StorageNetwork.GetStacks)),
+            prefix: new HarmonyMethod(typeof(StorageSupplyShelfTests), nameof(BeforeSnapshot)),
+            postfix: new HarmonyMethod(typeof(StorageSupplyShelfTests), nameof(AfterSnapshot)));
+        try
+        {
+            var large = new Fixture(10000); large.Shelf.SetSelection(0, large.X); large.Shelf.SetRestockLimit(0, 1);
+            for (int i = 0; i < 10000; i++) large.Store(large.X, 1);
+            var snapshot = new List<Thing>(); copiedStackReferences = 0;
+            large.Core.Network.GetStacks(large.X, snapshot);
+            Equal(10000L, copiedStackReferences, "snapshot observer verifies all copied references in control path");
+            copiedStackReferences = 0; Thing.StackCountReads = 0; large.Tick();
+            Equal(1, large.Stock(large.X).stackCount, "large inventory only supplies one requested item");
+            Equal(0L, copiedStackReferences, "shelf never requests a complete same-def stack snapshot");
+            Equal(true, Thing.StackCountReads < 200, "one-item refill does not inspect quantities of ten thousand remaining stacks");
+            Equal(9999L, large.Core.Network.GetTotalCount(large.X), "unvisited stock retained in network");
+
+            var f = new Fixture(); f.Shelf.SetSelection(0, f.X); f.Shelf.SetRestockLimit(0, 12);
+            var second = new Building_StorageUnit { SlotCapacity = 64 };
+            second.Map = f.Map; second.Position = new IntVec3(3, 0); second.Spawned = true; second.Faction = Faction.OfPlayer;
+            second.node = new CompStorageNode { parent = second }; f.Manager.Register(second.node);
+            f.Store(f.X, 2); f.Store(f.X, 2); f.Store(f.X, 2);
+            for (int i = 0; i < 3; i++) second.Inventory.Contents.TryAdd(new Thing { def = f.X, stackCount = 2 }, false);
+            f.Tick();
+            Equal(12, f.Stock(f.X).stackCount, "stream crosses units while consuming all tiny stacks");
+            Equal(0L, f.Core.Network.GetTotalCount(f.X), "removing final stack from each unit safely removes its def bucket");
+            Equal(0, f.Unit.Inventory.UsedSlots, "first unit emptied");
+            Equal(0, second.Inventory.UsedSlots, "second unit emptied");
+            Equal(0L, f.Pending(), "streamed success leaves no recovery stock");
+        }
+        finally { harmony.UnpatchAll(patchId); }
+    }
+
+    private static void StreamingRollback()
+    {
+        var f = new Fixture(); f.Shelf.SetSelection(0, f.X); f.Shelf.SetRestockLimit(0, 5);
+        f.Shelf.SlotFilter(0).WarnWhenRestockFails = true;
+        for (int i = 0; i < 20; i++) f.Store(f.X, 5, i.ToString());
+        f.Map.DropBudget = 0; Thing.StackCountReads = 0; f.Tick();
+        Equal(true, Thing.StackCountReads < 2500, "failed full-stack rollback terminates without repeated attempts on returned references");
+        Equal(100L, f.Core.Network.GetTotalCount(f.X), "failed streamed attempts restore exact physical count");
+        Equal(20, f.Unit.Inventory.UsedSlots, "different returned variants remain stored");
+        Equal(0L, f.Pending(), "all failed drops returned without hidden remainder");
+        Equal(StorageShelfFailureReason.PlacementFailed, f.Shelf.RestockFailure(0).Reason, "stream preserves placement failure diagnosis");
+        f.Map.DropBudget = int.MaxValue; f.Tick();
+        Equal(5, f.Stock(f.X).stackCount, "subsequent refill succeeds after placement becomes possible");
+        Equal(95L, f.Core.Network.GetTotalCount(f.X), "successful retry removes exactly one stack");
+
+        f = new Fixture(); f.Shelf.SetSelection(0, f.X); f.Shelf.SetRestockLimit(0, 12);
+        f.Store(f.X, 5); f.Store(f.X, 5); f.Store(f.X, 5); f.Map.DropBudget = 5;
+        f.Shelf.SlotFilter(0).WarnWhenRestockFails = true; f.Tick();
+        Equal(5, f.Stock(f.X).stackCount, "first successful source remains on shelf after later failures");
+        Equal(10L, f.Core.Network.GetTotalCount(f.X), "later compatible rollback merges retain remaining stock");
+        Equal(0L, f.Pending(), "merged rollback leaves no staging remainder");
+        Equal(StorageShelfFailureReason.PlacementFailed, f.Shelf.RestockFailure(0).Reason, "partial refill still reports placement failure");
+    }
+
+    private static void StreamingNetworkChange()
+    {
+        var f = new Fixture(); Thing first = f.Store(f.X, 2); f.Store(f.X, 3);
+        int visits = 0;
+        foreach (Thing source in f.Core.Network.EnumerateStacksForTransfer(f.X))
+        {
+            visits++;
+            Equal(first, source, "stream begins with the current def bucket's first stack");
+            f.Manager.Unregister(f.Core.node);
+        }
+        Equal(1, visits, "invalidated network stops stream before another source is yielded");
+        Equal(5L, f.Unit.Inventory.GetTotalCount(f.X), "network change during traversal never removes items");
     }
     private static void Configuration()
     {

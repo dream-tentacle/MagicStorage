@@ -6,4 +6,6 @@
   <MS_Trade_OrbitalCommand>通过魔法存储与{0}进行轨道交易</MS_Trade_OrbitalCommand>
   <MS_Trade_OrbitalInventoryNotice>魔法存储轨道交易：仅使用信标覆盖核心的网络库存和白银，买入物品由空投舱送达。</MS_Trade_OrbitalInventoryNotice>
   <MS_Trade_NoCoveredCore>需要通电的轨道贸易信标覆盖可用存储核心</MS_Trade_NoCoveredCore>
+  <MS_Trade_VanillaWarning>你正在使用原版交易选项！如果希望使用魔法存储中的物品交易，需要选择另一个选项才能正确交易。</MS_Trade_VanillaWarning>
+  <MS_Trade_DoNotShowAgain>不再提示</MS_Trade_DoNotShowAgain>
 </LanguageData>

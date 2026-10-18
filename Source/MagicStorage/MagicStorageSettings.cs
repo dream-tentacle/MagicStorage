@@ -1,14 +1,74 @@
 using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace MagicStorage
 {
     public sealed class MagicStorageSettings : ModSettings
     {
+        public List<StorageInventoryRule> InventoryFilters = new List<StorageInventoryRule>();
         public const int DefaultUnitSlots = 64;
-        public const int MinUnitSlots = 6;
-        public const int MaxUnitSlots = 1000;
+        public const int MinUnitSlots = 1;
+        public const int MaxUnitSlots = 10000;
         private int storageUnitSlots = DefaultUnitSlots;
+        public const int DefaultCosmicWorkbenchWorkSpeedPercent = 100;
+        public const int MinCosmicWorkbenchWorkSpeedPercent = 50;
+        public const int MaxCosmicWorkbenchWorkSpeedPercent = 1000;
+        public const int CosmicWorkbenchWorkSpeedStep = 10;
+        private int cosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
+        public int CosmicWorkbenchWorkSpeedPercent
+        {
+            get => cosmicWorkbenchWorkSpeedPercent;
+            set
+            {
+                int clamped = Math.Max(MinCosmicWorkbenchWorkSpeedPercent, Math.Min(MaxCosmicWorkbenchWorkSpeedPercent, value));
+                cosmicWorkbenchWorkSpeedPercent = (clamped + CosmicWorkbenchWorkSpeedStep / 2) /
+                    CosmicWorkbenchWorkSpeedStep * CosmicWorkbenchWorkSpeedStep;
+            }
+        }
+        public float CosmicWorkbenchWorkSpeedFactor => CosmicWorkbenchWorkSpeedPercent / 100f;
+        public const int DefaultRefreshSeconds = 1;
+        public const int MinRefreshSeconds = 1;
+        public const int MaxRefreshSeconds = 60;
+        public bool SimplifiedMode = true;
+        private int overallRefreshSeconds = DefaultRefreshSeconds;
+        private List<int> refreshSeconds = CreateRefreshDefaults();
+        public const int DefaultCraftingMaterialRecheckSeconds = 30;
+        private int craftingMaterialRecheckSeconds = DefaultCraftingMaterialRecheckSeconds;
+        public int CraftingMaterialRecheckSeconds
+        {
+            get => craftingMaterialRecheckSeconds;
+            set => craftingMaterialRecheckSeconds = Math.Max(0, Math.Min(60, value));
+        }
+        public int CraftingMaterialRecheckTicks => CraftingMaterialRecheckSeconds * 60;
+
+        private static List<int> CreateRefreshDefaults()
+        {
+            var result = new List<int>();
+            for (int i = 0; i < (int)StorageRefreshTask.Count; i++) result.Add(DefaultRefreshSeconds);
+            return result;
+        }
+
+        private static int ClampRefresh(int seconds) => Math.Max(MinRefreshSeconds, Math.Min(MaxRefreshSeconds, seconds));
+        public int OverallRefreshSeconds
+        {
+            get => overallRefreshSeconds;
+            set => overallRefreshSeconds = ClampRefresh(value);
+        }
+        public int GetIndividualRefreshSeconds(StorageRefreshTask task) => refreshSeconds[(int)task];
+        public void SetIndividualRefreshSeconds(StorageRefreshTask task, int seconds) => refreshSeconds[(int)task] = ClampRefresh(seconds);
+        public int GetRefreshTicks(StorageRefreshTask task) =>
+            (SimplifiedMode ? OverallRefreshSeconds : GetIndividualRefreshSeconds(task)) * 60;
+
+        public void RestoreDefaults()
+        {
+            StorageUnitSlots = DefaultUnitSlots;
+            CosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
+            SimplifiedMode = true;
+            OverallRefreshSeconds = DefaultRefreshSeconds;
+            refreshSeconds = CreateRefreshDefaults();
+            CraftingMaterialRecheckSeconds = DefaultCraftingMaterialRecheckSeconds;
+        }
 
         public int StorageUnitSlots
         {
@@ -19,8 +79,25 @@ namespace MagicStorage
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Collections.Look(ref InventoryFilters, "storageInventoryFilters", LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (InventoryFilters == null) InventoryFilters = new List<StorageInventoryRule>();
+                InventoryFilters.RemoveAll(rule => rule == null);
+            }
             Scribe_Values.Look(ref storageUnitSlots, "storageUnitSlots", DefaultUnitSlots);
             StorageUnitSlots = storageUnitSlots;
+            Scribe_Values.Look(ref cosmicWorkbenchWorkSpeedPercent, "cosmicWorkbenchWorkSpeedPercent", DefaultCosmicWorkbenchWorkSpeedPercent);
+            CosmicWorkbenchWorkSpeedPercent = cosmicWorkbenchWorkSpeedPercent;
+            Scribe_Values.Look(ref SimplifiedMode, "simplifiedMode", true);
+            Scribe_Values.Look(ref overallRefreshSeconds, "overallRefreshSeconds", DefaultRefreshSeconds);
+            Scribe_Values.Look(ref craftingMaterialRecheckSeconds, "craftingMaterialRecheckSeconds", DefaultCraftingMaterialRecheckSeconds);
+            CraftingMaterialRecheckSeconds = craftingMaterialRecheckSeconds;
+            Scribe_Collections.Look(ref refreshSeconds, "refreshSeconds", LookMode.Value);
+            OverallRefreshSeconds = overallRefreshSeconds;
+            if (refreshSeconds == null) refreshSeconds = CreateRefreshDefaults();
+            while (refreshSeconds.Count < (int)StorageRefreshTask.Count) refreshSeconds.Add(DefaultRefreshSeconds);
+            for (int i = 0; i < refreshSeconds.Count; i++) refreshSeconds[i] = ClampRefresh(refreshSeconds[i]);
         }
     }
 }

@@ -18,10 +18,25 @@ namespace UnityEngine
 }
 namespace Verse
 {
-    public static class Widgets { public static void Label(UnityEngine.Rect rect, string text) { } }
+    public static partial class Widgets { public static void Label(UnityEngine.Rect rect, string text) { } }
     public static class Messages { public static int Rejects; public static void Message(string text, object type, bool historical) { Rejects++; } }
+    public class Window
+    {
+        public virtual void PreOpen() { }
+        public virtual void PostOpen() { }
+        public virtual void PostClose() { }
+        public virtual void DoWindowContents(UnityEngine.Rect rect) { }
+    }
     public partial class WindowStack
-    { public T WindowOfType<T>() where T : class => Windows.OfType<T>().FirstOrDefault(); }
+    {
+        public T WindowOfType<T>() where T : class => Windows.OfType<T>().FirstOrDefault();
+        public void Add(Window window) { window.PreOpen(); Windows.Add(window); window.PostOpen(); }
+        public bool TryRemove(Window window, bool doCloseSound = true)
+        {
+            if (!Windows.Remove(window)) return false;
+            window.PostClose(); return true;
+        }
+    }
     public static class ThingMaker { public static Thing MakeThing(ThingDef def) => new Thing { def = def }; }
     public class Room { }
     public static class RoomBoundary { public static Room GetRoom(this Thing thing) => null; public static Room GetRoom(this IntVec3 cell, Map map) => null; }
@@ -193,8 +208,9 @@ namespace RimWorld
             Reset(); return true;
         }
     }
-    public class Dialog_Trade
+    public class Dialog_Trade : Window
     {
+        private readonly bool giftsOnly = false;
         public int Flashes;
         public Dialog_Trade(Pawn negotiator, ITrader trader)
         {
@@ -202,7 +218,9 @@ namespace RimWorld
             TradeSession.giftMode = false; TradeSession.deal = new TradeDeal();
         }
         public void FlashSilver() { Flashes++; }
-        public virtual void DoWindowContents(UnityEngine.Rect rect) { }
-        public virtual void PostClose() { }
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override void PostOpen() { if (giftsOnly) TradeSession.giftMode = true; }
+        public override void DoWindowContents(UnityEngine.Rect rect) { }
+        public override void PostClose() { }
     }
 }

@@ -20,7 +20,7 @@ namespace MagicStorage
                 (!(target is Blueprint_Build) && !(target is Frame))) return false;
             var buildDef = target.def.entityDefToBuild;
             if (!(buildDef is TerrainDef) && !(buildDef is ThingDef buildingDef && buildingDef.category == ThingCategory.Building)) return false;
-            if (GenConstruct.FirstBlockingThing(target, null) != null) return false;
+            if (HasBlockingThing(target)) return false;
             // Native delivery first removes replaceable flooring and waits for attachment walls.
             if (target is Blueprint_Build && buildDef is TerrainDef && target.Map.terrainGrid.CanRemoveTopLayerAt(target.Position)) return false;
             if (buildDef is ThingDef def && def.building?.isAttachment == true)
@@ -30,6 +30,25 @@ namespace MagicStorage
             }
             return true;
         }
+
+        private static bool HasBlockingThing(Thing target)
+        {
+            Thing first = GenConstruct.FirstBlockingThing(target, null);
+            if (first == null) return false;
+            if (!CanReplaceConduit(target, first)) return true;
+            // A replaceable conduit may hide another blocker later in the same cell
+            // or elsewhere in the footprint. Check every native construction blocker.
+            foreach (IntVec3 cell in target.OccupiedRect())
+                foreach (Thing thing in cell.GetThingList(target.Map))
+                    if (GenConstruct.BlocksConstruction(target, thing) && !CanReplaceConduit(target, thing)) return true;
+            return false;
+        }
+
+        private static bool CanReplaceConduit(Thing target, Thing thing) =>
+            target is Blueprint_Build && target.def.entityDefToBuild is ThingDef buildingDef &&
+            buildingDef.EverTransmitsPower && buildingDef.building?.isPowerConduit != true &&
+            thing.def.category == ThingCategory.Building && thing.def.building?.isPowerConduit == true &&
+            !thing.def.IsBlueprint && !thing.def.IsFrame && GenSpawn.SpawningWipes(buildingDef, thing.def);
 
         internal static int Needed(Thing target, ThingDef material) =>
             ((IHaulEnroute)target).GetSpaceRemainingWithEnroute(material);

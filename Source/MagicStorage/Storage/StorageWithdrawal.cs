@@ -45,7 +45,7 @@ namespace MagicStorage
     // The window keeps references to real stacks, never just def/count orders.
     internal static class StorageWithdrawal
     {
-        internal static List<StorageItemRow> Snapshot(StorageNetwork network)
+        internal static List<StorageItemRow> Snapshot(StorageNetwork network, Func<Thing, Thing, bool> canGroup = null)
         {
             var result = new List<StorageItemRow>();
             if (network == null) return result;
@@ -61,7 +61,8 @@ namespace MagicStorage
                 // minified items and mod-provided CanStackWith rules. Physical stack limits
                 // do not limit a display row. No trade session or trade UI is constructed.
                 foreach (var candidate in candidates)
-                    if (TransferableUtility.TransferAsOne(item, candidate.Representative, TransferAsOneMode.Normal))
+                    if (TransferableUtility.TransferAsOne(item, candidate.Representative, TransferAsOneMode.Normal) &&
+                        (canGroup == null || canGroup(item, candidate.Representative)))
                     { row = candidate; break; }
                 if (row == null) { row = new StorageItemRow(); candidates.Add(row); result.Add(row); }
                 row.Stacks.Add(item);

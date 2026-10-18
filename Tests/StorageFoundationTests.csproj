@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EngineStubs.cs" /><Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="StorageRefreshTests.cs" />
     <Compile Include="StorageIndexTests.cs" />
     <Compile Include="MonolynCompatibilityStubs.cs" />
     <Compile Include="MonolynCompatibilityTests.cs" />
@@ -24,6 +25,7 @@
     <Compile Include="..\Source\MagicStorage\Compatibility\MonolynCompatibility.cs" />
     <Compile Include="ModSettingsStubs.cs" />
     <Compile Include="..\Source\MagicStorage\MagicStorageSettings.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageRefreshTimer.cs" />
     <Compile Include="CoreContainerStubs.cs" />
     <Compile Include="ApparelStubs.cs" />
     <Compile Include="StorageApparelTests.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageFuelSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_TransportSupplier.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransportExchange.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransportPreview.cs" />
     <Compile Include="StorageWithdrawalTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageWithdrawal.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageRecoveryBatch.cs" />

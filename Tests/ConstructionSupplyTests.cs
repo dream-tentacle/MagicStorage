@@ -13,7 +13,7 @@ internal static class ConstructionSupplyTests
     internal static int Run()
     {
         RangeAndScan(); ReservationsAndOverlap(); BlueprintTransition(); Eligibility(); NetworkAndPartialSupply();
-        DeliveryBeam();
+        DeliveryBeam(); ReplaceableConduits();
         return checks;
     }
 
@@ -65,7 +65,7 @@ internal static class ConstructionSupplyTests
         var boundary = f.Site(42, 0, 10, 5); // 40 cells from unit at (2,0).
         var inside = f.Site(26, 32, 10, 5); // Exactly 40 cells on a diagonal.
         var outside = f.Site(42, 1); var otherSide = f.Site(-38, 0);
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         Equal(10, f.Stored(boundary, f.Steel), "inclusive radius at 40 cells");
         Equal(10, f.Stored(inside, f.Steel), "circular diagonal boundary");
         Equal(5, f.Stored(inside, f.Wood), "one cycle supplies multiple materials");
@@ -73,7 +73,7 @@ internal static class ConstructionSupplyTests
         Equal(0, f.Stored(outside, f.Steel), "outside circle is excluded");
         Equal(0f, inside.workDone, "supply does not perform construction work");
         Equal(45L, f.Remaining(f.Steel), "only delivered steel leaves storage");
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         Equal(45L, f.Remaining(f.Steel), "completed material lists are not supplied twice");
         f.Supplier.DrawExtraSelectionOverlays();
         Equal(40f, GenDraw.Radius, "selection overlay matches supply radius");
@@ -82,7 +82,7 @@ internal static class ConstructionSupplyTests
 
         f = new Fixture(); f.Stock(f.Steel, 12);
         var farther = f.Site(20, 0); var nearer = f.Site(4, 0);
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         Equal(10, f.Stored(nearer, f.Steel), "nearer site receives materials first regardless of list order");
         Equal(2, f.Stored(farther, f.Steel), "remaining stock reaches next site in same cycle");
     }
@@ -99,10 +99,10 @@ internal static class ConstructionSupplyTests
         Equal(3, ConstructionSupply.DeliverTo(f.Supplier, site), "subtracts existing contents and in-flight materials");
         Equal(7, f.Stored(site, f.Steel), "leaves exact room for hauler");
         var second = new Building_ConstructionSupplyUnit(); f.Register(second, 3);
-        second.TickRare();
+        second.RefreshSupply();
         Equal(7, f.Stored(site, f.Steel), "overlapping supplier does not duplicate in-flight material");
         f.Map.enrouteManager.Claims.Remove(site);
-        second.TickRare();
+        second.RefreshSupply();
         Equal(10, f.Stored(site, f.Steel), "cancelled hauling claim allows next cycle to fill deficit");
         Equal(10L, f.Remaining(f.Steel), "overlap preserves total inventory");
     }
@@ -110,7 +110,7 @@ internal static class ConstructionSupplyTests
     private static void BlueprintTransition()
     {
         var f = new Fixture(); var blueprint = f.Blueprint();
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         Equal(false, blueprint.Destroyed, "no stock leaves blueprint intact");
         Equal(0, blueprint.FactoryCalls, "no stock does not create empty frame");
         f.Stock(f.Steel, 20);
@@ -120,7 +120,7 @@ internal static class ConstructionSupplyTests
         Find.Selector.Selected = blueprint;
         var pawn = new Pawn(); f.Map.mapPawns.AllPawnsSpawned.Add(pawn);
         f.Map.enrouteManager.Claims[blueprint] = new Dictionary<ThingDef, int> { [f.Steel] = 3 };
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         var frame = blueprint.Made;
         Equal(true, blueprint.Destroyed, "first usable delivery replaces blueprint");
         Equal(true, frame.Spawned, "frame spawned through native boundary");
@@ -138,9 +138,73 @@ internal static class ConstructionSupplyTests
         Equal(1, f.Map.planManager.Plan.Removed, "plan marking removed on occupied cell");
         Equal(3, f.Map.enrouteManager.GetEnroute(frame, f.Steel), "in-flight claim belongs to frame");
         Equal(0f, frame.workDone, "new frame still requires native construction");
-        f.Supplier.TickRare();
+        f.Supplier.RefreshSupply();
         Equal(13L, f.Remaining(f.Steel), "repeated scan does not redeliver material");
         Equal(1, blueprint.FactoryCalls, "repeated scan does not recreate blueprint");
+    }
+
+    private static Thing Conduit(Fixture f, int x, int z, bool destroyable = true)
+    {
+        var conduit = new Thing { def = new ThingDef { category = ThingCategory.Building, destroyable = destroyable,
+            building = new BuildingProperties { isPowerConduit = true } } };
+        f.Spawn(conduit, x, z); f.Map.Ground.Add(conduit);
+        return conduit;
+    }
+
+    private static void ReplaceableConduits()
+    {
+        var f = new Fixture(); var blueprint = f.Blueprint(); blueprint.width = blueprint.height = 2;
+        f.Map.UseCellThingLists = true;
+        var generator = (ThingDef)blueprint.def.entityDefToBuild;
+        generator.EverTransmitsPower = true; generator.building = new BuildingProperties();
+        var first = Conduit(f, 4, 0); var second = Conduit(f, 5, 1);
+        GenConstruct.Blockers[blueprint] = first;
+        GenConstruct.AdditionalBlockers[blueprint] = new List<Thing> { second };
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "no stock leaves covered conduits untouched");
+        Equal(false, first.Destroyed || second.Destroyed, "no materials does not clear conduits prematurely");
+        Equal(0, blueprint.FactoryCalls, "no stock leaves generator blueprint intact");
+        f.Stock(f.Steel, 20);
+        Equal(10, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "generator over existing conduits receives materials");
+        Equal(true, blueprint.Destroyed, "generator blueprint becomes a frame");
+        Equal(true, first.Destroyed && second.Destroyed, "native frame spawning clears conduits across footprint");
+        Equal(1, f.Map.Wipes, "conduits cleared through existing native wipe boundary");
+        Equal(10, f.Stored(blueprint.Made, f.Steel), "all supplied materials belong to generator frame");
+        Equal(10L, f.Remaining(f.Steel), "generator supply preserves exact remaining stock");
+        Equal(0f, blueprint.Made.workDone, "conduit replacement does not build the generator");
+
+        f = new Fixture(); blueprint = f.Blueprint(); blueprint.width = 2;
+        f.Map.UseCellThingLists = true;
+        generator = (ThingDef)blueprint.def.entityDefToBuild;
+        generator.EverTransmitsPower = true; generator.building = new BuildingProperties();
+        first = Conduit(f, 4, 0); var obstruction = new Thing();
+        f.Spawn(obstruction, 5, 0); f.Map.Ground.Add(obstruction);
+        GenConstruct.Blockers[blueprint] = first;
+        GenConstruct.AdditionalBlockers[blueprint] = new List<Thing> { obstruction };
+        f.Stock(f.Steel, 20);
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "conduit cannot hide another obstruction in footprint");
+        Equal(0, blueprint.FactoryCalls, "another blocker prevents creating generator frame");
+        Equal(false, first.Destroyed, "blocked site keeps the existing conduit");
+        Equal(20L, f.Remaining(f.Steel), "blocked generator does not consume stock");
+        GenConstruct.AdditionalBlockers[blueprint].Clear();
+        obstruction.DeSpawn();
+        var outside = new Thing(); f.Spawn(outside, 30, 0); f.Map.Ground.Add(outside);
+        GenConstruct.AdditionalBlockers[blueprint].Add(outside);
+        Equal(10, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "generator supply resumes after other blocker is removed");
+        Equal(true, outside.Spawned, "an obstruction outside generator footprint is left alone");
+
+        f = new Fixture(); blueprint = f.Blueprint(); f.Stock(f.Steel, 20);
+        f.Map.UseCellThingLists = true;
+        generator = (ThingDef)blueprint.def.entityDefToBuild;
+        generator.EverTransmitsPower = true; generator.building = new BuildingProperties();
+        first = Conduit(f, 4, 0, false); GenConstruct.Blockers[blueprint] = first;
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "native non-replaceable conduit remains a blocker");
+        first.def.destroyable = true; generator.building.isPowerConduit = true;
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "replacing one conduit with another is not automatically supplied");
+        generator.building.isPowerConduit = false; first.def.IsBlueprint = true;
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "unfinished conduit blueprint is not cleared by the exception");
+        first.def.IsBlueprint = false; first.def.IsFrame = true;
+        Equal(0, ConstructionSupply.DeliverTo(f.Supplier, blueprint), "unfinished conduit frame is not cleared by the exception");
+        Equal(20L, f.Remaining(f.Steel), "rejected conduit replacements retain network materials");
     }
 
     private static void Eligibility()
@@ -210,20 +274,20 @@ internal static class ConstructionSupplyTests
     private static void NetworkAndPartialSupply()
     {
         var f = new Fixture(); f.Stock(f.Steel, 3); var site = f.Site(5, 0, 10, 5);
-        f.Supplier.TickRare(); Equal(3, f.Stored(site, f.Steel), "partial supply retains actual materials in frame");
+        f.Supplier.RefreshSupply(); Equal(3, f.Stored(site, f.Steel), "partial supply retains actual materials in frame");
         f.Stock(f.Steel, 10); f.Stock(f.Wood, 5);
         var manager = f.Map.GetComponent<MapComponent_StorageNetworks>();
-        manager.Unregister(f.Supplier.node); f.Supplier.TickRare();
+        manager.Unregister(f.Supplier.node); f.Supplier.RefreshSupply();
         Equal(3, f.Stored(site, f.Steel), "disconnected supplier stops");
-        manager.Register(f.Supplier.node); f.Supplier.TickRare();
+        manager.Register(f.Supplier.node); f.Supplier.RefreshSupply();
         Equal(10, f.Stored(site, f.Steel), "reconnection supplies missing remainder");
         Equal(5, f.Stored(site, f.Wood), "new stock supplies second material");
         var next = f.Site(6, 0, 2);
-        var secondCore = new Building_StorageCore(); f.Register(secondCore, -1); f.Supplier.TickRare();
+        var secondCore = new Building_StorageCore(); f.Register(secondCore, -1); f.Supplier.RefreshSupply();
         Equal(0, f.Stored(next, f.Steel), "multiple cores disable supply");
-        manager.Unregister(secondCore.node); f.Supplier.TickRare();
+        manager.Unregister(secondCore.node); f.Supplier.RefreshSupply();
         Equal(2, f.Stored(next, f.Steel), "removing extra core restores supply");
-        var last = f.Site(7, 0, 1); f.Supplier.SetFaction(new Faction()); f.Supplier.TickRare();
+        var last = f.Site(7, 0, 1); f.Supplier.SetFaction(new Faction()); f.Supplier.RefreshSupply();
         Equal(0, f.Stored(last, f.Steel), "captured supplier stops supplying player sites");
     }
 }

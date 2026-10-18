@@ -45,7 +45,29 @@
   <MS_ReceiverCapacity>Receiving buffer: {0} / {1} stacks</MS_ReceiverCapacity>
   <MS_ReceiverUse>Uses the connected core's filter and priority. Eligible items on its surface are automatically sent to storage units.</MS_ReceiverUse>
   <MS_SettingsCategory>Magic storage</MS_SettingsCategory>
+  <MS_SettingsTabGeneral>General</MS_SettingsTabGeneral>
+  <MS_SettingsTabPerformance>Performance</MS_SettingsTabPerformance>
+  <MS_SettingsPerformanceNotice>We recommend keeping the initial defaults, as this mod already performs very well.</MS_SettingsPerformanceNotice>
   <MS_SettingsUnitSlots>Stack slots per storage unit</MS_SettingsUnitSlots>
-  <MS_SettingsUnitSlotsHelp>Range: 6–1000. Default: 64. Applies immediately to existing and new storage units. Lowering the limit preserves stored items. Units above capacity cannot accept new stacks, but compatible partial stacks can still be filled.</MS_SettingsUnitSlotsHelp>
+  <MS_SettingsUnitSlotsHelp>Range: 1–10000. Default: 64. Applies immediately to existing and new storage units. Lowering the limit preserves stored items. Units above capacity cannot accept new stacks, but compatible partial stacks can still be filled.</MS_SettingsUnitSlotsHelp>
   <MS_SettingsRestoreDefaults>Restore defaults</MS_SettingsRestoreDefaults>
+  <MS_SettingsCosmicWorkbenchWorkSpeed>Cosmic workbench work speed: {0}%</MS_SettingsCosmicWorkbenchWorkSpeed>
+  <MS_SettingsSimplifiedMode>Simple mode</MS_SettingsSimplifiedMode>
+  <MS_SettingsRefreshHelp>Refresh times: 1–60 seconds at normal game speed, default 1. Longer intervals reduce periodic checks but delay responses. Switching modes preserves both sets of values. Immediate supply commands still run immediately.</MS_SettingsRefreshHelp>
+  <MS_SettingsOverallRefresh>Overall refresh time (seconds)</MS_SettingsOverallRefresh>
+  <MS_SettingsCraftingMaterialRecheck>Crafting material retry interval (seconds)</MS_SettingsCraftingMaterialRecheck>
+  <MS_SettingsCraftingMaterialRecheckHelp>How often to retry after materials are missing. Set to 0 to check on every attempt.</MS_SettingsCraftingMaterialRecheckHelp>
+  <MS_SettingsRefresh_NetworkMaintenance>Network maintenance (seconds)</MS_SettingsRefresh_NetworkMaintenance>
+  <MS_SettingsRefresh_Receiver>Receiver checks (seconds)</MS_SettingsRefresh_Receiver>
+  <MS_SettingsRefresh_FuelSupply>Fuel supply (seconds)</MS_SettingsRefresh_FuelSupply>
+  <MS_SettingsRefresh_TransportSupply>Transport supply (seconds)</MS_SettingsRefresh_TransportSupply>
+  <MS_SettingsRefresh_CraftingMaintenance>Crafting task maintenance (seconds)</MS_SettingsRefresh_CraftingMaintenance>
+  <MS_SettingsRefresh_CraftingPolicy>Crafting rule checks (seconds)</MS_SettingsRefresh_CraftingPolicy>
+  <MS_SettingsRefresh_ShelfRestock>Supply shelf restocking (seconds)</MS_SettingsRefresh_ShelfRestock>
+  <MS_SettingsRefresh_ConstructionSupply>Construction supply (seconds)</MS_SettingsRefresh_ConstructionSupply>
+  <MS_SettingsRefresh_ApparelCleanup>Apparel adapter cleanup (seconds)</MS_SettingsRefresh_ApparelCleanup>
+  <MS_SettingsRefresh_RecoveryRelease>Pending item placement retries (seconds)</MS_SettingsRefresh_RecoveryRelease>
+  <MS_DebugFill_SelectUnit>Select a single storage unit on the current map first.</MS_DebugFill_SelectUnit>
+  <MS_DebugFill_NoMaterials>None of the resources used by this tool are loaded.</MS_DebugFill_NoMaterials>
+  <MS_DebugFill_Completed>Added {0} full stacks. Storage slots: {1}/{2}.</MS_DebugFill_Completed>
 </LanguageData>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Caravan_Open>Form caravan</MS_Caravan_Open>
+  <MS_Caravan_WorldOpen>Form magic storage caravan</MS_Caravan_WorldOpen>
+  <MS_Caravan_NoTeleporter>This network has no caravan teleporter.</MS_Caravan_NoTeleporter>
+  <MS_Caravan_CorePosition>Storage core position: ({0}, {1})</MS_Caravan_CorePosition>
+  <MS_Caravan_OpenDesc>Choose caravan members and supplies from the connected magic storage network. The caravan departs immediately after confirmation.</MS_Caravan_OpenDesc>
+  <MS_Caravan_Unavailable>The caravan teleporter's storage network is unavailable or has changed. Reset the selection or reopen the window.</MS_Caravan_Unavailable>
+  <MS_Caravan_StockChanged>Some selected supplies are no longer available in the storage network. Reset the selection and try again.</MS_Caravan_StockChanged>
+  <MS_Caravan_PawnsChanged>Some selected caravan members are no longer available. Reset the selection and try again.</MS_Caravan_PawnsChanged>
+  <MS_Caravan_LayerUnavailable>A caravan cannot be formed at this world location.</MS_Caravan_LayerUnavailable>
+  <MS_Caravan_TransferFailed>An error occurred during caravan teleportation. Supplies have been preserved. Check the current caravan and its members before trying again.</MS_Caravan_TransferFailed>
+  <MS_Caravan_CannotDropCarried>A selected caravan member cannot put down what they are carrying. Clear their hands and try again.</MS_Caravan_CannotDropCarried>
+</LanguageData>

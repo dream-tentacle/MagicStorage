@@ -68,7 +68,7 @@ internal static class TransportSupplierTests
         assertions = 0;
         TwoSidedInventory(); WeightLimits(); Reservations(); ReturnRejected(); FullNetworkSwap();
         AllReturnsReservedTogether(); AutoLoadingAndDirections(); Preservation(); QuantityEditing(); MassStoppingPoints();
-        ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply();
+        ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply(); CachedPreview();
         return assertions;
     }
     private static void ManualFuel()
@@ -290,9 +290,10 @@ internal static class TransportSupplierTests
     private static void AutoLoadingAndDirections()
     {
         var f = new Fixture(); var def = new ThingDef { transportMass = 2 }; f.Cargo(def, 20);
+        int ticks = Find.TickManager.TicksGame;
+        Find.TickManager.TicksGame = 0; f.Supplier.RunTransportTestTick();
         var target = f.Target(50, 2, 1); f.Supplier.SupplyTransporter(); Equal(20L, f.Count(f.Supplier.Contents, def), "side transporter ignored");
         target.parent.Position = new IntVec3(3, 0); target.innerContainer.TryAdd(new Thing { def = def, stackCount = 20 });
-        int ticks = Find.TickManager.TicksGame;
         try
         {
             Find.TickManager.TicksGame = 59; f.Supplier.RunTransportTestTick(); Equal(20L, f.Count(f.Supplier.Contents, def), "no transfer between one-second intervals");
@@ -324,6 +325,58 @@ internal static class TransportSupplierTests
         row.EditChange("5000000000"); Equal(5000000000L, row.Change, "long network count exact");
         row.EditChange("-"); Equal(0L, row.Change, "unfinished negative input clears selection");
         row.EditChange(long.MinValue.ToString()); Equal(-100L, row.Change, "minimum long safe");
+    }
+
+    private static void CachedPreview()
+    {
+        var f = new Fixture(); var a = new ThingDef { transportMass = 2, stackLimit = 1000 }; var b = new ThingDef { transportMass = 3 };
+        f.Store(a, 200); f.Cargo(a, 10); f.Store(b, 30); f.Cargo(b, 10);
+        var rows = f.Rows(); var row = rows.Single(r => r.Representative.def == a);
+        var other = rows.Single(r => r.Representative.def == b);
+        using (var preview = new StorageTransportPreview(f.Supplier, f.Net, rows, 150))
+        {
+            Thing.StatReads = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                Equal(50d, preview.StoredMass, "cached initial cargo mass");
+                Equal(50d, preview.ProjectedMass, "unchanged preview mass");
+                Equal(50L, preview.MassLimit(row), "cached weight stopping point");
+            }
+            Equal(0, Thing.StatReads, "repeated preview reads never request mass stats");
+            other.SetChange(10);
+            Equal(80d, preview.ProjectedMass, "editing a different row updates total weight");
+            Equal(35L, preview.MassLimit(row), "editing a different row invalidates cached stopping point");
+            other.SetChange(-10); row.SetChange(65);
+            Equal(150d, preview.ProjectedMass, "planned returns free cached capacity");
+            Equal(65L, preview.MassLimit(row), "cached return and withdrawal limit agrees with live algorithm");
+            row.EditChange("-");
+            Equal(20d, preview.ProjectedMass, "unfinished quantity entry clears selection and refreshes preview");
+            Equal("-", row.Buffer, "unfinished input is retained");
+            preview.ResetSelections();
+            Equal(50d, preview.ProjectedMass, "reset returns weight to original cargo");
+            Equal(true, rows.All(r => r.Change == 0), "reset clears all rows together");
+            Equal(0, Thing.StatReads, "edits and resets reuse captured stack masses");
+            row.SetChange(50); a.transportMass = 4;
+            Equal(150d, preview.ProjectedMass, "preview remains the paused inventory snapshot");
+            Equal(false, f.Execute(rows, 150, out string error), "confirmation rejects mass changed outside the paused window");
+            Equal("MS_Transport_Overweight", error, "confirmation uses live weight validation");
+            Equal(true, Thing.StatReads > 0, "confirmation reads native mass stats afresh");
+            Equal(200L, f.Net.GetTotalCount(a), "rejected stale preview preserves stored stock");
+            Equal(10L, f.Count(f.Supplier.Contents, a), "rejected stale preview preserves cargo");
+        }
+        using (var refreshed = new StorageTransportPreview(f.Supplier, f.Net, f.Rows(), 150))
+        {
+            Equal(70d, refreshed.StoredMass, "refresh captures changed actual masses");
+        }
+        var mixed = new Fixture(); var def = new ThingDef();
+        Thing light = mixed.Store(def, 10), heavy = mixed.Store(def, 10); heavy.Stuff = new ThingDef { transportMass = 4 };
+        var grouped = new StorageTransportRow { Available = 20, NetworkCount = 20 };
+        grouped.NetworkStacks.Add(light); grouped.NetworkStacks.Add(heavy);
+        using (var preview = new StorageTransportPreview(mixed.Supplier, mixed.Net, new List<StorageTransportRow> { grouped }, 20))
+        {
+            Equal(12L, preview.MassLimit(grouped), "cache preserves different actual masses within one group");
+            grouped.SetChange(12); Equal(18d, preview.ProjectedMass, "cached mixed-stack preview matches actual transfer order");
+        }
     }
 
     private static void MassStoppingPoints()

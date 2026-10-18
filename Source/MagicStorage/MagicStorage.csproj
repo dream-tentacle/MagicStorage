@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project>
+  <!-- Select the version before the SDK imports so restore and build caches stay separate. -->
+  <PropertyGroup>
+    <GameVersion Condition=" '$(GameVersion)' == '' ">1.7</GameVersion>
+    <BaseIntermediateOutputPath>obj\$(GameVersion)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,56 +15,78 @@
     <RootNamespace>MagicStorage</RootNamespace>
     <AssemblyName>MagicStorage</AssemblyName>
     <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition=" '$(GameVersion)' == '1.6' ">net472</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\RimWorld</RimWorldDir>
+    <GameAssemblyDir Condition=" '$(GameAssemblyDir)' == '' And '$(GameVersion)' == '1.6' ">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\..\RimWorldWin64_Data\Managed'))</GameAssemblyDir>
+    <GameAssemblyDir Condition=" '$(GameAssemblyDir)' == '' ">$(RimWorldDir)</GameAssemblyDir>
+    <HarmonyAssemblyPath Condition=" '$(HarmonyAssemblyPath)' == '' ">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\$(GameVersion)\Assemblies\0Harmony.dll</HarmonyAssemblyPath>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Assemblies\</OutputPath>
+    <OutputPath>..\..\$(GameVersion)\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\$(GameVersion)\Assemblies\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
+      <HintPath>$(HarmonyAssemblyPath)</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(GameAssemblyDir)\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(GameVersion)' == '1.6' ">
     <Reference Include="UnityEngine">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(GameAssemblyDir)\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(GameAssemblyDir)\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(GameAssemblyDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(GameAssemblyDir)\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(GameAssemblyDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(GameVersion)' == '1.7' ">
+    <Reference Include="UnityStubs">
+      <HintPath>$(GameAssemblyDir)\UnityStubs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Waylith">
+      <HintPath>$(GameAssemblyDir)\Waylith.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -68,13 +95,23 @@
     <Compile Include="Compatibility\IStorageCompatibility.cs" />
     <Compile Include="Compatibility\CompatibilityManager.cs" />
     <Compile Include="Compatibility\MonolynCompatibility.cs" />
+    <Compile Include="Compatibility\DynamicTradeInterfaceCompatibility.cs" />
     <Compile Include="Compatibility\NivarianCannonApi.cs" />
     <Compile Include="Compatibility\NivarianCannonCompatibility.cs" />
     <Compile Include="Buildings\Building_NivarianCannonExtractor.cs" />
     <Compile Include="Buildings\Building_TransportSupplier.cs" />
+    <Compile Include="Buildings\Building_CaravanTeleporter.cs" />
+    <Compile Include="UI\Dialog_StorageCaravan.cs" />
+    <Compile Include="Storage\StorageCaravanPatches.cs" />
+    <Compile Include="Storage\StoragePawnScanPatches.cs" />
+    <Compile Include="Storage\StorageSelectionPatches.cs" />
+    <Compile Include="Storage\StorageRefreshTimer.cs" />
+    <Compile Include="Storage\StorageCaravanWorldGizmos.cs" />
+    <Compile Include="Storage\StorageCaravanTransfer.cs" />
     <Compile Include="Buildings\Building_FuelSupplier.cs" />
     <Compile Include="Storage\StorageFuelSupply.cs" />
     <Compile Include="Storage\StorageTransportExchange.cs" />
+    <Compile Include="Storage\StorageTransportPreview.cs" />
     <Compile Include="UI\Dialog_TransportSupplier.cs" />
     <Compile Include="UI\Dialog_SupplierSupply.cs" />
     <Compile Include="UI\StorageQuantityDrag.cs" />
@@ -87,6 +124,7 @@
     <Compile Include="Trading\StorageTradeSession.cs" />
     <Compile Include="Trading\Tradeable_Storage.cs" />
     <Compile Include="Trading\StorageTradePatches.cs" />
+    <Compile Include="Trading\StorageTradeWarning.cs" />
     <Compile Include="Trading\FloatMenuOptionProvider_StorageTrade.cs" />
     <Compile Include="Trading\FloatMenuOptionProvider_StorageOrbitalTrade.cs" />
     <Compile Include="Buildings\Building_StorageSupplyShelf.cs" />
@@ -105,6 +143,7 @@
     <Compile Include="Crafting\ICraftingProductionPolicy.cs" />
     <Compile Include="Crafting\CraftingRunPolicy.cs" />
     <Compile Include="Crafting\CraftingRecipeCatalog.cs" />
+    <Compile Include="Crafting\CraftingRecipeCategories.cs" />
     <Compile Include="Crafting\CraftingWorkerPolicy.cs" />
     <Compile Include="Crafting\CraftingMaterialPlanner.cs" />
     <Compile Include="Crafting\CraftingMaterials.cs" />
@@ -114,10 +153,16 @@
     <Compile Include="Crafting\JobDriver_CosmicCrafting.cs" />
     <Compile Include="Buildings\Building_CosmicWorkbench.cs" />
     <Compile Include="UI\Dialog_CosmicCrafting.cs" />
+    <Compile Include="UI\GameComponent_CosmicCraftingUI.cs" />
     <Compile Include="Storage\StorageInventory.cs" />
+    <Compile Include="Storage\StorageDebugActions.cs" />
     <Compile Include="Storage\StorageResourceCounter.cs" />
+    <Compile Include="Storage\StorageBuildMaterialPatches.cs" />
     <Compile Include="Storage\StorageWithdrawal.cs" />
     <Compile Include="UI\Dialog_StorageInventory.cs" />
+    <Compile Include="UI\Dialog_StorageInventoryRule.cs" />
+    <Compile Include="UI\Dialog_StorageInventoryIcon.cs" />
+    <Compile Include="Storage\StorageInventoryFilters.cs" />
     <Compile Include="UI\StorageInventoryEntry.cs" />
     <Compile Include="Storage\StorageTransfer.cs" />
     <Compile Include="Storage\StorageIncomingReservations.cs" />
@@ -138,5 +183,14 @@
     <Compile Include="Storage\StorageRecoveryBatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="ValidateGameBuild" BeforeTargets="PrepareForBuild">
+    <Error Condition=" '$(GameVersion)' != '1.6' And '$(GameVersion)' != '1.7' "
+           Text="GameVersion must be 1.6 or 1.7." />
+    <ItemGroup>
+      <RequiredGameAssembly Include="@(Reference)" Condition=" '%(Reference.HintPath)' != '' " />
+    </ItemGroup>
+    <Error Condition=" !Exists('%(RequiredGameAssembly.HintPath)') "
+           Text="RimWorld $(GameVersion) dependency not found: %(RequiredGameAssembly.HintPath). Set GameAssemblyDir to this version's game assembly directory, or HarmonyAssemblyPath to its 0Harmony.dll." />
+  </Target>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

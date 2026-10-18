@@ -7,7 +7,8 @@ namespace MagicStorage
     [StaticConstructorOnStartup]
     internal static class CompatibilityManager
     {
-        private static readonly IStorageCompatibility[] modules = { new MonolynCompatibility(), new NivarianCannonCompatibility() };
+        private static readonly IStorageCompatibility[] modules =
+        { new MonolynCompatibility(), new NivarianCannonCompatibility(), new DynamicTradeInterfaceCompatibility() };
 
         static CompatibilityManager()
         {

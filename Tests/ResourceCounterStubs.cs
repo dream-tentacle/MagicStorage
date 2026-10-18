@@ -6,16 +6,23 @@ using Verse;
 
 namespace Verse
 {
-    public partial class ThingDef { public bool CountAsResource = true; }
+    public partial class ThingDef
+    {
+        public bool CountAsResource = true;
+        public RimWorld.CompProperties_Rottable rottable;
+        public T GetCompProperties<T>() where T : class => rottable as T;
+    }
     public partial class Map
     {
         public readonly List<ThingDef> ResourceDefs = new List<ThingDef>();
         public readonly List<Thing> NativeStoredResources = new List<Thing>();
         public readonly HashSet<Thing> ExcludedResources = new HashSet<Thing>();
+        public readonly HashSet<IntVec3> Fog = new HashSet<IntVec3>();
     }
 }
 namespace RimWorld
 {
+    public sealed class CompProperties_Rottable { public bool rotDestroys; }
     public sealed class ResourceCounter
     {
         private Map map;

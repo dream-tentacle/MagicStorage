@@ -10,7 +10,9 @@
   <ItemGroup>
     <Reference Include="System" /><Reference Include="System.Core" />
     <Compile Include="RecipeCatalogTests.cs" />
+    <Compile Include="RecipeCategoryTests.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingRecipeCatalog.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingRecipeCategories.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

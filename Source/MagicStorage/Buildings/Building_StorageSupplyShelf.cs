@@ -10,6 +10,40 @@ namespace MagicStorage
     public sealed class Building_StorageSupplyShelf : Building, ISlotGroupParent
     {
         public const int SlotCount = 3;
+        // Session-only clipboard; never serialized or tied to a source building.
+        private static ShelfPreset copiedPreset;
+
+        private sealed class ShelfPreset
+        {
+            internal readonly List<ThingDef> Selections;
+            internal readonly List<int> RestockLimits;
+            internal readonly List<StorageShelfFilter> Filters;
+            internal readonly StoragePriority Priority;
+
+            internal ShelfPreset(Building_StorageSupplyShelf shelf)
+            {
+                Selections = new List<ThingDef>(shelf.selections);
+                RestockLimits = Enumerable.Range(0, SlotCount).Select(shelf.RestockLimit).ToList();
+                Filters = shelf.filters.Select(filter => filter.Clone()).ToList();
+                Priority = shelf.GetStoreSettings().Priority;
+            }
+        }
+
+        private void CopyPreset() => copiedPreset = new ShelfPreset(this);
+
+        private void PastePreset()
+        {
+            if (copiedPreset == null) return;
+            // Replace all slots together so swapped selections cannot conflict.
+            selections = new List<ThingDef>(copiedPreset.Selections);
+            restockLimits = new List<int>(copiedPreset.RestockLimits);
+            filters = copiedPreset.Filters.Select(filter => filter.Clone()).ToList();
+            GetStoreSettings().Priority = copiedPreset.Priority;
+            ClearRestockFailures();
+            RefreshSettings();
+        }
+
+        private StorageRefreshTimer refreshTimer;
         private List<ThingDef> selections = new List<ThingDef> { null, null, null };
         private List<int> restockLimits = new List<int> { 0, 0, 0 };
         private List<StorageShelfFilter> filters = new List<StorageShelfFilter>
@@ -98,9 +132,14 @@ namespace MagicStorage
             Notify_SettingsChanged();
         }
 
-        public override void TickRare()
+        protected override void Tick()
         {
-            base.TickRare();
+            base.Tick();
+            if (Spawned && refreshTimer.IsDue(StorageRefreshTask.ShelfRestock, Find.TickManager.TicksGame)) RefreshSupply();
+        }
+
+        internal void RefreshSupply()
+        {
             if (!Spawned || Faction != Faction.OfPlayer) return;
             Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             StorageShelfSupply.Process(this);
@@ -167,6 +206,7 @@ namespace MagicStorage
         {
             foreach (Gizmo gizmo in base.GetGizmos()) yield return gizmo;
             if (Faction == Faction.OfPlayer)
+            {
                 yield return new Command_Action
                 {
                     defaultLabel = "MS_Shelf_Configure".Translate(),
@@ -174,6 +214,25 @@ namespace MagicStorage
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/ConfigureShelf"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageSupplyShelf(this))
                 };
+                yield return new Command_Action
+                {
+                    defaultLabel = "MS_Shelf_CopyPreset".Translate(),
+                    defaultDesc = "MS_Shelf_CopyPresetDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/CopySettings"),
+                    alsoClickIfOtherInGroupClicked = false,
+                    action = CopyPreset
+                };
+                var paste = new Command_Action
+                {
+                    defaultLabel = "MS_Shelf_PastePreset".Translate(),
+                    defaultDesc = "MS_Shelf_PastePresetDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/PasteSettings"),
+                    alsoClickIfOtherInGroupClicked = true,
+                    action = PastePreset
+                };
+                if (copiedPreset == null) paste.Disable("MS_Shelf_NeedCopiedPreset".Translate());
+                yield return paste;
+            }
         }
         public override string GetInspectString() =>
             (base.GetInspectString() + "\n" + "MS_Shelf_Contents".Translate(slotGroup.HeldThingsCount, SlotCount) +

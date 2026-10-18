@@ -1,56 +1,54 @@
-// Controlled IMGUI boundary. Production gesture handling is linked unchanged.
+// Controlled input/rendering boundary. The production DragSelect-style state machine is linked unchanged.
 namespace UnityEngine
 {
     public struct Vector2
     {
         public float x, y;
         public Vector2(float x, float y) { this.x = x; this.y = y; }
-        public float sqrMagnitude => x * x + y * y;
-        public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.x - b.x, a.y - b.y);
-        public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.x + b.x, a.y + b.y);
+    }
+    public struct Vector3
+    {
+        public float x, y, z;
+        public Vector3(float x, float y, float z = 0) { this.x = x; this.y = y; this.z = z; }
+        public float sqrMagnitude => x * x + y * y + z * z;
+        public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
     }
     public struct Rect
     {
         public float x, y, width, height;
         public Rect(float x, float y, float width, float height) { this.x = x; this.y = y; this.width = width; this.height = height; }
-        public Rect(Vector2 position, Vector2 size) : this(position.x, position.y, size.x, size.y) { }
-        public float xMin => x;
-        public float yMin => y;
-        public float xMax => x + width;
-        public float yMax => y + height;
-        public bool Contains(Vector2 point) => point.x >= xMin && point.x < xMax && point.y >= yMin && point.y < yMax;
+        public bool Contains(Vector2 point) => point.x >= x && point.x < x + width && point.y >= y && point.y < y + height;
     }
     public enum EventType { MouseDown, MouseUp, MouseDrag, Repaint, Layout, Ignore, Used }
-    public enum FocusType { Passive }
     public sealed class Event
     {
         public static Event current;
-        public EventType type, rawType;
+        public EventType type;
         public Vector2 mousePosition;
-        public int button;
-        public void Use() { type = EventType.Used; }
     }
-    public static class GUI { public static bool enabled = true; }
-    public static class GUIUtility
+    public static class Input
     {
-        public static int hotControl, keyboardControl, ControlID = 1;
-        public static Vector2 GroupOffset;
-        public static int GetControlID(FocusType type) => ControlID;
-        public static Vector2 GUIToScreenPoint(Vector2 point) => point + GroupOffset;
+        public static Vector3 mousePosition;
+        public static bool Held, Down, Up;
+        public static bool GetMouseButton(int button) => button == 0 && Held;
+        public static bool GetMouseButtonDown(int button) => button == 0 && Down;
+        public static bool GetMouseButtonUp(int button) => button == 0 && Up;
     }
+    public static class Time { public static int frameCount; }
+    public static class GUIUtility { public static int hotControl, keyboardControl; }
 }
 namespace Verse
 {
     public static class Mouse
     {
         public static bool Blocked;
-        public static bool IsInputBlockedNow => Blocked;
         public static bool IsOver(UnityEngine.Rect rect) => !Blocked && rect.Contains(UnityEngine.Event.current.mousePosition);
     }
     public static class Widgets
     {
         public static int Draws;
-        public static bool ButtonText(UnityEngine.Rect rect, string label, bool active = true)
-        { Draws++; if (active) throw new System.Exception("Quantity button must not also use native click handling."); return false; }
+        public static bool NativeClick;
+        public static bool ButtonText(UnityEngine.Rect rect, string label)
+        { Draws++; return NativeClick; }
     }
 }

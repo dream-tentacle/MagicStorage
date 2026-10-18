@@ -14,11 +14,14 @@ namespace MagicStorage
         private ThingOwner<Thing> directlyHeldThings;
         private bool dirty = true;
         private bool topologyChanged;
+        private StorageRefreshTimer maintenanceTimer, recoveryTimer;
         private readonly StorageOutgoingReservations reservations = new StorageOutgoingReservations();
         private readonly Queue<System.Action> pendingActions = new Queue<System.Action>();
         internal void NotifyNodeUnavailable(Thing node) => reservations.NotifyNodeUnavailable(node);
         internal void Defer(System.Action action) => pendingActions.Enqueue(action);
         private readonly List<Building_StorageReceiver> receivers = new List<Building_StorageReceiver>();
+        private readonly List<Building_StorageCore> cores = new List<Building_StorageCore>();
+        internal IReadOnlyList<Building_StorageCore> StorageCores => cores;
         private readonly List<Building_StorageUnit> units = new List<Building_StorageUnit>();
         internal IReadOnlyList<Building_StorageUnit> StorageUnits => units;
         private readonly List<Building_StorageSupplyShelf> supplyShelves = new List<Building_StorageSupplyShelf>();
@@ -35,6 +38,7 @@ namespace MagicStorage
         internal void Register(CompStorageNode node)
         {
             if (!nodes.Add(node)) return;
+            if (node.parent is Building_StorageCore core) cores.Add(core);
             if (node.parent is Building_StorageReceiver receiver) receivers.Add(receiver);
             if (node.parent is Building_StorageUnit unit) units.Add(unit);
             if (node.parent is Building_StorageSupplyShelf shelf) supplyShelves.Add(shelf);
@@ -54,6 +58,7 @@ namespace MagicStorage
         internal void Unregister(CompStorageNode node)
         {
             if (!nodes.Remove(node)) return;
+            if (node.parent is Building_StorageCore core) cores.Remove(core);
             NotifyNodeUnavailable(node.parent);
             if (node.parent is Building_StorageReceiver receiver) receivers.Remove(receiver);
             if (node.parent is Building_StorageUnit unit) units.Remove(unit);
@@ -138,15 +143,18 @@ namespace MagicStorage
 
         public override void MapComponentTick()
         {
+            int tick = Find.TickManager.TicksGame;
+            // Topology changes and queued invalidations are events, not polling. Handle
+            // them promptly so removing a building cannot leave a live job or claim.
             if (dirty) Rebuild();
             else if (topologyChanged) FinishTopologyChange();
-            reservations.Validate();
+            if (maintenanceTimer.IsDue(StorageRefreshTask.NetworkMaintenance, tick)) reservations.Validate();
             reservations.DispatchNotifications();
             int pending = pendingActions.Count;
             while (pending-- > 0) pendingActions.Dequeue()();
             foreach (var receiver in receivers) receiver.ProcessIncoming();
             // Only exceptional, pending releases are revisited. Stored inventories never tick.
-            if (recovery.Count > 0 && Find.TickManager.TicksGame % 250 == 0)
+            if (recovery.Count > 0 && recoveryTimer.IsDue(StorageRefreshTask.RecoveryRelease, tick))
             {
                 var batch = recovery[0];
                 batch.TryRelease(map, 8);

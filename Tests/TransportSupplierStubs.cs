@@ -13,12 +13,8 @@ namespace Verse
     public partial class Thing
     {
         public string LabelCap => LabelNoCount;
-        public float GetStatValue(object stat) => Stuff?.transportMass ?? def.transportMass;
-    }
-    public partial class Building
-    {
-        protected virtual void Tick() { }
-        public void RunTransportTestTick() { Tick(); }
+        public static int StatReads;
+        public float GetStatValue(object stat) { StatReads++; return Stuff?.transportMass ?? def.transportMass; }
     }
     public partial struct Rot4
     {
@@ -72,7 +68,7 @@ namespace RimWorld
         }
     }
     public static class StatDefOf { public static readonly object Mass = new object(); }
-    public class TransferableOneWay { public List<Thing> things = new List<Thing>(); public virtual Thing AnyThing => things[0]; }
+    public partial class TransferableOneWay { public List<Thing> things = new List<Thing>(); public virtual Thing AnyThing => things[0]; }
     public sealed class CompTransporter : ThingComp, IThingHolder
     {
         public new Thing parent;

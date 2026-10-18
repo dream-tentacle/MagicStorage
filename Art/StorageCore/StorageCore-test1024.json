@@ -1,0 +1,22 @@
+{
+  "original_size": [
+    544,
+    544
+  ],
+  "test_size": [
+    1024,
+    1024
+  ],
+  "body_bounds": [
+    30,
+    30,
+    994,
+    994
+  ],
+  "center_offset": [
+    0,
+    0
+  ],
+  "source": "StorageCore-v10.svg",
+  "other_textures_and_xml_unchanged": true
+}

@@ -45,7 +45,29 @@
   <MS_ReceiverCapacity>接收暂存：{0} / {1} 堆</MS_ReceiverCapacity>
   <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，表面符合条件的物品自动存入单元。</MS_ReceiverUse>
   <MS_SettingsCategory>魔法存储</MS_SettingsCategory>
+  <MS_SettingsTabGeneral>通用</MS_SettingsTabGeneral>
+  <MS_SettingsTabPerformance>性能</MS_SettingsTabPerformance>
+  <MS_SettingsPerformanceNotice>建议保留初始默认值，因为本mod性能已经足够优秀。</MS_SettingsPerformanceNotice>
   <MS_SettingsUnitSlots>每个存储单元的槽位上限</MS_SettingsUnitSlots>
-  <MS_SettingsUnitSlotsHelp>范围：6–1000，默认：64。立即应用于现有和新建存储单元。调低上限不会移除已有物品；超出容量时无法新增堆叠，仍可补入未满的兼容堆叠。</MS_SettingsUnitSlotsHelp>
+  <MS_SettingsUnitSlotsHelp>范围：1–10000，默认：64。立即应用于现有和新建存储单元。调低上限不会移除已有物品；超出容量时无法新增堆叠，仍可补入未满的兼容堆叠。</MS_SettingsUnitSlotsHelp>
   <MS_SettingsRestoreDefaults>恢复默认值</MS_SettingsRestoreDefaults>
+  <MS_SettingsCosmicWorkbenchWorkSpeed>宇宙工作台工作速度：{0}%</MS_SettingsCosmicWorkbenchWorkSpeed>
+  <MS_SettingsSimplifiedMode>简约模式</MS_SettingsSimplifiedMode>
+  <MS_SettingsRefreshHelp>刷新时间范围：1–60秒，默认1秒，按正常游戏速度计算。数值越大，定期检查越少，响应也越慢。切换模式保留各自设置的数值；立即供应按钮仍立即执行。</MS_SettingsRefreshHelp>
+  <MS_SettingsOverallRefresh>总体刷新时间（秒）</MS_SettingsOverallRefresh>
+  <MS_SettingsCraftingMaterialRecheck>制作缺料复查间隔（秒）</MS_SettingsCraftingMaterialRecheck>
+  <MS_SettingsCraftingMaterialRecheckHelp>缺料后再次检查原料的间隔；设为0则每次尝试都检查。</MS_SettingsCraftingMaterialRecheckHelp>
+  <MS_SettingsRefresh_NetworkMaintenance>网络维护（秒）</MS_SettingsRefresh_NetworkMaintenance>
+  <MS_SettingsRefresh_Receiver>接收器检查（秒）</MS_SettingsRefresh_Receiver>
+  <MS_SettingsRefresh_FuelSupply>燃料供应（秒）</MS_SettingsRefresh_FuelSupply>
+  <MS_SettingsRefresh_TransportSupply>运输供应（秒）</MS_SettingsRefresh_TransportSupply>
+  <MS_SettingsRefresh_CraftingMaintenance>制作任务维护（秒）</MS_SettingsRefresh_CraftingMaintenance>
+  <MS_SettingsRefresh_CraftingPolicy>制作规则复查（秒）</MS_SettingsRefresh_CraftingPolicy>
+  <MS_SettingsRefresh_ShelfRestock>货架补货（秒）</MS_SettingsRefresh_ShelfRestock>
+  <MS_SettingsRefresh_ConstructionSupply>建筑供料（秒）</MS_SettingsRefresh_ConstructionSupply>
+  <MS_SettingsRefresh_ApparelCleanup>服装适配器清理（秒）</MS_SettingsRefresh_ApparelCleanup>
+  <MS_SettingsRefresh_RecoveryRelease>异常物品落地重试（秒）</MS_SettingsRefresh_RecoveryRelease>
+  <MS_DebugFill_SelectUnit>请先单独选中当前地图上的一个存储单元。</MS_DebugFill_SelectUnit>
+  <MS_DebugFill_NoMaterials>此工具使用的物品均未加载。</MS_DebugFill_NoMaterials>
+  <MS_DebugFill_Completed>已存入{0}个满堆。存储槽位：{1}/{2}。</MS_DebugFill_Completed>
 </LanguageData>

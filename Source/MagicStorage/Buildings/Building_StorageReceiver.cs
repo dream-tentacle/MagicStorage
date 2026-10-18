@@ -13,7 +13,7 @@ namespace MagicStorage
         private StorageSettings disabledSettings;
         private StorageSettings observedSettings;
         private StoragePriority observedPriority;
-        private int nextTransferTick;
+        private StorageRefreshTimer refreshTimer;
 
         public Building_StorageReceiver() { slotGroup = new SlotGroup(this); }
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
@@ -46,19 +46,18 @@ namespace MagicStorage
         {
             if (!Spawned) return;
             Map.listerHaulables.Notify_SlotGroupChanged(slotGroup);
-            nextTransferTick = Find.TickManager.TicksGame + 1;
         }
 
         public void Notify_ReceivedThing(Thing item)
         {
             // SpawnSetup/GenPlace may still be operating on this object. Never take it here.
-            nextTransferTick = Find.TickManager.TicksGame + 1;
         }
         public void Notify_LostThing(Thing item) { }
 
         internal void ProcessIncoming()
         {
-            if (!Spawned) return;
+            if (!Spawned || !refreshTimer.IsDue(StorageRefreshTask.Receiver, Find.TickManager.TicksGame)) return;
+            Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             StorageSettings settings = GetStoreSettings();
             if (settings != observedSettings || settings.Priority != observedPriority)
             {
@@ -67,9 +66,8 @@ namespace MagicStorage
                 Map.haulDestinationManager.Notify_HaulDestinationChangedPriority();
                 Notify_SettingsChanged();
             }
-            if (!CanWork || Find.TickManager.TicksGame < nextTransferTick) return;
+            if (!CanWork) return;
             // Retry waiting stacks, including native merges which do not spawn a new Thing.
-            nextTransferTick = Find.TickManager.TicksGame + 60;
             var items = new List<Thing>(slotGroup.HeldThings);
             foreach (Thing item in items)
             {
@@ -84,7 +82,7 @@ namespace MagicStorage
         {
             cells = new List<IntVec3> { Position };
             base.SpawnSetup(map, respawningAfterLoad);
-            nextTransferTick = Find.TickManager.TicksGame + 1;
+            refreshTimer.Start(Find.TickManager.TicksGame);
         }
 
         public override void SetFaction(Faction newFaction, Pawn recruiter = null)

@@ -50,7 +50,8 @@ namespace MagicStorage
         private MapComponent_CosmicCrafting dispatcher;
         private int revision;
         private bool finishRegistered;
-        private int nextPolicyCheck;
+        private StorageRefreshTimer policyTimer;
+        private bool policyAllowed = true;
         internal int WorkStartedAt;
         internal Building_CosmicWorkbench Bench => job.GetTarget(TargetIndex.A).Thing as Building_CosmicWorkbench;
         internal Building_StorageCore Core => job.GetTarget(TargetIndex.B).Thing as Building_StorageCore;
@@ -67,7 +68,7 @@ namespace MagicStorage
             if (recipe == null) return base.GetReport();
             var product = recipe.specialProducts == null && recipe.products?.Count == 1
                 ? recipe.products[0].thingDef : null;
-            return "MS_Craft_WorkReport".Translate(product?.label ?? recipe.label);
+            return "MS_Craft_WorkReport".Translate(product?.label ?? CraftingRecipeCatalog.Label(recipe));
         }
 
         private void RegisterFinish()
@@ -145,11 +146,10 @@ namespace MagicStorage
                 Bench.Faction != pawn.Faction || Core.Faction != pawn.Faction ||
                 Bench.InteractionCell.IsForbidden(pawn) || job.workGiverDef == null || !Core.CanWork) return false;
             if (!EnsureAssignment() || Order != claimedOrder || claimedOrder.Revision != revision) return false;
-            if (Find.TickManager.TicksGame < nextPolicyCheck) return true;
-            bool allowed = dispatcher.CanRun(Core, claimedOrder) &&
+            if (!policyTimer.IsDue(StorageRefreshTask.CraftingPolicy, Find.TickManager.TicksGame)) return policyAllowed;
+            policyAllowed = dispatcher.CanRun(Core, claimedOrder) &&
                 CraftingServices.Workers.Allows(claimedOrder, pawn, job.workGiverDef.workType);
-            if (allowed) nextPolicyCheck = Find.TickManager.TicksGame + 60;
-            return allowed;
+            return policyAllowed;
         }
         internal void OnMaterialsInvalidated()
         { if (!ended && Order?.Batch == null) EndJobWith(JobCondition.Incompletable); }

@@ -42,7 +42,34 @@ namespace MagicStorage
             }
         }
         internal static IEnumerable<RecipeDef> Available
-        { get { EnsureLoaded(); return routes.Keys.Where(CanAdd).OrderBy(r => r.label); } }
+        { get { EnsureLoaded(); return routes.Keys.Where(CanAdd).OrderBy(Label); } }
+        internal static IEnumerable<RecipeDef> AvailableForWorkbench(ThingDef table, WorkTypeDef type = null)
+        {
+            EnsureLoaded();
+            if (table == null || !table.IsResearchFinished) return Enumerable.Empty<RecipeDef>();
+            return table.AllRecipes.Where(recipe => recipe.AvailableNow && Workbenches(recipe).Contains(table) &&
+                Routes(recipe).Any(giver => (type == null || giver.workType == type) &&
+                    giver.fixedBillGiverDefs.Contains(table) &&
+                    (recipe.requiredGiverWorkType == null || recipe.requiredGiverWorkType == giver.workType)))
+                .Distinct().OrderBy(Label);
+        }
+        internal static IEnumerable<ThingDef> AvailableWorkbenches(WorkTypeDef type = null)
+        {
+            EnsureLoaded();
+            return workbenches.Values.SelectMany(tables => tables).Distinct()
+                .Where(table => AvailableForWorkbench(table, type).Any()).OrderBy(table => table.label);
+        }
+        internal static string Label(RecipeDef recipe)
+        {
+            if (recipe == null) return string.Empty;
+            if (!string.IsNullOrWhiteSpace(recipe.label)) return recipe.label;
+            ThingDef product = recipe.products?.FirstOrDefault(p => p?.thingDef != null)?.thingDef;
+            if (product == null) return recipe.defName ?? string.Empty;
+            string productLabel = !string.IsNullOrWhiteSpace(product.label) ? product.label : product.defName;
+            return "RecipeMake".Translate(productLabel).ToString();
+        }
+        internal static bool MatchesSearch(RecipeDef recipe, string search) => recipe != null &&
+            Label(recipe).IndexOf(search ?? string.Empty, StringComparison.CurrentCultureIgnoreCase) >= 0;
         // This gate only controls adding orders; existing orders keep their execution rules.
         internal static bool CanAdd(RecipeDef recipe) => recipe != null && recipe.AvailableNow &&
             Workbenches(recipe).Any(table => table.IsResearchFinished);
@@ -54,7 +81,7 @@ namespace MagicStorage
         { EnsureLoaded(); return recipe != null && routes.TryGetValue(recipe, out var list) ? list : (IReadOnlyList<WorkGiverDef>)Array.Empty<WorkGiverDef>(); }
         internal static bool Supports(RecipeDef recipe) => Routes(recipe).Count > 0;
         internal static bool HasType(RecipeDef recipe, WorkTypeDef type) => Routes(recipe).Any(w => w.workType == type);
-        internal static string WorkLabels(RecipeDef recipe) => string.Join(" / ", Routes(recipe).Select(w => w.workType.LabelCap.ToString()).Distinct());
+        internal static string WorkLabels(RecipeDef recipe) => string.Join(" / ", Routes(recipe).Select(w => w.workType.labelShort.CapitalizeFirst()).Distinct());
 
     }
 }

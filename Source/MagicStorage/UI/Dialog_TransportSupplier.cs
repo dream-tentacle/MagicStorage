@@ -14,11 +14,11 @@ namespace MagicStorage
         private const float QuantityWidth = 230f;
         private const float SideWidth = 155f;
         private readonly Building_TransportSupplier supplier;
-        private readonly StorageQuantityDrag quantityDrag = new StorageQuantityDrag();
         private readonly QuickSearchWidget search = new QuickSearchWidget();
         private StorageNetwork network;
         private long revision;
         private double capacity;
+        private StorageTransportPreview preview;
         private List<StorageTransportRow> rows = new List<StorageTransportRow>();
         private List<StorageTransportRow> visible = new List<StorageTransportRow>();
         private TransferableSorterDef primary = TransferableSorterDefOf.Category;
@@ -48,7 +48,7 @@ namespace MagicStorage
             Refresh();
         }
         public override void Notify_CommonSearchChanged() => ApplyFilter();
-        public override void PostClose() { quantityDrag.Reset(); base.PostClose(); }
+        public override void PostClose() { preview?.Dispose(); base.PostClose(); }
         protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
         {
             if (inRect.width < 950f) return new Rect(inRect.x, inRect.y + inRect.height - 86f, 200f, 24f);
@@ -60,12 +60,13 @@ namespace MagicStorage
             if (supplier.Spawned) supplier.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             network = supplier.Network;
             revision = network?.Revision ?? -1;
+            preview?.Dispose();
             rows = StorageTransportExchange.Snapshot(supplier, network);
+            preview = new StorageTransportPreview(supplier, network, rows, capacity);
             ApplyFilter();
         }
         private void ApplyFilter()
         {
-            quantityDrag.Reset();
             visible = rows.Where(row => search.filter.Matches(row.Label) && (category == null || InCategory(row.ThingDef, category)))
                 .OrderBy(row => row, primary.Comparer).ThenBy(row => row, secondary.Comparer)
                 .ThenBy(row => TransferableUIUtility.DefaultListOrderPriority(row.ThingDef))
@@ -115,7 +116,6 @@ namespace MagicStorage
             TextAnchor oldAnchor = Text.Anchor;
             bool oldWrap = Text.WordWrap;
             Color oldColor = GUI.color;
-            quantityDrag.BeginGUI(supplier.CanWork);
             try
             {
                 Text.Font = GameFont.Small;
@@ -123,7 +123,7 @@ namespace MagicStorage
                 DrawList(new Rect(0, 112, rect.width, Math.Max(0, rect.height - 242)));
                 DrawFooter(rect);
             }
-            finally { quantityDrag.EndGUI(); Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
+            finally { Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
         }
 
         private void DrawHeader(Rect rect)
@@ -155,7 +155,6 @@ namespace MagicStorage
 
         private void DrawList(Rect viewport)
         {
-            quantityDrag.SetViewport(viewport);
             Rect content = new Rect(0, 0, viewport.width - 16, 6 + visible.Count * RowHeight);
             Widgets.BeginScrollView(viewport, ref scroll, content);
             try
@@ -208,22 +207,22 @@ namespace MagicStorage
                 string value = Widgets.TextField(amount, row.Buffer);
                 if (value != row.Buffer) row.EditChange(value);
                 int step = GenUI.CurrentAdjustmentMultiplier();
-                if (row.Change > -row.SupplyCount)
+                if (supplier.CanWork && row.Change > -row.SupplyCount)
                 {
-                    quantityDrag.ButtonText(new Rect(amount.x - 58, rect.y, 29, rect.height), "<<", row.Representative.thingIDNumber,
+                    StorageQuantityDrag.ButtonText(new Rect(amount.x - 58, rect.y, 29, rect.height), "<<", row.Representative.thingIDNumber,
                         () => row.SetChange(-row.SupplyCount));
-                    quantityDrag.ButtonText(new Rect(amount.x - 29, rect.y, 29, rect.height), "<", row.Representative.thingIDNumber,
+                    StorageQuantityDrag.ButtonText(new Rect(amount.x - 29, rect.y, 29, rect.height), "<", row.Representative.thingIDNumber,
                         () => row.SetChange(row.Change - Math.Min(step, row.Change + row.SupplyCount)));
                 }
-                if (row.Change < row.Available)
+                if (supplier.CanWork && row.Change < row.Available)
                 {
-                    quantityDrag.ButtonText(new Rect(amount.xMax, rect.y, 29, rect.height), ">", row.Representative.thingIDNumber,
+                    StorageQuantityDrag.ButtonText(new Rect(amount.xMax, rect.y, 29, rect.height), ">", row.Representative.thingIDNumber,
                         () => row.SetChange(row.Change + Math.Min(step, row.Available - row.Change)));
-                    long massLimit = StorageTransportExchange.MassLimitChange(supplier, network, rows, row, capacity);
+                    long massLimit = preview.MassLimit(row);
                     bool stopAtMass = row.Change < massLimit && massLimit < row.Available;
-                    quantityDrag.ButtonText(new Rect(amount.xMax + 29, rect.y, 29, rect.height), stopAtMass ? ">M" : ">>",
+                    StorageQuantityDrag.ButtonText(new Rect(amount.xMax + 29, rect.y, 29, rect.height), stopAtMass ? ">M" : ">>",
                         row.Representative.thingIDNumber,
-                        () => row.SetChange(stopAtMass ? StorageTransportExchange.MassLimitChange(supplier, network, rows, row, capacity) : row.Available));
+                        () => row.SetChange(stopAtMass ? preview.MassLimit(row) : row.Available));
                 }
             }
             finally { GUI.enabled = enabled; }
@@ -232,13 +231,13 @@ namespace MagicStorage
 
         private void DrawFooter(Rect rect)
         {
-            double mass = StorageTransportExchange.ProjectedMass(supplier, network, rows);
+            double mass = preview.ProjectedMass;
             bool withinCapacity = mass <= capacity + StorageTransportExchange.MassTolerance;
             float y = rect.height - 126;
             Color color = GUI.color;
             if (!withinCapacity) GUI.color = Color.red;
             Widgets.Label(new Rect(0, y, rect.width, 26), "MS_Transport_Mass".Translate(
-                supplier.StoredMass.ToString("0.##"), mass.ToString("0.##"), capacity.ToString("0.##")));
+                preview.StoredMass.ToString("0.##"), mass.ToString("0.##"), capacity.ToString("0.##")));
             GUI.color = color;
             string status = !supplier.CanWork ? StorageNetwork.StatusLabel(network) : !withinCapacity ? "MS_Transport_Overweight".Translate().ToString() :
                 feedback.Length > 0 ? feedback : "MS_Transport_Hint".Translate().ToString();
@@ -248,7 +247,7 @@ namespace MagicStorage
             Text.Font = GameFont.Small;
             Rect accept = new Rect(rect.width / 2 - 80, rect.height - 55, 160, 40);
             if (Widgets.ButtonText(new Rect(accept.x - 170, accept.y, 160, 40), "ResetButton".Translate()))
-            { foreach (var row in rows) row.SetChange(0); feedback = ""; ApplyFilter(); GUI.FocusControl(null); }
+            { preview.ResetSelections(); feedback = ""; ApplyFilter(); GUI.FocusControl(null); }
             bool enabled = GUI.enabled;
             GUI.enabled = enabled && supplier.CanWork && withinCapacity;
             bool confirm;

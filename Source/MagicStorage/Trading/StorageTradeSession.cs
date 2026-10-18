@@ -43,7 +43,8 @@ namespace MagicStorage
 
         internal static void Open(Pawn negotiator, ITrader trader, Building_CommsConsole console = null)
         {
-            if (opening != null || Find.WindowStack.WindowOfType<Dialog_Trade>() != null) return;
+            if (opening != null || Find.WindowStack.WindowOfType<Dialog_Trade>() != null ||
+                DynamicTradeInterfaceCompatibility.HasTradeWindow()) return;
             var session = new StorageTradeSession(negotiator, trader, console);
             opening = session;
             try { Find.WindowStack.Add(new Dialog_StorageTrade(negotiator, trader, session)); }
@@ -204,6 +205,7 @@ namespace MagicStorage
         private bool Reject()
         {
             Find.WindowStack.WindowOfType<Dialog_Trade>()?.FlashSilver();
+            DynamicTradeInterfaceCompatibility.FlashSilver(this);
             Messages.Message("MS_Trade_Unavailable".Translate(), MessageTypeDefOf.RejectInput, false);
             return false;
         }
@@ -254,6 +256,7 @@ namespace MagicStorage
     internal sealed class Dialog_StorageTrade : Dialog_Trade
     {
         private readonly StorageTradeSession session;
+        internal StorageTradeSession Session => session;
         internal Dialog_StorageTrade(Pawn negotiator, ITrader trader, StorageTradeSession session) : base(negotiator, trader)
         { this.session = session; }
 
@@ -266,6 +269,9 @@ namespace MagicStorage
         }
 
         public override void PostClose()
-        { try { base.PostClose(); } finally { session.Dispose(); } }
+        {
+            try { base.PostClose(); }
+            finally { if (!DynamicTradeInterfaceCompatibility.DeferClose(this)) session.Dispose(); }
+        }
     }
 }

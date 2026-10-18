@@ -116,6 +116,30 @@ namespace MagicStorage
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Inventory"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageInventory(this))
                 };
+            if (DebugSettings.godMode && Spawned && Faction == Faction.OfPlayer)
+                yield return new Command_Action
+                {
+                    defaultLabel = "DEV: 吸收全图",
+                    action = AbsorbMapItems
+                };
+        }
+
+        private void AbsorbMapItems()
+        {
+            if (!DebugSettings.godMode || !Spawned || Faction != Faction.OfPlayer) return;
+            Map map = Map;
+            map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            StorageNetwork network = Network;
+            if (network?.CanWork != true) return;
+            // Intake despawns stacks and changes the map lister, so visit a snapshot.
+            foreach (Thing item in new List<Thing>(map.listerThings.AllThings))
+            {
+                if (!item.Spawned || item.Map != map || item.IsForbidden(Faction.OfPlayer) ||
+                    !Settings.AllowedToAccept(item)) continue;
+                // Full slots can still leave merge space for a later item. Never stop
+                // this scan because one transfer fails or only accepts part of a stack.
+                StorageReception.Transfer(network, item, map, item.Position);
+            }
         }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_UI_ModFilter>Mod: {0}</MS_UI_ModFilter>
+  <MS_UI_ModAll>All</MS_UI_ModAll>
+  <MS_UI_FilterCategories>Categories</MS_UI_FilterCategories>
+  <MS_UI_FilterCustom>Custom filters</MS_UI_FilterCustom>
+  <MS_UI_FilterCreate>Create filter</MS_UI_FilterCreate>
+  <MS_UI_FilterName>Name</MS_UI_FilterName>
+  <MS_UI_FilterDefaultName>Filter {0}</MS_UI_FilterDefaultName>
+  <MS_UI_FilterReset>Reset filters</MS_UI_FilterReset>
+  <MS_UI_FilterControls>Left-click: toggle whitelist. Right-click: toggle blacklist. Blacklists take priority; multiple whitelists match any selected rule.</MS_UI_FilterControls>
+  <MS_UI_FilterModeOff>Not selected</MS_UI_FilterModeOff>
+  <MS_UI_FilterModeInclude>Whitelist</MS_UI_FilterModeInclude>
+  <MS_UI_FilterModeExclude>Blacklist</MS_UI_FilterModeExclude>
+  <MS_UI_SelectAllCurrent>Select all filtered</MS_UI_SelectAllCurrent>
+  <MS_UI_FilterChooseIcon>Choose icon</MS_UI_FilterChooseIcon>
+  <MS_UI_FilterIconAutomatic>Automatic icon</MS_UI_FilterIconAutomatic>
+  <MS_UI_FilterIconHint>Choose any storable item as the icon. This does not change the rule's allowed items.</MS_UI_FilterIconHint>
+  <MS_UI_FilterDeleteMode>Toggle rule deletion. Click a red cross to delete that custom rule. Click minus again to exit.</MS_UI_FilterDeleteMode>
+  <MS_UI_FilterDeleteRule>Delete custom rule: {0}</MS_UI_FilterDeleteRule>
+  <MS_UI_FilterEdit>Edit filter rule</MS_UI_FilterEdit>
+  <MS_UI_FilterEditMode>Toggle rule editing. Click a custom rule to edit its name, filter and icon. Click this button again to exit.</MS_UI_FilterEditMode>
+  <MS_UI_FilterEditRule>Edit custom rule: {0}</MS_UI_FilterEditRule>
+</LanguageData>

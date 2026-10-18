@@ -2,6 +2,11 @@
 <LanguageData>
   <MS_Craft_ProductionNotice>中断后可继续制作。产物默认优先存入网络，存不下则放在核心周围；也可设置为放在地面。</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>制作后放到地面</MS_Craft_DropProductsOnFloor>
+  <MS_Craft_StoreProductsInNetwork>产物存入网络</MS_Craft_StoreProductsInNetwork>
+  <MS_Craft_NetworkDeliveryHint>选择产物去向。存入网络时，无法存入的产物会放在核心周围。</MS_Craft_NetworkDeliveryHint>
+  <MS_Craft_NotSuspended>未暂停</MS_Craft_NotSuspended>
+  <MS_Craft_CurrentTarget>目前有：{0} / {1}</MS_Craft_CurrentTarget>
+  <MS_Craft_CountScope>统计地图与当前网络中的物品</MS_Craft_CountScope>
   <MS_Craft_Progress>制作进度：{0}</MS_Craft_Progress>
   <MS_Craft_WorkReport>正在宇宙工作台制作{0}。</MS_Craft_WorkReport>
   <MS_Craft_BatchInvalid>本次制作无法继续；删除任务可退回剩余材料</MS_Craft_BatchInvalid>
@@ -9,7 +14,25 @@
   <MS_Craft_Open>制作清单</MS_Craft_Open>
   <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
+  <MS_Craft_Orders>已添加的制作任务</MS_Craft_Orders>
+  <MS_Craft_DragToSort>拖拽以排序</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
+  <MS_Craft_Details>详细</MS_Craft_Details>
+  <MS_Craft_Workbenches>工作台</MS_Craft_Workbenches>
+  <MS_Craft_CompactModeOff>开启工作台列表的紧凑模式。</MS_Craft_CompactModeOff>
+  <MS_Craft_CompactModeOn>关闭工作台列表的紧凑模式。</MS_Craft_CompactModeOn>
+  <MS_Craft_RecipeCompactModeOff>开启配方列表的紧凑模式。</MS_Craft_RecipeCompactModeOff>
+  <MS_Craft_RecipeCompactModeOn>关闭配方列表的紧凑模式。</MS_Craft_RecipeCompactModeOn>
+  <MS_Craft_CategoryModeOff>按物品分类显示配方。</MS_Craft_CategoryModeOff>
+  <MS_Craft_CategoryModeOn>关闭配方分类，显示平铺列表。</MS_Craft_CategoryModeOn>
+  <MS_Craft_OtherRecipes>其他配方</MS_Craft_OtherRecipes>
+  <MS_Craft_WorkbenchRecipes>{0} — 添加配方</MS_Craft_WorkbenchRecipes>
+  <MS_Craft_IngredientPreview>示例原料：{0} × {1}\n可用原料：{2}</MS_Craft_IngredientPreview>
+  <MS_Craft_NoOrders>尚未添加制作任务。点击右侧工作台选择配方。</MS_Craft_NoOrders>
+  <MS_Craft_NoMatchingWorkbenches>当前筛选条件下没有已解锁且有可用配方的工作台。</MS_Craft_NoMatchingWorkbenches>
   <MS_Craft_All>全部</MS_Craft_All>
+  <MS_Craft_AllRecipes>全部配方</MS_Craft_AllRecipes>
+  <MS_Craft_ModFilter>Mod：{0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>工作台：{0}</MS_Craft_WorkbenchFilter>
   <MS_Craft_SourceFilter>来源：{0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>没有符合筛选条件的制作任务。</MS_Craft_NoMatchingOrders>
@@ -27,13 +50,13 @@
   <MS_Craft_Resume>恢复</MS_Craft_Resume>
   <MS_Craft_Pause>暂停</MS_Craft_Pause>
   <MS_Craft_Delete>删除</MS_Craft_Delete>
+  <MS_Craft_Mode_TargetCount>维持 X 个</MS_Craft_Mode_TargetCount>
   <MS_Craft_WorkTypes>工作类型：{0}</MS_Craft_WorkTypes>
-  <MS_Craft_Mode_RepeatCount>制作X次</MS_Craft_Mode_RepeatCount>
-  <MS_Craft_Mode_Forever>永久制作</MS_Craft_Mode_Forever>
-  <MS_Craft_Mode_TargetCount>维持X个</MS_Craft_Mode_TargetCount>
   <MS_Craft_RepeatCount>剩余次数</MS_Craft_RepeatCount>
   <MS_Craft_TargetCount>目标数量</MS_Craft_TargetCount>
   <MS_Craft_ProductCount>统计数量：{0}（地图＋当前网络）</MS_Craft_ProductCount>
+  <MS_Craft_TargetReached>已达到目标</MS_Craft_TargetReached>
+  <MS_Craft_WaitingToResume>等待数量降至恢复阈值</MS_Craft_WaitingToResume>
   <MS_Craft_AlsoCounts>也统计……</MS_Craft_AlsoCounts>
   <MS_Craft_AlsoCountsHint>选中的物品也计入“维持X个”的数量</MS_Craft_AlsoCountsHint>
   <MS_Craft_PauseSatisfied>满足目标后暂停</MS_Craft_PauseSatisfied>

@@ -9,12 +9,22 @@ namespace Verse
     public class ModContentPack { }
     public class Mod
     {
+        public static int SettingsReads;
         public Mod(ModContentPack content) { }
-        public T GetSettings<T>() where T : ModSettings, new() => new T();
+        public T GetSettings<T>() where T : ModSettings, new() { SettingsReads++; return new T(); }
         public virtual string SettingsCategory() => "";
         public virtual void DoSettingsWindowContents(UnityEngine.Rect rect) { }
     }
-    public class MapPawns
+    public static class LongEventHandler
+    {
+        public static bool Defer;
+        public static readonly Queue<Action> Pending = new Queue<Action>();
+        public static void ExecuteWhenFinished(Action action)
+        { if (Defer) Pending.Enqueue(action); else action(); }
+        public static void Finish()
+        { while (Pending.Count > 0) Pending.Dequeue()(); }
+    }
+    public partial class MapPawns
     {
         public List<Pawn> AllPawnsSpawned = new List<Pawn>(); public int ColonistsSpawnedCount = 1;
         public IEnumerable<Pawn> SpawnedPawnsInFaction(Faction faction) => AllPawnsSpawned.FindAll(p => p.Faction == faction);

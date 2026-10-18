@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using MagicStorage;
 using UnityEngine;
 using Verse;
@@ -6,136 +7,149 @@ using Verse;
 internal static class QuantityDragTests
 {
     private static int assertions;
-    private static readonly Rect Viewport = new Rect(0, 0, 200, 180);
+    private static readonly Rect First = new Rect(20, 20, 30, 30);
+    private static readonly Rect Second = new Rect(20, 50, 30, 30);
+    private static readonly Rect Third = new Rect(20, 80, 30, 30);
     private static void Equal<T>(T expected, T actual, string message)
     { assertions++; if (!Equals(expected, actual)) throw new Exception(message + ": expected " + expected + ", got " + actual); }
-    private static void SetEvent(EventType type, float x, float y, int button = 0)
+    private static void Frame(int frame, float x, float y, bool held, bool down, bool up, Action draw,
+        EventType type = EventType.Repaint)
     {
-        GUIUtility.GroupOffset = new Vector2(0, 0);
-        Event.current = new Event { type = type, rawType = type, mousePosition = new Vector2(x, y), button = button };
+        Time.frameCount = frame;
+        Input.mousePosition = new Vector3(x, 1000 - y);
+        Input.Held = held; Input.Down = down; Input.Up = up;
+        Event.current = new Event { type = type, mousePosition = new Vector2(x, y) };
+        draw();
     }
-    private static void Frame(StorageQuantityDrag drag, EventType type, float x, float y, Action draw, bool enabled = true, int button = 0)
-    { SetEvent(type, x, y, button); drag.BeginGUI(enabled); drag.SetViewport(Viewport); draw(); drag.EndGUI(); }
     private static void ResetEngine()
-    { GUI.enabled = true; GUIUtility.hotControl = GUIUtility.keyboardControl = 0; GUIUtility.ControlID = 1; Mouse.Blocked = false; }
+    {
+        // DragSelect has no lifecycle reset; isolate tests without adding one to production.
+        foreach (FieldInfo field in typeof(StorageQuantityDrag).GetFields(BindingFlags.Static | BindingFlags.NonPublic))
+            field.SetValue(null, Activator.CreateInstance(field.FieldType));
+        GUIUtility.hotControl = GUIUtility.keyboardControl = 0;
+        Mouse.Blocked = false; Widgets.Draws = 0; Widgets.NativeClick = false;
+    }
     public static int Main()
     {
         try
         {
-            ClicksAndThreshold(); AcrossRowsAndRelease(); OnlyStartOnButton(); DisabledAndReset();
-            PerWindowState(); ClippedRowsAndLocalCoordinates(); BothDirectionsAndBulk();
-            Console.WriteLine("PASS: " + assertions + " assertions (production quantity drag logic; IMGUI boundaries stubbed).");
+            ClicksAndThreshold(); AcrossRowsAndRevisits(); SameRowButtons(); ClickFrameInterval();
+            SharedStateAndInputPolling(); MouseHitTesting(); NativeClickAndLargeQuantities(); ReleaseOutside();
+            Console.WriteLine("PASS: " + assertions + " assertions (DragSelect-style production input logic; engine boundary stubbed).");
             return 0;
         }
         catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
     }
     private static void ClicksAndThreshold()
     {
-        ResetEngine(); var drag = new StorageQuantityDrag(); int count = 0;
-        Action draw = () => drag.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => count++);
-        Frame(drag, EventType.MouseDown, 30, 30, draw); Equal(0, count, "press waits for click or drag");
-        Frame(drag, EventType.Repaint, 30, 30, draw); Equal(0, count, "repaint never clicks");
-        Frame(drag, EventType.MouseDrag, 33, 31, draw); Equal(0, count, "small pointer jitter preserves click");
-        Frame(drag, EventType.MouseUp, 33, 31, draw); Equal(1, count, "ordinary click fires once"); Equal(0, GUIUtility.hotControl, "click releases capture");
-        Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Frame(drag, EventType.MouseDrag, 35, 30, draw); Equal(2, count, "movement above threshold begins drag");
-        Frame(drag, EventType.MouseUp, 35, 30, draw); Equal(2, count, "drag release does not add a click");
-        Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Frame(drag, EventType.MouseUp, 190, 170, draw); Equal(2, count, "release outside cancels click"); Equal(0, GUIUtility.hotControl, "outside release clears capture");
+        ResetEngine(); int count = 0;
+        Action draw = () => StorageQuantityDrag.ButtonText(First, ">", 1, () => count++);
+        Frame(100, 30, 30, true, true, false, draw); Equal(0, count, "press waits for click or drag");
+        Frame(101, 34, 32, true, false, false, draw); Equal(0, count, "distance squared exactly 20 is not a drag");
+        Frame(102, 35, 30, true, false, false, draw); Equal(1, count, "distance squared above 20 begins drag");
+        Frame(103, 36, 30, true, false, false, draw); Equal(1, count, "same row does not repeat while held");
+        Frame(104, 36, 30, false, false, true, draw); Equal(1, count, "drag release is not a click");
+        Frame(105, 30, 30, false, false, false, draw);
+        Frame(110, 30, 30, true, true, false, draw);
+        Frame(111, 30, 30, false, false, true, draw); Equal(2, count, "ordinary release clicks once");
+        Frame(111, 30, 30, false, false, true, draw, EventType.Layout);
+        Equal(2, count, "another GUI pass in release frame does not click again");
     }
-    private static void AcrossRowsAndRelease()
+    private static void AcrossRowsAndRevisits()
     {
-        ResetEngine(); var drag = new StorageQuantityDrag(); var counts = new int[3];
-        Action draw = () => { for (int i = 0; i < 3; i++) { int row = i; drag.ButtonText(new Rect(20, 20 + i * 30, 30, 30), ">>", 10 + i, () => counts[row]++); } };
-        Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Frame(drag, EventType.MouseDrag, 30, 65, draw);
-        Equal(1, counts[0], "starting row included when pointer already moved away"); Equal(1, counts[1], "next row activated");
-        Frame(drag, EventType.MouseDrag, 30, 66, draw); Frame(drag, EventType.Repaint, 30, 66, draw);
-        Equal(1, counts[1], "hovering same row never repeats");
-        Frame(drag, EventType.MouseDrag, 30, 95, draw); Equal(1, counts[2], "third row activated");
-        Frame(drag, EventType.MouseDrag, 30, 30, draw); Equal(1, counts[0], "returning to visited row does not repeat");
-        Frame(drag, EventType.MouseUp, 190, 170, draw);
-        Frame(drag, EventType.MouseDrag, 30, 65, draw); Equal(1, counts[1], "no adjustment after release");
-        Frame(drag, EventType.MouseDown, 30, 65, draw); Frame(drag, EventType.MouseUp, 30, 65, draw);
-        Equal(2, counts[1], "later gesture may select same row again");
-    }
-    private static void OnlyStartOnButton()
-    {
-        ResetEngine(); var drag = new StorageQuantityDrag(); int count = 0;
-        Action draw = () => drag.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => count++);
-        Frame(drag, EventType.MouseDown, 150, 150, draw); Frame(drag, EventType.MouseDrag, 30, 30, draw);
-        Equal(0, count, "drag beginning on text or elsewhere does not paint quantities");
-        Frame(drag, EventType.MouseDown, 30, 30, draw, button: 1); Frame(drag, EventType.MouseDrag, 30, 40, draw, button: 1);
-        Frame(drag, EventType.MouseUp, 30, 40, draw, button: 1); Equal(0, count, "right mouse button ignored");
-        Mouse.Blocked = true; Frame(drag, EventType.MouseDown, 30, 30, draw); Frame(drag, EventType.MouseUp, 30, 30, draw);
-        Equal(0, count, "blocked window cannot begin selection");
-    }
-    private static void DisabledAndReset()
-    {
-        ResetEngine(); var drag = new StorageQuantityDrag(); int count = 0;
-        Action draw = () => drag.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => count++);
-        GUI.enabled = false; Frame(drag, EventType.MouseDown, 30, 30, draw); Frame(drag, EventType.MouseUp, 30, 30, draw);
-        Equal(0, count, "disabled controls do not fire"); GUI.enabled = true;
-        Frame(drag, EventType.MouseDown, 30, 30, draw); Frame(drag, EventType.MouseDrag, 30, 40, draw, enabled: false);
-        Equal(0, count, "network becoming unusable cancels pending start"); Equal(0, GUIUtility.hotControl, "disabled network releases mouse");
-        Frame(drag, EventType.MouseDown, 30, 30, draw); drag.Reset(); Frame(drag, EventType.MouseDrag, 30, 40, draw);
-        Equal(0, count, "refresh or close cancels pending gesture");
-        Frame(drag, EventType.MouseUp, 30, 40, draw); Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Frame(drag, EventType.Ignore, 30, 40, draw); Equal(0, GUIUtility.hotControl, "ignored input clears capture");
-        Frame(drag, EventType.MouseDown, 30, 30, draw, enabled: false);
-        Frame(drag, EventType.MouseUp, 30, 30, draw, enabled: false);
-        Equal(0, count, "unusable network cannot arm a click");
-        Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Mouse.Blocked = true; Frame(drag, EventType.MouseDrag, 30, 40, draw);
-        Equal(0, count, "obscuring window cancels pending start"); Mouse.Blocked = false;
-        Frame(drag, EventType.MouseDown, 30, 30, draw);
-        Frame(drag, EventType.MouseDown, 30, 30, draw); Frame(drag, EventType.MouseUp, 30, 30, draw);
-        Equal(1, count, "next click recovers after a lost mouse-up");
-    }
-    private static void PerWindowState()
-    {
-        ResetEngine(); var first = new StorageQuantityDrag(); var second = new StorageQuantityDrag(); int a = 0, b = 0;
-        Action drawA = () => first.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => a++);
-        Action drawB = () => second.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => b++);
-        Frame(first, EventType.MouseDown, 30, 30, drawA);
-        GUIUtility.ControlID = 2; Frame(second, EventType.MouseDrag, 30, 40, drawB);
-        Equal(0, b, "other window does not inherit gesture");
-        GUIUtility.hotControl = 99; GUIUtility.ControlID = 1; Frame(first, EventType.MouseDrag, 30, 40, drawA);
-        Equal(0, a, "stolen capture cancels previous window gesture"); Equal(99, GUIUtility.hotControl, "reset preserves other control's capture");
-    }
-    private static void ClippedRowsAndLocalCoordinates()
-    {
-        ResetEngine(); var drag = new StorageQuantityDrag(); int start = 0, hidden = 0, local = 0;
+        ResetEngine(); int a = 0, b = 0, c = 0;
         Action draw = () =>
         {
-            drag.ButtonText(new Rect(20, 20, 30, 30), ">", 1, () => start++);
-            drag.ButtonText(new Rect(20, 180, 30, 30), ">", 2, () => hidden++);
-            Vector2 screen = Event.current.mousePosition;
-            GUIUtility.GroupOffset = new Vector2(0, 100);
-            Event.current.mousePosition = screen - GUIUtility.GroupOffset;
-            drag.ButtonText(new Rect(20, 0, 30, 30), ">", 3, () => local++);
-            GUIUtility.GroupOffset = new Vector2(0, 0); Event.current.mousePosition = screen;
+            StorageQuantityDrag.ButtonText(First, ">>", 1, () => a++);
+            StorageQuantityDrag.ButtonText(Second, ">>", 2, () => b++);
+            StorageQuantityDrag.ButtonText(Third, ">>", 3, () => c++);
         };
-        Frame(drag, EventType.MouseDown, 30, 30, draw); Frame(drag, EventType.MouseDrag, 30, 190, draw);
-        Equal(1, start, "start still included when pointer leaves viewport"); Equal(0, hidden, "clipped row outside viewport cannot receive gesture");
-        Frame(drag, EventType.MouseDrag, 30, 110, draw); Equal(1, local, "local row coordinates match screen viewport");
-        Frame(drag, EventType.MouseUp, 30, 110, draw);
+        Frame(100, 30, 30, true, true, false, draw);
+        Frame(101, 30, 65, true, false, false, draw);
+        Equal(0, a, "starting row is not filled in after pointer has left"); Equal(1, b, "next row activated");
+        Frame(102, 30, 66, true, false, false, draw); Equal(1, b, "same row is suppressed");
+        Frame(103, 30, 95, true, false, false, draw); Equal(1, c, "third row activated");
+        Frame(104, 30, 65, true, false, false, draw); Equal(2, b, "returning to a previous row activates it again");
+        Frame(105, 30, 30, true, false, false, draw); Equal(1, a, "returning to starting row activates it");
+        Frame(106, 30, 65, true, false, false, draw); Equal(3, b, "A to B to A remains repeatable");
+        Frame(107, 30, 65, false, false, true, draw); Equal(3, b, "release does not add a drag click");
     }
-    private static void BothDirectionsAndBulk()
+    private static void SameRowButtons()
     {
-        ResetEngine(); var drag = new StorageQuantityDrag(); var changes = new long[2];
+        ResetEngine(); int add = 0, remove = 0, other = 0;
         Action draw = () =>
         {
-            for (int i = 0; i < 2; i++)
-            {
-                int row = i;
-                drag.ButtonText(new Rect(10, 20 + i * 30, 25, 30), "<<", i + 1, () => changes[row] = -7);
-                drag.ButtonText(new Rect(70, 20 + i * 30, 25, 30), ">>", i + 1, () => changes[row] = 5000000000L);
-            }
+            StorageQuantityDrag.ButtonText(First, ">", 1, () => add++);
+            StorageQuantityDrag.ButtonText(new Rect(60, 20, 30, 30), "<", 1, () => remove++);
+            StorageQuantityDrag.ButtonText(Second, ">", 2, () => other++);
         };
-        Frame(drag, EventType.MouseDown, 80, 30, draw); Frame(drag, EventType.MouseDrag, 80, 65, draw); Frame(drag, EventType.MouseUp, 80, 65, draw);
-        Equal(5000000000L, changes[0], "bulk load keeps large quantity exact"); Equal(5000000000L, changes[1], "bulk load paints next row");
-        Frame(drag, EventType.MouseDown, 20, 30, draw); Frame(drag, EventType.MouseDrag, 20, 65, draw); Frame(drag, EventType.MouseUp, 20, 65, draw);
-        Equal(-7L, changes[0], "return direction applies to starting row"); Equal(-7L, changes[1], "return direction paints next row");
+        Frame(100, 30, 30, true, true, false, draw);
+        Frame(101, 35, 30, true, false, false, draw); Equal(1, add, "first button activates");
+        Frame(102, 70, 30, true, false, false, draw); Equal(0, remove, "different button of same thing ID remains suppressed");
+        Frame(103, 30, 65, true, false, false, draw); Equal(1, other, "another row changes last row");
+        Frame(104, 70, 30, true, false, false, draw); Equal(1, remove, "button under pointer determines action on return");
+    }
+    private static void ClickFrameInterval()
+    {
+        ResetEngine(); int count = 0;
+        Action draw = () => StorageQuantityDrag.ButtonText(First, ">", 1, () => count++);
+        Frame(99, 30, 30, true, true, false, draw);
+        Frame(100, 30, 30, false, false, true, draw); Equal(1, count, "first click accepted");
+        Frame(104, 30, 30, true, true, false, draw);
+        Frame(105, 30, 30, false, false, true, draw); Equal(1, count, "exactly five frames is suppressed");
+        Frame(105, 30, 30, true, true, false, draw);
+        Frame(106, 30, 30, false, false, true, draw); Equal(2, count, "six frames after last accepted release is accepted");
+    }
+    private static void SharedStateAndInputPolling()
+    {
+        ResetEngine(); int a = 0, b = 0;
+        Action firstWindow = () => StorageQuantityDrag.ButtonText(First, ">", 1, () => a++);
+        Action secondWindow = () => StorageQuantityDrag.ButtonText(First, ">>", 2, () => b++);
+        GUIUtility.hotControl = 77; GUIUtility.keyboardControl = 88;
+        Frame(100, 30, 30, true, true, false, firstWindow, EventType.Used);
+        Frame(101, 35, 30, true, false, false, firstWindow, EventType.Layout);
+        Equal(1, a, "input polling operates independently of GUI event type");
+        Frame(102, 36, 30, true, false, false, secondWindow);
+        Equal(1, b, "another caller shares the active drag");
+        Frame(103, 36, 30, true, false, false, firstWindow); Equal(2, a, "last row is shared between callers");
+        Equal(77, GUIUtility.hotControl, "drag does not capture mouse control");
+        Equal(88, GUIUtility.keyboardControl, "drag does not clear keyboard control");
+    }
+    private static void MouseHitTesting()
+    {
+        ResetEngine(); int count = 0;
+        Action draw = () => StorageQuantityDrag.ButtonText(First, ">", 1, () => count++);
+        Frame(100, 150, 150, true, true, false, draw);
+        Frame(101, 30, 30, true, false, false, draw);
+        Equal(1, count, "DragSelect does not require the press to begin on the button");
+        Mouse.Blocked = true;
+        Frame(102, 35, 30, true, false, false, draw); Equal(1, count, "blocked Mouse.IsOver does not activate");
+        Mouse.Blocked = false;
+        Frame(103, 30, 30, false, false, false, draw);
+        Frame(104, 35, 30, false, false, false, draw); Equal(1, count, "no left input does not activate");
+    }
+    private static void NativeClickAndLargeQuantities()
+    {
+        ResetEngine(); long selected = 0;
+        Action draw = () => StorageQuantityDrag.ButtonText(First, ">M", 1, () => selected = 5000000000L);
+        Widgets.NativeClick = true;
+        Frame(100, 30, 30, false, false, false, draw);
+        Equal(0L, selected, "native ButtonText return is ignored as in DragSelect");
+        Equal(1, Widgets.Draws, "native button still draws");
+        Frame(101, 30, 30, true, true, false, draw);
+        Frame(102, 30, 30, false, false, true, draw); Equal(5000000000L, selected, "bulk quantity remains a long");
+        Action reverse = () => StorageQuantityDrag.ButtonText(First, "<<", 1, () => selected = -7);
+        Frame(110, 30, 30, true, true, false, reverse);
+        Frame(111, 30, 30, false, false, true, reverse); Equal(-7L, selected, "reverse action comes from hovered button");
+    }
+    private static void ReleaseOutside()
+    {
+        ResetEngine(); int count = 0;
+        Action draw = () => StorageQuantityDrag.ButtonText(First, ">", 1, () => count++);
+        Frame(100, 30, 30, true, true, false, draw);
+        Frame(101, 150, 150, false, false, true, draw); Equal(0, count, "release outside button does not click");
+        Frame(102, 30, 30, false, false, false, draw);
+        Frame(110, 30, 30, true, true, false, draw);
+        Frame(111, 30, 30, false, false, true, draw); Equal(1, count, "next ordinary click works after idle over button");
     }
 }

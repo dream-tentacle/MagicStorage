@@ -1,102 +1,55 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace MagicStorage
 {
-    // Per-window quantity buttons: retain ordinary clicks and paint an adjustment across rows.
-    // GUI events avoid a dependency on either DragSelect or Unity's legacy Input module.
-    internal sealed class StorageQuantityDrag
+    // Matches DragSelect 1.6.0.2's quantity-button wrapper and left-button state machine.
+    // Its quantity buttons pass listenRightButton: false and use the thing ID as rectHash.
+    internal static class StorageQuantityDrag
     {
-        private const float DragDistanceSquared = 20f;
-        private readonly HashSet<int> visited = new HashSet<int>();
-        private int controlID, capturedControl, startRow;
-        private string startLabel;
-        private Action startAction;
-        private Vector2 startPosition;
-        private Rect screenViewport;
-        private bool pressed, dragging, hasViewport, inputEnabled;
+        private static int leftDragControl;
+        private static Vector3 draggingStartPos;
+        private static bool leftDragging;
+        private static int lastPressFrame;
 
-        internal void BeginGUI(bool enabled)
+        internal static void ButtonText(Rect rect, string label, int rowID, Action activate)
         {
-            controlID = GUIUtility.GetControlID(FocusType.Passive);
-            hasViewport = false;
-            inputEnabled = enabled && GUI.enabled && !Mouse.IsInputBlockedNow;
-            Event current = Event.current;
-            if (!inputEnabled || current.rawType == EventType.Ignore ||
-                (pressed && GUIUtility.hotControl != capturedControl))
-            { Reset(); return; }
-            // Recover if the app lost focus and never delivered the previous mouse-up.
-            if (pressed && current.rawType == EventType.MouseDown && current.button == 0)
-            { Reset(); inputEnabled = true; }
-            if (!pressed || current.rawType != EventType.MouseDrag || current.button != 0) return;
-            if (!dragging && (GUIUtility.GUIToScreenPoint(current.mousePosition) - startPosition).sqrMagnitude > DragDistanceSquared)
-            {
-                dragging = true;
-                visited.Add(startRow);
-                // Include the starting row even if the first drag event has already left its button.
-                startAction();
-            }
-            if (dragging) current.Use();
+            Widgets.ButtonText(rect, label);
+            if (ButtonInvisibleDraggable(rect, rowID)) activate();
         }
 
-        // The list is clipped and row coordinates are local; compare in screen coordinates.
-        internal void SetViewport(Rect viewport)
+        private static bool ButtonInvisibleDraggable(Rect rect, int rowID)
         {
-            Vector2 min = GUIUtility.GUIToScreenPoint(new Vector2(viewport.xMin, viewport.yMin));
-            Vector2 max = GUIUtility.GUIToScreenPoint(new Vector2(viewport.xMax, viewport.yMax));
-            screenViewport = new Rect(min, max - min);
-            hasViewport = true;
-        }
-
-        internal void ButtonText(Rect rect, string label, int rowID, Action activate)
-        {
-            Widgets.ButtonText(rect, label, active: false);
-            Event current = Event.current;
-            if (!inputEnabled || !GUI.enabled || !hasViewport || !screenViewport.Contains(GUIUtility.GUIToScreenPoint(current.mousePosition)) ||
-                !Mouse.IsOver(rect)) return;
-            if (!pressed && current.type == EventType.MouseDown && current.button == 0 && GUIUtility.hotControl == 0)
+            bool clicked = false;
+            if (!Mouse.IsOver(rect)) return false;
+            if (Input.GetMouseButtonDown(0))
             {
-                pressed = true;
-                dragging = false;
-                startPosition = GUIUtility.GUIToScreenPoint(current.mousePosition);
-                startRow = rowID;
-                startLabel = label;
-                startAction = activate;
-                capturedControl = controlID;
-                GUIUtility.hotControl = capturedControl;
-                GUIUtility.keyboardControl = 0;
-                visited.Clear();
-                current.Use();
+                draggingStartPos = Input.mousePosition;
+                leftDragging = false;
             }
-            else if (pressed && dragging && current.rawType == EventType.MouseDrag && current.button == 0)
+            if (Input.GetMouseButton(0))
             {
-                if (visited.Add(rowID)) activate();
-                current.Use();
+                if (!leftDragging && (draggingStartPos - Input.mousePosition).sqrMagnitude > 20f)
+                    leftDragging = true;
             }
-            else if (pressed && !dragging && current.rawType == EventType.MouseUp && current.button == 0 &&
-                rowID == startRow && label == startLabel)
+            else if (!Input.GetMouseButtonUp(0))
             {
-                activate();
-                Reset();
-                current.Use();
+                leftDragging = false;
+                leftDragControl = 0;
             }
-        }
-
-        internal void EndGUI()
-        {
-            Event current = Event.current;
-            if (current.rawType == EventType.MouseUp && current.button == 0) Reset();
-        }
-
-        internal void Reset()
-        {
-            if (capturedControl != 0 && GUIUtility.hotControl == capturedControl) GUIUtility.hotControl = 0;
-            pressed = dragging = hasViewport = inputEnabled = false;
-            capturedControl = 0;
-            startAction = null;
-            visited.Clear();
+            if (Input.GetMouseButtonUp(0) && Time.frameCount - lastPressFrame > 5)
+            {
+                if (!leftDragging) clicked = true;
+                lastPressFrame = Time.frameCount;
+                leftDragging = false;
+            }
+            if ((leftDragging && leftDragControl != rowID) ^ clicked)
+            {
+                leftDragControl = rowID;
+                return true;
+            }
+            return false;
         }
     }
 }

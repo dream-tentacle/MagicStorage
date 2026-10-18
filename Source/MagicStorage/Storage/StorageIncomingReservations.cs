@@ -29,27 +29,47 @@ namespace MagicStorage
         private readonly IList<Building_StorageUnit> units;
         private readonly Func<Thing, bool> unavailableStack;
         private readonly Dictionary<object, StorageIncomingPlan> claims = new Dictionary<object, StorageIncomingPlan>();
+        private readonly Dictionary<Thing, long> reservedStacks = new Dictionary<Thing, long>();
+        private readonly Dictionary<Building_StorageUnit, int> reservedSlots = new Dictionary<Building_StorageUnit, int>();
 
         internal StorageIncomingReservations(IList<Building_StorageUnit> units, Func<Thing, bool> unavailableStack = null)
         { this.units = units; this.unavailableStack = unavailableStack; }
-        internal void Clear() { claims.Clear(); }
-        internal void Release(object owner) { if (owner != null) claims.Remove(owner); }
+        internal void Clear() { claims.Clear(); reservedStacks.Clear(); reservedSlots.Clear(); }
+        internal void Release(object owner)
+        {
+            if (owner == null || !claims.TryGetValue(owner, out var plan)) return;
+            ChangeIndex(plan, -1);
+            claims.Remove(owner);
+        }
         internal int CountFor(object owner)
         { return owner != null && claims.TryGetValue(owner, out var plan) ? plan.Count : 0; }
 
-        internal bool IsStackReserved(Thing stack)
+        internal long ReservedOnStack(Thing stack) => stack != null && reservedStacks.TryGetValue(stack, out long count) ? count : 0;
+        internal int ReservedSlots(Building_StorageUnit unit) => reservedSlots.TryGetValue(unit, out int count) ? count : 0;
+        internal bool IsStackReserved(Thing stack) => ReservedOnStack(stack) > 0;
+
+        private void ChangeIndex(StorageIncomingPlan plan, int direction)
         {
-            foreach (var plan in claims.Values)
-                foreach (var allocation in plan.Allocations)
-                    if (allocation.Stack == stack) return true;
-            return false;
+            foreach (var allocation in plan.Allocations)
+                if (allocation.Stack == null)
+                {
+                    int count = ReservedSlots(allocation.Unit) + direction;
+                    if (count == 0) reservedSlots.Remove(allocation.Unit);
+                    else reservedSlots[allocation.Unit] = count;
+                }
+                else
+                {
+                    long count = ReservedOnStack(allocation.Stack) + (long)direction * allocation.Count;
+                    if (count == 0) reservedStacks.Remove(allocation.Stack);
+                    else reservedStacks[allocation.Stack] = count;
+                }
         }
 
         internal StorageIncomingPlan Reserve(object owner, Thing item, int count)
         {
             StorageIncomingPlan plan = Plan(item, count, owner);
-            if (plan.Count > 0) claims[owner] = plan;
-            else Release(owner);
+            Release(owner);
+            if (plan.Count > 0) { claims.Add(owner, plan); ChangeIndex(plan, 1); }
             return plan;
         }
 
@@ -59,22 +79,25 @@ namespace MagicStorage
             if (item == null || item.Destroyed || item.def.category != ThingCategory.Item ||
                 item.def.destroyOnDrop || item.def.stackLimit <= 0 || requested <= 0) return result;
             int remaining = Math.Min(requested, item.stackCount);
-            var reservedStacks = new Dictionary<Thing, long>();
-            var reservedSlots = new Dictionary<Building_StorageUnit, int>();
-            foreach (var pair in claims)
+            // Replanning only subtracts this owner's old allocations. Other owners'
+            // totals are maintained incrementally instead of rebuilt for every query.
+            Dictionary<Thing, long> ownStacks = null;
+            Dictionary<Building_StorageUnit, int> ownSlots = null;
+            if (exclude != null && claims.TryGetValue(exclude, out var ownPlan))
             {
-                if (ReferenceEquals(pair.Key, exclude)) continue;
-                foreach (var allocation in pair.Value.Allocations)
+                ownStacks = new Dictionary<Thing, long>();
+                ownSlots = new Dictionary<Building_StorageUnit, int>();
+                foreach (var allocation in ownPlan.Allocations)
                 {
                     if (allocation.Stack == null)
                     {
-                        reservedSlots.TryGetValue(allocation.Unit, out int slots);
-                        reservedSlots[allocation.Unit] = slots + 1;
+                        ownSlots.TryGetValue(allocation.Unit, out int slots);
+                        ownSlots[allocation.Unit] = slots + 1;
                     }
                     else
                     {
-                        reservedStacks.TryGetValue(allocation.Stack, out long count);
-                        reservedStacks[allocation.Stack] = count + allocation.Count;
+                        ownStacks.TryGetValue(allocation.Stack, out long count);
+                        ownStacks[allocation.Stack] = count + allocation.Count;
                     }
                 }
             }
@@ -83,22 +106,25 @@ namespace MagicStorage
             List<Thing> stacks = new List<Thing>();
             foreach (var unit in units)
             {
+                if (remaining == 0) return result;
                 stacks.Clear();
-                unit.Inventory.GetStacks(item.def, stacks);
+                unit.Inventory.GetPartialStacks(item.def, stacks);
                 foreach (var stack in stacks)
                 {
-                    if (remaining == 0) return result;
-                    if (!stack.CanStackWith(item) || unavailableStack?.Invoke(stack) == true) continue;
-                    reservedStacks.TryGetValue(stack, out long reserved);
+                    long own = 0; ownStacks?.TryGetValue(stack, out own);
+                    long reserved = ReservedOnStack(stack) - own;
                     int take = (int)Math.Min(remaining, Math.Max(0L, stack.def.stackLimit - (long)stack.stackCount - reserved));
                     if (take <= 0) continue;
+                    if (unavailableStack?.Invoke(stack) == true || !stack.CanStackWith(item)) continue;
                     result.Add(unit, stack, take);
                     remaining -= take;
+                    if (remaining == 0) return result;
                 }
             }
             foreach (var unit in units)
             {
-                reservedSlots.TryGetValue(unit, out int reserved);
+                int own = 0; ownSlots?.TryGetValue(unit, out own);
+                int reserved = ReservedSlots(unit) - own;
                 int slots = Math.Max(0, unit.SlotCapacity - unit.Inventory.UsedSlots - reserved);
                 while (slots-- > 0 && remaining > 0)
                 {

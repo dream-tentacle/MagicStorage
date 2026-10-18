@@ -12,6 +12,7 @@ namespace MagicStorage
         private readonly List<Building_CosmicWorkbench> benches = new List<Building_CosmicWorkbench>();
         private readonly Dictionary<WorkTypeDef, int> lastCoreIds = new Dictionary<WorkTypeDef, int>();
         private readonly Dictionary<CraftingOrder, JobDriver_CosmicCrafting> assignments = new Dictionary<CraftingOrder, JobDriver_CosmicCrafting>();
+        private StorageRefreshTimer maintenanceTimer;
         public MapComponent_CosmicCrafting(Map map) : base(map) { }
         internal IEnumerable<Thing> Workbenches => benches.Where(b => b.Spawned && b.Map == map);
         internal void Register(Building_StorageCore core) { if (!cores.Contains(core)) { cores.Add(core); cores.Sort((a,b) => a.thingIDNumber.CompareTo(b.thingIDNumber)); } }
@@ -34,18 +35,31 @@ namespace MagicStorage
                 !order.Recipe.AvailableNow || !CraftingRecipeCatalog.Supports(order.Recipe)) return false;
             if (order.Batch != null && !order.Batch.Valid(order)) return false;
             if (order.Batch?.Committed == true) return !order.Suspended;
+            // Preserve ShouldRun's pause-state bookkeeping without evaluating any inventory.
+            if (order.Suspended) return order.ShouldRun(0);
             if (order.Mode == CraftingRepeatMode.TargetCount && !CraftingServices.Products.CanCount(order.Recipe)) return false;
-            return order.ShouldRun(order.Mode == CraftingRepeatMode.TargetCount ? CraftingServices.Products.Count(core, order) : 0);
+            return order.ShouldRun(order.Mode == CraftingRepeatMode.TargetCount
+                ? CraftingServices.Products.Count(core, order, order.ProductCountLimit) : 0);
         }
         internal bool CanClaimOrder(Building_StorageCore core, CraftingOrder order, Pawn pawn, WorkGiverDef giver) =>
-            core != null && order != null && giver != null && CanRun(core, order) && AssignedWorker(order) == null &&
-            CraftingServices.Workers.Allows(order, pawn, giver.workType);
+            core != null && order != null && giver != null && AssignedWorker(order) == null &&
+            CraftingServices.Workers.Allows(order, pawn, giver.workType) && CanRun(core, order);
+
+        private bool MaterialsAvailable(Building_StorageCore core, CraftingOrder order, bool immediate = false)
+        {
+            int tick = Find.TickManager.TicksGame;
+            if (!immediate && order.LastMaterialFailureTick is int last && tick >= last &&
+                (long)tick - last < MagicStorageMod.Settings.CraftingMaterialRecheckTicks) return false;
+            bool available = CraftingServices.Materials.TryPlan(core.Network, order, out _);
+            order.LastMaterialFailureTick = available ? (int?)null : tick;
+            return available;
+        }
 
         internal bool CanStartOrder(JobDriver_CosmicCrafting driver)
         {
             var core = driver.Core; var order = driver.Order;
             return CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef) &&
-                (order.Batch != null || CraftingServices.Materials.TryPlan(core.Network, order, out _));
+                (order.Batch != null || MaterialsAvailable(core, order, true));
         }
 
         internal bool TryClaim(JobDriver_CosmicCrafting driver, out CraftingMaterialLease lease)
@@ -55,7 +69,9 @@ namespace MagicStorage
             if (!CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef)) return false;
             if (order.Batch == null)
             {
-                if (!CraftingServices.Materials.TryPlan(core.Network, order, out var plan)) return false;
+                if (!CraftingServices.Materials.TryPlan(core.Network, order, out var plan))
+                { order.LastMaterialFailureTick = Find.TickManager.TicksGame; return false; }
+                order.LastMaterialFailureTick = null;
                 var acquired = new CraftingMaterialLease(core.Network, driver.Bench, order, driver.OnMaterialsInvalidated);
                 if (!acquired.Acquire(plan)) return false;
                 lease = acquired;
@@ -77,7 +93,7 @@ namespace MagicStorage
             {
                 var core = cores[(start + n) % cores.Count];
                 if (!core.CanWork || core.Faction != pawn.Faction) continue;
-                var order = FindOrder(pawn, giver, core, out _);
+                var order = FindOrder(pawn, giver, core, out _, FloatMenuMakerMap.makingFor == pawn, false);
                 if (order == null) continue;
                 var bench = FindBench(pawn, core.Network);
                 if (bench == null) continue;
@@ -86,24 +102,30 @@ namespace MagicStorage
             }
             return null;
         }
-        private CraftingOrder FindOrder(Pawn pawn, WorkGiverDef giver, Building_StorageCore core, out string reason)
+        private CraftingOrder FindOrder(Pawn pawn, WorkGiverDef giver, Building_StorageCore core, out string reason,
+            bool immediate = false, bool reportFailure = true)
         {
             reason = null;
             foreach (var order in core.Crafting.Orders)
             {
                 if (!CraftingRecipeCatalog.HasType(order.Recipe, giver.workType)) continue;
+                // Automatic searches skip ineligible workers before product counting or
+                // material scans. Menu searches keep their original failure precedence.
+                if (!reportFailure && !CraftingServices.Workers.Allows(order, pawn, giver.workType)) continue;
                 string failure = null;
                 var worker = AssignedWorker(order);
-                if (worker != null) failure = "MS_Craft_Assigned".Translate(worker.LabelShortCap);
-                else if (!CanRun(core, order)) failure = Status(core, order);
-                else if (!CraftingServices.Workers.Allows(order, pawn, giver.workType))
+                if (worker != null)
+                { if (!reportFailure) continue; failure = "MS_Craft_Assigned".Translate(worker.LabelShortCap); }
+                else if (!CanRun(core, order))
+                { if (!reportFailure) continue; failure = Status(core, order, false); }
+                else if (reportFailure && !CraftingServices.Workers.Allows(order, pawn, giver.workType))
                     failure = "MS_Craft_SelectedWorkerNotAllowed".Translate();
-                else if (order.Batch == null && !CraftingServices.Materials.TryPlan(core.Network, order, out _))
-                    failure = "MS_Craft_MissingMaterials".Translate();
+                else if (order.Batch == null && !MaterialsAvailable(core, order, immediate))
+                { if (!reportFailure) continue; failure = "MS_Craft_MissingMaterials".Translate(); }
                 if (failure == null) return order;
                 if (reason == null) reason = failure;
             }
-            if (reason == null) reason = "MS_Craft_NoOrdersForWorkType".Translate();
+            if (reportFailure && reason == null) reason = "MS_Craft_NoOrdersForWorkType".Translate();
             return null;
         }
         private static Job MakeJob(WorkGiverDef giver, Building_CosmicWorkbench bench, Building_StorageCore core, CraftingOrder order)
@@ -113,7 +135,7 @@ namespace MagicStorage
             job.workGiverDef = giver;
             return job;
         }
-        internal Job FindJobOnBench(Pawn pawn, WorkGiverDef giver, Building_CosmicWorkbench bench)
+        internal Job FindJobOnBench(Pawn pawn, WorkGiverDef giver, Building_CosmicWorkbench bench, bool forced = false)
         {
             if (bench == null || !bench.Spawned || bench.Map != map || bench.Faction != pawn.Faction) return null;
             // Pawn-level eligibility takes precedence over occupied benches/orders.
@@ -131,7 +153,7 @@ namespace MagicStorage
                 active.Bench == bench && pawn.CurJob.workGiverDef == giver && active.CanContinue()) return pawn.CurJob;
             if (!CanUseBench(pawn, bench, network))
             { JobFailReason.Is("MS_Craft_NoBench".Translate()); return null; }
-            var order = FindOrder(pawn, giver, network.Core, out string reason);
+            var order = FindOrder(pawn, giver, network.Core, out string reason, forced || FloatMenuMakerMap.makingFor == pawn);
             if (order == null) { JobFailReason.Is(reason); return null; }
             return MakeJob(giver, bench, network.Core, order);
         }
@@ -149,15 +171,19 @@ namespace MagicStorage
             .Where(b => CanUseBench(pawn, b, network)).OrderBy(b => pawn.Position.DistanceToSquared(b.Position)).FirstOrDefault();
 
         internal string Status(Building_StorageCore core, CraftingOrder order)
+            => Status(core, order, null);
+
+        // A result passed by FindOrder is valid for this immediate call only, not a persistent cache.
+        private string Status(Building_StorageCore core, CraftingOrder order, bool? canRun)
         {
             if (!core.CanWork) return StorageNetwork.StatusLabel(core.Network);
             if (order.Batch != null && !order.Batch.Valid(order)) return "MS_Craft_BatchInvalid".Translate();
             if (order.Suspended) return "MS_Craft_Suspended".Translate();
             if (!order.Recipe.AvailableNow) return "MS_Craft_Locked".Translate();
-            if (!CanRun(core, order)) return "MS_Craft_Satisfied".Translate();
+            if (!(canRun ?? CanRun(core, order))) return "MS_Craft_Satisfied".Translate();
             var worker = AssignedWorker(order);
             if (worker != null) return "MS_Craft_Assigned".Translate(worker.LabelShortCap);
-            if (order.Batch == null && !CraftingServices.Materials.TryPlan(core.Network, order, out _)) return "MS_Craft_MissingMaterials".Translate();
+            if (order.Batch == null && !MaterialsAvailable(core, order)) return "MS_Craft_MissingMaterials".Translate();
             var eligible = map.mapPawns.AllPawnsSpawned.Where(p => p.Faction == core.Faction &&
                 CraftingRecipeCatalog.Routes(order.Recipe).Any(w => CraftingServices.Workers.Allows(order, p, w.workType))).ToList();
             if (eligible.Count == 0) return "MS_Craft_NoWorker".Translate();
@@ -167,7 +193,7 @@ namespace MagicStorage
         public override void MapComponentTick()
         {
             // Also releases claims if a driver was abandoned before its toil setup completed.
-            if (Find.TickManager.TicksGame % 60 != 0) return;
+            if (!maintenanceTimer.IsDue(StorageRefreshTask.CraftingMaintenance, Find.TickManager.TicksGame)) return;
             foreach (var driver in assignments.Values.ToList())
             {
                 if (driver.ended || driver.pawn.jobs.curDriver != driver) driver.ReleaseAssignment();
@@ -190,7 +216,7 @@ namespace MagicStorage
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn) =>
             pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().Workbenches;
         public override Job JobOnThing(Pawn pawn, Thing thing, bool forced = false) =>
-            pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().FindJobOnBench(pawn, def, thing as Building_CosmicWorkbench);
+            pawn.Map?.GetComponent<MapComponent_CosmicCrafting>().FindJobOnBench(pawn, def, thing as Building_CosmicWorkbench, forced);
         public override Job NonScanJob(Pawn pawn)
         {
             var dispatcher = pawn.Map?.GetComponent<MapComponent_CosmicCrafting>();

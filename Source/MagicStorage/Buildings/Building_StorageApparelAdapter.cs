@@ -9,6 +9,7 @@ namespace MagicStorage
     {
         private ThingOwner<Thing> contents;
         private Pawn recipient;
+        private StorageRefreshTimer refreshTimer;
         public Building_StorageApparelAdapter()
         { contents = new ThingOwner<Thing>(this, false, LookMode.Deep) { dontTickContents = true }; }
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
@@ -46,9 +47,14 @@ namespace MagicStorage
             }
             finally { manager.ReleaseRecovery(recovery); }
         }
-        public override void TickRare()
+        protected override void Tick()
         {
-            base.TickRare();
+            base.Tick();
+            if (Spawned && refreshTimer.IsDue(StorageRefreshTask.ApparelCleanup, Find.TickManager.TicksGame)) RefreshApparel();
+        }
+
+        internal void RefreshApparel()
+        {
             if (!HasApparel) { recipient = null; return; }
             // Wear is vanilla and may be interrupted without calling our fetch driver.
             // Keep its garment while that exact job is active; otherwise return it.

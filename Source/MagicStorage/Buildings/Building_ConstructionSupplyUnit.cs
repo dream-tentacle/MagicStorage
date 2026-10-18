@@ -7,12 +7,18 @@ namespace MagicStorage
     public sealed class Building_ConstructionSupplyUnit : Building
     {
         public const float SupplyRadius = 40f;
+        private StorageRefreshTimer refreshTimer;
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
         public bool CanWork => Spawned && Faction == Faction.OfPlayer && Network?.CanWork == true;
 
-        public override void TickRare()
+        protected override void Tick()
         {
-            base.TickRare();
+            base.Tick();
+            if (Spawned && refreshTimer.IsDue(StorageRefreshTask.ConstructionSupply, Find.TickManager.TicksGame)) RefreshSupply();
+        }
+
+        internal void RefreshSupply()
+        {
             if (!Spawned) return;
             Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             if (CanWork) ConstructionSupply.Deliver(this);

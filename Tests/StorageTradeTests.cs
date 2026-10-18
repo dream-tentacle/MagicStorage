@@ -94,6 +94,7 @@ internal static class StorageTradeTests
             Equal(true, tx.Reserve(), "stack-specific use policy permits initial reservation");
             permitted = false;
             Equal(false, tx.Valid(), "stack-specific policy change blocks collection");
+            Find.TickManager.TicksGame += 60;
             f.Manager.MapComponentTick();
             Equal(false, f.Core.Network.HasOutgoingReservation(request, goods, 4), "shared interface invalidates changed purpose");
         }

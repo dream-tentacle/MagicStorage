@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Caravan_Open>组建远行队</MS_Caravan_Open>
+  <MS_Caravan_WorldOpen>魔法存储组建远行队</MS_Caravan_WorldOpen>
+  <MS_Caravan_NoTeleporter>该网络未建立远行队传送器</MS_Caravan_NoTeleporter>
+  <MS_Caravan_CorePosition>存储核心位置：({0}, {1})</MS_Caravan_CorePosition>
+  <MS_Caravan_OpenDesc>选择远行队成员和连接的魔法存储网络中的物资。确认后，人员和物资立即在大地图上形成远行队。</MS_Caravan_OpenDesc>
+  <MS_Caravan_Unavailable>远行队传送器的存储网络不可用或已发生变化。请重置选择或重新打开窗口。</MS_Caravan_Unavailable>
+  <MS_Caravan_StockChanged>部分所选物资已无法从存储网络中取出。请重置选择后重试。</MS_Caravan_StockChanged>
+  <MS_Caravan_PawnsChanged>部分所选远行队成员已无法出发。请重置选择后重试。</MS_Caravan_PawnsChanged>
+  <MS_Caravan_LayerUnavailable>无法在当前大地图位置组建远行队。</MS_Caravan_LayerUnavailable>
+  <MS_Caravan_TransferFailed>远行队传送发生错误。物资已保留，请检查当前远行队及其成员的状态后再重试。</MS_Caravan_TransferFailed>
+  <MS_Caravan_CannotDropCarried>所选远行队成员无法放下手中的物品或人员。请先腾出双手再重试。</MS_Caravan_CannotDropCarried>
+</LanguageData>

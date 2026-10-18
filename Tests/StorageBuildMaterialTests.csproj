@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <GameVersion Condition=" '$(GameVersion)' == '' ">1.7</GameVersion>
+    <BaseIntermediateOutputPath>obj\BuildMaterials\$(GameVersion)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>StorageBuildMaterialTests</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition=" '$(GameVersion)' == '1.6' ">net472</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputPath>bin\BuildMaterials\$(GameVersion)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <HarmonyAssemblyPath Condition=" '$(HarmonyAssemblyPath)' == '' ">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\$(GameVersion)\Assemblies\0Harmony.dll</HarmonyAssemblyPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony"><HintPath>$(HarmonyAssemblyPath)</HintPath><Private>True</Private></Reference>
+    <Compile Include="BuildMaterialStubs.cs" />
+    <Compile Include="StorageBuildMaterialTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageBuildMaterialPatches.cs" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

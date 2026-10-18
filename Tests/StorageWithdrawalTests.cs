@@ -34,7 +34,7 @@ internal static class StorageWithdrawalTests
     public static int Run()
     {
         Grouping(); MealTradeGrouping(); ReservationsAndPartial(); Revalidation(); PendingAndFlags(); LongCounts();
-        TradeQuantityEditing(); MinifiedPresentation();
+        TradeQuantityEditing(); MinifiedPresentation(); FilterGrouping();
         return assertions;
     }
     private static void Grouping()
@@ -53,6 +53,21 @@ internal static class StorageWithdrawalTests
         var result = StorageWithdrawal.Execute(f.Core, f.Net, new[] { bookRow }, false);
         Equal(1L, result.Withdrawn, "book withdrawn"); Equal(book1, f.Map.Ground[0], "real book identity preserved");
         Equal(true, f.Unit.Inventory.Contents.Contains(book2), "other book remains");
+    }
+
+    private static void FilterGrouping()
+    {
+        var f = new Fixture(); var def = new ThingDef();
+        Thing first = f.Add(def, 10); f.Add(def, 20); f.Add(def, 30);
+        Equal(1, StorageWithdrawal.Snapshot(f.Net).Count, "ordinary grouping remains unchanged");
+        var rows = StorageWithdrawal.Snapshot(f.Net, (left, right) => (left == first) == (right == first));
+        Equal(2, rows.Count, "different custom-filter outcomes cannot share a row");
+        var selected = rows.Single(row => row.Stacks.Contains(first));
+        Equal(10L, selected.Total, "filtered row counts only its matching stack");
+        Equal(50L, rows.Single(row => !row.Stacks.Contains(first)).Total, "other matching stacks still combine");
+        selected.SetRequested(5);
+        Equal(5L, StorageWithdrawal.Execute(f.Core, f.Net, new[] { selected }, false).Withdrawn, "filtered row withdraws correctly");
+        Equal(55L, f.Net.GetTotalCount(def), "filtered withdrawal conserves other stock");
     }
 
     private static void MealTradeGrouping()

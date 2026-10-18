@@ -34,7 +34,7 @@ internal static class StorageReceiverTests
             Manager.Register(Core.node); Manager.Register(Unit.node); Manager.Register(Receiver.node);
             Manager.FinalizeInit(); Tick();
         }
-        internal void Tick(int ticks = 1)
+        internal void Tick(int ticks = 60)
         { Find.TickManager.TicksGame += ticks; Manager.MapComponentTick(); }
         internal Thing Deliver(ThingDef def, int count, string variant = null)
         {
@@ -55,8 +55,60 @@ internal static class StorageReceiverTests
     {
         RuntimeHelpers.RunClassConstructor(typeof(StorageReceiverHaulingPatches).TypeHandle);
         NativeBoundary(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
-        CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks();
+        CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks(); GodModeMapIntake();
         return assertions;
+    }
+
+    private static Command_Action MapIntakeCommand(Building_StorageCore core)
+    {
+        foreach (Gizmo gizmo in core.GetGizmos())
+            if (gizmo is Command_Action command && command.defaultLabel == "DEV: 吸收全图") return command;
+        return null;
+    }
+
+    private static void GodModeMapIntake()
+    {
+        try
+        {
+            var f = new Fixture(1);
+            // Share the live map list so successful intake mutates the iterated source.
+            f.Map.listerThings.Things = f.Map.Ground;
+            f.Unit.Inventory.Contents.TryAdd(new Thing { def = f.X, stackCount = 65 });
+            var blocked = f.Deliver(f.Y, 10);
+            var forbidden = f.Deliver(f.X, 10); forbidden.forbidden = true;
+            var first = f.Deliver(f.X, 4); first.Position = new IntVec3(20, 20);
+            var partial = f.Deliver(f.X, 20); partial.Position = new IntVec3(30, 30);
+            DebugSettings.godMode = false;
+            Equal<Command_Action>(null, MapIntakeCommand(f.Core), "map intake hidden outside god mode");
+            DebugSettings.godMode = true;
+            Command_Action command = MapIntakeCommand(f.Core);
+            Equal(true, command != null, "god mode exposes map intake");
+            Equal<object>(null, command.icon, "map intake does not set an icon");
+            command.action();
+            Equal(true, blocked.Spawned, "incompatible first item stays on map when slots are full");
+            Equal(10, blocked.stackCount, "failed intake preserves incompatible item count");
+            Equal(true, forbidden.Spawned, "god mode intake respects forbidden flag");
+            Equal(10, forbidden.stackCount, "forbidden stack quantity unchanged");
+            Equal(false, first.Spawned, "later distant item absorbed after earlier capacity failure");
+            Equal(75L, f.Core.Network.GetTotalCount(f.X), "later stacks fill remaining merge capacity");
+            Equal(14, partial.stackCount, "partially accepted stack keeps exact remainder on map");
+            Equal(true, partial.Spawned, "partial remainder stays spawned");
+            Equal(1, f.Unit.Inventory.UsedSlots, "map intake never exceeds slot capacity");
+            Equal(0L, f.Pending(), "map intake leaves no detached items in recovery");
+
+            var filtered = new Fixture();
+            filtered.Map.listerThings.Things = filtered.Map.Ground;
+            var rejected = filtered.Deliver(filtered.X, 10);
+            filtered.Core.Settings.allow = false;
+            MapIntakeCommand(filtered.Core).action();
+            Equal(true, rejected.Spawned, "map intake respects core filter");
+            Equal(0L, filtered.Core.Network.GetTotalCount(filtered.X), "rejected item not stored");
+            filtered.Core.Settings.allow = true;
+            filtered.Manager.Unregister(filtered.Core.node);
+            MapIntakeCommand(filtered.Core).action();
+            Equal(true, rejected.Spawned, "unavailable network leaves map contents intact");
+        }
+        finally { DebugSettings.godMode = false; }
     }
 
     private static void NativeBoundary()

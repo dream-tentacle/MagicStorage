@@ -2,6 +2,11 @@
 <LanguageData>
   <MS_Craft_ProductionNotice>Interrupted work can resume. Products default to network storage, with overflow near the core; they can also be set to drop on the floor.</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>Drop products on floor</MS_Craft_DropProductsOnFloor>
+  <MS_Craft_StoreProductsInNetwork>Store products in network</MS_Craft_StoreProductsInNetwork>
+  <MS_Craft_NetworkDeliveryHint>Choose where products go. When storing in the network, overflow is placed near the core.</MS_Craft_NetworkDeliveryHint>
+  <MS_Craft_NotSuspended>Not suspended</MS_Craft_NotSuspended>
+  <MS_Craft_CurrentTarget>Currently have: {0} / {1}</MS_Craft_CurrentTarget>
+  <MS_Craft_CountScope>Count items on the map and in this network</MS_Craft_CountScope>
   <MS_Craft_Progress>Progress: {0}</MS_Craft_Progress>
   <MS_Craft_WorkReport>Producing {0} at a cosmic workbench.</MS_Craft_WorkReport>
   <MS_Craft_BatchInvalid>This iteration cannot continue; delete the order to return remaining ingredients</MS_Craft_BatchInvalid>
@@ -9,7 +14,25 @@
   <MS_Craft_Open>Production orders</MS_Craft_Open>
   <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
   <MS_Craft_Add>Add production order</MS_Craft_Add>
+  <MS_Craft_Orders>Production orders</MS_Craft_Orders>
+  <MS_Craft_DragToSort>Drag to reorder</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>Drag the task block to change production priority.</MS_Craft_DragOrder>
+  <MS_Craft_Details>Details</MS_Craft_Details>
+  <MS_Craft_Workbenches>Workbenches</MS_Craft_Workbenches>
+  <MS_Craft_CompactModeOff>Enable compact mode for the workbench list.</MS_Craft_CompactModeOff>
+  <MS_Craft_CompactModeOn>Disable compact mode for the workbench list.</MS_Craft_CompactModeOn>
+  <MS_Craft_RecipeCompactModeOff>Enable compact mode for the recipe list.</MS_Craft_RecipeCompactModeOff>
+  <MS_Craft_RecipeCompactModeOn>Disable compact mode for the recipe list.</MS_Craft_RecipeCompactModeOn>
+  <MS_Craft_CategoryModeOff>Group recipes by item categories.</MS_Craft_CategoryModeOff>
+  <MS_Craft_CategoryModeOn>Show recipes without category groups.</MS_Craft_CategoryModeOn>
+  <MS_Craft_OtherRecipes>Other recipes</MS_Craft_OtherRecipes>
+  <MS_Craft_WorkbenchRecipes>{0} — add recipe</MS_Craft_WorkbenchRecipes>
+  <MS_Craft_IngredientPreview>Example ingredient: {0} × {1}\nAllowed ingredients: {2}</MS_Craft_IngredientPreview>
+  <MS_Craft_NoOrders>No production orders yet. Select a workbench on the right to add a recipe.</MS_Craft_NoOrders>
+  <MS_Craft_NoMatchingWorkbenches>No unlocked workbenches with available recipes match these filters.</MS_Craft_NoMatchingWorkbenches>
   <MS_Craft_All>All</MS_Craft_All>
+  <MS_Craft_AllRecipes>All recipes</MS_Craft_AllRecipes>
+  <MS_Craft_ModFilter>Mod: {0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>Workbench: {0}</MS_Craft_WorkbenchFilter>
   <MS_Craft_SourceFilter>Source: {0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>No matching production orders.</MS_Craft_NoMatchingOrders>
@@ -27,15 +50,15 @@
   <MS_Craft_Resume>Resume</MS_Craft_Resume>
   <MS_Craft_Pause>Suspend</MS_Craft_Pause>
   <MS_Craft_Delete>Delete</MS_Craft_Delete>
+  <MS_Craft_Mode_TargetCount>Do until X</MS_Craft_Mode_TargetCount>
   <MS_Craft_WorkTypes>Work types: {0}</MS_Craft_WorkTypes>
-  <MS_Craft_Mode_RepeatCount>Do X times</MS_Craft_Mode_RepeatCount>
-  <MS_Craft_Mode_Forever>Do forever</MS_Craft_Mode_Forever>
-  <MS_Craft_Mode_TargetCount>Do until you have X</MS_Craft_Mode_TargetCount>
   <MS_Craft_RepeatCount>Remaining repeats</MS_Craft_RepeatCount>
   <MS_Craft_TargetCount>Target count</MS_Craft_TargetCount>
   <MS_Craft_ProductCount>Counted items: {0} (map + this network)</MS_Craft_ProductCount>
+  <MS_Craft_TargetReached>Target reached</MS_Craft_TargetReached>
+  <MS_Craft_WaitingToResume>Waiting for the count to reach the resume threshold</MS_Craft_WaitingToResume>
   <MS_Craft_AlsoCounts>Also counts...</MS_Craft_AlsoCounts>
-  <MS_Craft_AlsoCountsHint>Selected items also count toward the "Do until you have X" target.</MS_Craft_AlsoCountsHint>
+  <MS_Craft_AlsoCountsHint>Selected items also count toward the "Do until X" target.</MS_Craft_AlsoCountsHint>
   <MS_Craft_PauseSatisfied>Pause when satisfied</MS_Craft_PauseSatisfied>
   <MS_Craft_Unpause>Resume at this count</MS_Craft_Unpause>
   <MS_Craft_Worker>Worker: {0}</MS_Craft_Worker>

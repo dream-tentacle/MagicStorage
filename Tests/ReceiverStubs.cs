@@ -96,6 +96,8 @@ namespace Verse
         { Map.GetComponent<MapComponent_StorageNetworks>().Unregister(node); base.DeSpawn(mode); }
         public virtual string GetInspectString() => "";
         public virtual void TickRare() { }
+        protected virtual void Tick() { }
+        public void RunTransportTestTick() { Tick(); }
         public virtual void DrawExtraSelectionOverlays() { }
     }
     public partial class Map

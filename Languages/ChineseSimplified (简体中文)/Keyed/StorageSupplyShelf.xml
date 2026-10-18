@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Shelf_Configure>配置补货</MS_Shelf_Configure>
+  <MS_Shelf_CopyPreset>复制预设</MS_Shelf_CopyPreset>
+  <MS_Shelf_CopyPresetDesc>复制此货架的物品、补货上限、筛选条件、补货失败提醒和优先级。</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_PastePreset>粘贴预设</MS_Shelf_PastePreset>
+  <MS_Shelf_PastePresetDesc>将已复制的预设应用到选中的补货架，覆盖现有配置。支持多选货架。</MS_Shelf_PastePresetDesc>
+  <MS_Shelf_NeedCopiedPreset>需要先复制预设</MS_Shelf_NeedCopiedPreset>
   <MS_Shelf_Title>自动补货架</MS_Shelf_Title>
   <MS_Shelf_ConfigureDesc>分别指定三种物品及补货上限，每种最多一堆</MS_Shelf_ConfigureDesc>
   <MS_Shelf_PriorityHint>殖民者不会将物品搬入此架；补货仅由相连的存储网络提供。</MS_Shelf_PriorityHint>

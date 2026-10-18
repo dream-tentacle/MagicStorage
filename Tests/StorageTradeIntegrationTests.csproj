@@ -22,7 +22,9 @@
     <Compile Include="EngineStubs.cs" />
     <Compile Include="ModSettingsStubs.cs" />
     <Compile Include="..\Source\MagicStorage\MagicStorageSettings.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageRefreshTimer.cs" />
     <Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="StorageRefreshTests.cs" />
     <Compile Include="CoreContainerStubs.cs" />
     <Compile Include="ApparelStubs.cs" />
     <Compile Include="StorageApparelTests.cs" />
@@ -85,6 +87,9 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageOutgoingReservations.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReservation.cs" />
     <Compile Include="TradingStubs.cs" />
+    <Compile Include="DynamicTradeInterfaceStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\DynamicTradeInterfaceCompatibility.cs" />
     <Compile Include="StorageTradeIntegrationTests.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeSession.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\Tradeable_Storage.cs" />

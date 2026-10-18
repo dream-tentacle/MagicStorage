@@ -2,16 +2,18 @@
 namespace UnityEngine { public class Texture2D { } }
 namespace Verse
 {
+    public static class DebugSettings { public static bool godMode; }
     public static class ContentFinder<T> where T : new()
     { public static T Get(string path, bool reportFailure = true) => new T(); }
     public interface IThingHolderTickable { bool ShouldTickContents { get; } }
     public class Gizmo
     {
         public bool disabled;
+        public bool alsoClickIfOtherInGroupClicked = true;
         public string disabledReason;
         public void Disable(string reason = null) { disabled = true; disabledReason = reason; }
     }
-    public class Command_Action : Gizmo
+    public partial class Command_Action : Gizmo
     {
         public string defaultLabel, defaultDesc;
         public object icon;

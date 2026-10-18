@@ -5,6 +5,9 @@ using System.Runtime.CompilerServices;
 using MagicStorage;
 using RimWorld;
 using Verse;
+using HarmonyLib;
+using DynamicTradeInterface.Patches;
+using DynamicTradeInterface.UserInterface;
 
 internal static class StorageTradeIntegrationTests
 {
@@ -47,6 +50,11 @@ internal static class StorageTradeIntegrationTests
         {
             RuntimeHelpers.RunClassConstructor(typeof(StorageTradePatches).TypeHandle);
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver(); RefusalAndCancellation(); ChangedSources(); MultiCoreAndGifts(); Orbital();
+            var harmony = new Harmony("magicstorage.tests.dynamictrade");
+            harmony.Patch(AccessTools.Method(typeof(Dialog_Trade), nameof(Dialog_Trade.PostOpen)),
+                prefix: new HarmonyMethod(AccessTools.DeclaredMethod(typeof(Dialog_TradePatches), "Prefix")));
+            new DynamicTradeInterfaceCompatibility().Apply(harmony);
+            DynamicNativeFallback(); DynamicOrdinary(); DynamicSaleAndPurchase(); DynamicCancelAndFailures(); DynamicOrbital();
             Console.WriteLine("PASS: " + checks + " trade integration assertions (actual production Harmony hooks and sessions; native UI, pricing and delivery boundaries stubbed).");
             return 0;
         }
@@ -229,5 +237,139 @@ internal static class StorageTradeIntegrationTests
         f.Close(dialog);
         var ordinary = new Dialog_Trade(f.Negotiator, ship);
         Equal(false, StorageTradeSession.TryGet(TradeSession.deal, out _), "ordinary orbital trade retains native scope");
+    }
+
+    private static Window_DynamicTrade OpenDynamic(Fixture f)
+    {
+        StorageTradeSession.Open(f.Negotiator, f.Trader);
+        var window = Find.WindowStack.WindowOfType<Window_DynamicTrade>();
+        Equal(true, window != null, "optional mod still replaces the storage window");
+        Equal(true, StorageTradeSession.TryGet(TradeSession.deal, out _), "replacement retains exact deal binding");
+        Equal(null, Find.WindowStack.WindowOfType<Dialog_Trade>(), "native window removed during replacement");
+        return window;
+    }
+
+    private static void DynamicNativeFallback()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Stock(def, 10);
+        Dialog_TradePatches.Replace = false;
+        var dialog = f.Open(); var deal = TradeSession.deal;
+        Equal(true, dialog != null, "DTI native-window preference is preserved");
+        Equal(10, deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "native fallback retains network stock");
+        f.Close(dialog);
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "native fallback still cleans session on close");
+        Dialog_TradePatches.Replace = true;
+    }
+
+    private static void DynamicOrdinary()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 10);
+        TradeDeal.OrdinaryGoods.Clear(); TradeDeal.OrdinaryGoods.Add(new Thing { def = def, stackCount = 99 });
+        Find.WindowStack.Add(new Dialog_Trade(f.Negotiator, f.Trader));
+        var window = Find.WindowStack.WindowOfType<Window_DynamicTrade>(); var deal = TradeSession.deal;
+        Equal(99, window.ColonyCounts[def], "ordinary dynamic trade still uses ordinary goods");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "ordinary replacement never acquires storage session");
+        StorageTradeSession.Open(f.Negotiator, f.Trader);
+        Equal(deal, TradeSession.deal, "active ordinary dynamic window blocks a second global trade session");
+        Equal(1, Find.WindowStack.Windows.Count, "duplicate open leaves one trade window");
+        Find.WindowStack.TryRemove(window);
+        Equal(10, stock.stackCount, "ordinary dynamic window never touches network stock");
+    }
+
+    private static void DynamicSaleAndPurchase()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 15); f.Stock(ThingDefOf.Silver, 20);
+        var other = new object(); f.Core.Network.ReserveOutgoing(other, stock, 5);
+        var window = OpenDynamic(f); var deal = TradeSession.deal;
+        Equal(10, window.ColonyCounts[def], "colony table is populated before dynamic PreOpen completes");
+        StorageTradeSession.Open(f.Negotiator, f.Trader);
+        Equal(deal, TradeSession.deal, "active storage dynamic window blocks a second session");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+        Equal(true, window.Accept(), "dynamic window can execute network sale");
+        Equal(11L, f.Core.Network.GetTotalCount(def), "dynamic sale deducts actual network stock");
+        Equal(4, f.Trader.Goods.Where(t => t.def == def).Sum(t => t.stackCount), "dynamic sale delivers exact goods");
+        Equal(true, f.Core.Network.HasOutgoingReservation(other, stock, 5), "dynamic sale preserves other reservations");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "successful dynamic trade close releases session");
+        Equal(false, DynamicTradeInterfaceCompatibility.HasTradeWindow(), "successful trade leaves no dynamic window");
+        window = OpenDynamic(f); deal = TradeSession.deal;
+        Equal(6, window.ColonyCounts[def], "reopened dynamic table shows remaining unreserved stock");
+        Equal(4, window.TraderCounts[def], "reopened dynamic table shows merchant stock");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = 2;
+        Equal(true, window.Accept(), "dynamic purchase pays with network silver");
+        Equal(18L, f.Core.Network.GetTotalCount(ThingDefOf.Silver), "dynamic purchase removes exact network silver");
+        Equal(2, f.Map.Ground.Where(t => t.def == def).Sum(t => t.stackCount), "dynamic purchase keeps native ground delivery");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "purchase close cleans dynamic session");
+    }
+
+    private static void DynamicCancelAndFailures()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 10);
+        var window = OpenDynamic(f); var deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+        Equal(true, StorageTradeSession.TryGet(deal, out var session), "dynamic session available for reservation");
+        Equal(true, session.Prepare(out _), "dynamic trade can prepare reservations");
+        Equal(6, f.Core.Network.AvailableToWithdraw(stock), "dynamic preparation holds exact quantity");
+        Find.WindowStack.TryRemove(window);
+        Equal(10, f.Core.Network.AvailableToWithdraw(stock), "dynamic cancellation releases all its reservations");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "dynamic cancellation removes context");
+
+        window = OpenDynamic(f); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+        TradeDeal.RefuseExecution = true;
+        Equal(false, window.Accept(), "native refusal keeps the dynamic window open");
+        Equal(10, f.Core.Network.AvailableToWithdraw(stock), "dynamic refusal releases prepared reservations");
+        TradeDeal.RefuseExecution = false;
+        stock.stale = true;
+        Equal(false, window.Accept(), "changed stock eligibility rejects dynamic confirmation");
+        Equal(1, window.Flashes, "storage preflight rejection flashes dynamic currency display");
+        stock.stale = false;
+        Equal(true, StorageTradeSession.TryGet(deal, out session), "replacement session remains registered");
+        Equal(true, session.Prepare(out _), "prepare before exceptional dynamic close");
+        Window_DynamicTrade.FailPostClose = true;
+        try { Find.WindowStack.TryRemove(window); throw new Exception("Expected dynamic close exception"); }
+        catch (InvalidOperationException) { }
+        finally { Window_DynamicTrade.FailPostClose = false; }
+        Equal(10, f.Core.Network.AvailableToWithdraw(stock), "exceptional dynamic close still releases reservations");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "exceptional dynamic close still removes context");
+
+        Window_DynamicTrade.FailPreOpen = true;
+        try { StorageTradeSession.Open(f.Negotiator, f.Trader); throw new Exception("Expected dynamic open exception"); }
+        catch (InvalidOperationException) { }
+        finally { Window_DynamicTrade.FailPreOpen = false; }
+        Equal(false, StorageTradeSession.TryGet(TradeSession.deal, out _), "failed replacement leaves no session");
+        Equal(0, Find.WindowStack.Windows.Count, "failed PreOpen leaves no trade window");
+        Equal(10, stock.stackCount, "failed replacement does not extract any stock");
+        window = OpenDynamic(f);
+        Equal(10, window.ColonyCounts[def], "replacement failure does not poison the next opening");
+        Find.WindowStack.TryRemove(window);
+    }
+
+    private static void DynamicOrbital()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 12); f.Stock(ThingDefOf.Silver, 20);
+        var ship = new TradeShip { Map = f.Map }; f.Map.passingShipManager.passingShips.Add(ship);
+        ship.Stock.TryAdd(new Thing { def = def, stackCount = 5 });
+        var console = new Building_CommsConsole { Spawned = true, Map = f.Map };
+        var beacon = new Building_OrbitalTradeBeacon(); beacon.TradeableCells.Add(f.Core.Position); f.Map.Beacons.Add(beacon);
+        StorageTradeSession.Open(f.Negotiator, ship, console);
+        var window = Find.WindowStack.WindowOfType<Window_DynamicTrade>(); var deal = TradeSession.deal;
+        Equal(12, window.ColonyCounts[def], "orbital dynamic colony table shows covered network inventory");
+        Equal(5, window.TraderCounts[def], "orbital dynamic trader table shows ship stock");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        beacon.Powered = false;
+        Equal(false, window.Accept(), "dynamic orbital confirmation rechecks beacon power");
+        Equal(12, f.Core.Network.AvailableToWithdraw(stock), "failed orbital confirmation leaves no reservations");
+        beacon.Powered = true;
+        Equal(true, window.Accept(), "dynamic orbital sale succeeds after power restored");
+        Equal(9L, f.Core.Network.GetTotalCount(def), "dynamic orbital sale removes exact stock");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "dynamic orbital sale close clears session");
+        StorageTradeSession.Open(f.Negotiator, ship, console);
+        window = Find.WindowStack.WindowOfType<Window_DynamicTrade>(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = 2;
+        Equal(true, window.Accept(), "dynamic orbital purchase succeeds");
+        Equal(18L, f.Core.Network.GetTotalCount(ThingDefOf.Silver), "dynamic orbital purchase pays network silver");
+        Equal(1, ship.DropPods, "dynamic orbital purchase invokes native drop pod delivery");
+        Equal(9L, f.Core.Network.GetTotalCount(def), "dynamic orbital purchases remain outside network");
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "dynamic orbital purchase close clears session");
     }
 }

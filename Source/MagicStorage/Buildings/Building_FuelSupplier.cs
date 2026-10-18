@@ -8,13 +8,14 @@ namespace MagicStorage
     public sealed class Building_FuelSupplier : Building
     {
         public const float SupplyRadius = 20f;
+        private StorageRefreshTimer refreshTimer;
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
         public bool CanWork => Spawned && Faction == Faction.OfPlayer && Network?.CanWork == true;
 
         protected override void Tick()
         {
             base.Tick();
-            if (Spawned && this.IsHashIntervalTick(60)) SupplyFuel();
+            if (Spawned && refreshTimer.IsDue(StorageRefreshTask.FuelSupply, Find.TickManager.TicksGame)) SupplyFuel();
         }
 
         internal void SupplyFuel(bool immediate = false)

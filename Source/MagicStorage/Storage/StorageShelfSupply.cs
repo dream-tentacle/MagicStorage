@@ -72,13 +72,13 @@ namespace MagicStorage
 
         private static StorageShelfFailureReason Refill(Building_StorageSupplyShelf shelf, int slot, ThingDef itemDef, ref Thing stock, int limit)
         {
-            var sources = new List<Thing>();
             StorageNetwork network = shelf.Network;
-            network.GetStacks(itemDef, sources);
+            bool anySource = false;
             bool matched = false, compatible = false, placeable = false, reservedStock = false;
             bool transferFailed = false, placementFailed = false;
-            foreach (Thing source in sources)
+            foreach (Thing source in network.EnumerateStacksForTransfer(itemDef))
             {
+                anySource = true;
                 if (!shelf.CanWork || shelf.Network != network) break;
                 int missing = Math.Max(0, limit - (stock?.stackCount ?? 0));
                 if (missing == 0) break;
@@ -116,12 +116,13 @@ namespace MagicStorage
                     }
                 }
                 finally { network.ReleaseOutgoing(claim); manager.ReleaseRecovery(batch); }
+                if ((stock?.stackCount ?? 0) >= limit) break;
             }
             if ((stock?.stackCount ?? 0) >= limit) return StorageShelfFailureReason.None;
             if (!shelf.CanWork || shelf.Network != network) return StorageShelfFailureReason.NetworkUnavailable;
             if (placementFailed) return StorageShelfFailureReason.PlacementFailed;
             if (transferFailed) return StorageShelfFailureReason.TransferFailed;
-            if (!matched) return sources.Count == 0 ? StorageShelfFailureReason.NoStock : StorageShelfFailureReason.FilterMismatch;
+            if (!matched) return anySource ? StorageShelfFailureReason.FilterMismatch : StorageShelfFailureReason.NoStock;
             if (!compatible) return StorageShelfFailureReason.IncompatibleStack;
             if (!placeable && !reservedStock) return StorageShelfFailureReason.NoSpace;
             if (reservedStock) return StorageShelfFailureReason.ReservedStock;

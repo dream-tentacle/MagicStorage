@@ -21,9 +21,18 @@ if ([IO.Path]::GetDirectoryName($target) -ne $mods) {
 }
 
 # 主干目录：逐个复制，某个目录被占用（如游戏正在播放音效锁定 Sounds）则跳过该目录并继续
-$folders = @("About", "Assemblies", "Defs", "Patches", "Languages", "Textures")
+$folders = @("About", "1.6", "1.7", "Defs", "Patches", "Languages", "Textures")
 
 $skipped = @()
+
+# Versioned assemblies replace the former root-level assembly directory.
+$obsoleteAssemblies = [IO.Path]::GetFullPath((Join-Path $target "Assemblies"))
+if ([IO.Path]::GetDirectoryName($obsoleteAssemblies) -ne $target) {
+    throw "拒绝清理部署目标之外的目录: $obsoleteAssemblies"
+}
+if (Test-Path -LiteralPath $obsoleteAssemblies) {
+    Remove-Item -LiteralPath $obsoleteAssemblies -Recurse -Force -ErrorAction Stop
+}
 
 foreach ($folder in $folders) {
     $src = Join-Path $PSScriptRoot $folder

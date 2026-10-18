@@ -12,7 +12,7 @@
   <MS_Transport_QuantityTip>正数将网络物品转入补给器，负数将补给器物品送回网络。左右箭头调整数量，双箭头转移该方向的全部物品。&gt;M将该物品补至本次载重上限，包含已有存货和其他行的选择；达到上限后恢复双箭头。按住左键拖过多行箭头可批量调整，每行在同一次拖拽中只触发一次。</MS_Transport_QuantityTip>
   <MS_Transport_Mass>补给器重量：{0} → {1}千克    上限：{2}千克（包含筛选隐藏的选择）</MS_Transport_Mass>
   <MS_Transport_Overweight>转移后的补给器重量超过上限，无法确认。请减少转入数量或将部分物品送回网络。</MS_Transport_Overweight>
-  <MS_Transport_Hint>确认后执行全部选择；取消不会转移物品。补给器每秒向正前方的运输容器或燃料设备提供物资，多余或不匹配的物品留在补给器内。</MS_Transport_Hint>
+  <MS_Transport_Hint>确认后执行全部选择；取消不会转移物品。补给器按设置的刷新间隔向正前方的运输容器或燃料设备提供物资，多余或不匹配的物品留在补给器内。</MS_Transport_Hint>
   <MS_Transport_Unavailable>物品或网络状态已变化，未能完成全部转移。列表已刷新，请检查双方库存后重试。</MS_Transport_Unavailable>
   <MS_Transport_NetworkCannotAccept>网络的存储过滤规则或剩余槽位无法接收全部送回物品，本次转移已取消。</MS_Transport_NetworkCannotAccept>
   <MS_Transport_Refreshed>网络或库存已变化，列表已刷新并重置转移数量。</MS_Transport_Refreshed>
@@ -27,7 +27,7 @@
   <MS_Transport_DirectMode>供给模式：持续供给</MS_Transport_DirectMode>
   <MS_Transport_Configure>指定供给物品</MS_Transport_Configure>
   <MS_Transport_ConfigureTitle>物资补给器 · 持续供给</MS_Transport_ConfigureTitle>
-  <MS_Transport_DirectHint>最多选择三种物品，每秒直接从网络送往正前方的运输容器或燃料设备，自身不暂存。按从上到下的优先级供给；缺货或目标无法接收时尝试下一项。已被其他任务预留的物品不会取出。</MS_Transport_DirectHint>
+  <MS_Transport_DirectHint>最多选择三种物品，按设置的刷新间隔直接从网络送往正前方的运输容器或燃料设备，自身不暂存。按从上到下的优先级供给；缺货或目标无法接收时尝试下一项。已被其他任务预留的物品不会取出。</MS_Transport_DirectHint>
   <MS_Transport_PrioritySlot>优先级 {0}</MS_Transport_PrioritySlot>
   <MS_Transport_PickTitle>选择优先级 {0} 的供给物品</MS_Transport_PickTitle>
   <MS_Transport_PickHint>选择一种物品；同一种物品只能占用一个位置。上方位置优先供给。</MS_Transport_PickHint>

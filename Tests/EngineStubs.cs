@@ -7,7 +7,7 @@ namespace RimWorld { public static class MapMeshFlagDefOf { public static object
 namespace Verse
 {
     [AttributeUsage(AttributeTargets.Class)] public sealed class StaticConstructorOnStartupAttribute : Attribute { }
-    public enum ThingCategory { Item, Building }
+    public enum ThingCategory { Item, Building, Pawn }
     public enum LookMode { Deep, Def, Value }
     public enum LoadSaveMode { Inactive, PostLoadInit }
     public static class Scribe { public static LoadSaveMode mode; }
@@ -27,7 +27,7 @@ namespace Verse
         public static void Message(string text) { Messages.Add(text); }
         public static void Error(string text) { Errors.Add(text); }
     }
-    public static class Find { public static TickManager TickManager = new TickManager(); public static WindowStack WindowStack = new WindowStack(); public static Selector Selector = new Selector(); public static readonly List<Map> Maps = new List<Map>(); }
+    public static partial class Find { public static TickManager TickManager = new TickManager(); public static WindowStack WindowStack = new WindowStack(); public static Selector Selector = new Selector(); public static readonly List<Map> Maps = new List<Map>(); }
     public class TickManager { public int TicksGame = 1; }
     public partial struct IntVec3 : IEquatable<IntVec3>
     {
@@ -53,7 +53,9 @@ namespace Verse
         private static int nextId;
         public int thingIDNumber = ++nextId;
         public ThingDef def = new ThingDef();
-        public int stackCount = 1;
+        private int storedStackCount = 1;
+        public static int StackCountReads;
+        public int stackCount { get { StackCountReads++; return storedStackCount; } set { storedStackCount = value; } }
         public bool Destroyed, Spawned;
         public ThingOwner holdingOwner;
         public object ParentHolder => holdingOwner?.Owner;
@@ -64,7 +66,9 @@ namespace Verse
         public string variant;
         public IEnumerable<IntVec3> OccupiedRect()
         { for (int x = 0; x < width; x++) for (int z = 0; z < height; z++) yield return Position + new IntVec3(x,z); }
-        public bool CanStackWith(Thing other) => !Destroyed && !other.Destroyed && def == other.def && variant == other.variant;
+        public static int StackChecks;
+        public bool CanStackWith(Thing other)
+        { StackChecks++; return !Destroyed && !other.Destroyed && def == other.def && variant == other.variant; }
         public bool TryAbsorbStack(Thing other, bool respectStackLimit)
         {
             if (!CanStackWith(other)) return false;

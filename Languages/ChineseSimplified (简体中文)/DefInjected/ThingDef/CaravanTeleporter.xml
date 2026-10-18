@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_CaravanTeleporter.label>远行队传送器</MS_CaravanTeleporter.label>
+  <MS_CaravanTeleporter.description>使用连接的魔法存储网络中的物资组建远行队。可在远行队组建菜单中选择人员、动物、物品及旅途补给。确认后，所选物资直接转入远行队成员的背包，人员立即在大地图上形成远行队，无需搬运、集合或走到地图边缘。成员保留原有装备和背包；手中正在搬运的物品或人员会先放回地图。</MS_CaravanTeleporter.description>
+</LanguageData>

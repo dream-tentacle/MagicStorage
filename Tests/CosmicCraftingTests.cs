@@ -13,8 +13,8 @@ internal static class CosmicCraftingTests
     { checks++; if (!Equals(expected, actual)) throw new Exception("Cosmic crafting: " + message + "; expected " + expected + ", got " + actual); }
     internal static int Run()
     {
-        Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
-        ProductionCompletion(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
+        OrderReordering(); FilteredOrderReordering(); Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
+        ProductionCompletion(); ConfigurableWorkSpeed(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
         ReservationInvalidation();
         CoreContainerSelection();
         BenchSelectionAndPriority();
@@ -22,7 +22,349 @@ internal static class CosmicCraftingTests
         WorkerFailurePrecedesOccupation();
         FixedCostMaterials();
         VanillaMaterialSelection();
+        IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
+        RefreshDoesNotChangeWork();
+        MaterialRetryCaching(); EarlyWorkerEligibility();
         return checks;
+    }
+
+    private static void OrderReordering()
+    {
+        var list = new CraftingOrderList();
+        var a = list.Add(new RecipeDef()); var b = list.Add(new RecipeDef());
+        var c = list.Add(new RecipeDef()); var d = list.Add(new RecipeDef());
+        b.Suspended = true; b.RepeatCount = 7;
+        int revision = b.Revision;
+        list.Reorder(2, 0);
+        Equal(true, list.Orders.SequenceEqual(new[] { c, a, b, d }), "drag backward uses the destination insertion slot");
+        list.Reorder(0, 4);
+        Equal(true, list.Orders.SequenceEqual(new[] { a, b, d, c }), "drag to the end adjusts for source removal");
+        list.Reorder(0, 3);
+        Equal(true, list.Orders.SequenceEqual(new[] { b, d, a, c }), "drag forward inserts before the original target");
+        list.Reorder(0, 1); list.Reorder(1, 1);
+        Equal(true, list.Orders.SequenceEqual(new[] { b, d, a, c }), "dropping immediately before or after oneself does not move the order");
+        list.Reorder(-1, 0); list.Reorder(4, 0); list.Reorder(0, -1); list.Reorder(0, 5);
+        Equal(true, list.Orders.SequenceEqual(new[] { b, d, a, c }), "invalid drag indexes cannot mutate the order list");
+        Equal(b, list.Find(b.Id), "dragging preserves task identity");
+        Equal(true, b.Suspended, "dragging preserves suspension");
+        Equal(7, b.RepeatCount, "dragging preserves remaining production count");
+        Equal(revision, b.Revision, "priority changes do not invalidate in-progress task configuration");
+    }
+
+    private static void FilteredOrderReordering()
+    {
+        var list = new CraftingOrderList();
+        var hiddenFirst = list.Add(new RecipeDef()); var a = list.Add(new RecipeDef());
+        var hiddenMiddle = list.Add(new RecipeDef()); var b = list.Add(new RecipeDef());
+        var c = list.Add(new RecipeDef()); var hiddenLast = list.Add(new RecipeDef());
+        list.Reorder(new[] { a, b, c }, 0, 3);
+        Equal(true, list.Orders.SequenceEqual(new[] { hiddenFirst, b, hiddenMiddle, c, a, hiddenLast }),
+            "filtered forward drag changes only visible slots and preserves hidden task positions");
+        list.Reorder(new[] { b, c, a }, 2, 0);
+        Equal(true, list.Orders.SequenceEqual(new[] { hiddenFirst, a, hiddenMiddle, b, c, hiddenLast }),
+            "filtered backward drag preserves hidden tasks before, between and after visible tasks");
+        var expected = list.Orders.ToArray();
+        list.Reorder(new[] { a, b, c }, 1, 2);
+        list.Reorder(new[] { a }, 0, 1);
+        list.Reorder(new CraftingOrder[0], 0, 0);
+        list.Reorder(null, 0, 0);
+        Equal(true, list.Orders.SequenceEqual(expected), "adjacent, single-item and empty filtered drags preserve all tasks");
+        list.Reorder(new[] { a, a, c }, 0, 3);
+        Equal(true, list.Orders.SequenceEqual(expected), "duplicate visible tasks cannot overwrite hidden slots");
+        list.Reorder(new[] { c, b, a }, 0, 3);
+        Equal(true, list.Orders.SequenceEqual(expected), "out-of-order visible snapshots are rejected atomically");
+        list.Remove(b);
+        expected = list.Orders.ToArray();
+        list.Reorder(new[] { a, b, c }, 0, 3);
+        Equal(true, list.Orders.SequenceEqual(expected), "a task removed after the snapshot cannot corrupt filtered drag results");
+    }
+
+    private sealed class CountingMaterialPolicy : ICraftingMaterialPolicy
+    {
+        internal int Calls;
+        internal readonly ICraftingMaterialPolicy Inner = new NetworkCraftingMaterialPolicy();
+        public bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations)
+        { Calls++; return Inner.TryPlan(network, order, out allocations); }
+    }
+
+    private static void MaterialRetryCaching()
+    {
+        var previousPolicy = CraftingServices.Materials;
+        int previousTick = Find.TickManager.TicksGame;
+        var previousMenuPawn = FloatMenuMakerMap.makingFor;
+        try
+        {
+            MagicStorageMod.Settings.RestoreDefaults(); Find.TickManager.TicksGame = 10000;
+            var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 20);
+            var unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner;
+            var policy = new CountingMaterialPolicy(); CraftingServices.Materials = policy;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "first missing-material query performs a real search");
+            Equal(1, policy.Calls, "initial material search counted once");
+            Equal((int?)10000, order.LastMaterialFailureTick, "failed search stores actual check time");
+            var other = new Pawn { Map = f.Map, Spawned = true, Faction = Faction.OfPlayer };
+            Equal(null, f.Dispatch.FindJob(other, f.Giver), "other pawn shares this order's failure cache");
+            Equal(1, policy.Calls, "other pawn does not rescan missing materials");
+            Equal("MS_Craft_MissingMaterials", f.Dispatch.Status(a.Item1, order), "window status shares failure result");
+            Equal(1, policy.Calls, "status query never resets or rescans a fresh failure");
+            unit.Inventory.Contents.TryAdd(new Thing { def = f.Material, stackCount = 20 });
+            order.Changed(); MagicStorageMod.Settings.OverallRefreshSeconds = 60;
+            Find.TickManager.TicksGame = 10900;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "inventory and order changes do not invalidate time-only failure cache");
+            Equal(1, policy.Calls, "fresh stock waits for independent thirty-second interval");
+            Equal((int?)10000, order.LastMaterialFailureTick, "cache hit does not slide the deadline forward");
+            Find.TickManager.TicksGame = 11800;
+            Equal(true, f.Dispatch.FindJob(f.Pawn, f.Giver) != null, "next query at retry boundary discovers added materials");
+            Equal(2, policy.Calls, "elapsed retry interval performs one fresh search");
+            Equal(null, order.LastMaterialFailureTick, "successful search clears failure cache");
+            Equal(true, f.Dispatch.FindJob(other, f.Giver) != null, "success is not cached as a material plan");
+            Equal(3, policy.Calls, "another successful query still plans materials live");
+            unit.Inventory.Contents.Remove(a.Item3);
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "new failure begins a new retry interval");
+            Equal(4, policy.Calls, "new failure was actually checked");
+            Find.TickManager.TicksGame = 15400;
+            f.Map.GetComponent<MapComponent_StorageNetworks>().MapComponentTick(); f.Dispatch.MapComponentTick();
+            Equal(4, policy.Calls, "elapsed intervals without queries never trigger background material checks");
+            Equal((int?)11800, order.LastMaterialFailureTick, "expiration never flushes or rewrites failure time in background");
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "late query retries only once rather than replaying missed intervals");
+            Equal(5, policy.Calls, "late retry counted once");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 60; Find.TickManager.TicksGame = 17200;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "longer setting immediately extends current failure interval");
+            Equal(5, policy.Calls, "current cache reads live retry setting");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 1;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "shorter setting allows retry on next query");
+            Equal(6, policy.Calls, "shorter interval does not require cache reset");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 0;
+            f.Dispatch.FindJob(f.Pawn, f.Giver); f.Dispatch.FindJob(f.Pawn, f.Giver);
+            Equal(8, policy.Calls, "zero setting checks every query even within the same tick");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 30;
+            unit.Inventory.Contents.TryAdd(a.Item3, false);
+            FloatMenuMakerMap.makingFor = f.Pawn;
+            var job = new WorkGiver_CosmicCrafting { def = f.Giver }.JobOnThing(f.Pawn, a.Item2);
+            Equal(true, job != null, "native menu generation bypasses missing-material delay");
+            Equal(9, policy.Calls, "manual menu checks materials immediately");
+            FloatMenuMakerMap.makingFor = null;
+            unit.Inventory.Contents.Remove(a.Item3);
+            var driver = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+            Equal(false, f.Dispatch.TryClaim(driver, out _), "formal claim rejects materials lost after successful find");
+            Equal(10, policy.Calls, "formal claim still computes a fresh material plan");
+            unit.Inventory.Contents.TryAdd(a.Item3, false);
+            Equal(true, new WorkGiver_CosmicCrafting { def = f.Giver }.JobOnThing(f.Pawn, a.Item2, true) != null,
+                "forced job query also bypasses failure cache");
+            Equal(11, policy.Calls, "forced query searches again despite same-tick failure");
+            unit.Inventory.Contents.Remove(a.Item3); f.Dispatch.FindJob(f.Pawn, f.Giver);
+            Find.TickManager.TicksGame = 100;
+            f.Dispatch.FindJob(f.Pawn, f.Giver);
+            Equal(13, policy.Calls, "clock rewind allows a fresh check rather than retaining future failure forever");
+        }
+        finally
+        {
+            CraftingServices.Materials = previousPolicy; Find.TickManager.TicksGame = previousTick;
+            FloatMenuMakerMap.makingFor = previousMenuPawn; MagicStorageMod.Settings.RestoreDefaults();
+        }
+    }
+
+    private static void EarlyWorkerEligibility()
+    {
+        var previousPolicy = CraftingServices.Materials;
+        try
+        {
+            var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+            order.Mode = CraftingRepeatMode.TargetCount; order.TargetCount = 10; order.Worker = new Pawn();
+            var products = (TestProductCounter)CraftingServices.Products;
+            var materials = new CountingMaterialPolicy(); CraftingServices.Materials = materials;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "automatic work excludes another named worker");
+            Equal(0, products.Calls, "wrong named worker never counts products");
+            Equal(0, materials.Calls, "wrong named worker never scans ingredients");
+            order.Worker = null; order.Recipe.minimumSkill = 20;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "automatic work excludes insufficient recipe skill");
+            Equal(0, products.Calls, "insufficient skill never counts products");
+            Equal(0, materials.Calls, "insufficient skill never scans ingredients");
+            order.Recipe.minimumSkill = 0; order.Worker = new Pawn();
+            products.Amount = 10; JobFailReason.Clear();
+            Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "manual query keeps satisfied-order precedence");
+            Equal("MS_Craft_Satisfied", JobFailReason.Reason, "manual failure reason retains original ordering");
+            Equal(1, products.Calls, "manual reason may count products for original precedence");
+            products.Amount = 0;
+            Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "manual query rejects wrong named worker below target");
+            Equal("MS_Craft_SelectedWorkerNotAllowed", JobFailReason.Reason, "manual worker restriction reason preserved");
+            Equal(0, materials.Calls, "manual wrong worker still never plans ingredients");
+            order.Worker = null;
+            Equal(true, f.Dispatch.FindJob(f.Pawn, f.Giver) != null, "eligible worker can immediately find the same order");
+            Equal(1, materials.Calls, "eligible worker does perform live material planning");
+        }
+        finally { CraftingServices.Materials = previousPolicy; }
+    }
+
+    private sealed class TestPackedProduct : MinifiedThing { }
+
+    private static void RefreshDoesNotChangeWork()
+    {
+        var settings = MagicStorageMod.Settings;
+        try
+        {
+            foreach (int seconds in new[] { 1, 60 })
+            {
+                settings.SimplifiedMode = true; settings.OverallRefreshSeconds = seconds;
+                var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 3);
+                order.Mode = CraftingRepeatMode.RepeatCount; order.RepeatCount = 3;
+                var policy = (TestProductionPolicy)CraftingServices.Production; policy.Required = 5;
+                var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+                var work = driver.TestToils.Last();
+                work.tickIntervalAction(2);
+                Equal(0.4f, order.Progress, "refresh interval does not change actual work progression");
+                Equal(0.2f, f.Pawn.CraftingXp, "refresh interval does not multiply experience");
+                work.tickIntervalAction(3600);
+                Equal(0.5f, f.Pawn.CraftingXp, "large update grants experience only for work needed to finish");
+                Equal(4L, a.Item1.Network.GetTotalCount(policy.Product), "large update completes exactly one batch");
+                Equal(1, policy.MakeCalls, "large update never replays production for missed refresh cycles");
+                Equal(2, order.RepeatCount, "only one repeat credited");
+                Equal(7L, a.Item1.Network.GetTotalCount(f.Material), "exactly one batch's ingredients consumed");
+            }
+        }
+        finally { settings.RestoreDefaults(); }
+    }
+
+    private static void IndexedProductCounts()
+    {
+        var f = new Fixture(); var a = f.Core(0);
+        var unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner;
+        unit.SlotCapacity = 10010;
+        var product = new ThingDef { hasQualityComp = true };
+        var extra = new ThingDef(); var unrelated = new ThingDef();
+        var packedDef = new ThingDef { thingClass = typeof(TestPackedProduct) };
+        var recipe = new RecipeDef { route = f.Giver };
+        recipe.products.Add(new ThingDefCountClass { thingDef = product });
+        var order = a.Item1.Crafting.Add(recipe);
+        order.AdditionalCounts.SetAllow(extra, true);
+        order.AdditionalCounts.SetAllow(product, true);
+        var normal = new Thing { def = product, stackCount = 4, hasQuality = true, quality = QualityCategory.Poor };
+        unit.Inventory.Contents.TryAdd(normal, false);
+        unit.Inventory.Contents.TryAdd(new Thing { def = extra, stackCount = 5 }, false);
+        var wrappedProduct = new TestPackedProduct
+        {
+            def = packedDef, stackCount = 2,
+            InnerThing = new Thing { def = product, stackCount = 3, hasQuality = true, quality = QualityCategory.Good }
+        };
+        unit.Inventory.Contents.TryAdd(wrappedProduct, false);
+        unit.Inventory.Contents.TryAdd(new TestPackedProduct
+            { def = packedDef, InnerThing = new Thing { def = extra, stackCount = 2 } }, false);
+        unit.Inventory.Contents.TryAdd(new TestPackedProduct
+            { def = packedDef, InnerThing = new Thing { def = unrelated, stackCount = 9 } }, false);
+        for (int i = 0; i < 10000; i++)
+            if (!unit.Inventory.Contents.TryAdd(new Thing { def = unrelated }, false))
+                throw new Exception("Large product-count fixture ran out of slots.");
+        var claim = new object();
+        Equal(4, a.Item1.Network.ReserveOutgoing(claim, normal, 4), "product count fixture reserves all normal products");
+        var counter = new MapAndNetworkCraftingProductCounter();
+        Thing.InnerLookups = 0;
+        Equal(17L, counter.Count(a.Item1, order), "indexed products, additional goods and wrapped quantities all counted once");
+        Equal(5, Thing.InnerLookups, "ten thousand unrelated stacks never enter the item-counting path");
+        Equal(0, a.Item1.Network.AvailableToWithdraw(normal), "physical count includes stock already reserved by another job");
+        order.Quality = new QualityRange { min = QualityCategory.Normal, max = QualityCategory.Legendary };
+        Equal(13L, counter.Count(a.Item1, order), "wrapped primary product still observes quality while additional goods retain their own rules");
+        long revision = a.Item1.Network.Revision;
+        wrappedProduct.InnerThing.quality = QualityCategory.Poor;
+        Equal(revision, a.Item1.Network.Revision, "quality changes do not alter the quantity revision");
+        Equal(7L, counter.Count(a.Item1, order), "fresh filtering sees quality changes without relying on network revision");
+        wrappedProduct.InnerThing.quality = QualityCategory.Good;
+        f.Register(new Building_StorageCore(), 3);
+        Equal(false, a.Item1.Network.CanWork, "duplicate core makes fixture network unavailable");
+        Equal(13L, counter.Count(a.Item1, order), "read-only counting preserves physical inventory visibility with duplicate cores");
+        var consumable = new List<Thing>();
+        a.Item1.Network.GetMatchingStacks(def => def == product, consumable);
+        Equal(0, consumable.Count, "consumption queries continue to require a working network");
+    }
+
+    private static void LimitedProductCounts()
+    {
+        var f = new Fixture(); var a = f.Core(0);
+        var unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner; unit.SlotCapacity = 10010;
+        var product = new ThingDef(); var order = f.Order(a.Item1);
+        order.Recipe.products.Add(new ThingDefCountClass { thingDef = product });
+        order.Mode = CraftingRepeatMode.TargetCount; order.TargetCount = 10;
+        for (int i = 0; i < 10000; i++)
+            if (!unit.Inventory.Contents.TryAdd(new Thing { def = product }, false))
+                throw new Exception("Large limited-count fixture ran out of slots.");
+        var counter = new MapAndNetworkCraftingProductCounter();
+        Thing.InnerLookups = 0;
+        Equal(10L, counter.Count(a.Item1, order, order.ProductCountLimit), "target count stops at required quantity");
+        Equal(10, Thing.InnerLookups, "only ten of ten thousand matching network stacks inspected");
+        Thing.InnerLookups = 0;
+        Equal(0L, counter.Count(a.Item1, order, 0), "zero target needs no inventory traversal");
+        Equal(0, Thing.InnerLookups, "zero target never inspects a stack");
+        f.Map.listerThings.Things.Add(new Thing { def = product, stackCount = 50, Spawned = true, Map = f.Map });
+        Thing.InnerLookups = 0;
+        Equal(10L, counter.Count(a.Item1, order, 10), "one map stack can satisfy target");
+        Equal(1, Thing.InnerLookups, "satisfied map count skips the network entirely");
+
+        f = new Fixture(); a = f.Core(0); unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner;
+        product = new ThingDef { hasQualityComp = true }; order = f.Order(a.Item1);
+        order.Recipe.products.Add(new ThingDefCountClass { thingDef = product });
+        order.Mode = CraftingRepeatMode.TargetCount; order.TargetCount = 10; order.PauseWhenSatisfied = true; order.UnpauseAt = 5;
+        var goods = new Thing { def = product, stackCount = 10, hasQuality = true, quality = QualityCategory.Good };
+        unit.Inventory.Contents.TryAdd(goods, false); CraftingServices.Products = counter;
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "enough goods pause the order");
+        Equal(true, order.Paused, "satisfaction sets paused state");
+        Equal(6L, order.ProductCountLimit, "paused count only distinguishes above resume threshold");
+        unit.Inventory.Contents.Remove(goods); goods.stackCount = 8; unit.Inventory.Contents.TryAdd(goods, false);
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "capped count preserves pause above resume threshold");
+        unit.Inventory.Contents.Remove(goods); goods.stackCount = 5; unit.Inventory.Contents.TryAdd(goods, false);
+        Equal(5L, counter.Count(a.Item1, order, 10), "below target count remains exact");
+        Equal(true, f.Dispatch.CanRun(a.Item1, order), "order resumes exactly at resume threshold");
+        Equal(false, order.Paused, "resume clears paused state");
+        order.Quality = new QualityRange { min = QualityCategory.Excellent, max = QualityCategory.Legendary };
+        Equal(0L, counter.Count(a.Item1, order, 1), "early exit still respects quality filters");
+        order.Quality = new QualityRange { min = QualityCategory.Normal, max = QualityCategory.Legendary };
+        var packedDef = new ThingDef { thingClass = typeof(TestPackedProduct) };
+        unit.Inventory.Contents.TryAdd(new TestPackedProduct { def = packedDef, stackCount = 2,
+            InnerThing = new Thing { def = product, stackCount = 3, hasQuality = true, quality = QualityCategory.Good } }, false);
+        Equal(10L, counter.Count(a.Item1, order, 10), "wrapped quantities saturate safely at target");
+        Equal(11L, counter.Count(a.Item1, order), "uncapped caller can still request exact quantity");
+    }
+
+    private static void SuspendedProductChecks()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        order.Mode = CraftingRepeatMode.TargetCount; order.TargetCount = 10;
+        order.Suspended = true; order.PauseWhenSatisfied = true; order.UnpauseAt = 3;
+        var counter = (TestProductCounter)CraftingServices.Products; counter.Amount = 20;
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "manually suspended target order cannot run");
+        Equal(0, counter.Calls, "manual suspension never counts inventory");
+        Equal(false, order.Paused, "manual suspension does not activate target hysteresis");
+        order.Mode = CraftingRepeatMode.Forever; order.Paused = true;
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "suspended forever order remains stopped");
+        Equal(false, order.Paused, "non-target mode retains native pause-state reset");
+        order.Mode = CraftingRepeatMode.TargetCount; order.Paused = true; order.Suspended = false; counter.Amount = 7;
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "target-paused order waits for its low-water mark");
+        Equal(1, counter.Calls, "target-paused order still checks live count for resumption");
+        counter.Amount = 3;
+        Equal(true, f.Dispatch.CanRun(a.Item1, order), "target-paused order resumes at low-water mark");
+        Equal(false, order.Paused, "resumption clears target pause");
+        counter.Amount = 10;
+        Equal(false, f.Dispatch.CanRun(a.Item1, order), "target order pauses again when satisfied");
+        Equal(true, order.Paused, "satisfaction sets target pause");
+        Equal(3, counter.Calls, "each live target decision still reads an up-to-date count");
+    }
+
+    private static void SingleProductCheckPerOrder()
+    {
+        var f = new Fixture(); var a = f.Core(0); var first = f.Order(a.Item1);
+        first.Mode = CraftingRepeatMode.TargetCount; first.TargetCount = 10;
+        var counter = (TestProductCounter)CraftingServices.Products; counter.Amount = 10;
+        JobFailReason.Clear();
+        Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2), "satisfied order produces no work");
+        Equal(1, counter.Calls, "failure explanation reuses its immediately preceding target check");
+        Equal("MS_Craft_Satisfied", JobFailReason.Reason, "satisfied-order failure reason preserved");
+        counter.Calls = 0;
+        Equal("MS_Craft_Satisfied", f.Dispatch.Status(a.Item1, first), "standalone status still performs its own check");
+        Equal(1, counter.Calls, "standalone status is not a stale cached result");
+        var second = f.Order(a.Item1); second.Mode = CraftingRepeatMode.TargetCount; second.TargetCount = 10;
+        counter.Calls = 0;
+        Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2), "multiple satisfied orders produce no work");
+        Equal(2, counter.Calls, "each rejected order is counted once rather than twice");
+        counter.Amount = 9; counter.Calls = 0;
+        Equal(true, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2) != null, "new lower quantity immediately makes work available");
+        Equal(1, counter.Calls, "accepted first order needs only one target check");
     }
     private sealed class AdjustedIngredientWorker : RecipeWorker
     {
@@ -704,6 +1046,35 @@ internal static class CosmicCraftingTests
         Equal(4,a.Item1.Network.AvailableToWithdraw(a.Item3),"despawn preserves core-owned batch");
         Equal(true,a.Item1.Crafting.CancelAll(true),"core destruction can refund every batch");
         Equal(10,a.Item1.Network.AvailableToWithdraw(a.Item3),"cancel returns unfinished ingredients");
+    }
+
+    private static void ConfigurableWorkSpeed()
+    {
+        var settings = MagicStorageMod.Settings;
+        try
+        {
+            var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 3);
+            var policy = (TestProductionPolicy)CraftingServices.Production;
+            policy.Required = 100; policy.Speed = 2;
+            var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+            var batch = order.Batch; var toil = driver.TestToils.Last();
+            settings.CosmicWorkbenchWorkSpeedPercent = 50;
+            toil.tickIntervalAction(4);
+            Equal(0.04f, order.Progress, "minimum speed multiplies existing worker speed by half");
+            settings.CosmicWorkbenchWorkSpeedPercent = 1000;
+            toil.tickIntervalAction(2);
+            Equal(0.44f, order.Progress, "maximum speed applies immediately to unfinished work");
+            Equal(batch, order.Batch, "changing speed preserves the current batch");
+            settings.RestoreDefaults();
+            toil.tickIntervalAction(3);
+            Equal(0.5f, order.Progress, "restoring defaults immediately restores normal speed");
+            toil.tickIntervalAction(25);
+            Equal(JobCondition.Succeeded, driver.EndCondition.Value, "adjusted batch completes normally");
+            Equal(7L, a.Item1.Network.GetTotalCount(f.Material), "speed changes do not consume extra materials");
+            Equal(4L, a.Item1.Network.GetTotalCount(policy.Product), "speed changes preserve product quantity");
+            Equal(1, policy.MakeCalls, "speed changes never duplicate production");
+        }
+        finally { settings.RestoreDefaults(); }
     }
 
     private static void ProductionCompletion()

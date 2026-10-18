@@ -29,9 +29,7 @@
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
     <size>(2,2)</size>
     <rotatable>false</rotatable>
-    <passability>Impassable</passability>
     <surfaceType>None</surfaceType>
-    <disableImpassableShotOverConfigError>true</disableImpassableShotOverConfigError>
     <graphicData>
       <texPath>Things/Building/StorageCore/StorageCore</texPath>
       <graphicClass>Graphic_Single</graphicClass>
@@ -49,7 +47,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageUnit</defName>
     <label>storage unit</label>
-    <description>A storage unit following normal stacking rules. It provides 64 stack slots by default, adjustable from 6 to 1000 in the mod settings. Stored food does not rot.</description>
+    <description>A storage unit following normal stacking rules. It provides 64 stack slots by default, adjustable from 1 to 10000 in the mod settings. Stored food does not rot.</description>
     <thingClass>MagicStorage.Building_StorageUnit</thingClass>
     <size>(1,2)</size>
     <rotatable>true</rotatable>
@@ -98,7 +96,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_CosmicWorkbench</defName>
     <label>cosmic workbench</label>
-    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. If a product does not pass the core's storage filter, it is dropped at the core after production. Orders can also be set to drop finished products near the workbench.</description>
+    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored. Orders can also be set to drop finished products near the workbench.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <building><isMealSource>true</isMealSource></building>
     <size>(3,1)</size>
@@ -127,7 +125,7 @@
     <label>construction supply unit</label>
     <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells. No hauling is required; colonists still perform the construction work.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
-    <tickerType>Rare</tickerType>
+    <tickerType>Normal</tickerType>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
     <graphicData>
@@ -149,7 +147,7 @@
     <label>apparel adapter</label>
     <description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Serves one colonist at a time.</description>
     <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>
-    <tickerType>Rare</tickerType>
+    <tickerType>Normal</tickerType>
     <size>(2,1)</size>
     <rotatable>true</rotatable>
     <hasInteractionCell>true</hasInteractionCell>

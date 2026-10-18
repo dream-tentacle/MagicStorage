@@ -62,7 +62,8 @@ namespace MagicStorage
         internal void Work(CraftingOrder order, Pawn worker, Building_CosmicWorkbench bench, int delta)
         {
             if (delta <= 0 || Finished || !Valid(order)) return;
-            float speed = CraftingServices.Production.WorkSpeed(order.Recipe, worker, bench);
+            float speed = CraftingServices.Production.WorkSpeed(order.Recipe, worker, bench) *
+                MagicStorageMod.Settings.CosmicWorkbenchWorkSpeedFactor;
             if (speed <= 0 || float.IsNaN(speed) || float.IsInfinity(speed)) return;
             int appliedTicks = Math.Min(delta, Math.Max(1, (int)Math.Ceiling((requiredWork - completedWork) / speed)));
             completedWork = Math.Min(requiredWork, completedWork + speed * appliedTicks);

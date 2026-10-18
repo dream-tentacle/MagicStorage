@@ -55,11 +55,12 @@ namespace Verse
     { public virtual float GetIngredientCount(IngredientCount ingredient, RimWorld.Bill bill) => ingredient.GetBaseCount(); }
     public class ThingDefCountClass { public ThingDef thingDef; public int count; }
     public enum ThingRequestGroup { MinifiedThing, Blueprint, BuildingFrame, Refuelable }
-    public partial struct IntVec3 { public bool Standable(Map map) => true; public bool Fogged(Map map) => false; }
+    public partial struct IntVec3 { public bool Standable(Map map) => true; public bool Fogged(Map map) => map.Fog.Contains(this); }
     public enum Danger { Some }
     public partial class Thing { public string LabelShortCap => "test pawn"; public RimWorld.RotStage GetRotStage() => stale ? RimWorld.RotStage.Rotting : RimWorld.RotStage.Fresh; }
     public partial class ThingDef
     {
+        public Type thingClass = typeof(Thing);
         public bool useHitPoints = true, MadeFromStuff, hasQualityComp;
         public RimWorld.ApparelProperties apparel;
         public bool HasComp(Type type) => type == typeof(RimWorld.CompQuality) && hasQualityComp;
@@ -84,6 +85,7 @@ namespace Verse
     public class ThingLister
     {
         public List<Thing> Things = new List<Thing>();
+        public List<Thing> AllThings => Things;
         public IEnumerable<Thing> ThingsOfDef(ThingDef def) => Things.Where(t => t.def == def);
         public IEnumerable<Thing> ThingsInGroup(ThingRequestGroup group) => Things.Where(t =>
 #if TRANSPORT_SUPPLIER_TESTS
@@ -164,6 +166,7 @@ namespace RimWorld
         public static void Is(string reason) { Reason = reason; }
         public static void Clear() { Reason = null; }
     }
+    public static class FloatMenuMakerMap { public static Pawn makingFor; }
     public static class MechanitorUtility { public static bool IsMechanitor(Pawn pawn) => pawn.mechanitor; }
 }
 namespace Verse.AI
@@ -186,12 +189,19 @@ namespace MagicStorage
     { public CompStorageNode node; public StorageNetwork Network => node?.Network; public IntVec3 InteractionCell => Position; }
     internal static class CraftingRecipeCatalog
     {
+        internal static string Label(RecipeDef recipe) => recipe.label;
         internal static bool Supports(RecipeDef recipe) => recipe != null;
         internal static bool HasType(RecipeDef recipe, RimWorld.WorkTypeDef type) => recipe.route.workType == type;
         internal static IReadOnlyList<RimWorld.WorkGiverDef> Routes(RecipeDef recipe) => new[] { recipe.route };
     }
     internal sealed class TestProductCounter : ICraftingProductCounter
-    { internal long Amount; public bool CanCount(RecipeDef recipe) => true; public long Count(Building_StorageCore core, CraftingOrder order) => Amount; }
+    {
+        internal long Amount;
+        internal int Calls;
+        public bool CanCount(RecipeDef recipe) => true;
+        public long Count(Building_StorageCore core, CraftingOrder order, long stopAt = long.MaxValue)
+        { Calls++; return System.Math.Min(Amount, stopAt); }
+    }
     // Product/skill/game notification boundary; batch lifecycle remains production code.
     internal class TestProductionPolicy : ICraftingProductionPolicy
     {
