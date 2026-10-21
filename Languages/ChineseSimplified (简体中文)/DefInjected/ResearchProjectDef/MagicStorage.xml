@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_BasicMagicStorage.label>基础魔法存储</MS_BasicMagicStorage.label>
-  <MS_BasicMagicStorage.description>建造由控制核心、存储单元、存储线和接收器组成的魔法存储网络。解锁自动补货架、衣物适配器、宇宙工作台和建筑供给单元。</MS_BasicMagicStorage.description>
+  <MS_BasicMagicStorage.description>解锁魔法存储网络的基础建筑。</MS_BasicMagicStorage.description>
   <MS_MaterialSupplyTechnology.label>物资供应技术</MS_MaterialSupplyTechnology.label>
   <MS_MaterialSupplyTechnology.description>建造物资补给器和燃料供给器，将魔法存储网络中的物资直接送入运输容器和燃料设备。</MS_MaterialSupplyTechnology.description>
   <MS_WarpTechnology.label>跃迁技术</MS_WarpTechnology.label>
   <MS_WarpTechnology.description>建造远行队传送器，使用魔法存储网络中的物资，直接在大地图上组建远行队。</MS_WarpTechnology.description>
+  <MS_MagicDrive.label>魔法驱动</MS_MagicDrive.label>
+  <MS_MagicDrive.description>添加使用魔法驱动的便携设施</MS_MagicDrive.description>
 </LanguageData>

@@ -3,7 +3,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase" MayRequire="keeptpa.NivarianRace">
     <defName>MS_NivarianCannonExtractor</defName>
     <label>Nivarian mass driver extractor</label>
-    <description>Supplies an adjacent Nivarian mass driver with materials from the connected magic storage network. Extracts only materials requested by the driver's logistics network and passes them directly to the driver, with no internal storage. Drivers then route and deliver the cargo normally.\n\nRequires power and a working storage network. Place beside a mass driver, including diagonally. Network extraction takes priority; ground intakes supply any remaining demand. Stock reserved by other tasks is not extracted. Cancelled cargo follows the driver's normal handling and may be dropped beside a driver.</description>
+    <description>Supplies an adjacent Nivarian mass driver with materials from the connected magic storage network. Extracts materials as requested by the driver's logistics network and passes them directly to the driver.</description>
     <thingClass>MagicStorage.Building_NivarianCannonExtractor</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

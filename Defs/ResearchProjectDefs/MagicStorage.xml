@@ -3,7 +3,7 @@
   <ResearchProjectDef>
     <defName>MS_BasicMagicStorage</defName>
     <label>basic magic storage</label>
-    <description>Build a magic storage network with a control core, storage units, storage conduits and receivers. Unlock auto-restocking shelves, apparel adapters, cosmic workbenches and construction supply units.</description>
+    <description>Unlock basic buildings for the magic storage network.</description>
     <baseCost>10</baseCost>
     <techLevel>Industrial</techLevel>
     <tab>MS_MagicStorage</tab>
@@ -33,5 +33,17 @@
     <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
     <researchViewX>1</researchViewX>
     <researchViewY>2</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MS_MagicDrive</defName>
+    <label>magic drive</label>
+    <description>Unlock portable facilities powered by magic.</description>
+    <baseCost>100</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MS_MagicStorage</tab>
+    <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
+    <researchViewX>1</researchViewX>
+    <researchViewY>1</researchViewY>
   </ResearchProjectDef>
 </Defs>

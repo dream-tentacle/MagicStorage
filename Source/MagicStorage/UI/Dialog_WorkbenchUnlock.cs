@@ -66,7 +66,7 @@ namespace MagicStorage
             var outer = new Rect(0, y, rect.width, Math.Max(0f, rect.height - y - 108f));
             Widgets.DrawMenuSection(outer);
             float width = outer.width - 24f;
-            var heights = valid ? costs.Select(cost => Math.Max(36f, Text.CalcHeight(cost.thingDef.LabelCap, Math.Max(1f, width - 150f)) + 8f)).ToList()
+            var heights = valid ? costs.Select(cost => Math.Max(36f, Text.CalcHeight(cost.thingDef.LabelCap, Math.Max(1f, width - 178f)) + 8f)).ToList()
                 : new List<float>();
             var view = new Rect(0, 0, width, heights.Sum());
             Widgets.BeginScrollView(outer.ContractedBy(4f), ref scroll, view);
@@ -78,7 +78,8 @@ namespace MagicStorage
                     var cost = costs[i];
                     counts.TryGetValue(cost.thingDef, out long available);
                     Widgets.DefIcon(new Rect(4f, rowY + 4f, 28f, 28f), cost.thingDef);
-                    Widgets.Label(new Rect(40f, rowY + 4f, Math.Max(1f, width - 150f), heights[i] - 8f), cost.thingDef.LabelCap);
+                    Widgets.InfoCardButton(36f, rowY + (heights[i] - 24f) / 2f, cost.thingDef);
+                    Widgets.Label(new Rect(68f, rowY + 4f, Math.Max(1f, width - 178f), heights[i] - 8f), cost.thingDef.LabelCap);
                     Color previous = GUI.color;
                     if (available < cost.count) GUI.color = Color.red;
                     Text.Anchor = TextAnchor.MiddleRight;

@@ -4,7 +4,7 @@
     <defName>MS_CaravanTeleporter</defName>
     <researchPrerequisites><li>MS_WarpTechnology</li></researchPrerequisites>
     <label>caravan teleporter</label>
-    <description>Forms a caravan using supplies from the connected magic storage network. Choose people, animals, items and travel supplies in the caravan formation menu. Once confirmed, the selected supplies are transferred to the caravan's inventories and its members depart immediately, without hauling, gathering or walking to the map edge. Members retain their equipment and inventories; anything they are carrying in their hands stays on the map.</description>
+    <description>Forms a caravan using supplies from the connected magic storage network. Once confirmed, the selected supplies are transferred to the caravan members' inventories, and the members immediately form a caravan on the world map.</description>
     <thingClass>MagicStorage.Building_CaravanTeleporter</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

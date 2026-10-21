@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_FuelSupplier.label>燃料供给器</MS_FuelSupplier.label>
-  <MS_FuelSupplier.description>自动从相连的存储网络向半径20格内的己方建筑供应燃料，遵循各建筑的燃料过滤规则及自动补充开关。无需搬运或内部暂存。已被其他任务预留的燃料仍留在网络中。\n\n补料遵循原版规则：剩余燃料达到目标建筑的自动补料阈值时才会触发，通常为目标燃料量的30%；材料充足时补至目标量，燃料份数按原版向上取整。</MS_FuelSupplier.description>
+  <MS_FuelSupplier.description>自动从相连的存储网络向半径20格内的己方建筑供应燃料，遵循各建筑的燃料过滤规则及自动补充开关。\n\n补料遵循原版规则：剩余燃料达到目标建筑的自动补料阈值时才会触发，通常为目标燃料量的30%；材料充足时补至目标量，燃料份数按原版向上取整。</MS_FuelSupplier.description>
 </LanguageData>

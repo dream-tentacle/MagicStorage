@@ -24,10 +24,12 @@
   <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
   <MS_Craft_Add>Add production order</MS_Craft_Add>
   <MS_Craft_Orders>Production orders</MS_Craft_Orders>
-  <MS_Craft_DragToSort>Right-drag to reorder</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>Hold the right mouse button and drag the task block to change production priority.</MS_Craft_DragOrder>
+  <MS_Craft_DragToSort>Left/right-drag to reorder</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>Hold the left or right mouse button and drag the task block to change production priority.</MS_Craft_DragOrder>
   <MS_Craft_Details>Details</MS_Craft_Details>
   <MS_Craft_Workbenches>Workbenches</MS_Craft_Workbenches>
+  <MS_Craft_FavoriteWorkbench>Favorite this workbench and move it to the top.</MS_Craft_FavoriteWorkbench>
+  <MS_Craft_UnfavoriteWorkbench>Remove this workbench from favorites.</MS_Craft_UnfavoriteWorkbench>
   <MS_Craft_CompactModeOff>Enable compact mode for the workbench list.</MS_Craft_CompactModeOff>
   <MS_Craft_CompactModeOn>Disable compact mode for the workbench list.</MS_Craft_CompactModeOn>
   <MS_Craft_RecipeCompactModeOff>Enable compact mode for the recipe list.</MS_Craft_RecipeCompactModeOff>
@@ -53,7 +55,7 @@
   <MS_Craft_MissingMaterials>Ingredients unavailable or reserved</MS_Craft_MissingMaterials>
   <MS_Craft_NoWorker>No eligible worker with the work type enabled</MS_Craft_NoWorker>
   <MS_Craft_NoBench>No reachable, available workbench</MS_Craft_NoBench>
-  <MS_Craft_NoOrdersForWorkType>No production orders for this work type</MS_Craft_NoOrdersForWorkType>
+  <MS_Craft_NoOrdersForWorkType>This pawn has no eligible recipes</MS_Craft_NoOrdersForWorkType>
   <MS_Craft_SelectedWorkerNotAllowed>This pawn is not assigned to this work type or does not meet the order's skill and worker restrictions</MS_Craft_SelectedWorkerNotAllowed>
   <MS_Craft_Ready>Ready</MS_Craft_Ready>
   <MS_Craft_Resume>Resume</MS_Craft_Resume>

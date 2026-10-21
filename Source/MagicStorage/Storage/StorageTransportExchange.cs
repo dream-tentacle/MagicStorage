@@ -233,12 +233,24 @@ namespace MagicStorage
                 }
                 // Withdrawals can free slots for returns. Reserve all returns together before storing any.
                 foreach (var move in moves)
-                    if (!move.ToSupplier && expected.ReserveIncoming(move, move.Item, move.Count) != move.Count)
-                    { error = "MS_Transport_NetworkCannotAccept"; return false; }
+                {
+                    if (move.ToSupplier) continue;
+                    if (!supplier.CanWork || supplier.Network != expected) return false;
+                    if (!expected.Core.Settings.AllowedToAccept(move.Item))
+                    { error = "MS_Transport_ReturnFilterRejected"; return false; }
+                    if (expected.ReserveIncoming(move, move.Item, move.Count) != move.Count)
+                    { error = "MS_Transport_ReturnCapacityInsufficient"; return false; }
+                }
                 foreach (var move in moves)
                 {
                     if (move.ToSupplier) continue;
-                    if (!expected.TryStoreReserved(supplier.Contents, move.Item, move.Count, move).Complete) return false;
+                    var result = expected.TryStoreReserved(supplier.Contents, move.Item, move.Count, move);
+                    if (!result.Complete)
+                    {
+                        if (result.Failure == StorageFailure.FilterRejected) error = "MS_Transport_ReturnFilterRejected";
+                        else if (result.Failure == StorageFailure.InsufficientCapacity) error = "MS_Transport_ReturnCapacityInsufficient";
+                        return false;
+                    }
                 }
                 if (!supplier.CanWork || supplier.Network != expected ||
                     supplier.StoredMass + ContainerMass(staging.Contents) > capacity + MassTolerance) return false;

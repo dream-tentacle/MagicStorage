@@ -11,6 +11,9 @@ namespace MagicStorage
     public sealed class Dialog_CosmicCrafting : Window
     {
         private static readonly Texture2D CompactModeIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/CompactMode");
+        private static readonly Texture2D FavoriteEmptyIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteEmpty");
+        private static readonly Texture2D FavoriteFilledIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteFilled");
+        private static readonly Texture2D FavoriteHoverIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteHover");
         private static Vector2? lastClosedPosition;
         private readonly Building_StorageCore core;
         private readonly CosmicCraftingListFilter listFilter = new CosmicCraftingListFilter();
@@ -24,6 +27,7 @@ namespace MagicStorage
         private readonly Dictionary<CraftingOrder, string> statuses = new Dictionary<CraftingOrder, string>();
         private float refreshAt;
         private int orderReorderGroup = -1;
+        private int orderDragButton = -1;
         private readonly Dictionary<CraftingOrder, long> productCounts = new Dictionary<CraftingOrder, long>();
         public override Vector2 InitialSize => new Vector2(Math.Min(1100, UI.screenWidth), Math.Min(800, UI.screenHeight));
         public Dialog_CosmicCrafting(Building_StorageCore core)
@@ -86,6 +90,17 @@ namespace MagicStorage
             DrawOrders(new Rect(0, listY, leftWidth, listHeight),
                 core.Crafting.Orders.Where(order => listFilter.Matches(order.Recipe)).ToList());
             DrawWorkbenches(new Rect(leftWidth + 16, listY, rect.width - leftWidth - 16, listHeight));
+            Event current = Event.current;
+            if (orderDragButton >= 0 && current.button == orderDragButton)
+            {
+                // The native reorder widget observes raw MouseUp even after the event is consumed.
+                if (current.rawType == EventType.MouseUp)
+                {
+                    orderDragButton = -1;
+                    if (current.type == EventType.MouseUp) current.Use();
+                }
+                else if (current.type == EventType.MouseDrag) current.Use();
+            }
         }
         private void SharedFilterChanged()
         {
@@ -109,15 +124,16 @@ namespace MagicStorage
         {
             Widgets.DrawMenuSection(outer);
             var tables = CraftingRecipeCatalog.AvailableWorkbenches(listFilter.WorkType)
-                .Where(listFilter.MatchesWorkbench).ToList();
+                .Where(listFilter.MatchesWorkbench).OrderBy(uiState.WorkbenchFavoriteOrder).ToList();
             if (tables.Count == 0)
             { Widgets.Label(outer.ContractedBy(8), "MS_Craft_NoMatchingWorkbenches".Translate()); return; }
             float viewWidth = outer.width - 18;
             var heights = tables.Select(table => CompactMode
-                ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 80f) + 8f) : 64f).ToList();
+                ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 108f) + 8f) : 64f).ToList();
             var view = new Rect(0, 0, viewWidth, heights.Sum());
             Widgets.BeginScrollView(outer, ref workbenchScroll, view);
             float y = 0;
+            bool favoritesChanged = false;
             for (int index = 0; index < tables.Count; index++)
             {
                 var table = tables[index];
@@ -133,23 +149,35 @@ namespace MagicStorage
                 {
                     Widgets.DefIcon(new Rect(row.x + 4, row.y + (row.height - 24f) / 2f, 24, 24), table);
                     Text.Anchor = TextAnchor.MiddleLeft;
-                    Widgets.Label(new Rect(row.x + 36, row.y + 4, row.width - 72, row.height - 8), table.LabelCap);
+                    Widgets.Label(new Rect(row.x + 36, row.y + 4, row.width - 100, row.height - 8), table.LabelCap);
                     Text.Anchor = TextAnchor.UpperLeft;
                     Widgets.DrawLineHorizontal(row.x, row.yMax - 1f, row.width, Widgets.SeparatorLineColor);
                 }
                 else
                 {
                     Widgets.DefIcon(new Rect(row.x + 4, row.y + 8, 44, 44), table);
-                    Widgets.Label(new Rect(row.x + 56, row.y + 3, row.width - 94, 28), table.LabelCap);
-                    Widgets.Label(new Rect(row.x + 56, row.y + 31, row.width - 94, 26), source);
+                    Widgets.Label(new Rect(row.x + 56, row.y + 3, row.width - 120, 28), table.LabelCap);
+                    Widgets.Label(new Rect(row.x + 56, row.y + 31, row.width - 120, 26), source);
+                }
+                bool favorite = uiState.IsWorkbenchFavorite(table);
+                var favoriteRect = new Rect(row.xMax - 58, row.y + (row.height - 24f) / 2f, 24, 24);
+                TooltipHandler.TipRegion(favoriteRect,
+                    (favorite ? "MS_Craft_UnfavoriteWorkbench" : "MS_Craft_FavoriteWorkbench").Translate());
+                Texture2D favoriteIcon = Mouse.IsOver(favoriteRect) ? FavoriteHoverIcon :
+                    (favorite ? FavoriteFilledIcon : FavoriteEmptyIcon);
+                if (Widgets.ButtonImage(favoriteRect, favoriteIcon, Color.white, Color.white))
+                {
+                    uiState.ToggleWorkbenchFavorite(table);
+                    favoritesChanged = true;
                 }
                 Widgets.InfoCardButton(row.xMax - 30, row.y + (row.height - 24f) / 2f, table);
-                TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 36, row.height),
+                TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 64, row.height),
                     table.LabelCap + "\n" + source + (locked ? "\n" + "MS_Craft_WorkbenchLockedHint".Translate().ToString() : ""));
-                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, row.height)))
+                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 64, row.height)))
                     OpenRecipePicker(table);
             }
             Widgets.EndScrollView();
+            if (favoritesChanged) workbenchScroll = Vector2.zero;
         }
         private void OpenRecipePicker(ThingDef table = null)
         {
@@ -203,9 +231,23 @@ namespace MagicStorage
                             GUI.color = borderColor;
                             DrawOrderRow(row, icon, title, order);
                         }
-                        // Right-button dragging reorders the block independently of left-button window dragging.
                         // Register offscreen rows too so native drag indexes remain stable while scrolling.
-                        ReorderableWidget.Reorderable(orderReorderGroup, row, useRightButton: true);
+                        Event current = Event.current;
+                        bool startReorder = current.type == EventType.MouseDown &&
+                            (current.button == 0 || current.button == 1) && Mouse.IsOver(row);
+                        if (ReorderableWidget.Reorderable(orderReorderGroup, row, useRightButton: current.button == 1))
+                        {
+                            Color previousColor = GUI.color;
+                            GUI.color = new Color(1f, 1f, 1f, 0.5f);
+                            Widgets.DrawBox(row, 2);
+                            GUI.color = previousColor;
+                        }
+                        if (startReorder)
+                        {
+                            // Let row buttons handle their clicks first, then prevent window dragging.
+                            orderDragButton = current.button;
+                            current.Use();
+                        }
                     }
                 }
                 finally { Widgets.EndScrollView(); }

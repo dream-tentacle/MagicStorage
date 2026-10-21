@@ -21,6 +21,7 @@ internal static class CosmicCraftingTests
         BenchSelectionAndPriority();
         OrderedJobPreflight();
         WorkerFailurePrecedesOccupation();
+        DuplicateRecipeWorkerEligibility();
         FixedCostMaterials();
         VanillaMaterialSelection();
         IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
@@ -182,12 +183,12 @@ internal static class CosmicCraftingTests
             Equal(0, materials.Calls, "insufficient skill never scans ingredients");
             order.Recipe.minimumSkill = 0; order.Worker = new Pawn();
             products.Amount = 10; JobFailReason.Clear();
-            Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "manual query keeps satisfied-order precedence");
-            Equal("MS_Craft_Satisfied", JobFailReason.Reason, "manual failure reason retains original ordering");
-            Equal(1, products.Calls, "manual reason may count products for original precedence");
+            Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "manual query filters another named worker before checking targets");
+            Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "no eligible order uses the pawn-specific recipe message");
+            Equal(0, products.Calls, "manual query never counts products for an excluded order");
             products.Amount = 0;
             Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "manual query rejects wrong named worker below target");
-            Equal("MS_Craft_SelectedWorkerNotAllowed", JobFailReason.Reason, "manual worker restriction reason preserved");
+            Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "worker restrictions leave no eligible recipe");
             Equal(0, materials.Calls, "manual wrong worker still never plans ingredients");
             order.Worker = null;
             Equal(true, f.Dispatch.FindJob(f.Pawn, f.Giver) != null, "eligible worker can immediately find the same order");
@@ -480,6 +481,41 @@ internal static class CosmicCraftingTests
         Equal(f.Pawn.CurJob, scanner.JobOnThing(f.Pawn, a.Item2, true), "actual worker is still recognized as already working");
         Equal(f.Pawn, f.Dispatch.AssignedWorker(order), "menu checks do not disturb the existing worker");
         driver.EndJobWith(JobCondition.InterruptForced);
+    }
+    private static void DuplicateRecipeWorkerEligibility()
+    {
+        var f = new Fixture(); var a = f.Core(0); var first = f.Order(a.Item1, 3);
+        first.Recipe.minimumSkill = 8;
+        first.Recipe.workSkill = new SkillDef();
+        var second = a.Item1.Crafting.Add(first.Recipe); second.Mode = CraftingRepeatMode.Forever;
+        var bench = new Building_CosmicWorkbench(); f.Register(bench, 3); f.Dispatch.Register(bench);
+        f.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+        var running = f.Start(f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true));
+        var other = new Pawn { Spawned = true, Map = f.Map, Faction = Faction.OfPlayer };
+        other.skills.record.Level = 5;
+        JobFailReason.Clear();
+        Equal(null, f.Dispatch.FindJobOnBench(other, f.Giver, bench, true), "low skill pawn cannot claim either duplicate recipe");
+        Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "occupied first order cannot mask the pawn's lack of eligible recipes");
+        Equal(f.Pawn, f.Dispatch.AssignedWorker(first), "failed query leaves first worker assigned");
+        Equal(null, f.Dispatch.AssignedWorker(second), "failed query never claims the second order");
+
+        other.skills.record.Level = 10;
+        first.Worker = f.Pawn;
+        second.SkillRange = new IntRange(15, 20);
+        Equal(null, f.Dispatch.FindJobOnBench(other, f.Giver, bench, true), "named-worker and skill-range filters also run first");
+        Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "no order survives the worker restrictions");
+
+        second.SkillRange = new IntRange(0, 20);
+        var job = f.Dispatch.FindJobOnBench(other, f.Giver, bench, true);
+        Equal(true, job != null, "eligible pawn finds the second duplicate recipe");
+        Equal(second.Id, job.count, "existing availability logic skips the running first order");
+        var driver = new JobDriver_CosmicCrafting { pawn = other, job = job };
+        other.jobs.curJob = job; other.jobs.curDriver = driver;
+        Equal(true, driver.TryMakePreToilReservations(false), "second worker can prepare an independent batch");
+        Equal(other, f.Dispatch.AssignedWorker(second), "same recipe orders have separate worker assignments");
+        Equal(f.Pawn, f.Dispatch.AssignedWorker(first), "second claim does not replace the first worker");
+        driver.EndJobWith(JobCondition.InterruptForced);
+        running.EndJobWith(JobCondition.InterruptForced);
     }
     private static void OrderedJobPreflight()
     {

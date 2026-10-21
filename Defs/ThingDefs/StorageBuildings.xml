@@ -108,9 +108,9 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_CosmicWorkbench</defName>
-    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
+    <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>cosmic workbench</label>
-    <description>Performs production orders assigned by the connected control core. When a worker takes an order, ingredients for the current batch are set aside from the network, using connected auto-restocking shelves to make up any shortfall. Prepared ingredients remain with the order when work is interrupted and are returned if the order is deleted.\n\nProducts default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored. Orders can also be set to drop finished products near the workbench.</description>
+    <description>Performs production orders assigned by the connected control core. When a worker takes an order, ingredients for the current batch are set aside from the network, using connected auto-restocking shelves to make up any shortfall. Prepared ingredients remain with the order when work is interrupted and are returned if the order is deleted.\n\nProducts default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored.\n\nWorkbench unlock mode can be enabled in the settings. Unlocking a workbench's recipes requires materials.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
@@ -138,7 +138,7 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_ConstructionSupplyUnit</defName>
-    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
+    <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>construction supply unit</label>
     <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells. No hauling is required; colonists still perform the construction work.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
@@ -163,7 +163,7 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageApparelAdapter</defName>
-    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
+    <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>apparel adapter</label>
     <description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Serves one colonist at a time.</description>
     <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>

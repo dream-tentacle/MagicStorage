@@ -72,8 +72,8 @@ namespace MagicStorage
 
         private void DrawGeneralSettings(Listing_Standard listing)
         {
-            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode);
             listing.Label("MS_SettingsWorkbenchUnlockModeHelp".Translate());
+            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode);
             listing.Gap();
             listing.Label("MS_SettingsUnitSlotsHelp".Translate());
             int slots = Settings.StorageUnitSlots;

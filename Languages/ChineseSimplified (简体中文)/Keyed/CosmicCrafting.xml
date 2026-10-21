@@ -24,10 +24,12 @@
   <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
   <MS_Craft_Orders>已添加的制作任务</MS_Craft_Orders>
-  <MS_Craft_DragToSort>右键拖拽以排序</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>按住右键拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
+  <MS_Craft_DragToSort>左/右键拖拽以排序</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>按住左键或右键拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
   <MS_Craft_Details>详细</MS_Craft_Details>
   <MS_Craft_Workbenches>工作台</MS_Craft_Workbenches>
+  <MS_Craft_FavoriteWorkbench>收藏此工作台并置顶。</MS_Craft_FavoriteWorkbench>
+  <MS_Craft_UnfavoriteWorkbench>取消收藏此工作台。</MS_Craft_UnfavoriteWorkbench>
   <MS_Craft_CompactModeOff>开启工作台列表的紧凑模式。</MS_Craft_CompactModeOff>
   <MS_Craft_CompactModeOn>关闭工作台列表的紧凑模式。</MS_Craft_CompactModeOn>
   <MS_Craft_RecipeCompactModeOff>开启配方列表的紧凑模式。</MS_Craft_RecipeCompactModeOff>
@@ -53,7 +55,7 @@
   <MS_Craft_MissingMaterials>材料不足或已被预留</MS_Craft_MissingMaterials>
   <MS_Craft_NoWorker>没有符合条件且启用对应工作的工作者</MS_Craft_NoWorker>
   <MS_Craft_NoBench>没有可到达且未被占用的工作台</MS_Craft_NoBench>
-  <MS_Craft_NoOrdersForWorkType>没有此类工作的制作任务</MS_Craft_NoOrdersForWorkType>
+  <MS_Craft_NoOrdersForWorkType>此人没有可工作的配方</MS_Craft_NoOrdersForWorkType>
   <MS_Craft_SelectedWorkerNotAllowed>此殖民者未启用对应工作，或不符合任务的技能与工作者条件</MS_Craft_SelectedWorkerNotAllowed>
   <MS_Craft_Ready>可进行</MS_Craft_Ready>
   <MS_Craft_Resume>恢复</MS_Craft_Resume>

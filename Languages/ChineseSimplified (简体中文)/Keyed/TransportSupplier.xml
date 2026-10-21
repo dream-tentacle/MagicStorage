@@ -14,7 +14,9 @@
   <MS_Transport_Overweight>转移后的补给器重量超过上限，无法确认。请减少转入数量或将部分物品送回网络。</MS_Transport_Overweight>
   <MS_Transport_Hint>确认后执行全部选择；取消不会转移物品。补给器按设置的刷新间隔向正前方的运输容器或燃料设备提供物资，多余或不匹配的物品留在补给器内。</MS_Transport_Hint>
   <MS_Transport_Unavailable>物品或网络状态已变化，未能完成全部转移。列表已刷新，请检查双方库存后重试。</MS_Transport_Unavailable>
-  <MS_Transport_NetworkCannotAccept>网络的存储过滤规则或剩余槽位无法接收全部送回物品，本次转移已取消。</MS_Transport_NetworkCannotAccept>
+  <MS_Transport_ReturnFilterRejected>有物品不符合存储核心的过滤规则，本次转移已取消。</MS_Transport_ReturnFilterRejected>
+  <MS_Transport_ReturnCapacityInsufficient>存储网络的剩余容量不足，无法接收全部送回物品，本次转移已取消。</MS_Transport_ReturnCapacityInsufficient>
+  <MS_Transport_ReturnWarningTitle>无法送回物品</MS_Transport_ReturnWarningTitle>
   <MS_Transport_Refreshed>网络或库存已变化，列表已刷新并重置转移数量。</MS_Transport_Refreshed>
   <MS_Transport_Contents>内部存货：{0}堆，共{1}千克</MS_Transport_Contents>
   <MS_Transport_NoTarget>正前方没有运输容器或燃料设备；等待供给。</MS_Transport_NoTarget>

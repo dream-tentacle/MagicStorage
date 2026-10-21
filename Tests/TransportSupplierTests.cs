@@ -520,7 +520,7 @@ internal static class TransportSupplierTests
         var rows = f.Rows(); rows.Single(row => row.Representative.def == a).SetChange(5); rows.Single(row => row.Representative.def == b).SetChange(-10);
         f.Core.Settings.allow = false;
         Equal(false, f.Execute(rows, 150, out string error), "filter-rejected return cancels exchange");
-        Equal("MS_Transport_NetworkCannotAccept", error, "return rejection reason");
+        Equal("MS_Transport_ReturnFilterRejected", error, "return rejection identifies the storage filter");
         Equal(20L, f.Net.GetTotalCount(a), "withdrawal restored after rejected return"); Equal(10L, f.Count(f.Supplier.Contents, b), "return retained in supplier");
         Equal(0L, f.Count(f.Supplier.Contents, a), "no partial incoming delivery"); Equal(0, f.Map.Ground.Count, "rejected return not dropped");
         Equal(20L, f.Rows().Single(row => row.Representative.def == a).Available, "failed transaction releases claims");
@@ -529,7 +529,8 @@ internal static class TransportSupplierTests
     {
         var f = new Fixture(); f.Unit.SlotCapacity = 1; var a = new ThingDef(); var b = new ThingDef();
         f.Store(a, 10); f.Cargo(b, 20); var rows = f.Rows(); rows.Single(row => row.Representative.def == b).SetChange(-20);
-        Equal(false, f.Execute(rows, 150, out _), "full network rejects return"); Equal(20L, f.Count(f.Supplier.Contents, b), "full-network return preserved");
+        Equal(false, f.Execute(rows, 150, out string error), "full network rejects return"); Equal(20L, f.Count(f.Supplier.Contents, b), "full-network return preserved");
+        Equal("MS_Transport_ReturnCapacityInsufficient", error, "full network reports insufficient capacity instead of a filter rejection");
         rows = f.Rows(); rows.Single(row => row.Representative.def == a).SetChange(10); rows.Single(row => row.Representative.def == b).SetChange(-20);
         Equal(true, f.Execute(rows, 150, out _), "withdrawal frees slot for same exchange's return");
         Equal(20L, f.Net.GetTotalCount(b), "returned stock occupies freed slot"); Equal(10L, f.Count(f.Supplier.Contents, a), "outgoing stock reaches supplier");
@@ -538,7 +539,8 @@ internal static class TransportSupplierTests
     {
         var f = new Fixture(); f.Unit.SlotCapacity = 1; var a = new ThingDef(); var b = new ThingDef();
         f.Cargo(a, 5); f.Cargo(b, 5); var rows = f.Rows(); foreach (var row in rows) row.SetChange(-5);
-        Equal(false, f.Execute(rows, 150, out _), "two returns cannot compete for one free slot");
+        Equal(false, f.Execute(rows, 150, out string error), "two returns cannot compete for one free slot");
+        Equal("MS_Transport_ReturnCapacityInsufficient", error, "combined returns report capacity reserved by the other returning item");
         Equal(5L, f.Count(f.Supplier.Contents, a), "first return untouched if second cannot fit");
         Equal(5L, f.Count(f.Supplier.Contents, b), "second return untouched"); Equal(0L, f.Net.UsedSlots, "no partial return before reservation completes");
     }

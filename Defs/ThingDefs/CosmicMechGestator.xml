@@ -3,7 +3,7 @@
   <ThingDef ParentName="MechGestatorBase" MayRequire="Ludeon.RimWorld.Biotech">
     <defName>MS_CosmicMechGestator</defName>
     <label>cosmic mech gestator</label>
-    <description>A mech gestator connected to the magic storage network. Each gestator has its own bills. When a mechanitor accepts a bill, the required ingredients are transferred directly from the network. Interrupted work retains its ingredients; cancelling a bill returns unconsumed ingredients to the network, with overflow placed nearby.\n\nDoes not require electricity. Supports recipes that use the standard mech gestation process. The source gestator's research must also be completed. Mechanitor work, bandwidth, gestation cycles and toxic waste are handled normally. Gestation pauses while the storage network is unavailable.</description>
+    <description>A mech gestator connected to the magic storage network. Each gestator has its own bills. When a mechanitor works at it, the required ingredients are transferred directly from the network, without hauling.</description>
     <thingClass>MagicStorage.Building_CosmicMechGestator</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
@@ -37,6 +37,7 @@
       <ComponentIndustrial>6</ComponentIndustrial>
     </costList>
     <researchPrerequisites>
+      <li>MS_MagicDrive</li>
       <li>BasicMechtech</li>
     </researchPrerequisites>
     <comps Inherit="False">

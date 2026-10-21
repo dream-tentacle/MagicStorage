@@ -18,6 +18,8 @@
 
 也可以使用 `build.ps1` 切换版本：`./build.ps1 -GameVersion 1.7` 或 `./build.ps1 -GameVersion 1.6`。旧版依赖位于备份目录时，用 `-GameAssemblyDir <1.6的Managed目录>` 指定；Harmony 路径可用 `-HarmonyAssemblyPath <0Harmony.dll路径>` 覆盖。`build.ps1` 只编译；部署仍单独运行 `deploy.ps1`，并申请沙箱外部权限。
 
+需要同时维护1.6、1,7两个版本。
+
 进行任何xml修改后，需要使用 `deploy.ps1` （需要申请沙箱外部权限运行，否则会失败）。部署后不允许额外核对，可以直接向用户汇报。
 
 运行命令需要注意：运行deploy.ps1时，必须临时申请沙箱外部权限。

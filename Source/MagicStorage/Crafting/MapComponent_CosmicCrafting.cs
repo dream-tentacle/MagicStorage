@@ -110,17 +110,15 @@ namespace MagicStorage
             foreach (var order in core.Crafting.Orders)
             {
                 if (!CraftingRecipeCatalog.HasType(order.Recipe, giver.workType)) continue;
-                // Automatic searches skip ineligible workers before product counting or
-                // material scans. Menu searches keep their original failure precedence.
-                if (!reportFailure && !CraftingServices.Workers.Allows(order, pawn, giver.workType)) continue;
+                // Only this pawn's eligible orders may contribute an availability reason.
+                // This also avoids counting products or scanning materials for excluded orders.
+                if (!CraftingServices.Workers.Allows(order, pawn, giver.workType)) continue;
                 string failure = null;
                 var worker = AssignedWorker(order);
                 if (worker != null)
                 { if (!reportFailure) continue; failure = "MS_Craft_Assigned".Translate(worker.LabelShortCap); }
                 else if (!CanRun(core, order))
                 { if (!reportFailure) continue; failure = Status(core, order, false); }
-                else if (reportFailure && !CraftingServices.Workers.Allows(order, pawn, giver.workType))
-                    failure = "MS_Craft_SelectedWorkerNotAllowed".Translate();
                 else if (order.Batch == null && !MaterialsAvailable(core, order, immediate))
                 { if (!reportFailure) continue; failure = "MS_Craft_MissingMaterials".Translate(); }
                 if (failure == null) return order;

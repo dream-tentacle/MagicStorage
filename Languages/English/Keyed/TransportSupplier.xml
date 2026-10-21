@@ -14,7 +14,9 @@
   <MS_Transport_Overweight>The supplier would exceed its mass limit. Reduce incoming quantities or return some items to the network before confirming.</MS_Transport_Overweight>
   <MS_Transport_Hint>Confirm executes all selections; cancel moves nothing. The supplier delivers to the transporter or refuelable building directly ahead at the configured refresh interval. Excess or incompatible items stay in the supplier.</MS_Transport_Hint>
   <MS_Transport_Unavailable>Items or network status changed, and the full transfer could not be completed. The list has been refreshed. Check both inventories before retrying.</MS_Transport_Unavailable>
-  <MS_Transport_NetworkCannotAccept>The network's storage filter or remaining stack slots cannot accept all returning items. This transfer was cancelled.</MS_Transport_NetworkCannotAccept>
+  <MS_Transport_ReturnFilterRejected>Some returning items are not allowed by the storage core's filter. This transfer was cancelled.</MS_Transport_ReturnFilterRejected>
+  <MS_Transport_ReturnCapacityInsufficient>The storage network does not have enough remaining capacity to accept all returning items. This transfer was cancelled.</MS_Transport_ReturnCapacityInsufficient>
+  <MS_Transport_ReturnWarningTitle>Unable to return items</MS_Transport_ReturnWarningTitle>
   <MS_Transport_Refreshed>The network or inventory changed. The list was refreshed and transfer quantities were reset.</MS_Transport_Refreshed>
   <MS_Transport_Contents>Internal cargo: {0} stacks, {1} kg</MS_Transport_Contents>
   <MS_Transport_NoTarget>No transporter or refuelable building directly ahead; waiting to supply.</MS_Transport_NoTarget>

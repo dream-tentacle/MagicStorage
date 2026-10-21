@@ -246,7 +246,14 @@ namespace MagicStorage
                 if (!rows.Any(row => row.Change != 0)) Close();
                 else if (StorageTransportExchange.Execute(supplier, network, rows, capacity, out string error))
                 { SoundDefOf.ExecuteTrade.PlayOneShotOnCamera(); Close(false); }
-                else { Refresh(); feedback = error.Translate(); SoundDefOf.ClickReject.PlayOneShotOnCamera(); }
+                else
+                {
+                    Refresh();
+                    feedback = error.Translate();
+                    SoundDefOf.ClickReject.PlayOneShotOnCamera();
+                    if (error == "MS_Transport_ReturnFilterRejected" || error == "MS_Transport_ReturnCapacityInsufficient")
+                        Find.WindowStack.Add(new Dialog_MessageBox(feedback, title: "MS_Transport_ReturnWarningTitle".Translate()));
+                }
                 Event.current.Use();
             }
             if (Widgets.ButtonText(new Rect(accept.xMax + 10, accept.y, 160, 40), "CancelButton".Translate()))
