@@ -31,6 +31,21 @@
   <MS_Transport_PrioritySlot>优先级 {0}</MS_Transport_PrioritySlot>
   <MS_Transport_PickTitle>选择优先级 {0} 的供给物品</MS_Transport_PickTitle>
   <MS_Transport_PickHint>选择一种物品；同一种物品只能占用一个位置。上方位置优先供给。</MS_Transport_PickHint>
-  <MS_Transport_ImmediateDesc>立即向正前方目标供给一次，使用当前模式的物资来源。补料只跳过百分比阈值，仍遵循目标建筑的自动补充开关、燃料过滤、目标量及其他补料限制，不使用已预留物品。</MS_Transport_ImmediateDesc>
+  <MS_Transport_ImmediateDesc>立即向正前方的目标补充物资。</MS_Transport_ImmediateDesc>
+  <MS_Transport_GenericSupply>通用容器供给</MS_Transport_GenericSupply>
+  <MS_Transport_GenericSupplyDesc>提高兼容能力，但是不保证能被目标mod识别存入</MS_Transport_GenericSupplyDesc>
+  <MS_Transport_ChooseContainer>选择目标容器</MS_Transport_ChooseContainer>
+  <MS_Transport_ChooseContainerDesc>选择正前方己方建筑公开的目标容器。只有一个容器时自动使用；多个容器时须先选择。运输容器和燃料设备优先使用专用供给规则。</MS_Transport_ChooseContainerDesc>
+  <MS_Transport_GenericEmpty>空</MS_Transport_GenericEmpty>
+  <MS_Transport_GenericContainer>容器 {0}：{1}</MS_Transport_GenericContainer>
+  <MS_Transport_GenericTarget>正前方：{0}\n通用供给目标：{1}</MS_Transport_GenericTarget>
+  <MS_Transport_NoGenericTarget>正前方没有可供给的运输容器、燃料设备或通用容器；等待供给。</MS_Transport_NoGenericTarget>
+  <MS_Transport_SelectContainerFirst>目标有多个容器，请先选择目标容器。</MS_Transport_SelectContainerFirst>
+  <MS_Transport_SpecializedTarget>当前目标使用运输或燃料专用供给规则。</MS_Transport_SpecializedTarget>
   <MS_Transport_ImmediateEmpty>物资补给器内没有可供给的物品。</MS_Transport_ImmediateEmpty>
+  <MS_Transport_CreateGroup>建立发射组</MS_Transport_CreateGroup>
+  <MS_Transport_CreateGroupDesc>将选中的{0}个空投仓建立为同一个发射组，保留仓内物品。物资补给器和发射检查共用整组载重上限，允许单仓超过自身容量。建组后直接使用原版发射按钮。</MS_Transport_CreateGroupDesc>
+  <MS_Transport_GroupAlreadyAssigned>选中的空投仓已有发射组。请只选择尚未编组的空投仓。</MS_Transport_GroupAlreadyAssigned>
+  <MS_Transport_GroupInvalid>请选择同一地图上同类型、属于玩家且尚未编组的空投仓。</MS_Transport_GroupInvalid>
+  <MS_Transport_GroupMass>发射组载重：{0} / {1}千克</MS_Transport_GroupMass>
 </LanguageData>

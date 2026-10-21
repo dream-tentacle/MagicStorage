@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_CosmicMechGestator.label>宇宙机械体培育器</MS_CosmicMechGestator.label>
+  <MS_CosmicMechGestator.description>与魔法存储网络相连的机械体培育器。每台培育器拥有独立的任务清单。机械师领取任务时，所需材料直接从网络送入培育器，无需搬运。工作中断时保留材料；取消任务时，未消耗的材料优先退回网络，无法存入的部分放在附近。\n\n无需电力。可执行使用原版机械体培育流程的配方，且须完成配方来源培育器的研究。机械师操作、带宽、培育周期及有毒垃圾均按原有规则处理。存储网络不可用时暂停培育。</MS_CosmicMechGestator.description>
+</LanguageData>

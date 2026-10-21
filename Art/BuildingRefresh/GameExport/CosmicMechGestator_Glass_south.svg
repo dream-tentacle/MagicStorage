@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="928" height="800" viewBox="0 0 928 800"><g transform="matrix(1.080000000000 0 0 1.316571428571 49.280000000000 37.942857142857)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="768" height="512" style="mask-type:luminance"><rect x="0" y="0" width="768" height="512" fill="#ffffff" /><path d="M84 100H253.7509A132 92.4 0 0 1 514.2491 100H684Q704 100 704 120V454Q704 474 684 474H84Q64 474 64 454V120Q64 100 84 100Z" fill="#000000" stroke="none" /></mask></defs>
+  <defs>
+    <radialGradient id="lid-metal" cx="34%" cy="23%" r="84%">
+      <stop offset="0" stop-color="#e1e9ef" />
+      <stop offset=".52" stop-color="#bccbd6" />
+      <stop offset="1" stop-color="#94abba" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4d7188" stop-opacity=".90" /><stop offset=".20" stop-color="#b9d9e7" stop-opacity=".65" /><stop offset=".74" stop-color="#94b7ca" stop-opacity=".55" /><stop offset="1" stop-color="#4a7189" stop-opacity=".88" /></linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfE3" stop-opacity=".2" />
+      <stop offset="1" stop-color="#5d87a3" stop-opacity=".5" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" />
+    </clipPath>
+  </defs>
+
+  <g transform="translate(0 -27)" id="cylinder-glass" clip-path="url(#tank-body-clip)">
+    <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" fill="url(#tank-glass)" stroke="#698ca5" stroke-width="2.5" />
+    <path d="M267 267C267 218 501 218 501 267V302C501 347 448 383.9 384 383.9C320 383.9 267 347 267 302Z" fill="url(#culture-fluid)" />
+    <path d="M275 268C275 310 493 310 493 268" fill="none" stroke="#d6eaf5" stroke-opacity=".25" stroke-width="2" />
+    <path d="M283 238V300Q283 338 310 357" fill="none" stroke="#eaf7fd" stroke-opacity=".44" stroke-width="6" stroke-linecap="round" />
+    <path d="M487 240V300Q487 338 460 357" fill="none" stroke="#527a96" stroke-opacity=".46" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  </g></svg>

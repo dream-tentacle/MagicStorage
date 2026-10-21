@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchProjectDef>
+    <defName>MS_BasicMagicStorage</defName>
+    <label>basic magic storage</label>
+    <description>Build a magic storage network with a control core, storage units, storage conduits and receivers. Unlock auto-restocking shelves, apparel adapters, cosmic workbenches and construction supply units.</description>
+    <baseCost>10</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MS_MagicStorage</tab>
+    <researchViewX>0</researchViewX>
+    <researchViewY>1</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MS_MaterialSupplyTechnology</defName>
+    <label>material supply technology</label>
+    <description>Build material suppliers and fuel suppliers to deliver supplies directly from the magic storage network to transporters and fuel-powered buildings.</description>
+    <baseCost>100</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MS_MagicStorage</tab>
+    <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
+    <researchViewX>1</researchViewX>
+    <researchViewY>0</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>MS_WarpTechnology</defName>
+    <label>warp technology</label>
+    <description>Build caravan teleporters to form caravans directly on the world map, supplied by the magic storage network.</description>
+    <baseCost>100</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MS_MagicStorage</tab>
+    <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
+    <researchViewX>1</researchViewX>
+    <researchViewY>2</researchViewY>
+  </ResearchProjectDef>
+</Defs>

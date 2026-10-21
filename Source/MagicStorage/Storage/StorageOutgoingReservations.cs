@@ -97,6 +97,13 @@ namespace MagicStorage
                 Invalidate(claim, StorageReservationFailure.NodeUnavailable);
         }
 
+        internal void CancelForSource(Building_StorageUnit source)
+        {
+            if (!byNode.TryGetValue(source, out var bucket)) return;
+            foreach (var claim in new List<StorageReservation>(bucket))
+                if (claim.Source == source) Invalidate(claim, StorageReservationFailure.PolicyChanged);
+        }
+
         // Inventory callbacks only check physical availability; policy/topology checks wait
         // until the graph is current. No user code is called from a ThingOwner mutation.
         internal void ValidateInventory()

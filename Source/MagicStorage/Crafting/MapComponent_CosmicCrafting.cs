@@ -25,7 +25,11 @@ namespace MagicStorage
                 if (predicate(driver)) map.GetComponent<MapComponent_StorageNetworks>().Defer(() =>
                 { if (!driver.ended) driver.EndJobWith(JobCondition.Incompletable); });
         }
-        internal Pawn AssignedWorker(CraftingOrder order) => assignments.TryGetValue(order, out var driver) && !driver.ended ? driver.pawn : null;
+        internal Pawn AssignedWorker(CraftingOrder order) => assignments.TryGetValue(order, out var driver) &&
+            !driver.ended && driver.pawn?.jobs?.curDriver == driver && driver.pawn.CurJob == driver.job
+                ? driver.pawn : null;
+        internal bool IsAssigned(CraftingOrder order, JobDriver_CosmicCrafting driver) =>
+            assignments.TryGetValue(order, out var owner) && owner == driver;
         internal void Release(CraftingOrder order, JobDriver_CosmicCrafting driver)
         { if (order != null && assignments.TryGetValue(order, out var owner) && owner == driver) assignments.Remove(order); }
 
@@ -62,9 +66,8 @@ namespace MagicStorage
                 (order.Batch != null || MaterialsAvailable(core, order, true));
         }
 
-        internal bool TryClaim(JobDriver_CosmicCrafting driver, out CraftingMaterialLease lease)
+        internal bool TryClaim(JobDriver_CosmicCrafting driver)
         {
-            lease = null;
             var core = driver.Core; var order = driver.Order;
             if (!CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef)) return false;
             if (order.Batch == null)
@@ -72,9 +75,7 @@ namespace MagicStorage
                 if (!CraftingServices.Materials.TryPlan(core.Network, order, out var plan))
                 { order.LastMaterialFailureTick = Find.TickManager.TicksGame; return false; }
                 order.LastMaterialFailureTick = null;
-                var acquired = new CraftingMaterialLease(core.Network, driver.Bench, order, driver.OnMaterialsInvalidated);
-                if (!acquired.Acquire(plan)) return false;
-                lease = acquired;
+                if (!CraftingMaterialPreparation.Prepare(core, order, plan)) return false;
             }
             assignments[order] = driver;
             return true;
@@ -192,21 +193,46 @@ namespace MagicStorage
 
         public override void MapComponentTick()
         {
-            // Also releases claims if a driver was abandoned before its toil setup completed.
+            // Prepared materials belong to the order. Clean abandoned worker assignments
+            // independently so one broken driver cannot block other workers from resuming.
             if (!maintenanceTimer.IsDue(StorageRefreshTask.CraftingMaintenance, Find.TickManager.TicksGame)) return;
-            foreach (var driver in assignments.Values.ToList())
+            foreach (var pair in assignments.ToList())
             {
-                if (driver.ended || driver.pawn.jobs.curDriver != driver) driver.ReleaseAssignment();
-                else if (!driver.CanContinue()) driver.EndJobWith(JobCondition.Incompletable);
+                var driver = pair.Value;
+                bool release = false;
+                try
+                {
+                    if (driver.ended || driver.pawn?.jobs?.curDriver != driver ||
+                        driver.pawn.CurJob != driver.job || driver.pawn.Map != map) release = true;
+                    else if (!driver.CanContinue())
+                    {
+                        release = true;
+                        driver.EndJobWith(JobCondition.Incompletable);
+                    }
+                }
+                catch (System.Exception exception)
+                {
+                    release = true;
+                    Log.Error("[MagicStorage] Could not maintain crafting worker assignment: " + exception);
+                }
+                finally
+                {
+                    if (release) { driver.ReleaseAssignment(); Release(pair.Key, driver); }
+                }
             }
         }
 
         public override void FinalizeInit()
         {
-            // Restore runtime claims before idle pawns can claim a loaded job's order/materials.
+            // Old walking jobs have no saved batch: prepare once on load. Existing
+            // batches only restore their worker assignment and never take materials again.
             map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             foreach (var pawn in map.mapPawns.AllPawnsSpawned)
-                if (pawn.jobs?.curDriver is JobDriver_CosmicCrafting driver && !driver.ended) driver.CanContinue();
+                if (pawn.jobs?.curDriver is JobDriver_CosmicCrafting driver && !driver.ended && !driver.CanContinue())
+                {
+                    try { driver.EndJobWith(JobCondition.Incompletable); }
+                    finally { driver.ReleaseAssignment(); }
+                }
         }
     }
 

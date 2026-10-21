@@ -2,9 +2,12 @@
 <Defs>
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_TransportSupplier</defName>
+    <researchPrerequisites><li>MS_MaterialSupplyTechnology</li></researchPrerequisites>
     <label>material supplier</label>
-    <description>A storage network terminal that supplies the transporter or refuelable building directly ahead at the configured refresh interval. Manual mode delivers items from its internal container. Continuous mode sends up to three selected item types directly from the network, in order of priority, without storing them in the supplier. Fuel deliveries follow the target's fuel filter and automatic refueling toggle. Transporters take priority on targets with both components.\n\nFuel delivery uses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.\n\nEmpty the supplier's internal container before switching modes. In manual mode, items can be exchanged with the connected network. The transfer window limits the final stored mass to 150 kg or the total capacity of the transporter present when the window opens, whichever is greater.</description>
+    <description>A storage network terminal that supplies the transporter or refuelable building directly ahead at the configured refresh interval. Manual mode delivers items from its internal container. Continuous mode sends up to three selected item types directly from the network, in order of priority, without storing them in the supplier. Fuel deliveries follow the target's fuel filter and automatic refueling toggle. Transporters take priority on targets with both components.\n\nFuel delivery uses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.\n\nEmpty the supplier's internal container before switching modes. In manual mode, items can be exchanged with the connected network. The transfer window limits the final stored mass to 150 kg or the capacity of the transporter present when the window opens, whichever is greater. Grouped transport pods share their launch group's total capacity. Use Create launch group on the selected pods to group them without unloading their contents.</description>
     <thingClass>MagicStorage.Building_TransportSupplier</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <tickerType>Normal</tickerType>
     <size>(1,1)</size>
     <rotatable>true</rotatable>
@@ -14,7 +17,7 @@
       <drawSize>(1.125,1.125)</drawSize>
       <color>(1,1,1)</color>
       <drawRotated>false</drawRotated>
-      <allowFlip>true</allowFlip>
+      <allowFlip>false</allowFlip>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>

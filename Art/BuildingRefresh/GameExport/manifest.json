@@ -1,0 +1,741 @@
+{
+  "ppu": 256,
+  "padding": 16,
+  "inset_pixels": 12,
+  "outline_pixels": 10.138613861386137,
+  "ordinary": [
+    {
+      "family": "StorageCore",
+      "direction": "single",
+      "footprint": [
+        2,
+        2
+      ],
+      "world_size": [
+        2.125,
+        2.125
+      ],
+      "size": [
+        544,
+        544
+      ],
+      "target": "Textures/Things/Building/StorageCore/StorageCore.png",
+      "source": "Art\\BuildingRefresh\\StorageCore-refresh-v1.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "south",
+      "footprint": [
+        1,
+        2
+      ],
+      "world_size": [
+        1.125,
+        2.125
+      ],
+      "size": [
+        288,
+        544
+      ],
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_south.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageUnit_south.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "north",
+      "footprint": [
+        1,
+        2
+      ],
+      "world_size": [
+        1.125,
+        2.125
+      ],
+      "size": [
+        288,
+        544
+      ],
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_north.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageUnit_north.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "east",
+      "footprint": [
+        2,
+        1
+      ],
+      "world_size": [
+        2.125,
+        1.125
+      ],
+      "size": [
+        544,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_east.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageUnit_east.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "west",
+      "footprint": [
+        2,
+        1
+      ],
+      "world_size": [
+        2.125,
+        1.125
+      ],
+      "size": [
+        544,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_west.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageUnit_west.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageReceiver",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageReceiver/StorageReceiver.png",
+      "source": "Art\\BuildingRefresh\\StorageReceiver-refresh-v1.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "south",
+      "footprint": [
+        3,
+        1
+      ],
+      "world_size": [
+        3.125,
+        1.125
+      ],
+      "size": [
+        800,
+        288
+      ],
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_south.png",
+      "source": "Art\\BuildingRefresh\\Directions\\CosmicWorkbench_south.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "north",
+      "footprint": [
+        3,
+        1
+      ],
+      "world_size": [
+        3.125,
+        1.125
+      ],
+      "size": [
+        800,
+        288
+      ],
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_north.png",
+      "source": "Art\\BuildingRefresh\\Directions\\CosmicWorkbench_north.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "east",
+      "footprint": [
+        1,
+        3
+      ],
+      "world_size": [
+        1.125,
+        3.125
+      ],
+      "size": [
+        288,
+        800
+      ],
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_east.png",
+      "source": "Art\\BuildingRefresh\\Directions\\CosmicWorkbench_east.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "west",
+      "footprint": [
+        1,
+        3
+      ],
+      "world_size": [
+        1.125,
+        3.125
+      ],
+      "size": [
+        288,
+        800
+      ],
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_west.png",
+      "source": "Art\\BuildingRefresh\\Directions\\CosmicWorkbench_west.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "ConstructionSupplyUnit",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit.png",
+      "source": "Art\\BuildingRefresh\\ConstructionSupplyUnit-refresh-v1.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "south",
+      "footprint": [
+        2,
+        1
+      ],
+      "world_size": [
+        2.125,
+        1.125
+      ],
+      "size": [
+        544,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_south.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageApparelAdapter_south.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "north",
+      "footprint": [
+        2,
+        1
+      ],
+      "world_size": [
+        2.125,
+        1.125
+      ],
+      "size": [
+        544,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_north.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageApparelAdapter_north.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "east",
+      "footprint": [
+        1,
+        2
+      ],
+      "world_size": [
+        1.125,
+        2.125
+      ],
+      "size": [
+        288,
+        544
+      ],
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_east.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageApparelAdapter_east.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "west",
+      "footprint": [
+        1,
+        2
+      ],
+      "world_size": [
+        1.125,
+        2.125
+      ],
+      "size": [
+        288,
+        544
+      ],
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_west.png",
+      "source": "Art\\BuildingRefresh\\Directions\\StorageApparelAdapter_west.svg",
+      "xml": "StorageBuildings.xml"
+    },
+    {
+      "family": "StorageSupplyShelf",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/StorageSupplyShelf/StorageSupplyShelf.png",
+      "source": "Art\\BuildingRefresh\\StorageSupplyShelf-refresh-v1.svg",
+      "xml": "StorageSupplyShelf.xml"
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "south",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_south.png",
+      "source": "Art\\BuildingRefresh\\Directions\\TransportSupplier_south.svg",
+      "xml": "TransportSupplier.xml"
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "north",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_north.png",
+      "source": "Art\\BuildingRefresh\\Directions\\TransportSupplier_north.svg",
+      "xml": "TransportSupplier.xml"
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "east",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_east.png",
+      "source": "Art\\BuildingRefresh\\Directions\\TransportSupplier_east.svg",
+      "xml": "TransportSupplier.xml"
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "west",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_west.png",
+      "source": "Art\\BuildingRefresh\\Directions\\TransportSupplier_west.svg",
+      "xml": "TransportSupplier.xml"
+    },
+    {
+      "family": "FuelSupplier",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/FuelSupplier/FuelSupplier.png",
+      "source": "Art\\BuildingRefresh\\FuelSupplier-refresh-v1.svg",
+      "xml": "FuelSupplier.xml"
+    },
+    {
+      "family": "NivarianCannonExtractor",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/NivarianCannonExtractor/NivarianCannonExtractor.png",
+      "source": "Art\\BuildingRefresh\\NivarianCannonExtractor-refresh-v1.svg",
+      "xml": "NivarianCannonExtractor.xml"
+    },
+    {
+      "family": "CaravanTeleporter",
+      "direction": "single",
+      "footprint": [
+        1,
+        1
+      ],
+      "world_size": [
+        1.125,
+        1.125
+      ],
+      "size": [
+        288,
+        288
+      ],
+      "target": "Textures/Things/Building/CaravanTeleporter/CaravanTeleporter.png",
+      "source": "Art\\BuildingRefresh\\CaravanTeleporter-refresh-v1.svg",
+      "xml": "CaravanTeleporter.xml"
+    }
+  ],
+  "gestator": [
+    {
+      "direction": "south",
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "size": [
+        928,
+        800
+      ],
+      "center_svg": [
+        384,
+        275
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        -16.13632814710047
+      ],
+      "platform_plane_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        15.461386138613811
+      ],
+      "layers": {
+        "Base": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_south.png",
+        "Glass": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_south.png",
+        "Top": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_south.png"
+      },
+      "reference": "References/CosmicMechGestator_south.png"
+    },
+    {
+      "direction": "north",
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "size": [
+        928,
+        800
+      ],
+      "center_svg": [
+        384,
+        275
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        -16.13632814710047
+      ],
+      "platform_plane_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        15.461386138613811
+      ],
+      "layers": {
+        "Base": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_north.png",
+        "Glass": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_north.png",
+        "Top": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_north.png"
+      },
+      "reference": "References/CosmicMechGestator_north.png"
+    },
+    {
+      "direction": "east",
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "size": [
+        800,
+        928
+      ],
+      "center_svg": [
+        384,
+        400
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        -3.336328147100403
+      ],
+      "platform_plane_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        28.26138613861388
+      ],
+      "layers": {
+        "Base": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_east.png",
+        "Glass": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_east.png",
+        "Top": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_east.png"
+      },
+      "reference": "References/CosmicMechGestator_east.png"
+    },
+    {
+      "direction": "west",
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "size": [
+        800,
+        928
+      ],
+      "center_svg": [
+        384,
+        400
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        -3.336328147100403
+      ],
+      "platform_plane_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        28.26138613861388
+      ],
+      "layers": {
+        "Base": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_west.png",
+        "Glass": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_west.png",
+        "Top": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_west.png"
+      },
+      "reference": "References/CosmicMechGestator_west.png"
+    }
+  ],
+  "renders": [
+    {
+      "svg": "StorageCore.svg",
+      "png": "Textures/Things/Building/StorageCore/StorageCore.png"
+    },
+    {
+      "svg": "StorageUnit_south.svg",
+      "png": "Textures/Things/Building/StorageUnit/StorageUnit_south.png"
+    },
+    {
+      "svg": "StorageUnit_north.svg",
+      "png": "Textures/Things/Building/StorageUnit/StorageUnit_north.png"
+    },
+    {
+      "svg": "StorageUnit_east.svg",
+      "png": "Textures/Things/Building/StorageUnit/StorageUnit_east.png"
+    },
+    {
+      "svg": "StorageUnit_west.svg",
+      "png": "Textures/Things/Building/StorageUnit/StorageUnit_west.png"
+    },
+    {
+      "svg": "StorageReceiver.svg",
+      "png": "Textures/Things/Building/StorageReceiver/StorageReceiver.png"
+    },
+    {
+      "svg": "CosmicWorkbench_south.svg",
+      "png": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_south.png"
+    },
+    {
+      "svg": "CosmicWorkbench_north.svg",
+      "png": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_north.png"
+    },
+    {
+      "svg": "CosmicWorkbench_east.svg",
+      "png": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_east.png"
+    },
+    {
+      "svg": "CosmicWorkbench_west.svg",
+      "png": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_west.png"
+    },
+    {
+      "svg": "ConstructionSupplyUnit.svg",
+      "png": "Textures/Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit.png"
+    },
+    {
+      "svg": "StorageApparelAdapter_south.svg",
+      "png": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_south.png"
+    },
+    {
+      "svg": "StorageApparelAdapter_north.svg",
+      "png": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_north.png"
+    },
+    {
+      "svg": "StorageApparelAdapter_east.svg",
+      "png": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_east.png"
+    },
+    {
+      "svg": "StorageApparelAdapter_west.svg",
+      "png": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_west.png"
+    },
+    {
+      "svg": "StorageSupplyShelf.svg",
+      "png": "Textures/Things/Building/StorageSupplyShelf/StorageSupplyShelf.png"
+    },
+    {
+      "svg": "TransportSupplier_south.svg",
+      "png": "Textures/Things/Building/TransportSupplier/TransportSupplier_south.png"
+    },
+    {
+      "svg": "TransportSupplier_north.svg",
+      "png": "Textures/Things/Building/TransportSupplier/TransportSupplier_north.png"
+    },
+    {
+      "svg": "TransportSupplier_east.svg",
+      "png": "Textures/Things/Building/TransportSupplier/TransportSupplier_east.png"
+    },
+    {
+      "svg": "TransportSupplier_west.svg",
+      "png": "Textures/Things/Building/TransportSupplier/TransportSupplier_west.png"
+    },
+    {
+      "svg": "FuelSupplier.svg",
+      "png": "Textures/Things/Building/FuelSupplier/FuelSupplier.png"
+    },
+    {
+      "svg": "NivarianCannonExtractor.svg",
+      "png": "Textures/Things/Building/NivarianCannonExtractor/NivarianCannonExtractor.png"
+    },
+    {
+      "svg": "CaravanTeleporter.svg",
+      "png": "Textures/Things/Building/CaravanTeleporter/CaravanTeleporter.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Full_south.svg",
+      "png": "References/CosmicMechGestator_south.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Base_south.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_south.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Glass_south.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_south.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Top_south.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_south.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Full_north.svg",
+      "png": "References/CosmicMechGestator_north.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Base_north.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_north.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Glass_north.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_north.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Top_north.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_north.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Full_east.svg",
+      "png": "References/CosmicMechGestator_east.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Base_east.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_east.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Glass_east.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_east.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Top_east.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_east.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Full_west.svg",
+      "png": "References/CosmicMechGestator_west.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Base_west.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_west.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Glass_west.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_west.png"
+    },
+    {
+      "svg": "CosmicMechGestator_Top_west.svg",
+      "png": "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_west.png"
+    }
+  ]
+}

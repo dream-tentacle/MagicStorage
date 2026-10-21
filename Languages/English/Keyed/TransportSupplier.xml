@@ -31,6 +31,21 @@
   <MS_Transport_PrioritySlot>Priority {0}</MS_Transport_PrioritySlot>
   <MS_Transport_PickTitle>Select an item for priority {0}</MS_Transport_PickTitle>
   <MS_Transport_PickHint>Select one item type per slot. Higher slots are supplied first; duplicate selections are not allowed.</MS_Transport_PickHint>
-  <MS_Transport_ImmediateDesc>Immediately supply the target directly ahead once, using the current mode's item source. Refueling skips only percentage thresholds, respecting each target's automatic refueling toggle, fuel filter, target level, other refueling restrictions and reserved stock.</MS_Transport_ImmediateDesc>
+  <MS_Transport_ImmediateDesc>Immediately supply the target directly ahead.</MS_Transport_ImmediateDesc>
+  <MS_Transport_GenericSupply>Generic container supply</MS_Transport_GenericSupply>
+  <MS_Transport_GenericSupplyDesc>Improves compatibility, but does not guarantee that the target mod will recognize the inserted items.</MS_Transport_GenericSupplyDesc>
+  <MS_Transport_ChooseContainer>Select target container</MS_Transport_ChooseContainer>
+  <MS_Transport_ChooseContainerDesc>Select a container exposed by the player-owned building directly ahead. A single container is used automatically; choose a target when several are available. Transporters and refuelable buildings take priority and use their dedicated supply rules.</MS_Transport_ChooseContainerDesc>
+  <MS_Transport_GenericEmpty>Empty</MS_Transport_GenericEmpty>
+  <MS_Transport_GenericContainer>Container {0}: {1}</MS_Transport_GenericContainer>
+  <MS_Transport_GenericTarget>Ahead: {0}\nGeneric supply target: {1}</MS_Transport_GenericTarget>
+  <MS_Transport_NoGenericTarget>No transporter, refuelable building or generic container available directly ahead; waiting to supply.</MS_Transport_NoGenericTarget>
+  <MS_Transport_SelectContainerFirst>The target has multiple containers. Select a target container first.</MS_Transport_SelectContainerFirst>
+  <MS_Transport_SpecializedTarget>This target uses dedicated transporter or fuel supply rules.</MS_Transport_SpecializedTarget>
   <MS_Transport_ImmediateEmpty>The material supplier has no items to supply.</MS_Transport_ImmediateEmpty>
+  <MS_Transport_CreateGroup>Create launch group</MS_Transport_CreateGroup>
+  <MS_Transport_CreateGroupDesc>Create a launch group from the {0} selected transport pods, keeping their contents. Material suppliers and launch checks share the group's total mass capacity; individual pods may exceed their own capacity. Use the standard launch command after grouping.</MS_Transport_CreateGroupDesc>
+  <MS_Transport_GroupAlreadyAssigned>A selected transport pod already belongs to a launch group. Select only ungrouped pods.</MS_Transport_GroupAlreadyAssigned>
+  <MS_Transport_GroupInvalid>Select ungrouped player-owned transport pods of the same type on the same map.</MS_Transport_GroupInvalid>
+  <MS_Transport_GroupMass>Launch group mass: {0} / {1} kg</MS_Transport_GroupMass>
 </LanguageData>

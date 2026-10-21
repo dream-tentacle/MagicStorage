@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <GameVersion Condition=" '$(GameVersion)' == '' ">1.7</GameVersion>
+    <BaseIntermediateOutputPath>obj\TransportGroupPatches\$(GameVersion)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition=" '$(GameVersion)' == '1.6' ">net472</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputPath>bin\TransportGroupPatches\$(GameVersion)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\$(GameVersion)\Assemblies\0Harmony.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Compile Include="TransportGroupPatchTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransportGroups.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransportGroupPatches.cs" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

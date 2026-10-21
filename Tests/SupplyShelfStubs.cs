@@ -23,6 +23,16 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public class Command_SelectStorage : Command_Action { public Thing Target; }
+    public static class ContainingSelectionUtility
+    {
+        public static Gizmo CreateSelectStorageGizmo(string label, string description, Thing thingToSelect,
+            Thing iconThing = null, bool groupable = true) => new Command_SelectStorage
+        {
+            Target = thingToSelect, defaultLabel = label, defaultDesc = description,
+            action = () => Find.Selector.Select(thingToSelect, false, true)
+        };
+    }
     public static partial class StoreUtility
     {
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

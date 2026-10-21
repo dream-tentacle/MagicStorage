@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 768 512">
+  <defs>
+    <radialGradient id="lid-metal" cx="34%" cy="23%" r="84%">
+      <stop offset="0" stop-color="#e1e9ef" />
+      <stop offset=".52" stop-color="#bccbd6" />
+      <stop offset="1" stop-color="#94abba" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4e7895" stop-opacity=".87" />
+      <stop offset=".14" stop-color="#bbdfee" stop-opacity=".66" />
+      <stop offset=".5" stop-color="#9fc5dc" stop-opacity=".4" />
+      <stop offset=".84" stop-color="#76a3bf" stop-opacity=".64" />
+      <stop offset="1" stop-color="#4a718d" stop-opacity=".87" />
+    </linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfE3" stop-opacity=".2" />
+      <stop offset="1" stop-color="#5d87a3" stop-opacity=".5" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" />
+    </clipPath>
+  </defs>
+  <g id="gestator-top" transform="translate(0 -27)">
+    <path d="M252 142V154C252 205 311 246 384 246C457 246 516 205 516 154V142Z" fill="#88a2b6" />
+    <ellipse cx="384" cy="142" rx="132" ry="92.4" fill="url(#lid-metal)" />
+    <path d="M269 125C290 84 337 58 374 57" fill="none" stroke="#eaf2f7" stroke-width="3" stroke-linecap="round" />
+    <path d="M299 220C347 245 421 245 469 220" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round" />
+    <path d="M365 132H403M365 141H403" stroke="#94adbf" stroke-width="3" stroke-linecap="round" />
+    <path d="M374 151H394" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" />
+  </g>
+  <path d="M253.7509 100A132 92.4 0 0 1 514.2491 100" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+</svg>

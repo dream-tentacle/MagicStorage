@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -24,86 +25,130 @@ namespace MagicStorage
             // before consulting the recipe-wide and player-selected filters.
             network.GetMatchingStacks(d => bill.IsFixedOrAllowedIngredient(d) &&
                 recipe.ingredients.Any(i => i.filter.Allows(d)), things);
-            var stocks = things.Where(t => !t.Destroyed && bill.IsFixedOrAllowedIngredient(t) &&
-                    recipe.ingredients.Any(i => i.filter.Allows(t)) &&
-                    (!recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh))
-                .Select(t => new CraftingMaterialStock<Thing> { Item = t, Kind = t.def,
-                    Count = network.AvailableToWithdraw(t), Value = recipe.IngredientValueGetter.ValuePerUnitOf(t.def) })
-                .Where(s => s.Count > 0 && (recipe.allowMixingIngredients ||
-                    !recipe.ignoreIngredientCountTakeEntireStacks || s.Count == s.Item.stackCount))
-                // Match vanilla's distance order for no-mix and value-then-distance
-                // order for mix. The core is the material destination of this network.
-                .OrderBy(s => recipe.allowMixingIngredients ? s.Value : 0d)
-                .ThenBy(s => s.Item.PositionHeld.DistanceToSquared(network.Core.Position))
-                .ThenBy(s => s.Item.thingIDNumber).ToList();
+            var stocks = Stocks(network, order, bill, things);
             var needs = recipe.ingredients.Select(ingredient => new CraftingMaterialNeed<Thing>
             {
                 Value = ingredient.GetBaseCount(),
                 CountRequired = t => ingredient.CountRequiredOfFor(t.def, recipe, bill),
                 Allows = t => ingredient.filter.Allows(t) && (ingredient.IsFixedIngredient || order.Ingredients.Allows(t))
             }).ToList();
+            if (CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
+                recipe.ignoreIngredientCountTakeEntireStacks, out allocations)) return true;
+
+            // Shelves are a fallback: do not scan or take their everyday supplies when
+            // the network alone can satisfy this batch. Keep network stacks first.
+            things.Clear();
+            foreach (var shelf in network.Core.Map.GetComponent<MapComponent_StorageNetworks>().SupplyShelves)
+                if (UsableShelf(network, shelf)) things.AddRange(shelf.GetSlotGroup().HeldThings);
+            stocks.AddRange(Stocks(network, order, bill, things));
             return CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
                 recipe.ignoreIngredientCountTakeEntireStacks, out allocations);
         }
+
+        private static List<CraftingMaterialStock<Thing>> Stocks(StorageNetwork network, CraftingOrder order,
+            Bill_Production bill, List<Thing> things)
+        {
+            var recipe = order.Recipe;
+            return things.Where(t => Allows(order, bill, t))
+                .Select(t => new CraftingMaterialStock<Thing> { Item = t, Kind = t.def,
+                    Count = Available(network, t), Value = recipe.IngredientValueGetter.ValuePerUnitOf(t.def) })
+                .Where(s => s.Count > 0 && (recipe.allowMixingIngredients ||
+                    !recipe.ignoreIngredientCountTakeEntireStacks || s.Count == s.Item.stackCount))
+                .OrderBy(s => recipe.allowMixingIngredients ? s.Value : 0d)
+                .ThenBy(s => s.Item.PositionHeld.DistanceToSquared(network.Core.Position))
+                .ThenBy(s => s.Item.thingIDNumber).ToList();
+        }
+
+        internal static bool Allows(CraftingOrder order, Bill_Production bill, Thing t) =>
+            t != null && !t.Destroyed && bill.IsFixedOrAllowedIngredient(t) &&
+                    order.Recipe.ingredients.Any(i => i.filter.Allows(t)) &&
+                    (!order.Recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh);
+
+        private static bool UsableShelf(StorageNetwork network, Building_StorageSupplyShelf shelf) =>
+            shelf.Spawned && shelf.Map == network.Core.Map && shelf.Network == network &&
+            shelf.Faction == network.Core.Faction && !shelf.IsForbidden(network.Core.Faction) &&
+            !shelf.IsBurning() && !shelf.Position.ContainsStaticFire(shelf.Map);
+
+        internal static int Available(StorageNetwork network, Thing item)
+        {
+            if (network?.CanWork != true || item == null || item.Destroyed) return 0;
+            if (!item.Spawned) return network.AvailableToWithdraw(item);
+            if (item.Map != network.Core.Map || item.IsForbidden(network.Core.Faction) || item.IsBurning()) return 0;
+            var shelf = item.Map.haulDestinationManager.SlotGroupParentAt(item.Position) as Building_StorageSupplyShelf;
+            return shelf != null && UsableShelf(network, shelf) && !StorageShelfSupply.Reserved(shelf, item)
+                ? item.stackCount : 0;
+        }
     }
 
-    // Each allocation has its own token because the shared withdrawal service owns one stack per token.
-    // Partial acquisition is rolled back; supply shelves and manual withdrawals see the same claims.
-    internal sealed class CraftingMaterialLease : IStorageReservationClient
+    // Preparation is synchronous. Publish the real holder before moving any ingredients
+    // so partial failures remain saved and refundable, without a long-lived material lease.
+    internal static class CraftingMaterialPreparation
     {
-        private sealed class Claim { internal Thing Item; internal int Count; }
-        private readonly List<Claim> claims = new List<Claim>();
-        private readonly StorageNetwork initialNetwork;
-        private readonly Building_StorageCore core;
-        private readonly Thing endpoint;
-        private readonly CraftingOrder order;
-        private readonly System.Action invalidated;
-        private bool released;
-        internal StorageNetwork Network => core?.Network ?? initialNetwork;
-        internal CraftingMaterialLease(StorageNetwork network, Thing endpoint = null,
-            CraftingOrder order = null, System.Action invalidated = null)
-        { initialNetwork = network; core = network.Core; this.endpoint = endpoint; this.order = order; this.invalidated = invalidated; }
-        internal bool Acquire(Dictionary<Thing, int> allocations)
+        internal static bool Prepare(Building_StorageCore core, CraftingOrder order, Dictionary<Thing, int> allocations)
         {
-            Release();
-            released = false;
-            foreach (var pair in allocations)
-            {
-                var claim = new Claim { Item = pair.Key, Count = pair.Value };
-                claims.Add(claim);
-                if (Network.ReserveOutgoing(claim, claim.Item, claim.Count, endpoint, this,
-                    () => order == null || !order.Recipe.interruptIfIngredientIsRotting || claim.Item.GetRotStage() == RotStage.Fresh)
-                    != claim.Count) { Release(); return false; }
-            }
-            return true;
-        }
-        internal bool Valid(CraftingOrder order)
-        {
-            if (released || !Network.CanWork) return false;
-            foreach (var claim in claims)
-                if (!Network.HasOutgoingReservation(claim, claim.Item, claim.Count) ||
-                    (order.Recipe.interruptIfIngredientIsRotting && claim.Item.GetRotStage() != RotStage.Fresh)) return false;
-            return true;
-        }
-        internal bool Collect(CraftingOrder order, ThingOwner destination)
-        {
-            if (!Valid(order)) return false;
+            if (order.Batch != null) return order.Batch.Valid(order);
+            var network = core.Network;
+            if (network?.CanWork != true || allocations == null) return false;
+            var batch = new CraftingBatch(core);
+            order.Batch = batch;
+            bool prepared = false;
             try
             {
-                foreach (var claim in claims)
-                    if (!Network.TryWithdrawReserved(claim, claim.Item, claim.Count, destination, out _).Complete) return false;
-                return true;
+                var bill = new Bill_Production { recipe = order.Recipe, ingredientFilter = order.Ingredients };
+                foreach (var pair in allocations)
+                {
+                    if (core.Network != network || !core.CanWork || pair.Value <= 0 ||
+                        !NetworkCraftingMaterialPolicy.Allows(order, bill, pair.Key) ||
+                        NetworkCraftingMaterialPolicy.Available(network, pair.Key) < pair.Value) return false;
+                    if (pair.Key.Spawned)
+                    {
+                        if (!TakeShelfStock(pair.Key, pair.Value, batch.Ingredients)) return false;
+                    }
+                    else if (!network.TryTransferTo(pair.Key, pair.Value, batch.Ingredients, merge: false).Complete)
+                        return false;
+                }
+                prepared = batch.Initialize(order);
+                return prepared;
             }
-            finally { Release(); }
+            catch (Exception exception)
+            {
+                order.Suspended = true;
+                Log.Error("[MagicStorage] Could not prepare crafting materials: " + exception);
+                return false;
+            }
+            finally
+            {
+                if (!prepared)
+                {
+                    try
+                    {
+                        if (batch.Cancel()) order.Batch = null;
+                        else order.Suspended = true;
+                    }
+                    catch (Exception exception)
+                    {
+                        order.Suspended = true;
+                        Log.Error("[MagicStorage] Could not refund crafting materials; batch retained: " + exception);
+                    }
+                }
+            }
         }
-        internal void Release()
-        { foreach (var claim in claims) initialNetwork.ReleaseOutgoing(claim); claims.Clear(); released = true; }
 
-        public void OnReservationInvalidated(StorageReservation reservation, StorageReservationFailure reason)
+        private static bool TakeShelfStock(Thing item, int count, ThingOwner destination)
         {
-            if (released) return;
-            Release();
-            invalidated?.Invoke();
+            Map map = item.Map;
+            IntVec3 cell = item.Position;
+            Thing part = null;
+            try
+            {
+                part = item.SplitOff(count);
+                return part != null && destination.TryAdd(part, false);
+            }
+            finally
+            {
+                if (part != null && !part.Destroyed && !part.Spawned && part.holdingOwner == null)
+                    map.GetComponent<MapComponent_StorageNetworks>().PreserveLooseThing(part, cell);
+            }
         }
     }
 }

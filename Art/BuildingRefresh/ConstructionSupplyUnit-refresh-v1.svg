@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" data-outline-original-viewbox="0 0 512 512" data-outline-original-width="512" data-outline-original-height="512">
+<defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff"/><path d="M61 54H451L480 83V449L453 478H59L32 449V83Z" fill="#000000" stroke="none"/></mask></defs>
+<title>建筑供给单元 · 优化样稿</title>
+<desc>Simplified raised hatch with one shutter seam and one sky-blue inlay; blank surrounding casing; no side trims, status marks or service panel. Review draft only; not installed.</desc>
+<path d="M61 54H451L480 83V449L453 478H59L32 449V83Z" fill="#637782" />
+<path d="M61 54H451L480 83V422L453 450H59L32 422V83Z" fill="#d8dfe3" />
+<path d="M61 54H451L480 83H465L452 70H53L45 83H32Z" fill="#e6e9e8" />
+<path d="M465 83H480V422L453 450H59L68 436H446L465 416Z" fill="#acb8bf" />
+<path d="M130 136H382L405 160V364L380 392H132L107 364V160Z" fill="#637782" />
+<path d="M130 125H382L405 149V346L380 374H132L107 346V149Z" fill="#acb8bf" />
+<path d="M132 132H378L393 149L393 341L376 362L136 362L119 341V149Z" fill="#d8dfe3" />
+<path d="M130 125H382L405 149H393L378 132H132L119 149H107Z" fill="#e6e9e8" />
+<path d="M153 173H359L375 192V301L355 327H157L137 301V192Z" fill="#637782" />
+<path d="M157 182H355L363 195V296L349 313H163L149 296V195Z" fill="#acb8bf" />
+<path d="M149 195H363V212H149Z" fill="#304553" />
+<path d="M155 247H357V254H155Z" fill="#8498a4" />
+<path d="M121.428571429 344H390.571428571L378.428571429 359H133.571428571Z" fill="#c5e5f5" />
+<g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M61 54H451L480 83V449L453 478H59L32 449V83Z" fill="none" stroke="#000000" stroke-width="38.537634409" stroke-linejoin="miter" stroke-miterlimit="2"/></g>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "source": "StorageCore-v11.svg",
+  "png": [
+    512,
+    512
+  ],
+  "alpha_bounds": [
+    62,
+    58,
+    450,
+    448
+  ],
+  "exterior_stroke": {
+    "color": "#000000",
+    "width": 4
+  },
+  "accent": "#C5E5F5",
+  "review_only": true,
+  "game_files_changed": false
+}

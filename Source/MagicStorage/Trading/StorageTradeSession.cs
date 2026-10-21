@@ -156,7 +156,10 @@ namespace MagicStorage
 
         private void Add(Thing item, Transactor trans)
         {
-            Tradeable entry = TransferableUtility.TradeableMatching(item, deal.AllTradeables);
+            var candidates = MagicStorageMod.Settings.TradeItemFilters && item.def != ThingDefOf.Silver
+                ? deal.AllTradeables.Where(candidate => StorageInventoryFilters.CanGroup(item, candidate.AnyThing,
+                    MagicStorageMod.Settings.InventoryFilters)).ToList() : deal.AllTradeables;
+            Tradeable entry = TransferableUtility.TradeableMatching(item, candidates);
             if (entry == null)
             {
                 entry = item is Pawn ? (Tradeable)new Tradeable_Pawn() : new Tradeable_Storage(this);
@@ -256,16 +259,40 @@ namespace MagicStorage
     internal sealed class Dialog_StorageTrade : Dialog_Trade
     {
         private readonly StorageTradeSession session;
+        private StorageItemFilterPanel itemFilters;
+        private bool filtersWereEnabled;
+        internal StorageItemFilterPanel ItemFilters => itemFilters ?? (itemFilters = new StorageItemFilterPanel(
+            TradeSession.playerNegotiator.Map, CommonSearchWidget, () => StorageNativeItemFilters.InvalidateTrade(this),
+            () => StorageNativeItemFilters.RebuildTrade(this)));
+        public override Vector2 InitialSize => MagicStorageMod.Settings.TradeItemFilters
+            ? new Vector2(Math.Min(1340f, UI.screenWidth), UI.screenHeight) : base.InitialSize;
         internal StorageTradeSession Session => session;
         internal Dialog_StorageTrade(Pawn negotiator, ITrader trader, StorageTradeSession session) : base(negotiator, trader)
         { this.session = session; }
+
+        protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
+        {
+            var rect = base.QuickSearchWidgetRect(winRect, inRect);
+            if (MagicStorageMod.Settings.TradeItemFilters) rect.x += StorageItemFilterPanel.Width(inRect.width) + 16f;
+            return rect;
+        }
 
         public override void DoWindowContents(Rect inRect)
         {
             Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width, 26f),
                 (TradeSession.trader is TradeShip ? "MS_Trade_OrbitalInventoryNotice" : "MS_Trade_InventoryNotice").Translate());
             inRect.yMin += 28f;
-            base.DoWindowContents(inRect);
+            bool enabled = MagicStorageMod.Settings.TradeItemFilters;
+            if (enabled != filtersWereEnabled)
+            { filtersWereEnabled = enabled; StorageNativeItemFilters.RebuildTrade(this); }
+            if (!enabled) { base.DoWindowContents(inRect); return; }
+            float width = StorageItemFilterPanel.Width(inRect.width);
+            ItemFilters.Draw(new Rect(inRect.x, inRect.y, width, inRect.height),
+                TradeSession.deal.AllTradeables.SelectMany(row => row.thingsColony.Concat(row.thingsTrader)));
+            var body = new Rect(inRect.x + width + 16f, inRect.y, inRect.width - width - 16f, inRect.height);
+            Widgets.BeginGroup(body);
+            try { base.DoWindowContents(body.AtZero()); }
+            finally { Widgets.EndGroup(); }
         }
 
         public override void PostClose()

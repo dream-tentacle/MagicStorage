@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Craft_WorkbenchLockedHint>Locked. Click to spend construction materials and unlock this workbench.</MS_Craft_WorkbenchLockedHint>
+  <MS_Craft_UnlockWorkbench>Unlock workbench</MS_Craft_UnlockWorkbench>
+  <MS_Craft_UnlockWorkbenchQuestion>Spend the following materials to unlock {0}? Materials are taken from the current storage network and its connected auto-restocking shelves.</MS_Craft_UnlockWorkbenchQuestion>
+  <MS_Craft_UnlockStuff>Construction material: {0}</MS_Craft_UnlockStuff>
+  <MS_Craft_UnlockMaterials>Unlock materials (available / required)</MS_Craft_UnlockMaterials>
+  <MS_Craft_NoLegalStuff>No valid construction material is available.</MS_Craft_NoLegalStuff>
+  <MS_Craft_UnlockMissingMaterials>Not enough available materials, or the storage network is unavailable.</MS_Craft_UnlockMissingMaterials>
+  <MS_Craft_UnlockSharedHint>Once unlocked, this workbench's recipes are available to every storage network in this save.</MS_Craft_UnlockSharedHint>
+  <MS_Craft_UnlockFailed>Unlock failed because the materials or network changed. Check and try again.</MS_Craft_UnlockFailed>
   <MS_Craft_ProductionNotice>Interrupted work can resume. Products default to network storage, with overflow near the core; they can also be set to drop on the floor.</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>Drop products on floor</MS_Craft_DropProductsOnFloor>
   <MS_Craft_StoreProductsInNetwork>Store products in network</MS_Craft_StoreProductsInNetwork>
@@ -15,8 +24,8 @@
   <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
   <MS_Craft_Add>Add production order</MS_Craft_Add>
   <MS_Craft_Orders>Production orders</MS_Craft_Orders>
-  <MS_Craft_DragToSort>Drag to reorder</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>Drag the task block to change production priority.</MS_Craft_DragOrder>
+  <MS_Craft_DragToSort>Right-drag to reorder</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>Hold the right mouse button and drag the task block to change production priority.</MS_Craft_DragOrder>
   <MS_Craft_Details>Details</MS_Craft_Details>
   <MS_Craft_Workbenches>Workbenches</MS_Craft_Workbenches>
   <MS_Craft_CompactModeOff>Enable compact mode for the workbench list.</MS_Craft_CompactModeOff>

@@ -15,7 +15,12 @@ namespace UnityEngine
 #endif
 namespace UnityEngine
 {
-    public struct Vector2 { public static Vector2 zero => default(Vector2); }
+    public struct Vector2
+    {
+        public float x, y;
+        public Vector2(float x, float y) { this.x = x; this.y = y; }
+        public static Vector2 zero => default(Vector2);
+    }
     public static class Mathf { public static float Max(float a, float b) => System.Math.Max(a, b); }
 }
 namespace Verse
@@ -44,14 +49,15 @@ namespace Verse
     public class Listing_Standard
     {
         public static readonly System.Collections.Generic.List<string> NumericLabels = new System.Collections.Generic.List<string>();
+        public static readonly System.Collections.Generic.List<string> Events = new System.Collections.Generic.List<string>();
         public float CurHeight => 500;
         public void Begin(UnityEngine.Rect rect) { }
         public void End() { }
         public void TextFieldNumericLabeled<T>(string label, ref T value, ref string buffer, float min, float max) where T : struct
         { NumericLabels.Add(label); }
         public void Gap() { }
-        public void CheckboxLabeled(string label, ref bool value) { }
-        public void Label(string label) { }
+        public void CheckboxLabeled(string label, ref bool value) { Events.Add(label); }
+        public void Label(string label) { Events.Add(label); }
         public float Slider(float value, float min, float max) => value;
         public bool ButtonText(string label) => false;
     }

@@ -22,6 +22,9 @@ namespace Verse
     public static class Messages { public static int Rejects; public static void Message(string text, object type, bool historical) { Rejects++; } }
     public class Window
     {
+        public virtual UnityEngine.Vector2 InitialSize => new UnityEngine.Vector2(1024, 900);
+        public virtual QuickSearchWidget CommonSearchWidget => new QuickSearchWidget();
+        protected virtual UnityEngine.Rect QuickSearchWidgetRect(UnityEngine.Rect winRect, UnityEngine.Rect inRect) => inRect;
         public virtual void PreOpen() { }
         public virtual void PostOpen() { }
         public virtual void PostClose() { }
@@ -128,6 +131,7 @@ namespace RimWorld
     }
     public class Tradeable
     {
+        public Thing AnyThing => thingsColony.FirstOrDefault() ?? thingsTrader.FirstOrDefault();
         public readonly List<Thing> thingsColony = new List<Thing>(), thingsTrader = new List<Thing>();
         public int CountToTransfer;
         public int CountToTransferToSource => Math.Max(0, CountToTransfer);

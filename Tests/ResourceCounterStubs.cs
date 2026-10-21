@@ -37,7 +37,10 @@ namespace RimWorld
             Updates++;
             AllCountedAmounts.Clear();
             foreach (ThingDef def in map.ResourceDefs) AllCountedAmounts.Add(def, 0);
-            foreach (Thing stored in map.NativeStoredResources)
+            var storedResources = new List<Thing>(map.NativeStoredResources);
+            foreach (SlotGroup group in map.haulDestinationManager.AllGroupsListForReading)
+                storedResources.AddRange(group.HeldThings);
+            foreach (Thing stored in storedResources)
             {
                 Thing item = stored.GetInnerIfMinified();
                 if (item.def.CountAsResource && ShouldCount(item)) AllCountedAmounts[item.def] += item.stackCount;

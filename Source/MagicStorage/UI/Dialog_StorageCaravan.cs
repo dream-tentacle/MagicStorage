@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace MagicStorage
@@ -11,6 +13,13 @@ namespace MagicStorage
         internal readonly Building_CaravanTeleporter Teleporter;
         internal StorageNetwork Network { get; private set; }
         internal Map SourceMap { get; }
+        private StorageItemFilterPanel itemFilters;
+        private bool filtersWereEnabled;
+        internal StorageItemFilterPanel ItemFilters => itemFilters ?? (itemFilters = new StorageItemFilterPanel(
+            SourceMap, null, () => StorageNativeItemFilters.InvalidateCaravan(this),
+            () => StorageNativeItemFilters.RebuildCaravan(this), () => StorageNativeItemFilters.InvalidateCaravan(this, true)));
+        public override Vector2 InitialSize => MagicStorageMod.Settings.CaravanItemFilters
+            ? new Vector2(Math.Min(1340f, UI.screenWidth), UI.screenHeight) : base.InitialSize;
 
         public Dialog_StorageCaravan(Building_CaravanTeleporter teleporter) : base(teleporter.Map)
         {
@@ -20,6 +29,21 @@ namespace MagicStorage
 
         internal bool Usable => Teleporter.Spawned && Teleporter.Map == SourceMap &&
             Teleporter.CanWork && Teleporter.Network == Network;
+
+        public override void DoWindowContents(Rect inRect)
+        {
+            bool enabled = MagicStorageMod.Settings.CaravanItemFilters;
+            if (enabled != filtersWereEnabled)
+            { filtersWereEnabled = enabled; StorageNativeItemFilters.RebuildCaravan(this); }
+            if (!enabled) { base.DoWindowContents(inRect); return; }
+            float width = StorageItemFilterPanel.Width(inRect.width);
+            ItemFilters.Draw(new Rect(inRect.x + 8f, inRect.y + 8f, width - 8f, inRect.height - 16f),
+                transferables.Where(row => !(row.AnyThing is Pawn)).SelectMany(row => row.things));
+            var body = new Rect(inRect.x + width + 16f, inRect.y, inRect.width - width - 16f, inRect.height);
+            Widgets.BeginGroup(body);
+            try { base.DoWindowContents(body.AtZero()); }
+            finally { Widgets.EndGroup(); }
+        }
 
         internal void FillNetworkItems()
         {
@@ -34,7 +58,10 @@ namespace MagicStorage
             foreach (Thing item in stacks)
             {
                 if (item.Destroyed || item.def.category != ThingCategory.Item || Network.AvailableToWithdraw(item) <= 0) continue;
-                var row = TransferableUtility.TransferableMatching(item, transferables, TransferAsOneMode.PodsOrCaravanPacking);
+                var candidates = MagicStorageMod.Settings.CaravanItemFilters
+                    ? transferables.Where(candidate => StorageInventoryFilters.CanGroup(item, candidate.AnyThing,
+                        MagicStorageMod.Settings.InventoryFilters)).ToList() : transferables;
+                var row = TransferableUtility.TransferableMatching(item, candidates, TransferAsOneMode.PodsOrCaravanPacking);
                 if (row == null)
                 {
                     row = new Transferable_StorageCaravan(Network);

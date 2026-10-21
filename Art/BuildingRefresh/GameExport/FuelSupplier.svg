@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288"><g transform="matrix(0.563092479461 0 0 0.533306731177 0.974510216979 1.873756141357)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff" /><path d="M74 96H190L219 119C237 86 274 68 316 68C389 68 442 110 442 163V371C442 426 389 465 316 465H74L66 457V104Z" fill="#000000" stroke="none" /></mask></defs>
+<title>燃料供给器 · 优化样稿</title>
+<desc>A sealed cylindrical fuel reservoir with a compact pump and one feed connection; flat metal shading. Review draft only; not installed.</desc>
+<path d="M74 96H190L219 119C237 86 274 68 316 68C389 68 442 110 442 163V371C442 426 389 465 316 465H74L66 457V104Z" fill="#637782" />
+<path d="M74 96L190 96L198 104L198 457L190 465L74 465L66 457L66 104Z" fill="#637782" />
+<path d="M74 96L190 96L198 104L198 433L190 441L74 441L66 433L66 104Z" fill="#d8dfe3" />
+<path d="M74 96L190 96L186.686 104L77.3137 104Z" fill="#e6e9e8" />
+<path d="M190 96L198 104L190 107.314L186.686 104Z" fill="#acb8bf" />
+<path d="M198 104L198 433L190 429.686L190 107.314Z" fill="#acb8bf" />
+<path d="M198 433L190 441L186.686 433L190 429.686Z" fill="#acb8bf" />
+<path d="M190 441L74 441L77.3137 433L186.686 433Z" fill="#acb8bf" />
+<path d="M74 441L66 433L74 429.686L77.3137 433Z" fill="#acb8bf" />
+<path d="M66 433L66 104L74 107.314L74 429.686Z" fill="#e6e9e8" />
+<path d="M66 104L74 96L77.3137 104L74 107.314Z" fill="#e6e9e8" />
+<rect x="95" y="137" width="70" height="89" rx="4" fill="#93a3ad" />
+<rect x="108" y="150" width="44" height="59" rx="2" fill="#304553" />
+<rect x="113" y="177" width="34" height="27" rx="1" fill="#c5e5f5" />
+<path d="M96 286H111V363H96ZM121 286H136V363H121ZM146 286H161V363H146Z" fill="#637782" />
+<path d="M213 160H442V371C442 426 389 465 316 465C250 465 213 425 213 371Z" fill="#93a3ad" />
+<path d="M213 160H442V348C442 400 389 437 316 437C250 437 213 400 213 348Z" fill="#d8dfe3" />
+<path d="M395 169H442V348C442 395 400 431 337 436C382 414 402 390 402 343Z" fill="#acb8bf" />
+<ellipse cx="327.5" cy="162" rx="114.5" ry="77" fill="#acb8bf" />
+<ellipse cx="327.5" cy="150" rx="114.5" ry="77" fill="#d8dfe3" />
+<ellipse cx="327.5" cy="150" rx="79" ry="49" fill="#637782" />
+<ellipse cx="327.5" cy="144" rx="65" ry="37" fill="#c5e5f5" />
+<rect x="311" y="124" width="33" height="35" rx="4" fill="#93a3ad" />
+<rect x="311" y="124" width="33" height="12" rx="2" fill="#e6e9e8" />
+<path d="M216 264C257 304 400 304 439 264V285C400 325 257 325 216 285Z" fill="#c5e5f5" />
+<path d="M178 380H194V393Q194 408 213 408H234" fill="none" stroke="#304553" stroke-width="20" stroke-linejoin="round" />
+<path d="M178 377H194V390Q194 402 213 402H234" fill="none" stroke="#93a3ad" stroke-width="11" stroke-linejoin="round" />
+<g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M74 96H190L219 119C237 86 274 68 316 68C389 68 442 110 442 163V371C442 426 389 465 316 465H74L66 457V104Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g>
+</g></svg>

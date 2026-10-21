@@ -22,6 +22,8 @@ namespace Nivarian_Race.Code.Comps.BuildingComps
         public readonly ThingOwner Contents;
         public readonly List<CannonCargoOrder> Accepted = new List<CannonCargoOrder>();
         public bool Powered = true, Reject, Throw;
+        public bool ThrowAfterAccept, ReturnFalseAfterAccept, ReturnTrueWithoutAccept;
+        public int AcceptLimit = int.MaxValue;
         public int CapacityLimit = 75, ShotLimit = 75, Distance, Load;
         public bool IsOperational => Powered && parent.Spawned;
         public int RemainingCapacity => Math.Max(0, CapacityLimit - Contents.Sum(item => item.stackCount));
@@ -34,10 +36,13 @@ namespace Nivarian_Race.Code.Comps.BuildingComps
             BeforeAccept?.Invoke();
             if (Throw) throw new InvalidOperationException("fixture enqueue failure");
             if (Reject) return false;
-            int count = item.stackCount;
+            if (ReturnTrueWithoutAccept) return true;
+            int count = Math.Min(item.stackCount, AcceptLimit);
             if (StorageTransfer.Move(item.holdingOwner, Contents, item, count, parent.Map, parent.Position, false) != count) return false;
             var order = CannonOrderLedger.Current.ById(orderId);
-            order.Stocked = true; Accepted.Add(order); return true;
+            order.Stocked = true; Accepted.Add(order);
+            if (ThrowAfterAccept) throw new InvalidOperationException("fixture post-acceptance failure");
+            return !ReturnFalseAfterAccept;
         }
         public IThingHolder ParentHolder => parent.Map;
         public ThingOwner GetDirectlyHeldThings() => Contents;

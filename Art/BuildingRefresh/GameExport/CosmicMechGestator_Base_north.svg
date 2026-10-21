@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="928" height="800" viewBox="0 0 928 800"><g transform="matrix(1.080000000000 0 0 1.316571428571 49.280000000000 37.942857142857)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="768" height="512" style="mask-type:luminance"><rect x="0" y="0" width="768" height="512" fill="#ffffff" /><path d="M84 100H253.7509A132 92.4 0 0 1 514.2491 100H684Q704 100 704 120V454Q704 474 684 474H84Q64 474 64 454V120Q64 100 84 100Z" fill="#000000" stroke="none" /></mask></defs>
+  <defs>
+    <radialGradient id="lid-metal" cx="34%" cy="23%" r="84%">
+      <stop offset="0" stop-color="#e1e9ef" />
+      <stop offset=".52" stop-color="#bccbd6" />
+      <stop offset="1" stop-color="#94abba" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4d7188" stop-opacity=".90" /><stop offset=".20" stop-color="#b9d9e7" stop-opacity=".65" /><stop offset=".74" stop-color="#94b7ca" stop-opacity=".55" /><stop offset="1" stop-color="#4a7189" stop-opacity=".88" /></linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfE3" stop-opacity=".2" />
+      <stop offset="1" stop-color="#5d87a3" stop-opacity=".5" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" />
+    </clipPath>
+  </defs>
+
+  <g id="gestator-base" data-platform-center="384,275">
+    <rect x="64" y="120" width="640" height="354" rx="20" fill="#637782" />
+    <rect x="64" y="100" width="640" height="350" rx="20" fill="#d8dfe3" />
+    <path d="M64 430Q64 450 84 450H684Q704 450 704 430" fill="none" stroke="#536d7f" stroke-width="3.5" />
+    <path d="M89 392H679" stroke="#acbfcd" stroke-width="2" />
+    <g id="side-manifolds" transform="translate(0 21)">
+      <path d="M104 170L116 154H240V375H104Z" fill="#acb8bf" />
+      <path d="M112 174L121 163H231V366H112Z" fill="#8498a4" />
+      <path d="M528 154H652L664 170V375H528Z" fill="#acb8bf" />
+      <path d="M537 163H647L656 174V366H537Z" fill="#8498a4" />
+      <path d="M205 237H234L271 193M205 320H235L271 309M563 237H534L497 193M563 320H533L497 309" fill="none" stroke="#6e8a9f" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M205 232H234L271 188M205 315H235L271 304M563 232H534L497 188M563 315H533L497 304" fill="none" stroke="#cddde7" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="189" y="221" width="27" height="24" rx="6" fill="#9fb7c8" />
+      <ellipse cx="202.5" cy="221" rx="13.5" ry="9.45" fill="#dce8f0" />
+      <rect x="189" y="304" width="27" height="24" rx="6" fill="#9fb7c8" />
+      <ellipse cx="202.5" cy="304" rx="13.5" ry="9.45" fill="#dce8f0" />
+      <rect x="552" y="221" width="27" height="24" rx="6" fill="#9fb7c8" />
+      <ellipse cx="565.5" cy="221" rx="13.5" ry="9.45" fill="#dce8f0" />
+      <rect x="552" y="304" width="27" height="24" rx="6" fill="#9fb7c8" />
+      <ellipse cx="565.5" cy="304" rx="13.5" ry="9.45" fill="#dce8f0" />
+      <rect x="129" y="171" width="9" height="15" rx="2" fill="#c5e5f5" />
+      <rect x="630" y="171" width="9" height="15" rx="2" fill="#c5e5f5" />
+    </g>
+  </g>
+  <g id="rear-service">
+    <path d="M88 103H680V146H88Z" fill="#acb8bf" />
+    <rect x="523" y="111" width="143" height="23" rx="4" fill="#93afc3" />
+    <rect x="527" y="114" width="135" height="16" rx="2" fill="#344e64" />
+    <path d="M538 122H561M591 122H613M625 122H650" stroke="#c5e5f5" stroke-width="2.5" />
+    <path d="M283 109H485V141H283Z" fill="#8ea9bd" />
+    <path d="M288 112H480V122H288ZM288 130H480V140H288Z" fill="#d8dfe3" />
+    <rect x="104" y="111" width="126" height="23" rx="4" fill="#d2e0e9" />
+    <rect x="204" y="118" width="17" height="7" rx="2" fill="#c5e5f5" />
+  </g>
+  <g id="vessel-seat" transform="translate(0 -27)">
+    
+    <path d="M244 302V315C244 369 307 413 384 413C461 413 524 369 524 315V302Z" fill="#637782" />
+    <ellipse cx="384" cy="302" rx="140" ry="98" fill="#acb8bf" />
+    <ellipse cx="384" cy="302" rx="129" ry="90.3" fill="#637782" />
+    <ellipse cx="384" cy="302" rx="122" ry="85.4" fill="#405c70" />
+    <ellipse cx="384" cy="302" rx="83" ry="58.1" fill="#8498a4" />
+    <ellipse cx="384" cy="300" rx="57" ry="39.9" fill="#acb8bf" />
+    </g>
+  <g id="back-casing">
+    <path d="M88 406H680V449H88Z" fill="#acb8bf" />
+    <path d="M282 416H486V440H282Z" fill="#93a3ad" />
+    <path d="M297 423H471M297 433H471" stroke="#7c99ad" stroke-width="3" />
+    <path d="M112 425H186M582 425H656" stroke="#8da7ba" stroke-width="3" stroke-linecap="round" />
+    <path d="M124 435H151M617 435H644" stroke="#c5e5f5" stroke-width="3" stroke-linecap="round" />
+    <rect x="343" y="461" width="82" height="6" rx="3" fill="#344e64" />
+  </g>
+  <defs><clipPath id="exterior-layer-partition"><rect x="-1000" y="100" width="3000" height="2000" /></clipPath></defs><g clip-path="url(#exterior-layer-partition)"><g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M84 100H253.7509A132 92.4 0 0 1 514.2491 100H684Q704 100 704 120V454Q704 474 684 474H84Q64 474 64 454V120Q64 100 84 100Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g></g></g></svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchTabDef>
+    <defName>MS_MagicStorage</defName>
+    <label>magic storage</label>
+    <generalTitle>Magic storage</generalTitle>
+    <generalDescription>The technology of magic storage. It's quite mysterious. Perhaps it's some kind of alien technology.</generalDescription>
+  </ResearchTabDef>
+</Defs>

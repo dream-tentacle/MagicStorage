@@ -50,6 +50,7 @@ namespace Verse
     public class Selector
     {
         public Thing Selected;
+        public int NumSelected => Selected == null ? 0 : 1;
         public bool IsSelected(Thing thing) => Selected == thing;
         public void Select(Thing thing, bool playSound, bool forceDesignatorDeselect) { Selected = thing; }
     }

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="352" viewBox="0 0 768 352">
+  <title>魔法存储 — 宇宙工作台，第十四稿</title>
+  <desc>North-facing 3×1 assembly workbench with a plain uninterrupted working plate, integrated vise housing, an inset display and a shallow trapezoid operator recess. Sky-blue accents RGB(197,229,245), flat grey metal and a uniform black exterior contour. Transparent draft, not installed.</desc>
+  <defs>
+    <path id="worktop-body" d="M80 68H688L704 84V236L690 250H452L430 228H338L316 250H78L64 236V84Z" />
+    <path id="worktop-surface" d="M80 68H688L704 84V220L690 234H452L430 212H338L316 234H78L64 220V84Z" />
+    <clipPath id="surface-clip">
+      <use href="#worktop-surface" />
+    </clipPath>
+  </defs>
+  <g id="tabletop">
+    <use href="#worktop-body" fill="#7d8c93" />
+    <path d="M64 220L78 234H316L338 212H430L452 234H690L704 220V236L690 250H452L430 228H338L316 250H78L64 236Z" fill="#657982" />
+    <use href="#worktop-surface" fill="#d8dfe3" />
+    <g clip-path="url(#surface-clip)">
+      <path d="M80 68H688L704 84H64Z" fill="#e0e4e1" />
+      <path d="M64 84H73V218L84 228L78 234L64 220Z" fill="#dce1de" />
+      <path d="M695 84H704V220L690 234H452L430 212H338L316 234H78L84 226H312L334 204H434L456 226H686L695 217Z" fill="#aab6ba" />
+    </g>
+    <path id="notch-back-joint-fill" d="M336.3431458 210.75H338V228H336.3431458Z" fill="#657982" />
+    <path id="notch-right-back-joint-fill" d="M430 210.75H431.6568542V228H430Z" fill="#657982" />
+    <path d="M64 220L78 234H314.3431458M336.3431458 212H431.6568542M453.6568542 234H690L704 220" fill="none" stroke="#657982" stroke-width="2.5" />
+    <path d="M431.6568542 210.75L453.6568542 232.75V250L431.6568542 228Z" fill="#465d6b" />
+    <path d="M314.3431458 232.75L336.3431458 210.75V228L314.3431458 250Z" fill="#91a1a9" />
+    <path d="M570 238H657V244H570Z" fill="#c5e5f5" />
+    <use href="#worktop-body" fill="none" stroke="#000000" stroke-width="8" stroke-linejoin="round" />
+  </g>
+  <g>
+    <g id="rear-backstop">
+      <path d="M230 87H541V102H230Z" fill="#7e909b" />
+      <path d="M230 87H541V93H230Z" fill="#b9c4ca" />
+      <path d="M230 99H541V102H230Z" fill="#607784" />
+    </g>
+    <g id="vise-utility-housing">
+      <path d="M87 94H224V211H87Z" fill="#b7bfc2" />
+      <path d="M87 90H224V99H87Z" fill="#dce1de" />
+      <path d="M218 99H224V211H218Z" fill="#8e9fa8" />
+      <path d="M87 196H224V211H87Z" fill="#97a6ae" />
+      <path d="M102 201H110V206H102ZM115 201H123V206H115ZM128 201H136V206H128Z" fill="#596f7d" />
+      <path d="M100 105H126V111H100Z" fill="#c5e5f5" />
+    </g>
+    <g id="assembly-plate">
+      <path d="M249 112H522L530 120V198H241V120Z" fill="#7d8f99" />
+      <path d="M251 115H520L526 122V190H245V122Z" fill="#bcc6ca" />
+      <path d="M245 190H526V198H245Z" fill="#8c9da7" />
+    </g>
+    <g id="inset-display">
+      <path d="M566 117H663V196H558V125Z" fill="#9baab2" />
+      <path d="M568 121H659V188H562V127Z" fill="#b9c4c8" />
+      <path d="M566 129H654V182H566Z" fill="#344a5b" />
+      <path d="M562 188H659V196H562Z" fill="#8197a4" />
+      <path d="M575 138H608M575 146H597" stroke="#91adbf" stroke-width="3" />
+      <path d="M629 137H645V152H629Z" fill="#c5e5f5" />
+      <path d="M575 166H645V172H575Z" fill="#68889d" />
+      <path d="M575 166H618V172H575Z" fill="#c5e5f5" />
+    </g>
+  </g>
+  <g id="bench-vise">
+    <path d="M112 172H197V188H112Z" fill="#718793" />
+    <path d="M119 166H188L197 172H112Z" fill="#aebbc1" />
+    <path d="M120 131H181V168H120Z" fill="#7c919d" />
+    <path d="M121 139H181V157H121Z" fill="#536c7b" />
+    <path d="M119 124H181V137H119Z" fill="#b8c4c9" />
+    <path d="M119 133H181V139H119Z" fill="#4b6371" />
+    <path d="M119 157H181V170H119Z" fill="#b8c4c9" />
+    <path d="M119 165H181V171H119Z" fill="#7c919d" />
+    <path d="M177 148H216" stroke="#4f6877" stroke-width="7" />
+    <path d="M184 146H216" stroke="#aebdc5" stroke-width="3" />
+    <rect x="213" y="137" width="6" height="28" rx="2" fill="#607a89" />
+  </g>
+</svg>

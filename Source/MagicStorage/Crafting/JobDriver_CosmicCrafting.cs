@@ -45,7 +45,6 @@ namespace MagicStorage
 
     public sealed class JobDriver_CosmicCrafting : JobDriver, IStorageNetworkClient
     {
-        private CraftingMaterialLease lease;
         private CraftingOrder claimedOrder;
         private MapComponent_CosmicCrafting dispatcher;
         private int revision;
@@ -83,52 +82,23 @@ namespace MagicStorage
                 !pawn.ReserveSittableOrSpot(Bench.InteractionCell, job, errorOnFailed)) return false;
             // Ordered jobs first run this on Job.GetCachedDriver, then StartJob
             // creates a new driver. Only the actual current driver may own a
-            // network lease or assignment; the cached driver only checks eligibility.
+            // prepared batch or assignment; the cached driver only checks eligibility.
             if (pawn.jobs.curDriver != this)
                 return pawn.Map.GetComponent<MapComponent_CosmicCrafting>().CanStartOrder(this);
             return EnsureAssignment();
         }
         private bool EnsureAssignment()
         {
-            if (claimedOrder != null && claimedOrder.Batch != null && dispatcher?.AssignedWorker(claimedOrder) == pawn)
+            if (claimedOrder != null && claimedOrder.Batch != null && dispatcher?.IsAssigned(claimedOrder, this) == true)
                 return claimedOrder.Batch.Valid(claimedOrder);
-            // The map owns claims across graph rebuilds; the lease resolves its core's
-            // current network while retaining the same exact material allocations.
-            if (lease != null && lease.Network != Core?.Network) ReleaseAssignment();
-            if (lease != null) return lease.Network == Core?.Network && lease.Valid(claimedOrder);
             if (pawn.Map == null || Core == null || job.workGiverDef == null ||
                 !MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network)) return false;
             dispatcher = pawn.Map.GetComponent<MapComponent_CosmicCrafting>();
-            if (!dispatcher.TryClaim(this, out lease)) return false;
+            if (!dispatcher.TryClaim(this)) return false;
             claimedOrder = Order; revision = claimedOrder.Revision;
             return true;
         }
-        internal bool BeginBatch()
-        {
-            var order = Order;
-            if (order == null) return false;
-            if (order.Batch != null) return order.Batch.Valid(order);
-            if (lease == null || !lease.Valid(order)) return false;
-            var batch = new CraftingBatch(Core);
-            order.Batch = batch;
-            try
-            {
-                if (!lease.Collect(order, batch.Ingredients) || !batch.Initialize(order))
-                {
-                    if (batch.Cancel()) order.Batch = null;
-                    return false;
-                }
-                return true;
-            }
-            catch (System.Exception exception)
-            {
-                if (batch.Cancel()) order.Batch = null;
-                order.Suspended = true;
-                Log.Error("[MagicStorage] Could not initialize crafting batch: " + exception);
-                return false;
-            }
-            finally { lease.Release(); lease = null; }
-        }
+        internal bool BeginBatch() => Order?.Batch?.Valid(Order) == true;
         internal void FinishBatch()
         {
             var order = Order;
@@ -139,7 +109,7 @@ namespace MagicStorage
         }
         internal bool CanContinue()
         {
-            if (ended) return false;
+            if (ended || pawn == null || !pawn.Spawned || pawn.Dead || pawn.Map != Core?.Map) return false;
             pawn.Map?.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             if (Core == null || !Core.Spawned || Bench == null || !Bench.Spawned || Order == null ||
                 Bench.IsForbidden(pawn) || Bench.IsBurning() || Bench.Network != Core.Network ||
@@ -151,9 +121,6 @@ namespace MagicStorage
                 CraftingServices.Workers.Allows(claimedOrder, pawn, job.workGiverDef.workType);
             return policyAllowed;
         }
-        internal void OnMaterialsInvalidated()
-        { if (!ended && Order?.Batch == null) EndJobWith(JobCondition.Incompletable); }
-
         void IStorageNetworkClient.OnStorageNetworksRebuilt()
         {
             if (!ended && !CanContinue()) pawn.Map.GetComponent<MapComponent_StorageNetworks>().Defer(() =>
@@ -161,7 +128,6 @@ namespace MagicStorage
         }
         internal void ReleaseAssignment()
         {
-            lease?.Release(); lease = null;
             dispatcher?.Release(claimedOrder, this);
             claimedOrder = null;
         }

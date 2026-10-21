@@ -1,0 +1,302 @@
+[
+  {
+    "name": "StorageUnit_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      512,
+      768
+    ],
+    "bounds": [
+      115,
+      87,
+      397,
+      641
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      512,
+      768
+    ],
+    "bounds": [
+      115,
+      87,
+      397,
+      641
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_east",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      768,
+      512
+    ],
+    "bounds": [
+      108,
+      116,
+      660,
+      396
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_west",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      768,
+      512
+    ],
+    "bounds": [
+      108,
+      116,
+      660,
+      396
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      768,
+      352
+    ],
+    "bounds": [
+      51,
+      55,
+      717,
+      263
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      768,
+      352
+    ],
+    "bounds": [
+      51,
+      55,
+      717,
+      263
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_east",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      352,
+      768
+    ],
+    "bounds": [
+      55,
+      90,
+      297,
+      631
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_west",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      352,
+      768
+    ],
+    "bounds": [
+      55,
+      90,
+      297,
+      631
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1044,
+      532
+    ],
+    "bounds": [
+      5,
+      21,
+      1039,
+      527
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1044,
+      532
+    ],
+    "bounds": [
+      5,
+      21,
+      1039,
+      527
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_east",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      532,
+      1044
+    ],
+    "bounds": [
+      5,
+      21,
+      527,
+      1039
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_west",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      532,
+      1044
+    ],
+    "bounds": [
+      5,
+      21,
+      527,
+      1039
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      25,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      25,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_east",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      25,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_west",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      25,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1536,
+      1024
+    ],
+    "bounds": [
+      98,
+      19,
+      1438,
+      974
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1536,
+      1024
+    ],
+    "bounds": [
+      98,
+      19,
+      1438,
+      974
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_east",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1536,
+      1536
+    ],
+    "bounds": [
+      310,
+      248,
+      1226,
+      1400
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_west",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1536,
+      1536
+    ],
+    "bounds": [
+      310,
+      248,
+      1226,
+      1400
+    ],
+    "changed_opaque_interior_pixels": 0
+  }
+]

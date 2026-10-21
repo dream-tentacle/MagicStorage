@@ -61,6 +61,7 @@ internal static class MonolynCompatibilityTests
         new MonolynCompatibility().Apply(new Harmony("magicstorage.tests.monolyn"));
         ContainerOnly(); MixedAndMultipleCosts(); MultipleUnits(); IneligibleUnits(); DisconnectedAndReserved();
         WholeReservedStack(); PreservedReservation(); CraftingGroupInvalidated(); IncomingMergeReservation(); Insufficient();
+        LaterMaterialMissing(); DuplicateCosts(); GroundReservations(); ExtractionRollback(); StoredExtractionRollback(); EffectFailure();
         Equal(0, ASEL.PlaceWorker_LightBuilder.OriginalCalls, "prefix replaces original deduction without double charging");
         Equal(Effecter.Triggers, Effecter.Cleanups, "transfer effects cleaned up");
         return assertions;
@@ -115,16 +116,18 @@ internal static class MonolynCompatibilityTests
         object claim = new object();
         var client = new Client();
         Equal(15, f.Core.Network.ReserveOutgoing(claim, item, 15, client: client), "fixture reserves outgoing stock");
-        Equal(true, f.Consume(10), "immediate consumption follows physical resource-count semantics");
-        Equal(false, f.Core.Network.HasOutgoingReservation(claim, item, 15), "overdrawn reservation invalidated");
-        Equal(0, client.Calls, "notification deferred until inventory mutation completes");
+        Equal(false, f.Consume(10), "reserved quantity cannot fund immediate construction");
+        Equal(20, item.stackCount, "insufficient unreserved stock remains unchanged");
+        Equal(true, f.Core.Network.HasOutgoingReservation(claim, item, 15), "existing reservation survives failed consumption");
         f.Manager.MapComponentTick(); f.Manager.MapComponentTick();
-        Equal(1, client.Calls, "affected reservation owner notified exactly once");
-        Equal(StorageReservationFailure.InsufficientCount, client.Reason, "owner receives count loss reason");
+        Equal(0, client.Calls, "failed consumption does not invalidate the existing owner");
+        Equal(true, f.Consume(5), "unreserved remainder can still fund construction");
+        Equal(true, f.Core.Network.HasOutgoingReservation(claim, item, 15), "consuming free remainder preserves existing claim");
         f.Manager.Unregister(f.Core.node); f.Manager.EnsureCurrent();
         Equal(false, f.First.Network.CanWork, "fixture network disconnected");
-        Equal(true, f.Consume(5), "counted disconnected stock can still be consumed");
-        Equal(5L, f.First.Inventory.GetTotalCount(f.Steel), "disconnected deduction updates physical inventory");
+        Equal(false, f.Consume(5), "disconnected stock cannot be consumed");
+        Equal(15L, f.First.Inventory.GetTotalCount(f.Steel), "disconnected physical inventory remains intact");
+        Equal(0, f.Map.resourceCounter.GetCount(f.Steel), "disconnected stock is absent from resource count");
     }
 
     private static void WholeReservedStack()
@@ -132,10 +135,12 @@ internal static class MonolynCompatibilityTests
         var f = new Fixture(); Thing item = f.Store(f.First, f.Steel, 10);
         var client = new Client(); object claim = new object();
         f.Core.Network.ReserveOutgoing(claim, item, 5, client: client);
-        Equal(true, f.Consume(10), "whole reserved stack consumed");
+        Equal(false, f.Consume(10), "whole stack cannot be consumed while partly reserved");
         f.Manager.MapComponentTick();
-        Equal(1, client.Calls, "whole stack owner notified");
-        Equal(StorageReservationFailure.ItemUnavailable, client.Reason, "whole stack reports removed item");
+        Equal(0, client.Calls, "reservation owner is not interrupted");
+        Equal(false, item.Destroyed, "reserved stack remains a real item");
+        f.Core.Network.ReleaseOutgoing(claim);
+        Equal(true, f.Consume(10), "whole stack can be consumed after owner releases it");
     }
 
     private static void IncomingMergeReservation()
@@ -145,10 +150,10 @@ internal static class MonolynCompatibilityTests
         var carry = new ThingOwner(null); carry.TryAdd(incoming, false);
         object claim = new object();
         Equal(15, f.Core.Network.ReserveIncoming(claim, incoming, 15), "incoming merge reserved");
-        Equal(true, f.Consume(60), "incoming merge target consumed");
+        Equal(false, f.Consume(60), "incoming merge target cannot be consumed mid-delivery");
         Equal(15, f.Core.Network.TryStoreReserved(carry, incoming, 15, claim).Transferred,
-            "incoming reservation replans into freed space without losing carried material");
-        Equal(15L, f.First.Network.GetTotalCount(f.Steel), "incoming material stored once after replan");
+            "incoming reservation completes without losing carried material");
+        Equal(75L, f.First.Network.GetTotalCount(f.Steel), "existing and incoming material preserved exactly");
     }
 
     private static void PreservedReservation()
@@ -165,20 +170,131 @@ internal static class MonolynCompatibilityTests
     private static void CraftingGroupInvalidated()
     {
         var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 20);
-        Thing other = f.Store(f.Second, f.Component, 10); int canceled = 0;
-        var lease = new CraftingMaterialLease(f.Core.Network, f.Core, null, () => canceled++);
-        Equal(true, lease.Acquire(new Dictionary<Thing, int> { { steel, 10 }, { other, 3 } }), "crafting group reserved");
-        Equal(true, f.Consume(20), "reserved ingredient consumed by Monolyn");
+        Thing other = f.Store(f.Second, f.Component, 10);
+        var recipe = new RecipeDef();
+        recipe.fixedIngredientFilter.SetAllow(f.Steel, true); recipe.fixedIngredientFilter.SetAllow(f.Component, true);
+        var metal = new IngredientCount { count = 10 }; metal.filter.SetAllow(f.Steel, true);
+        var component = new IngredientCount { count = 3 }; component.filter.SetAllow(f.Component, true);
+        recipe.ingredients.Add(metal); recipe.ingredients.Add(component);
+        var order = f.Core.Crafting.Add(recipe);
+        Equal(true, CraftingMaterialPreparation.Prepare(f.Core, order,
+            new Dictionary<Thing, int> { { steel, 10 }, { other, 3 } }), "crafting batch owns materials before other consumers run");
+        Equal(true, f.Consume(10), "Monolyn consumes only the remaining network stock");
         f.Manager.MapComponentTick(); f.Manager.MapComponentTick();
-        Equal(1, canceled, "real crafting lease receives one cancellation");
-        Equal(10, f.Core.Network.AvailableToWithdraw(other), "canceled crafting group releases other ingredients");
+        Equal(13, order.Batch.Ingredients[0].stackCount + order.Batch.Ingredients[1].stackCount,
+            "external consumption cannot touch prepared materials");
+        Equal(7, f.Core.Network.AvailableToWithdraw(other), "unprepared components remain available without claims");
     }
 
     private static void Insufficient()
     {
         var f = new Fixture(); f.Store(f.First, f.Steel, 4);
-        Equal(false, f.Consume(6), "insufficient deduction returns false like original");
-        Equal(0L, f.First.Inventory.GetTotalCount(f.Steel), "original partial-consumption behavior retained");
+        Equal(false, f.Consume(6), "insufficient deduction returns false");
+        Equal(4L, f.First.Inventory.GetTotalCount(f.Steel), "insufficient stock is never partially consumed");
+        Equal(true, f.Consume(4), "unchanged stock remains available for a smaller cost");
         Equal(false, f.Consume(1), "empty sources return false");
+    }
+
+    private static void LaterMaterialMissing()
+    {
+        var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 20);
+        int effects = Effecter.Triggers;
+        Equal(false, f.Consume(10, 1), "later missing component rejects entire cost");
+        Equal(20, steel.stackCount, "earlier sufficient material is not charged");
+        Equal(20L, f.First.Inventory.GetTotalCount(f.Steel), "failed multi-material plan leaves index unchanged");
+        Equal(20, f.Core.Network.AvailableToWithdraw(steel), "failed plan leaks no reservation");
+        Equal(effects, Effecter.Triggers, "failed plan emits no paid-transfer effects");
+    }
+
+    private static void DuplicateCosts()
+    {
+        var f = new Fixture(); f.Store(f.First, f.Steel, 8);
+        var def = new ThingDef { costList = new List<ThingDefCountClass> {
+            new ThingDefCountClass { thingDef = f.Steel, count = 5 },
+            new ThingDefCountClass { thingDef = f.Steel, count = 5 } } };
+        Equal(false, f.Worker.DestroyResources(f.Map, def), "repeated costs cannot reuse the same five items");
+        Equal(8L, f.First.Inventory.GetTotalCount(f.Steel), "failed repeated cost leaves entire stock");
+        f.Store(f.Second, f.Steel, 4);
+        Equal(true, f.Worker.DestroyResources(f.Map, def), "repeated costs aggregate across storage units");
+        Equal(2L, f.First.Network.GetTotalCount(f.Steel), "aggregate cost charged exactly once");
+    }
+
+    private static void GroundReservations()
+    {
+        var f = new Fixture();
+        var ground = new Thing { def = f.Steel, stackCount = 10, Map = f.Map, Spawned = true };
+        f.Map.Ground.Add(ground); f.Map.listerThings.Things.Add(ground);
+        f.Map.reservationManager.Reserved.Add(ground);
+        Equal(false, f.Consume(5), "normal ground reservation blocks consumption");
+        f.Map.reservationManager.Reserved.Clear(); f.Map.physicalInteractionReservationManager.Reserved.Add(ground);
+        Equal(false, f.Consume(5), "physical interaction reservation blocks consumption");
+        Equal(10, ground.stackCount, "both reservation failures preserve ground quantity");
+        f.Map.physicalInteractionReservationManager.Reserved.Clear();
+        Equal(true, f.Consume(5), "released ground stock is available again");
+        Equal(5, ground.stackCount, "ground deduction remains exact");
+    }
+
+    private static void ExtractionRollback()
+    {
+        foreach (bool wholeGroundStack in new[] { false, true })
+        {
+            var f = new Fixture(); Thing component = f.Store(f.First, f.Component, 3);
+            var ground = new Thing { def = f.Steel, stackCount = 10, Map = f.Map, Spawned = true };
+            f.Map.Ground.Add(ground); f.Map.listerThings.Things.Add(ground);
+            if (wholeGroundStack) f.Map.DropBudget = 0;
+            Thing.BeforeMonolynTestSplit = item =>
+            {
+                if (item != ground) return;
+                Thing.BeforeMonolynTestSplit = null;
+                f.Manager.Unregister(f.Core.node); f.Manager.EnsureCurrent();
+            };
+            try { Equal(false, f.Consume(wholeGroundStack ? 10 : 5, 1), "network loss during extraction aborts payment"); }
+            finally { Thing.BeforeMonolynTestSplit = null; }
+            Equal(3, component.stackCount, "later component is never destroyed after failed extraction");
+            Equal(3L, f.First.Inventory.GetTotalCount(f.Component), "component ownership and index remain correct");
+            var holders = new List<IThingHolder>(); f.Manager.GetChildHolders(holders);
+            long pending = 0; foreach (StorageRecoveryBatch batch in holders) pending += batch.PendingCount;
+            if (wholeGroundStack)
+            {
+                Equal(10L, pending, "blocked full-stack rollback stays in saved recovery");
+                Equal(false, ground.Destroyed, "recovery preserves original whole stack");
+                f.Map.DropBudget = int.MaxValue; Find.TickManager.TicksGame += 1000; f.Manager.MapComponentTick();
+                Equal(ground, f.Map.Ground[0], "recovery later releases original whole stack");
+            }
+            else
+            {
+                Equal(10, ground.stackCount, "partial ground withdrawal is restored to original stack");
+                Equal(0L, pending, "successful rollback leaves no duplicate recovery stock");
+            }
+        }
+    }
+
+    private static void EffectFailure()
+    {
+        var f = new Fixture(); f.Store(f.First, f.Steel, 10);
+        Effecter.ThrowOnTrigger = true;
+        try { Equal(true, f.Consume(5), "cosmetic effect failure cannot reject paid construction"); }
+        finally { Effecter.ThrowOnTrigger = false; }
+        Equal(5L, f.First.Inventory.GetTotalCount(f.Steel), "effect failure does not charge twice or refund payment");
+    }
+
+    private static void StoredExtractionRollback()
+    {
+        var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 20);
+        var component = new Thing { def = f.Component, stackCount = 3, Map = f.Map, Spawned = true };
+        f.Map.Ground.Add(component); f.Map.listerThings.Things.Add(component);
+        Thing.BeforeMonolynTestSplit = item =>
+        {
+            if (item != steel) return;
+            Thing.BeforeMonolynTestSplit = null;
+            f.Map.reservationManager.Reserved.Add(component);
+        };
+        try { Equal(false, f.Consume(10, 1), "new ground reservation after storage withdrawal aborts entire payment"); }
+        finally { Thing.BeforeMonolynTestSplit = null; }
+        Equal(20L, f.First.Inventory.GetTotalCount(f.Steel), "withdrawn material restored to original storage inventory");
+        Equal(20L, f.Core.Network.GetTotalCount(f.Steel), "restored material reindexed in network exactly once");
+        Equal(20, f.Core.Network.AvailableToWithdraw(steel), "failed extraction releases its temporary storage claim");
+        Equal(3, component.stackCount, "newly reserved ground component remains untouched");
+        Equal(0, f.Map.Ground.FindAll(item => item.def == f.Steel).Count, "successful storage restoration creates no loose duplicate");
     }
 }

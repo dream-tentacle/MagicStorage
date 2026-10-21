@@ -1,0 +1,282 @@
+[
+  {
+    "name": "StorageUnit_south",
+    "size": [
+      512,
+      768
+    ],
+    "bounds": [
+      121,
+      93,
+      391,
+      635
+    ],
+    "outline": 10.6666666665
+  },
+  {
+    "name": "StorageUnit_north",
+    "size": [
+      512,
+      768
+    ],
+    "bounds": [
+      121,
+      93,
+      391,
+      635
+    ],
+    "outline": 10.6666666665
+  },
+  {
+    "name": "StorageUnit_east",
+    "size": [
+      768,
+      512
+    ],
+    "bounds": [
+      113,
+      121,
+      655,
+      391
+    ],
+    "outline": 10.7216494845
+  },
+  {
+    "name": "StorageUnit_west",
+    "size": [
+      768,
+      512
+    ],
+    "bounds": [
+      113,
+      121,
+      655,
+      391
+    ],
+    "outline": 10.7216494845
+  },
+  {
+    "name": "CosmicWorkbench_south",
+    "size": [
+      768,
+      352
+    ],
+    "bounds": [
+      55,
+      59,
+      713,
+      259
+    ],
+    "outline": 8.6779661015
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "size": [
+      768,
+      352
+    ],
+    "bounds": [
+      55,
+      59,
+      713,
+      259
+    ],
+    "outline": 8.6779661015
+  },
+  {
+    "name": "CosmicWorkbench_east",
+    "size": [
+      352,
+      768
+    ],
+    "bounds": [
+      60,
+      95,
+      292,
+      626
+    ],
+    "outline": 9.17562724
+  },
+  {
+    "name": "CosmicWorkbench_west",
+    "size": [
+      352,
+      768
+    ],
+    "bounds": [
+      60,
+      95,
+      292,
+      626
+    ],
+    "outline": 9.17562724
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "size": [
+      1024,
+      512
+    ],
+    "bounds": [
+      5,
+      21,
+      1019,
+      507
+    ],
+    "outline": 20.0412371135
+  },
+  {
+    "name": "StorageApparelAdapter_north",
+    "size": [
+      1024,
+      512
+    ],
+    "bounds": [
+      5,
+      21,
+      1019,
+      507
+    ],
+    "outline": 20.0412371135
+  },
+  {
+    "name": "StorageApparelAdapter_east",
+    "size": [
+      512,
+      1024
+    ],
+    "bounds": [
+      6,
+      22,
+      506,
+      1018
+    ],
+    "outline": 19.7849462365
+  },
+  {
+    "name": "StorageApparelAdapter_west",
+    "size": [
+      512,
+      1024
+    ],
+    "bounds": [
+      6,
+      22,
+      506,
+      1018
+    ],
+    "outline": 19.7849462365
+  },
+  {
+    "name": "TransportSupplier_south",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      10,
+      30,
+      502,
+      498
+    ],
+    "outline": 19.440860215
+  },
+  {
+    "name": "TransportSupplier_north",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      10,
+      30,
+      502,
+      498
+    ],
+    "outline": 19.440860215
+  },
+  {
+    "name": "TransportSupplier_east",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      10,
+      30,
+      502,
+      498
+    ],
+    "outline": 19.440860215
+  },
+  {
+    "name": "TransportSupplier_west",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      10,
+      30,
+      502,
+      498
+    ],
+    "outline": 19.440860215
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "size": [
+      1536,
+      1024
+    ],
+    "bounds": [
+      110,
+      27,
+      1426,
+      966
+    ],
+    "outline": 8.6779661015
+  },
+  {
+    "name": "CosmicMechGestator_north",
+    "size": [
+      1536,
+      1024
+    ],
+    "bounds": [
+      110,
+      27,
+      1426,
+      966
+    ],
+    "outline": 8.6779661015
+  },
+  {
+    "name": "CosmicMechGestator_east",
+    "size": [
+      1536,
+      1536
+    ],
+    "bounds": [
+      323,
+      257,
+      1213,
+      1391
+    ],
+    "outline": 8.7972494845
+  },
+  {
+    "name": "CosmicMechGestator_west",
+    "size": [
+      1536,
+      1536
+    ],
+    "bounds": [
+      323,
+      257,
+      1213,
+      1391
+    ],
+    "outline": 8.7972494845
+  }
+]

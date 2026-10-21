@@ -35,6 +35,12 @@ namespace MagicStorage
         internal StorageIncomingReservations(IList<Building_StorageUnit> units, Func<Thing, bool> unavailableStack = null)
         { this.units = units; this.unavailableStack = unavailableStack; }
         internal void Clear() { claims.Clear(); reservedStacks.Clear(); reservedSlots.Clear(); }
+        internal void ReleaseForUnit(Building_StorageUnit unit)
+        {
+            foreach (var entry in new List<KeyValuePair<object, StorageIncomingPlan>>(claims))
+                foreach (var allocation in entry.Value.Allocations)
+                    if (allocation.Unit == unit) { Release(entry.Key); break; }
+        }
         internal void Release(object owner)
         {
             if (owner == null || !claims.TryGetValue(owner, out var plan)) return;
@@ -73,7 +79,8 @@ namespace MagicStorage
             return plan;
         }
 
-        internal StorageIncomingPlan Plan(Thing item, int requested, object exclude = null)
+        internal StorageIncomingPlan Plan(Thing item, int requested, object exclude = null,
+            Building_StorageUnit excludedUnit = null)
         {
             StorageIncomingPlan result = new StorageIncomingPlan();
             if (item == null || item.Destroyed || item.def.category != ThingCategory.Item ||
@@ -106,6 +113,7 @@ namespace MagicStorage
             List<Thing> stacks = new List<Thing>();
             foreach (var unit in units)
             {
+                if (unit == excludedUnit) continue;
                 if (remaining == 0) return result;
                 stacks.Clear();
                 unit.Inventory.GetPartialStacks(item.def, stacks);
@@ -123,6 +131,7 @@ namespace MagicStorage
             }
             foreach (var unit in units)
             {
+                if (unit == excludedUnit) continue;
                 int own = 0; ownSlots?.TryGetValue(unit, out own);
                 int reserved = ReservedSlots(unit) - own;
                 int slots = Math.Max(0, unit.SlotCapacity - unit.Inventory.UsedSlots - reserved);

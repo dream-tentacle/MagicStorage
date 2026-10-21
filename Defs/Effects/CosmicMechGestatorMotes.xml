@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Defs>
+  <ThingDef ParentName="MechGestatorFormingBase" Name="MS_CosmicMechGestatorGlowBase" Abstract="True" MayRequire="Ludeon.RimWorld.Biotech">
+    <graphicData>
+      <color>(0.35,0.65,0.85,0.4)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorGlowBase" Name="MS_CosmicMechGestatorFormingNorth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorForming_North</defName>
+    <graphicData>
+      <texPath>Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_north</texPath>
+      <drawSize>(3.625,3.125)</drawSize>
+      <shaderParameters Inherit="False">
+        <_MistTex>/Things/Mote/SmokeTiled</_MistTex>
+        <_MistScrollSpeed>0.2</_MistScrollSpeed>
+        <_MistOpacityTex>/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_north</_MistOpacityTex>
+        <_ScanOffset>0</_ScanOffset>
+        <_ScanScale>12.5</_ScanScale>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingNorth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorCycleComplete_North</defName>
+    <graphicData>
+      <color>(0.6,0.8,0.95,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingNorth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorFormed_North</defName>
+    <graphicData>
+      <color>(0.65,0.9,1,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorGlowBase" Name="MS_CosmicMechGestatorFormingEast" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorForming_East</defName>
+    <graphicData>
+      <texPath>Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_east</texPath>
+      <drawSize>(3.125,3.625)</drawSize>
+      <shaderParameters Inherit="False">
+        <_MistTex>/Things/Mote/SmokeTiled</_MistTex>
+        <_MistScrollSpeed>0.2</_MistScrollSpeed>
+        <_MistOpacityTex>/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_east</_MistOpacityTex>
+        <_ScanOffset>0</_ScanOffset>
+        <_ScanScale>12.5</_ScanScale>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingEast" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorCycleComplete_East</defName>
+    <graphicData>
+      <color>(0.6,0.8,0.95,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingEast" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorFormed_East</defName>
+    <graphicData>
+      <color>(0.65,0.9,1,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorGlowBase" Name="MS_CosmicMechGestatorFormingSouth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorForming_South</defName>
+    <graphicData>
+      <texPath>Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_south</texPath>
+      <drawSize>(3.625,3.125)</drawSize>
+      <shaderParameters Inherit="False">
+        <_MistTex>/Things/Mote/SmokeTiled</_MistTex>
+        <_MistScrollSpeed>0.2</_MistScrollSpeed>
+        <_MistOpacityTex>/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_south</_MistOpacityTex>
+        <_ScanOffset>0</_ScanOffset>
+        <_ScanScale>12.5</_ScanScale>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingSouth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorCycleComplete_South</defName>
+    <graphicData>
+      <color>(0.6,0.8,0.95,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingSouth" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorFormed_South</defName>
+    <graphicData>
+      <color>(0.65,0.9,1,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorGlowBase" Name="MS_CosmicMechGestatorFormingWest" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorForming_West</defName>
+    <graphicData>
+      <texPath>Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_west</texPath>
+      <drawSize>(3.125,3.625)</drawSize>
+      <shaderParameters Inherit="False">
+        <_MistTex>/Things/Mote/SmokeTiled</_MistTex>
+        <_MistScrollSpeed>0.2</_MistScrollSpeed>
+        <_MistOpacityTex>/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_west</_MistOpacityTex>
+        <_ScanOffset>0</_ScanOffset>
+        <_ScanScale>12.5</_ScanScale>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingWest" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorCycleComplete_West</defName>
+    <graphicData>
+      <color>(0.6,0.8,0.95,0.45)</color>
+    </graphicData>
+  </ThingDef>
+  <ThingDef ParentName="MS_CosmicMechGestatorFormingWest" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicMechGestatorFormed_West</defName>
+    <graphicData>
+      <color>(0.65,0.9,1,0.45)</color>
+    </graphicData>
+  </ThingDef>
+</Defs>

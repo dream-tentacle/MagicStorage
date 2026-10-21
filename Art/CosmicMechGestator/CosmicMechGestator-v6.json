@@ -1,0 +1,26 @@
+{
+  "source": "CosmicMechGestator_south-v6.svg",
+  "source_png": [
+    1536,
+    1024
+  ],
+  "platform_top_center": [
+    384,
+    275
+  ],
+  "vessel_seat_center": [
+    384,
+    275
+  ],
+  "lid_center": [
+    384,
+    115
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "view": "south",
+  "review_only": true,
+  "game_files_changed": false
+}

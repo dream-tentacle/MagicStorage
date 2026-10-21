@@ -1,0 +1,132 @@
+[
+  {
+    "name": "StorageUnit_south",
+    "size": [
+      512,
+      768
+    ],
+    "alpha_bounds": [
+      121,
+      93,
+      391,
+      635
+    ]
+  },
+  {
+    "name": "StorageReceiver",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      10,
+      28,
+      502,
+      498
+    ]
+  },
+  {
+    "name": "StorageSupplyShelf",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      8,
+      22,
+      504,
+      502
+    ]
+  },
+  {
+    "name": "TransportSupplier_south",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      10,
+      30,
+      502,
+      498
+    ]
+  },
+  {
+    "name": "ConstructionSupplyUnit",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      12,
+      34,
+      500,
+      498
+    ]
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "size": [
+      1024,
+      512
+    ],
+    "alpha_bounds": [
+      5,
+      21,
+      1019,
+      507
+    ]
+  },
+  {
+    "name": "FuelSupplier",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      49,
+      51,
+      459,
+      482
+    ]
+  },
+  {
+    "name": "NivarianCannonExtractor",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      14,
+      26,
+      498,
+      494
+    ]
+  },
+  {
+    "name": "CaravanTeleporter",
+    "size": [
+      512,
+      512
+    ],
+    "alpha_bounds": [
+      6,
+      22,
+      506,
+      506
+    ]
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "size": [
+      1536,
+      1024
+    ],
+    "alpha_bounds": [
+      110,
+      27,
+      1426,
+      966
+    ]
+  }
+]

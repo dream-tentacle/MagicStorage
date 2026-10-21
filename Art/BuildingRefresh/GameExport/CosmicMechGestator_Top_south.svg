@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="928" height="800" viewBox="0 0 928 800"><g transform="matrix(1.080000000000 0 0 1.316571428571 49.280000000000 37.942857142857)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="768" height="512" style="mask-type:luminance"><rect x="0" y="0" width="768" height="512" fill="#ffffff" /><path d="M84 100H253.7509A132 92.4 0 0 1 514.2491 100H684Q704 100 704 120V454Q704 474 684 474H84Q64 474 64 454V120Q64 100 84 100Z" fill="#000000" stroke="none" /></mask></defs>
+  <defs>
+    <radialGradient id="lid-metal" cx="34%" cy="23%" r="84%">
+      <stop offset="0" stop-color="#e1e9ef" />
+      <stop offset=".52" stop-color="#bccbd6" />
+      <stop offset="1" stop-color="#94abba" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4d7188" stop-opacity=".90" /><stop offset=".20" stop-color="#b9d9e7" stop-opacity=".65" /><stop offset=".74" stop-color="#94b7ca" stop-opacity=".55" /><stop offset="1" stop-color="#4a7189" stop-opacity=".88" /></linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfE3" stop-opacity=".2" />
+      <stop offset="1" stop-color="#5d87a3" stop-opacity=".5" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" />
+    </clipPath>
+  </defs>
+
+  <g id="gestator-top" transform="translate(0 -27)">
+    <path d="M252 142V154C252 205 311 246 384 246C457 246 516 205 516 154V142Z" fill="#637782" />
+    <ellipse cx="384" cy="142" rx="132" ry="92.4" fill="#d8dfe3" />
+    <path d="M299 220C347 245 421 245 469 220" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round" />
+    <path d="M267 151C281 190 328 219 384 219C440 219 487 190 501 151C490 203 441 234 384 234C327 234 278 203 267 151Z" fill="#acb8bf" /><path d="M326 121H442V135H326Z" fill="#93a3ad" /><path d="M346 124.5H422V131.5H346Z" fill="#c5e5f5" /></g>
+
+  <defs><clipPath id="exterior-layer-partition"><rect x="-1000" y="-1000" width="3000" height="1100" /></clipPath></defs><g clip-path="url(#exterior-layer-partition)"><g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M84 100H253.7509A132 92.4 0 0 1 514.2491 100H684Q704 100 704 120V454Q704 474 684 474H84Q64 474 64 454V120Q64 100 84 100Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g>
+</g></g></svg>

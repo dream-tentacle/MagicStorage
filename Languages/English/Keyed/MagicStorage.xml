@@ -8,6 +8,10 @@
   <MS_Status_Ready>operational</MS_Status_Ready>
   <MS_NetworkCapacity>Connected units: {0}\nSlots used: {1} / {2}</MS_NetworkCapacity>
   <MS_UnitCapacity>Slots used: {0} / {1}</MS_UnitCapacity>
+  <MS_UnitTransfer_Label>Transfer inventory</MS_UnitTransfer_Label>
+  <MS_UnitTransfer_Desc>Cancel reservations for items in this unit and move as much as possible into other storage units on the same network. Fill compatible partial stacks before using empty slots. Items that cannot be moved remain in this unit.</MS_UnitTransfer_Desc>
+  <MS_UnitTransfer_Empty>This unit has no items to transfer.</MS_UnitTransfer_Empty>
+  <MS_UnitTransfer_Result>Transferred: {0}; remaining in this unit: {1}.</MS_UnitTransfer_Result>
   <MS_ManualWithdrawalOnly>Ordinary hauling cannot withdraw stored items. Auto-restocking shelves place selected items for colonists to collect.</MS_ManualWithdrawalOnly>
   <MS_ConduitAlreadyPresent>A storage conduit or its construction plan is already here.</MS_ConduitAlreadyPresent>
   <MS_UI_Open>View items</MS_UI_Open>
@@ -46,6 +50,12 @@
   <MS_ReceiverUse>Uses the connected core's filter and priority. Eligible items on its surface are automatically sent to storage units.</MS_ReceiverUse>
   <MS_SettingsCategory>Magic storage</MS_SettingsCategory>
   <MS_SettingsTabGeneral>General</MS_SettingsTabGeneral>
+  <MS_SettingsTabAccessibility>Accessibility</MS_SettingsTabAccessibility>
+  <MS_SettingsAccessibilityNotice>The following options modify vanilla code. If enabling them causes errors or has no effect, this indicates a conflict with another mod: both this mod and the other mod modify vanilla code.</MS_SettingsAccessibilityNotice>
+  <MS_SettingsCaravanItemFilters>Caravan item filters</MS_SettingsCaravanItemFilters>
+  <MS_SettingsTradeItemFilters>Trade window item filters</MS_SettingsTradeItemFilters>
+  <MS_SettingsWorkbenchUnlockMode>Workbench unlock mode</MS_SettingsWorkbenchUnlockMode>
+  <MS_SettingsWorkbenchUnlockModeHelp>Spend construction materials to unlock workbenches before adding their recipes. Workbenches with no material cost are unlocked automatically. Unlocks are shared throughout the current save. Disabling this mode makes all researched recipes available and preserves recorded unlocks.</MS_SettingsWorkbenchUnlockModeHelp>
   <MS_SettingsTabPerformance>Performance</MS_SettingsTabPerformance>
   <MS_SettingsPerformanceNotice>We recommend keeping the initial defaults, as this mod already performs very well.</MS_SettingsPerformanceNotice>
   <MS_SettingsUnitSlots>Stack slots per storage unit</MS_SettingsUnitSlots>

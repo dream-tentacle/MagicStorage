@@ -5,9 +5,9 @@ import xml.etree.ElementTree as ET
 root = Path(__file__).resolve().parent
 sheet = Image.new('RGBA', (1280, 650), '#242727')
 draw = ImageDraw.Draw(sheet)
-draw.text((24, 20), 'MAGIC STORAGE / MATERIAL SUPPLIER / THREE DIRECTIONS / SKY BLUE: 197, 229, 245', fill='#d3d9d7')
+draw.text((24, 20), 'MAGIC STORAGE / MATERIAL SUPPLIER / THREE DIRECTIONS / DEEP BLUE ARROW: #204570', fill='#d3d9d7')
 for i, direction in enumerate(['south', 'north', 'east']):
-    stem = root / f'TransportSupplier_{direction}-v3'
+    stem = root / f'TransportSupplier_{direction}-v4'
     ET.parse(stem.with_suffix('.svg'))
     sprite = Image.open(stem.with_suffix('.png')).convert('RGBA')
     assert sprite.size == (512, 512)
@@ -22,6 +22,6 @@ for i, direction in enumerate(['south', 'north', 'east']):
     draw.rectangle((x, 514, x + 399, 628), fill='#7c8273')
     sheet.alpha_composite(sprite.resize((108, 108), Image.Resampling.LANCZOS), (x + 146, 517))
     print(direction, sprite.size, 'transparent RGBA')
-destination = root / 'TransportSupplier-directions-review-v3.png'
+destination = root / 'TransportSupplier-directions-review-v4.png'
 sheet.convert('RGB').save(destination)
 print(destination)

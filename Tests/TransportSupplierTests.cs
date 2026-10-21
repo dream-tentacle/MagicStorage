@@ -69,7 +69,262 @@ internal static class TransportSupplierTests
         TwoSidedInventory(); WeightLimits(); Reservations(); ReturnRejected(); FullNetworkSwap();
         AllReturnsReservedTogether(); AutoLoadingAndDirections(); Preservation(); QuantityEditing(); MassStoppingPoints();
         ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply(); CachedPreview();
+        SharedLaunchCapacity();
+        FilterGroupingAndSelections();
+        GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
         return assertions;
+    }
+    private sealed class GenericBuilding : ThingWithComps, IThingHolder
+    {
+        internal ThingOwner Container;
+        internal GenericBuilding() { def.category = ThingCategory.Building; Container = new ThingOwner(this); }
+        public new IThingHolder ParentHolder => Map;
+        public ThingOwner GetDirectlyHeldThings() => Container;
+        public void GetChildHolders(List<IThingHolder> children) { }
+    }
+    private sealed class GenericComp : ThingComp, IThingHolder
+    {
+        internal readonly ThingOwner Container;
+        internal GenericComp() { Container = new ThingOwner(this); }
+        public IThingHolder ParentHolder => parent as IThingHolder;
+        public ThingOwner GetDirectlyHeldThings() => Container;
+        public void GetChildHolders(List<IThingHolder> children) { }
+    }
+    private sealed class LimitedContainer : ThingOwner
+    {
+        internal int Limit;
+        internal ThingDef Allowed;
+        internal bool RejectAdd;
+        internal Action AfterAdd;
+        internal LimitedContainer(IThingHolder owner, int limit) : base(owner) { Limit = limit; }
+        public override int GetCountCanAccept(Thing item, bool merge = true) =>
+            Allowed != null && item.def != Allowed ? 0 : Math.Min(item.stackCount, Math.Max(0, Limit - items.Sum(t => t.stackCount)));
+        public override bool TryAdd(Thing item, bool merge = true)
+        {
+            if (RejectAdd) return false;
+            bool added = base.TryAdd(item, merge);
+            AfterAdd?.Invoke();
+            return added;
+        }
+    }
+    private static GenericBuilding GenericTarget(Fixture f)
+    {
+        var target = new GenericBuilding { Spawned = true, Map = f.Map, Position = new IntVec3(3, 0), Faction = Faction.OfPlayer };
+        f.Map.Ground.Add(target);
+        return target;
+    }
+    private static void ToggleGeneric(Fixture f) => f.Supplier.GetGizmos().OfType<Command_Toggle>().Single().toggleAction();
+    private static void GenericManualSupply()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var other = new ThingDef();
+        var target = GenericTarget(f);
+        var container = new LimitedContainer(target, 5) { Allowed = def }; target.Container = container;
+        f.Cargo(def, 8); f.Cargo(other, 3);
+        var toggle = f.Supplier.GetGizmos().OfType<Command_Toggle>().Single();
+        Equal(false, toggle.isActive(), "generic supply is disabled by default");
+        Equal("MS_Transport_GenericSupplyDesc", toggle.defaultDesc, "generic toggle uses the compatibility description");
+        f.Supplier.SupplyTransporter(); Equal(0, container.Count, "disabled generic supply leaves target untouched");
+        toggle.toggleAction(); Equal(true, f.Supplier.GenericContainerSupply, "generic supply enabled");
+        Equal(false, f.Supplier.GetGizmos().OfType<Command_Action>().Last().disabled, "single generic target enables immediate supply");
+        f.Supplier.GetGizmos().OfType<Command_Action>().Last().action();
+        Equal(5L, f.Count(container, def), "manual generic supply respects exposed acceptance limit");
+        Equal(3L, f.Count(f.Supplier.Contents, def), "manual excess stays in supplier");
+        Equal(3L, f.Count(f.Supplier.Contents, other), "rejected item type stays in supplier");
+        container.Limit = 20; toggle.toggleAction(); f.Supplier.SupplyTransporter();
+        Equal(5L, f.Count(container, def), "disabling stops generic delivery");
+        toggle.toggleAction(); container.RejectAdd = true; f.Supplier.SupplyTransporter();
+        Equal(3L, f.Count(f.Supplier.Contents, def), "late rejection returns manual cargo intact");
+        Equal(0, f.Map.Ground.Count(t => t.def.category == ThingCategory.Item), "rejected cargo never spills");
+    }
+    private static void GenericDirectSupply()
+    {
+        var f = new Fixture(); var high = new ThingDef(); var low = new ThingDef(); var unselected = new ThingDef();
+        var stack = f.Store(high, 8); f.Store(low, 10); f.Store(unselected, 4);
+        f.Select(0, high); f.Select(1, low); f.Supplier.TrySwitchMode(); ToggleGeneric(f);
+        var target = GenericTarget(f); var container = new LimitedContainer(target, 5); target.Container = container;
+        object claim = new object(); f.Net.ReserveOutgoing(claim, stack, 6);
+        f.Supplier.SupplyTransporter();
+        Equal(2L, f.Count(container, high), "generic supply preserves reserved high-priority stock");
+        Equal(3L, f.Count(container, low), "generic supply fills remaining capacity with lower priority");
+        Equal(6L, f.Net.GetTotalCount(high), "reserved stock remains in network");
+        Equal(7L, f.Net.GetTotalCount(low), "only accepted lower-priority amount withdrawn");
+        Equal(4L, f.Net.GetTotalCount(unselected), "unselected items remain untouched");
+        Equal(0, f.Supplier.Contents.Count, "generic continuous supply has no internal buffer");
+        container.Limit = 20; container.RejectAdd = true; f.Supplier.SupplyTransporter();
+        Equal(7L, f.Net.GetTotalCount(low), "late rejection restores network stock");
+        container.RejectAdd = false;
+        f.Manager.Unregister(f.Supplier.node); f.Supplier.SupplyTransporter();
+        Equal(7L, f.Net.GetTotalCount(low), "disconnected generic supplier cannot withdraw");
+
+        f = new Fixture(); f.Store(low, 2); f.Store(low, 3); f.Select(0, low); f.Supplier.TrySwitchMode(); ToggleGeneric(f);
+        target = GenericTarget(f); container = new LimitedContainer(target, 20); target.Container = container;
+        container.AfterAdd = () => target.Destroyed = true;
+        f.Supplier.SupplyTransporter();
+        Equal(2L, f.Count(container, low), "first transfer can invoke target callbacks");
+        Equal(3L, f.Net.GetTotalCount(low), "target destruction stops further transfers");
+    }
+    private static void GenericContainerSelection()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Cargo(def, 4); ToggleGeneric(f);
+        var target = GenericTarget(f); var comp = new GenericComp { parent = target }; target.AllComps.Add(comp);
+        f.Supplier.SupplyTransporter();
+        Equal(4L, f.Count(f.Supplier.Contents, def), "multiple containers wait for player selection");
+        Equal(true, f.Supplier.GetGizmos().OfType<Command_Action>().Last().disabled, "ambiguous generic target disables immediate supply");
+        var choose = f.Supplier.GetGizmos().OfType<Command_Action>().Single(g => g.defaultLabel == "MS_Transport_ChooseContainer");
+        choose.action(); var menu = (FloatMenu)Find.WindowStack.Windows.Last();
+        Equal(2, menu.options.Count, "picker lists building and component containers");
+        menu.options[1].action(); f.Supplier.SupplyTransporter();
+        Equal(0, target.Container.Count, "unselected building container untouched");
+        Equal(4L, f.Count(comp.Container, def), "chosen component container receives cargo");
+        f.Cargo(def, 2); choose.action(); menu = (FloatMenu)Find.WindowStack.Windows.Last();
+        target.Spawned = false; var replacement = GenericTarget(f);
+        replacement.AllComps.Add(new GenericComp { parent = replacement });
+        menu.options[0].action(); f.Supplier.SupplyTransporter();
+        Equal(2L, f.Count(f.Supplier.Contents, def), "stale selection cannot target a replacement building");
+        Equal(false, f.Supplier.SelectGenericContainer(replacement, 2), "invalid container index rejected");
+        Equal(true, f.Supplier.SelectGenericContainer(replacement, 0), "replacement target can be selected explicitly");
+        f.Supplier.SupplyTransporter(); Equal(2L, f.Count(replacement.Container, def), "explicit new selection resumes supply");
+
+        f = new Fixture(); target = GenericTarget(f); target.Container = null;
+        comp = new GenericComp { parent = target }; target.AllComps.Add(comp); f.Cargo(def, 3); ToggleGeneric(f);
+        f.Supplier.SupplyTransporter(); Equal(3L, f.Count(comp.Container, def), "single component-only container is discovered automatically");
+    }
+    private static void GenericTargetRules()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Cargo(def, 8); ToggleGeneric(f);
+        var target = GenericTarget(f);
+        target.Position = new IntVec3(2, 1); f.Supplier.SupplyTransporter(); Equal(0, target.Container.Count, "side container ignored");
+        target.Position = new IntVec3(3, 0); target.Faction = new Faction(); f.Supplier.SupplyTransporter();
+        Equal(0, target.Container.Count, "foreign generic container ignored");
+        target.Faction = Faction.OfPlayer;
+        var transporter = new CompTransporter { parent = target, MassCapacity = 3 }; target.AllComps.Add(transporter);
+        f.Supplier.SupplyTransporter();
+        Equal(3L, f.Count(transporter.innerContainer, def), "specialized transporter keeps its mass rules with generic mode on");
+        Equal(0, target.Container.Count, "generic mode cannot bypass full transporter");
+        f.Supplier.SupplyTransporter(); Equal(0, target.Container.Count, "full transporter does not fall back to another container");
+
+        f = new Fixture(); f.Cargo(def, 4); ToggleGeneric(f); target = GenericTarget(f);
+        var fuel = new CompRefuelable { parent = target, Fuel = 100, TargetFuelLevel = 100 }; fuel.Props.fuelFilter.SetAllow(def, true);
+        target.AllComps.Add(fuel); f.Supplier.SupplyTransporter();
+        Equal(0, target.Container.Count, "full fuel target does not bypass fuel rules through generic container");
+        Equal(4L, f.Count(f.Supplier.Contents, def), "fuel target leaves unneeded material in supplier");
+    }
+    private static void FilterGroupingAndSelections()
+    {
+        var f = new Fixture(); var def = new ThingDef { stackLimit = 1000 };
+        var first = f.Store(def, 5); var second = f.Store(def, 7);
+        var firstCargo = f.Cargo(def, 3); var secondCargo = f.Cargo(def, 4);
+        var matching = new HashSet<Thing> { first, firstCargo };
+        Func<Thing, Thing, bool> sameRuleResult = (left, right) => matching.Contains(left) == matching.Contains(right);
+        var previous = f.Rows();
+        Equal(1, previous.Count, "native grouping initially combines both rule results");
+        previous[0].SetChange(9);
+        var split = StorageTransportExchange.Snapshot(f.Supplier, f.Net, sameRuleResult);
+        Equal(2, split.Count, "rule matching results split otherwise identical items");
+        var included = split.Single(row => matching.Contains(row.Representative));
+        var excluded = split.Single(row => !matching.Contains(row.Representative));
+        Equal(5L, included.NetworkCount, "matching network stacks stay in the matching row");
+        Equal(3L, included.SupplyCount, "matching supplier stock joins the same row");
+        Equal(7L, excluded.NetworkCount, "other network stock remains separate");
+        Equal(4L, excluded.SupplyCount, "other supplier stock remains separate");
+        StorageTransportExchange.RestoreSelections(previous, split, f.Net);
+        Equal(5L, included.Change, "splitting keeps the first selected physical stack");
+        Equal(4L, excluded.Change, "splitting keeps the remaining selected quantity");
+        using (var preview = new StorageTransportPreview(f.Supplier, f.Net, split, 150))
+        {
+            var visible = split.Where(row => matching.Contains(row.Representative)).ToList();
+            Equal(1, visible.Count, "filter hides the other row");
+            Equal(16d, preview.ProjectedMass, "hidden selections still count toward projected mass");
+            Equal(9L, split.Sum(row => row.Change), "filtering does not clear any selection");
+        }
+        Equal(true, f.Execute(split, 150, out _), "confirmation executes visible and hidden selected rows");
+        Equal(3L, f.Net.GetTotalCount(def), "all selected outgoing stock leaves the network");
+        Equal(16L, f.Count(f.Supplier.Contents, def), "all selected outgoing stock reaches supplier");
+
+        f = new Fixture(); first = f.Store(def, 5); second = f.Store(def, 7);
+        firstCargo = f.Cargo(def, 3); secondCargo = f.Cargo(def, 4);
+        matching = new HashSet<Thing> { first, firstCargo };
+        previous = f.Rows(); previous[0].SetChange(-6);
+        split = StorageTransportExchange.Snapshot(f.Supplier, f.Net, sameRuleResult);
+        StorageTransportExchange.RestoreSelections(previous, split, f.Net);
+        included = split.Single(row => matching.Contains(row.Representative));
+        excluded = split.Single(row => !matching.Contains(row.Representative));
+        Equal(-3L, included.Change, "splitting preserves first return stack selection");
+        Equal(-3L, excluded.Change, "splitting preserves remaining return quantity");
+        var merged = f.Rows(); StorageTransportExchange.RestoreSelections(split, merged, f.Net);
+        Equal(-6L, merged.Single().Change, "deleting a rule merges return selections without resetting them");
+
+        previous = f.Rows(); previous[0].SetChange(9);
+        var claim = new object(); f.Net.ReserveOutgoing(claim, first, 4);
+        split = StorageTransportExchange.Snapshot(f.Supplier, f.Net, sameRuleResult);
+        StorageTransportExchange.RestoreSelections(previous, split, f.Net);
+        Equal(8L, split.Sum(row => row.Change), "restoration clamps to current unreserved availability");
+        Equal(true, f.Net.HasOutgoingReservation(claim, first, 4), "restoration does not consume another task's reservation");
+        f.Net.ReleaseOutgoing(claim);
+    }
+    private static void SharedLaunchCapacity()
+    {
+        var f = new Fixture();
+        var heavy = new ThingDef { transportMass = 299 };
+        var light = new ThingDef { transportMass = 1 };
+        var first = f.Target(150); var second = f.Target(150, 4);
+        foreach (var pod in new[] { first, second })
+        {
+            pod.parent.Faction = Faction.OfPlayer;
+            pod.Launchable = new CompLaunchable_TransportPod();
+            pod.parent.def = first.parent.def;
+        }
+        var order = new TransferableOneWay();
+        first.leftToLoad = new List<TransferableOneWay> { order };
+        second.innerContainer.TryAdd(new Thing { def = light, stackCount = 1 });
+        f.Cargo(heavy, 1);
+        f.Supplier.SupplyTransporter();
+        Equal(1, f.Supplier.Contents.Count, "ungrouped pod cannot receive a single 299 kg item");
+        Equal(true, StorageTransportGroups.TryCreate(new[] { first, second }, out _), "create loaded two-pod group");
+        Equal(first.groupID, second.groupID, "pods share a native group ID");
+        Equal(1L, f.Count(second.innerContainer, light), "grouping preserves already loaded cargo");
+        Equal(order, first.leftToLoad[0], "grouping preserves outstanding native orders");
+        Equal(300f, f.Supplier.TransferCapacity, "manual exchange uses total group capacity");
+        f.Supplier.SupplyTransporter();
+        Equal(299f, first.MassUsage, "single heavy item fits using shared capacity");
+        Equal(1f, second.MassUsage, "other pod's existing cargo is counted");
+        Equal(0, f.Supplier.Contents.Count, "heavy item leaves supplier intact");
+        Equal(false, StorageTransportGroups.OverCapacity(first), "heavy pod can initiate a 300 kg group launch");
+        Equal(false, StorageTransportGroups.OverCapacity(second), "light pod sees the same launch mass check");
+        f.Cargo(light, 1); f.Supplier.SupplyTransporter();
+        Equal(1L, f.Count(f.Supplier.Contents, light), "full group refuses excess manual cargo");
+        int originalGroup = first.groupID;
+        Equal(false, StorageTransportGroups.TryCreate(new[] { first, second }, out string error), "existing group cannot be overwritten");
+        Equal("MS_Transport_GroupAlreadyAssigned", error, "already grouped selection explains rejection");
+        Equal(originalGroup, first.groupID, "rejected grouping leaves original group intact");
+
+        first.innerContainer.TryAdd(new Thing { def = light, stackCount = 1 });
+        Equal(true, StorageTransportGroups.OverCapacity(first), "301 kg group is overweight from heavy pod");
+        Equal(true, StorageTransportGroups.OverCapacity(second), "301 kg group is overweight from light pod too");
+        second.parent.Spawned = false;
+        Equal(150f, StorageTransportGroups.Capacity(first), "removed pod no longer contributes capacity");
+        Equal(true, StorageTransportGroups.OverCapacity(first), "remaining pod cannot use removed capacity");
+
+        var direct = new Fixture();
+        var a = direct.Target(150); var b = direct.Target(150, 4);
+        foreach (var pod in new[] { a, b })
+        {
+            pod.parent.Faction = Faction.OfPlayer;
+            pod.Launchable = new CompLaunchable_TransportPod();
+            pod.parent.def = a.parent.def;
+        }
+        direct.Store(heavy, 1); direct.Store(light, 5);
+        direct.Select(0, heavy); direct.Select(1, light); direct.Supplier.TrySwitchMode();
+        StorageTransportGroups.TryCreate(new[] { a, b }, out _);
+        direct.Supplier.SupplyTransporter();
+        Equal(300f, a.MassUsage, "continuous supply fills exactly to group capacity");
+        Equal(4L, direct.Net.GetTotalCount(light), "continuous supply retains excess network stock");
+        Equal(0, direct.Supplier.Contents.Count, "continuous group delivery uses no buffer");
+        b.Shuttle = new object();
+        Equal(150f, StorageTransportGroups.Capacity(a), "mixed shuttle groups retain native single-pod rules");
+        a.groupID = -1; b.groupID = -1;
+        Equal(false, StorageTransportGroups.TryCreate(new[] { a, b }, out _), "quest shuttle cannot be grouped by this command");
+        Equal(-1, a.groupID, "invalid grouping changes no group IDs");
     }
     private static void ManualFuel()
     {

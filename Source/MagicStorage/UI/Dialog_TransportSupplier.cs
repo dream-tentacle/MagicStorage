@@ -23,22 +23,21 @@ namespace MagicStorage
         private List<StorageTransportRow> visible = new List<StorageTransportRow>();
         private TransferableSorterDef primary = TransferableSorterDefOf.Category;
         private TransferableSorterDef secondary = TransferableSorterDefOf.MarketValue;
-        private ThingCategoryDef category;
+        private readonly StorageItemFilterPanel filters;
         private Vector2 scroll;
         private string feedback = "";
-        public override Vector2 InitialSize => new Vector2(Math.Min(1100f, UI.screenWidth), UI.screenHeight);
+        public override Vector2 InitialSize => new Vector2(Math.Min(1340f, UI.screenWidth), UI.screenHeight);
         public override QuickSearchWidget CommonSearchWidget => search;
 
         public Dialog_TransportSupplier(Building_TransportSupplier supplier)
         {
             this.supplier = supplier;
+            filters = new StorageItemFilterPanel(supplier.Map, search, ApplyFilter, () => Refresh(true));
             forcePause = true;
             absorbInputAroundWindow = true;
             closeOnClickedOutside = false;
             soundAppear = SoundDefOf.CommsWindow_Open;
             soundClose = SoundDefOf.CommsWindow_Close;
-            commonSearchWidgetOffset.x += 18f;
-            commonSearchWidgetOffset.y -= 18f;
         }
 
         public override void PostOpen()
@@ -51,50 +50,30 @@ namespace MagicStorage
         public override void PostClose() { preview?.Dispose(); base.PostClose(); }
         protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
         {
-            if (inRect.width < 950f) return new Rect(inRect.x, inRect.y + inRect.height - 86f, 200f, 24f);
-            return base.QuickSearchWidgetRect(winRect, inRect);
+            return new Rect(inRect.x + 8f, inRect.y + 8f, StorageItemFilterPanel.Width(inRect.width) - 56f, 24f);
         }
 
-        private void Refresh()
+        private void Refresh(bool preserveSelections = false)
         {
+            var previousRows = rows;
             if (supplier.Spawned) supplier.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             network = supplier.Network;
             revision = network?.Revision ?? -1;
             preview?.Dispose();
-            rows = StorageTransportExchange.Snapshot(supplier, network);
+            rows = StorageTransportExchange.Snapshot(supplier, network, filters.CanGroup);
+            if (preserveSelections) StorageTransportExchange.RestoreSelections(previousRows, rows, network);
             preview = new StorageTransportPreview(supplier, network, rows, capacity);
             ApplyFilter();
         }
         private void ApplyFilter()
         {
-            visible = rows.Where(row => search.filter.Matches(row.Label) && (category == null || InCategory(row.ThingDef, category)))
+            visible = rows.Where(row => search.filter.Matches(row.Label) &&
+                filters.Allows(row.Representative))
                 .OrderBy(row => row, primary.Comparer).ThenBy(row => row, secondary.Comparer)
                 .ThenBy(row => TransferableUIUtility.DefaultListOrderPriority(row.ThingDef))
                 .ThenBy(row => row.ThingDef.label).ThenBy(row => row.AnyThing.HitPoints).ToList();
             search.noResultsMatched = visible.Count == 0;
             scroll = Vector2.zero;
-        }
-        private static bool InCategory(ThingDef def, ThingCategoryDef wanted)
-        {
-            if (def.thingCategories == null) return false;
-            foreach (var leaf in def.thingCategories)
-                for (var current = leaf; current != null; current = current.parent) if (current == wanted) return true;
-            return false;
-        }
-        private void ChooseCategory()
-        {
-            var categories = new HashSet<ThingCategoryDef>();
-            foreach (var row in rows)
-                if (row.ThingDef.thingCategories != null)
-                    foreach (var leaf in row.ThingDef.thingCategories)
-                        for (var current = leaf; current != null; current = current.parent) categories.Add(current);
-            var options = new List<FloatMenuOption> { new FloatMenuOption("MS_UI_AllCategories".Translate(), () => { category = null; ApplyFilter(); }) };
-            foreach (var value in categories.OrderBy(c => c.label))
-            {
-                var selected = value;
-                options.Add(new FloatMenuOption(selected.LabelCap, () => { category = selected; ApplyFilter(); }));
-            }
-            Find.WindowStack.Add(new FloatMenu(options));
         }
         private void ChooseSorter(bool first)
         {
@@ -119,9 +98,18 @@ namespace MagicStorage
             try
             {
                 Text.Font = GameFont.Small;
-                DrawHeader(rect);
-                DrawList(new Rect(0, 112, rect.width, Math.Max(0, rect.height - 242)));
-                DrawFooter(rect);
+                float sidebarWidth = StorageItemFilterPanel.Width(rect.width);
+                filters.Draw(new Rect(0f, 0f, sidebarWidth, rect.height));
+                Rect inventory = new Rect(sidebarWidth + 16f, 0f, rect.width - sidebarWidth - 16f, rect.height);
+                Widgets.BeginGroup(inventory);
+                try
+                {
+                    Rect local = inventory.AtZero();
+                    DrawHeader(local);
+                    DrawList(new Rect(0, 112, local.width, Math.Max(0, local.height - 242)));
+                    DrawFooter(local);
+                }
+                finally { Widgets.EndGroup(); }
             }
             finally { Text.Font = oldFont; Text.Anchor = oldAnchor; Text.WordWrap = oldWrap; GUI.color = oldColor; }
         }
@@ -134,10 +122,11 @@ namespace MagicStorage
             if (Widgets.ButtonText(new Rect(210, 0, 130, 27), secondary.LabelCap.ToString().Truncate(128))) ChooseSorter(false);
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.UpperRight;
-            Widgets.Label(new Rect(350, 0, rect.width - 350, 30), "MS_Transport_Title".Translate());
+            Widgets.Label(new Rect(350, 0, Math.Max(0, rect.width - 350), 30),
+                "MS_Transport_Title".Translate().ToString().Truncate(Math.Max(0, rect.width - 350)));
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
-            if (Widgets.ButtonText(new Rect(0, 32, 195, 25), (category?.LabelCap.ToString() ?? "MS_UI_AllCategories".Translate().ToString()).Truncate(190))) ChooseCategory();
+            filters.DrawSourceButton(new Rect(0, 32, 195, 25), rows.Select(row => row.Representative));
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleRight;
             Widgets.Label(new Rect(205, 30, rect.width - 205, 30), "MS_Transport_CapacityRule".Translate(capacity.ToString("0.##")));
@@ -242,8 +231,7 @@ namespace MagicStorage
             string status = !supplier.CanWork ? StorageNetwork.StatusLabel(network) : !withinCapacity ? "MS_Transport_Overweight".Translate().ToString() :
                 feedback.Length > 0 ? feedback : "MS_Transport_Hint".Translate().ToString();
             Text.Font = GameFont.Tiny;
-            float statusX = rect.width < 950 ? 210 : 0;
-            Widgets.Label(new Rect(statusX, y + 28, rect.width - statusX, 37), status);
+            Widgets.Label(new Rect(0, y + 28, rect.width, 37), status);
             Text.Font = GameFont.Small;
             Rect accept = new Rect(rect.width / 2 - 80, rect.height - 55, 160, 40);
             if (Widgets.ButtonText(new Rect(accept.x - 170, accept.y, 160, 40), "ResetButton".Translate()))

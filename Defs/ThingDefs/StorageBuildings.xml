@@ -13,7 +13,13 @@
     <repairEffect>Repair</repairEffect>
     <soundImpactDefault>BulletImpact_Metal</soundImpactDefault>
     <drawerType>MapMeshOnly</drawerType>
-    <building><isInert>true</isInert></building>
+    <building>
+      <isInert>true</isInert>
+      <relatedBuildCommands>
+        <li>MS_StorageConduit</li>
+        <li>MS_HiddenStorageConduit</li>
+      </relatedBuildCommands>
+    </building>
     <statBases>
       <MaxHitPoints>200</MaxHitPoints>
       <WorkToBuild>1200</WorkToBuild>
@@ -24,9 +30,12 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageCore</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>storage control core</label>
     <description>The control core of magic storage, coordinating operations within the network. Each network supports only one control core.</description>
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <size>(2,2)</size>
     <rotatable>false</rotatable>
     <surfaceType>None</surfaceType>
@@ -46,6 +55,7 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageUnit</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>storage unit</label>
     <description>A storage unit following normal stacking rules. It provides 64 stack slots by default, adjustable from 1 to 10000 in the mod settings. Stored food does not rot.</description>
     <thingClass>MagicStorage.Building_StorageUnit</thingClass>
@@ -59,7 +69,7 @@
       <drawSize>(1.125,2.125)</drawSize>
       <color>(1,1,1)</color>
       <drawRotated>false</drawRotated>
-      <allowFlip>true</allowFlip>
+      <allowFlip>false</allowFlip>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
@@ -69,9 +79,12 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageReceiver</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>storage receiver</label>
     <description>Receives items hauled by colonists for storage in units by the connected control core. Haulers only select the receiver when its network has space for the item.\n\n(It absorbs all items on its surface that match the storage filter, so placing it directly next to the core is not recommended; otherwise, manually withdrawn items may be absorbed back into storage.)</description>
     <thingClass>MagicStorage.Building_StorageReceiver</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
     <surfaceType>Item</surfaceType>
@@ -95,9 +108,12 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_CosmicWorkbench</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>cosmic workbench</label>
-    <description>Performs production orders assigned by the connected control core. Products default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored. Orders can also be set to drop finished products near the workbench.</description>
+    <description>Performs production orders assigned by the connected control core. When a worker takes an order, ingredients for the current batch are set aside from the network, using connected auto-restocking shelves to make up any shortfall. Prepared ingredients remain with the order when work is interrupted and are returned if the order is deleted.\n\nProducts default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored. Orders can also be set to drop finished products near the workbench.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <building><isMealSource>true</isMealSource></building>
     <size>(3,1)</size>
     <rotatable>true</rotatable>
@@ -111,7 +127,7 @@
       <drawSize>(3.125,1.125)</drawSize>
       <color>(1,1,1)</color>
       <drawRotated>false</drawRotated>
-      <allowFlip>true</allowFlip>
+      <allowFlip>false</allowFlip>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
@@ -122,9 +138,12 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_ConstructionSupplyUnit</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>construction supply unit</label>
     <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells. No hauling is required; colonists still perform the construction work.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <tickerType>Normal</tickerType>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
@@ -144,9 +163,12 @@
 
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageApparelAdapter</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>apparel adapter</label>
     <description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Serves one colonist at a time.</description>
     <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <tickerType>Normal</tickerType>
     <size>(2,1)</size>
     <rotatable>true</rotatable>
@@ -159,7 +181,7 @@
       <drawSize>(2.125,1.125)</drawSize>
       <color>(1,1,1)</color>
       <drawRotated>false</drawRotated>
-      <allowFlip>true</allowFlip>
+      <allowFlip>false</allowFlip>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
@@ -168,12 +190,15 @@
     <uiOrder>3107</uiOrder>
   </ThingDef>
 
-  <ThingDef ParentName="BuildingBase">
+  <ThingDef Name="MS_StorageConduitBase" ParentName="BuildingBase">
     <defName>MS_StorageConduit</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <drawStyleCategory>Conduits</drawStyleCategory>
     <label>storage conduit</label>
     <description>Connects storage control cores and storage units. Storage conduits form a separate network and do not transmit electricity.</description>
     <thingClass>MagicStorage.Building_StorageConduit</thingClass>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <category>Building</category>
     <altitudeLayer>Conduits</altitudeLayer>
     <selectable>true</selectable>
@@ -207,5 +232,31 @@
     <costList><Steel>1</Steel></costList>
     <statBases><MaxHitPoints>80</MaxHitPoints><WorkToBuild>35</WorkToBuild><Flammability>0.5</Flammability></statBases>
     <uiOrder>3102</uiOrder>
+  </ThingDef>
+
+  <ThingDef ParentName="MS_StorageConduitBase">
+    <defName>MS_HiddenStorageConduit</defName>
+    <label>hidden storage conduit</label>
+    <description>Hidden conduits for connecting storage control cores and storage units. Tougher than regular storage conduits, but slower to build and more expensive. Storage conduits do not transmit electricity.</description>
+    <graphicData>
+      <color>(0.3,0.85,1,0)</color>
+      <shaderType>Transparent</shaderType>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <WorkToBuild>280</WorkToBuild>
+      <Flammability>0</Flammability>
+      <Beauty>0</Beauty>
+    </statBases>
+    <uiIconPath>Things/Building/Linked/HiddenConduit_MenuIcon</uiIconPath>
+    <costList><Steel>2</Steel></costList>
+    <constructEffect>ConstructDirt</constructEffect>
+    <building>
+      <ai_neverTrashThis>true</ai_neverTrashThis>
+      <isTargetable>false</isTargetable>
+      <expandHomeArea>false</expandHomeArea>
+      <canBeDamagedByAttacks>false</canBeDamagedByAttacks>
+    </building>
+    <uiOrder>3103</uiOrder>
   </ThingDef>
 </Defs>

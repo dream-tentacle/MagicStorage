@@ -95,10 +95,20 @@ internal static class StorageResourceCounterTests
         Equal(50, f.Counter.GetCount(f.Food), "duplicate registration cannot duplicate counts");
         f.Manager.Unregister(f.Core.node); f.Manager.EnsureCurrent(); f.Counter.UpdateResourceCounts();
         Equal(false, f.First.Network.CanWork, "fixture network disconnected");
-        Equal(50, f.Counter.GetCount(f.Food), "disconnected stock still owned and counted");
+        Equal(0, f.Counter.GetCount(f.Food), "disconnected stock no longer contributes to resource count");
         var other = new Fixture(); other.Store(other.First, other.Food, 11); other.Counter.UpdateResourceCounts();
         Equal(11, other.Counter.GetCount(other.Food), "maps have independent counts");
-        Equal(50, f.Counter.GetCount(f.Food), "other map refresh leaves first map alone");
+        Equal(0, f.Counter.GetCount(f.Food), "other map refresh leaves disconnected count alone");
+        f.Manager.Register(f.Core.node); f.Counter.UpdateResourceCounts();
+        Equal(50, f.Counter.GetCount(f.Food), "counter refresh rebuilds topology and restores reconnected stock");
+        var duplicateCore = new Building_StorageCore(); f.Register(duplicateCore, 3);
+        f.Counter.UpdateResourceCounts();
+        Equal(0, f.Counter.GetCount(f.Food), "multiple-core network contributes no stored resources");
+        f.Map.NativeStoredResources.Add(new Thing { def = f.Food, stackCount = 7 });
+        f.Counter.UpdateResourceCounts();
+        Equal(7, f.Counter.GetCount(f.Food), "ordinary spawned resources still count with disabled storage network");
+        f.Manager.Unregister(duplicateCore.node); f.Counter.UpdateResourceCounts();
+        Equal(57, f.Counter.GetCount(f.Food), "removing extra core restores valid stock without manual network refresh");
     }
     private static void TransfersAndClaims()
     {

@@ -55,7 +55,71 @@ internal static class StorageApparelTests
         { var holders = new List<IThingHolder>(); Manager.GetChildHolders(holders); return holders.Cast<StorageRecoveryBatch>().Sum(h => h.PendingCount); }
     }
     internal static int Run()
-    { Selection(); Eligibility(); Reservations(); CollectionAndRecovery(); return checks; }
+    { Selection(); Eligibility(); Reservations(); CollectionAndRecovery(); GravshipTransfer(); return checks; }
+
+    private static void GravshipTransfer()
+    {
+        // Exercise the actual holder and network across two maps. The flag and map
+        // transfer are engine boundaries; this does not simulate flight serialization.
+        for (int landingMode = 0; landingMode < 3; landingMode++)
+        {
+            var origin = new Fixture(); var driver = origin.Start(); driver.RunTestToils();
+            origin.Item.variant = "unique garment data";
+            origin.Adapter.BeingTransportedOnGravship = true;
+            origin.Manager.Unregister(origin.Core.node);
+            origin.Manager.Unregister(origin.Unit.node);
+            origin.Adapter.ReturnApparel(); // Also called by interrupted job cleanup.
+            origin.Adapter.RefreshApparel();
+            Equal(true, origin.Adapter.HasPrepared(origin.Pawn, origin.Item), "launch cleanup retains garment and recipient after network removal");
+            Equal(0L, origin.Pending(), "launch cleanup never hands garment to old map recovery");
+            Equal(0, origin.Map.Ground.Count, "launch cleanup never drops garment onto old map");
+
+            origin.Adapter.DeSpawn();
+            Equal(false, origin.Adapter.Spawned, "loaded adapter can leave map during flight");
+            Equal(0, origin.Manager.ApparelAdapters.Count, "flight still unregisters adapter node");
+            Equal(origin.Adapter.Contents, origin.Item.holdingOwner, "same holder owns garment in transit");
+
+            var destination = new Fixture();
+            destination.Register(origin.Adapter, 3);
+            if (landingMode == 2) destination.Manager.Unregister(destination.Core.node);
+            destination.Manager.EnsureCurrent();
+            origin.Adapter.RefreshApparel();
+            Equal(true, origin.Adapter.HasApparel, "arrival waits until map swap finishes");
+            origin.Adapter.BeingTransportedOnGravship = false;
+            if (landingMode == 1)
+            {
+                origin.Pawn.Map = destination.Map;
+                origin.Pawn.jobs.curJob = JobMaker.MakeJob(JobDefOf.Wear, origin.Item);
+                origin.Pawn.jobs.curDriver = new NativeWearBoundary { pawn = origin.Pawn, job = origin.Pawn.CurJob };
+            }
+            origin.Adapter.RefreshApparel();
+            if (landingMode == 1)
+            {
+                Equal(true, origin.Adapter.HasPrepared(origin.Pawn, origin.Item), "recipient still wearing garment keeps original handoff after landing");
+                Equal(true, origin.Adapter.RemoveApparel(origin.Item), "native wearer can take same garment after landing");
+            }
+            else if (landingMode == 0)
+            {
+                Equal(false, origin.Adapter.HasApparel, "abandoned handoff frees adapter on new map");
+                Equal(true, destination.Unit.Inventory.Contents.Contains(origin.Item), "abandoned garment returns to destination network");
+                Equal(1L, destination.Core.Network.GetTotalCount(origin.Def), "destination indexes returned garment once");
+            }
+            else
+            {
+                Equal(false, origin.Adapter.HasApparel, "missing destination core does not strand garment in adapter");
+                Equal(origin.Item, destination.Map.Ground.Single(), "unavailable destination network drops same garment on new map");
+            }
+            Equal("unique garment data", origin.Item.variant, "cross-map transfer retains per-item data");
+            Equal(0L, origin.Pending(), "old map recovery remains empty after landing");
+            Equal(0, origin.Map.Ground.Count, "old map never receives transferred garment");
+        }
+
+        var empty = new Fixture();
+        empty.Adapter.BeingTransportedOnGravship = true;
+        empty.Adapter.DeSpawn();
+        Equal(false, empty.Adapter.Spawned, "empty adapter can also leave map during flight");
+        Equal(0, empty.Manager.ApparelAdapters.Count, "empty flying adapter unregisters normally");
+    }
 
     private static void Selection()
     {

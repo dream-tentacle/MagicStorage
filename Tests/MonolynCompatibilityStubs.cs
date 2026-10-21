@@ -4,6 +4,7 @@ using Verse;
 
 namespace Verse
 {
+    public partial class Thing { internal static System.Action<Thing> BeforeMonolynTestSplit; }
     public class BuildableDef { }
     public partial class ThingDef : BuildableDef
     { public string defName = "FixtureMaterial"; public List<ThingDefCountClass> costList; }
@@ -18,8 +19,10 @@ namespace Verse
     public class Effecter
     {
         public static int Triggers, Cleanups;
+        public static bool ThrowOnTrigger;
         public static TargetInfo LastTarget;
-        public void Trigger(TargetInfo a, TargetInfo b, int tick) { Triggers++; LastTarget = a; }
+        public void Trigger(TargetInfo a, TargetInfo b, int tick)
+        { Triggers++; LastTarget = a; if (ThrowOnTrigger) throw new System.Exception("Injected effect failure"); }
         public void Cleanup() { Cleanups++; }
     }
 }

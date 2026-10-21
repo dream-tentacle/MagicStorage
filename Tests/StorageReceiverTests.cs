@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using MagicStorage;
 using RimWorld;
@@ -54,7 +55,7 @@ internal static class StorageReceiverTests
     internal static int Run()
     {
         RuntimeHelpers.RunClassConstructor(typeof(StorageReceiverHaulingPatches).TypeHandle);
-        NativeBoundary(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
+        NativeBoundary(); PrioritySortLifecycle(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
         CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks(); GodModeMapIntake();
         return assertions;
     }
@@ -128,6 +129,75 @@ internal static class StorageReceiverTests
         Verse.AI.HaulAIUtility.OriginalCalls = 0;
         Verse.AI.HaulAIUtility.HaulToStorageJob(new Pawn(), new Thing(), false);
         Equal(1, Verse.AI.HaulAIUtility.OriginalCalls, "native job factory is not intercepted");
+    }
+
+    private static void PrioritySortLifecycle()
+    {
+        var f = new Fixture();
+        f.Core.Settings.Priority = StoragePriority.Critical;
+        var otherCore = new Building_StorageCore
+        { Map = f.Map, Spawned = true, Faction = Faction.OfPlayer, Position = new IntVec3(10, 0) };
+        var otherReceiver = new Building_StorageReceiver
+        { Map = f.Map, Spawned = true, Faction = Faction.OfPlayer, Position = new IntVec3(11, 0) };
+        otherCore.node = new CompStorageNode { parent = otherCore };
+        otherReceiver.node = new CompStorageNode { parent = otherReceiver };
+        f.Manager.Register(otherCore.node);
+        f.Manager.Register(otherReceiver.node);
+        f.Manager.EnsureCurrent();
+        otherCore.Settings.Priority = StoragePriority.Normal;
+
+        // Initialize the shelf before spawning, as its real SpawnSetup does.
+        var shelf = new Building_StorageSupplyShelf();
+        shelf.def.building = new BuildingProperties();
+        shelf.GetStoreSettings().Priority = StoragePriority.Important;
+        shelf.Map = f.Map;
+        shelf.Spawned = true;
+        shelf.Position = new IntVec3(20, 0);
+        var destinations = f.Map.haulDestinationManager;
+        destinations.AddHaulDestination(f.Receiver);
+        destinations.AddHaulDestination(shelf);
+        destinations.AddHaulDestination(otherReceiver);
+
+        StorageNetwork network = f.Receiver.Network;
+        network.Invalidate();
+        f.Manager.NotifyReceiverSettingsChanged();
+        Equal(3, destinations.AllHaulDestinationsListForReading.Distinct().Count(),
+            "disabling a receiver preserves every destination exactly once");
+        Equal<ISlotGroupParent>(otherReceiver, destinations.AllHaulDestinationsListForReading[1],
+            "unrelated receiver remains registered at its priority");
+        Equal(3, destinations.AllGroupsListForReading.Distinct().Count(), "slot groups remain unique");
+        Equal(1, destinations.MaxSortDepth, "settings lookup never reenters priority sorting");
+        int sorts = destinations.Sorts;
+        StorageSettings disabled = f.Receiver.GetStoreSettings();
+        Equal(StoragePriority.Unstored, disabled.Priority, "disabled receiver remains unstored");
+        Equal(false, disabled.filter.Allows(f.X), "disabled receiver accepts no resource definitions");
+        Equal(disabled, f.Receiver.GetStoreSettings(), "disabled settings have stable identity");
+        Equal(sorts, destinations.Sorts, "reading disabled settings does not sort destinations");
+
+        network.FinishRebuild();
+        f.Manager.NotifyReceiverSettingsChanged();
+        Equal<ISlotGroupParent>(f.Receiver, destinations.AllHaulDestinationsListForReading[0],
+            "reconnecting restores the core priority");
+        network.Invalidate();
+        f.Manager.NotifyReceiverSettingsChanged();
+        Equal(3, destinations.AllHaulDestinationsListForReading.Distinct().Count(),
+            "repeated network changes preserve registration");
+
+        f.Map.ResourceDefs.Add(f.X);
+        f.Map.Ground.Add(new Thing { def = f.X, stackCount = 6, Map = f.Map,
+            Spawned = true, Position = otherReceiver.Position });
+        var counter = new ResourceCounter(f.Map);
+        counter.UpdateResourceCounts();
+        Equal(6, counter.GetCount(f.X), "registered receiver contents are counted");
+        int errors = Log.Errors.Count;
+        otherReceiver.DeSpawn(DestroyMode.Deconstruct);
+        Equal(errors, Log.Errors.Count, "receiver removal finds its registered destination");
+        Equal(false, destinations.AllHaulDestinationsListForReading.Contains(otherReceiver),
+            "despawn removes the destination");
+        Equal(false, destinations.AllGroupsListForReading.Contains(otherReceiver.GetSlotGroup()),
+            "despawn removes the slot group");
+        counter.UpdateResourceCounts();
+        Equal(0, counter.GetCount(f.X), "resource counting succeeds after receiver removal");
     }
 
     private static void DeferredAndMixed()

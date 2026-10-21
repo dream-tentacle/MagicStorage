@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <WorkGiverDef MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_CosmicGestation</defName>
+    <label>work at cosmic mech gestator</label>
+    <giverClass>MagicStorage.WorkGiver_CosmicGestation</giverClass>
+    <workType>Smithing</workType>
+    <priorityInType>211</priorityInType>
+    <fixedBillGiverDefs><li>MS_CosmicMechGestator</li></fixedBillGiverDefs>
+    <prioritizeSustains>true</prioritizeSustains>
+    <requiredCapacities><li>Manipulation</li></requiredCapacities>
+    <verb>work at</verb>
+    <gerund>working at</gerund>
+  </WorkGiverDef>
+</Defs>

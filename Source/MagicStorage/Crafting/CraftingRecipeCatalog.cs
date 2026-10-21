@@ -43,10 +43,11 @@ namespace MagicStorage
         }
         internal static IEnumerable<RecipeDef> Available
         { get { EnsureLoaded(); return routes.Keys.Where(CanAdd).OrderBy(Label); } }
-        internal static IEnumerable<RecipeDef> AvailableForWorkbench(ThingDef table, WorkTypeDef type = null)
+        internal static IEnumerable<RecipeDef> AvailableForWorkbench(ThingDef table, WorkTypeDef type = null, bool includeLocked = false)
         {
             EnsureLoaded();
-            if (table == null || !table.IsResearchFinished) return Enumerable.Empty<RecipeDef>();
+            if (table == null || !table.IsResearchFinished || (!includeLocked && !CraftingWorkbenchUnlocks.IsUnlocked(table)))
+                return Enumerable.Empty<RecipeDef>();
             return table.AllRecipes.Where(recipe => recipe.AvailableNow && Workbenches(recipe).Contains(table) &&
                 Routes(recipe).Any(giver => (type == null || giver.workType == type) &&
                     giver.fixedBillGiverDefs.Contains(table) &&
@@ -57,7 +58,7 @@ namespace MagicStorage
         {
             EnsureLoaded();
             return workbenches.Values.SelectMany(tables => tables).Distinct()
-                .Where(table => AvailableForWorkbench(table, type).Any()).OrderBy(table => table.label);
+                .Where(table => AvailableForWorkbench(table, type, includeLocked: true).Any()).OrderBy(table => table.label);
         }
         internal static string Label(RecipeDef recipe)
         {
@@ -72,7 +73,7 @@ namespace MagicStorage
             Label(recipe).IndexOf(search ?? string.Empty, StringComparison.CurrentCultureIgnoreCase) >= 0;
         // This gate only controls adding orders; existing orders keep their execution rules.
         internal static bool CanAdd(RecipeDef recipe) => recipe != null && recipe.AvailableNow &&
-            Workbenches(recipe).Any(table => table.IsResearchFinished);
+            Workbenches(recipe).Any(table => table.IsResearchFinished && CraftingWorkbenchUnlocks.IsUnlocked(table));
         internal static IReadOnlyList<WorkTypeDef> WorkTypes
         { get { EnsureLoaded(); return workTypes; } }
         internal static IReadOnlyList<ThingDef> Workbenches(RecipeDef recipe)

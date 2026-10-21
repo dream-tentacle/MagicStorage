@@ -100,6 +100,22 @@ internal static class RecipeCatalogTests
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(electric).Any(), "The workbench picker hides recipes whose own research is locked.");
         Check(!CraftingRecipeCatalog.AvailableWorkbenches().Contains(electric), "Do not offer a workbench with no unlocked supported recipes.");
         Check(CraftingRecipeCatalog.Supports(pants), "Recipe availability does not mutate the catalog.");
+        pants.AvailableNow = true;
+        hand.IsResearchFinished = true;
+        CraftingWorkbenchUnlocks.Allows = table => table != hand && table != electric;
+        Check(!CraftingRecipeCatalog.CanAdd(pants), "Hide a recipe when every source workbench is unpaid.");
+        Check(!CraftingRecipeCatalog.Available.Contains(pants), "The all-recipes picker applies the unlock gate.");
+        Check(!CraftingRecipeCatalog.AvailableForWorkbench(hand).Any(), "A locked workbench cannot expose its recipes.");
+        Check(CraftingRecipeCatalog.AvailableWorkbenches().Contains(hand), "Locked workbenches stay in the browser for unlocking.");
+        Check(CraftingRecipeCatalog.AvailableWorkbenches().Contains(electric), "Every researched alternative remains available to unlock.");
+        CraftingWorkbenchUnlocks.Allows = table => table != hand;
+        Check(CraftingRecipeCatalog.CanAdd(pants), "One paid alternative exposes a shared recipe.");
+        Check(CraftingRecipeCatalog.AvailableForWorkbench(electric).Contains(pants), "A paid workbench exposes its recipes.");
+        Check(!CraftingRecipeCatalog.AvailableForWorkbench(hand).Any(), "An alternative unlock does not pay for the selected workbench.");
+        electric.IsResearchFinished = false;
+        Check(!CraftingRecipeCatalog.CanAdd(pants), "The paid alternative must also meet its research conditions.");
+        electric.IsResearchFinished = true;
+        CraftingWorkbenchUnlocks.Allows = table => true;
         Check(!CraftingRecipeCatalog.CanAdd(null), "A missing recipe cannot be added.");
         Check(CraftingRecipeCatalog.Label(vanillaProduct) == "Vanilla product", "Preserve existing recipe names.");
         Check(CraftingRecipeCatalog.Label(unnamedMedicine) == "制作医药", "A null name uses the product name.");
@@ -181,4 +197,12 @@ namespace RimWorld
         public List<ThingDef> fixedBillGiverDefs;
     }
 }
-namespace MagicStorage { internal sealed class WorkGiver_CosmicCrafting { } }
+namespace MagicStorage
+{
+    internal sealed class WorkGiver_CosmicCrafting { }
+    internal static class CraftingWorkbenchUnlocks
+    {
+        internal static Func<ThingDef, bool> Allows = table => true;
+        internal static bool IsUnlocked(ThingDef table) => Allows(table);
+    }
+}

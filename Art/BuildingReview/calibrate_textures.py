@@ -22,9 +22,10 @@ ASSETS = [
     ('MS_ConstructionSupplyUnit', 'StorageBuildings.xml', 'RemainingBuildings/ConstructionSupplyUnit-v1', '建筑供给单元'),
     ('MS_StorageApparelAdapter', 'StorageBuildings.xml', 'RemainingBuildings/StorageApparelAdapter_{direction}-v2', '衣物适配器'),
     ('MS_StorageSupplyShelf', 'StorageSupplyShelf.xml', 'StorageEndpoints/StorageSupplyShelf_south-v1', '自动补货架'),
-    ('MS_TransportSupplier', 'TransportSupplier.xml', 'StorageEndpoints/TransportSupplier_{direction}-v3', '物资补给器'),
+    ('MS_TransportSupplier', 'TransportSupplier.xml', 'StorageEndpoints/TransportSupplier_{direction}-v4', '物资补给器'),
     ('MS_FuelSupplier', 'FuelSupplier.xml', 'RemainingBuildings/FuelSupplier-v1', '燃料供给器'),
     ('MS_NivarianCannonExtractor', 'NivarianCannonExtractor.xml', 'RemainingBuildings/NivarianCannonExtractor-v1', '质量驱动器提取口'),
+    ('MS_CaravanTeleporter', 'CaravanTeleporter.xml', 'CaravanTeleporter/CaravanTeleporter-v2', '远行队传送器'),
 ]
 
 

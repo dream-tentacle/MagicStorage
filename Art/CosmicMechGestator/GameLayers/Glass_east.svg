@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1536" viewBox="0 0 768 768">
+  <defs>
+    <radialGradient id="lid-metal" cx="34%" cy="23%" r="84%">
+      <stop offset="0" stop-color="#e1e9ef" />
+      <stop offset=".52" stop-color="#bccbd6" />
+      <stop offset="1" stop-color="#94abba" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4e7895" stop-opacity=".87" />
+      <stop offset=".14" stop-color="#bbdfee" stop-opacity=".66" />
+      <stop offset=".5" stop-color="#9fc5dc" stop-opacity=".4" />
+      <stop offset=".84" stop-color="#76a3bf" stop-opacity=".64" />
+      <stop offset="1" stop-color="#4a718d" stop-opacity=".87" />
+    </linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfE3" stop-opacity=".2" />
+      <stop offset="1" stop-color="#5d87a3" stop-opacity=".5" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" />
+    </clipPath>
+  </defs>
+  <g transform="translate(0 98)" id="cylinder-glass" clip-path="url(#tank-body-clip)">
+    <path d="M262 154C262 107 506 107 506 154V302C506 349 451 387.4 384 387.4C317 387.4 262 349 262 302Z" fill="url(#tank-glass)" stroke="#698ca5" stroke-width="2.5" />
+    <path d="M267 267C267 218 501 218 501 267V302C501 347 448 383.9 384 383.9C320 383.9 267 347 267 302Z" fill="url(#culture-fluid)" />
+    <path d="M275 268C275 310 493 310 493 268" fill="none" stroke="#d6eaf5" stroke-opacity=".25" stroke-width="2" />
+    <path d="M283 238V300Q283 338 310 357" fill="none" stroke="#eaf7fd" stroke-opacity=".44" stroke-width="6" stroke-linecap="round" />
+    <path d="M487 240V300Q487 338 460 357" fill="none" stroke="#527a96" stroke-opacity=".46" stroke-width="4" stroke-linecap="round" />
+  </g>
+</svg>

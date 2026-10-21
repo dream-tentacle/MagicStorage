@@ -45,6 +45,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />
     <Compile Include="CosmicCraftingTests.cs" />
     <Compile Include="StorageReservationTests.cs" />
+    <Compile Include="StorageUnitTransferTests.cs" />
     <Compile Include="StorageTradeTests.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeTransaction.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingOrder.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageOutgoingReservations.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReservation.cs" />
     <Compile Include="TradingStubs.cs" />
+    <Compile Include="ItemFilterIntegrationStubs.cs" />
     <Compile Include="DynamicTradeInterfaceStubs.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\DynamicTradeInterfaceCompatibility.cs" />

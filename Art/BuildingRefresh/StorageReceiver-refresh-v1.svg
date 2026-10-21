@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" data-outline-original-viewbox="0 0 512 512" data-outline-original-width="512" data-outline-original-height="512">
+<defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff"/><path d="M64 48H448L482 82V448L456 478H56L30 448V82Z" fill="#000000" stroke="none"/></mask></defs>
+<title>存储接收器 · 优化样稿</title>
+<desc>Receiving tray with a dark back wall, open landing floor and one loading lip; fixed orientation. Review draft only; not installed.</desc>
+<path d="M64 48H448L482 82V448L456 478H56L30 448V82Z" fill="#637782" />
+<path d="M64 48H448L482 82V422L456 450H56L30 422V82Z" fill="#d8dfe3" />
+<path d="M64 48H448L465 65H58L45 83H30V82Z" fill="#e6e9e8" />
+<path d="M465 83H482V422L456 450H56L65 434H448L465 415Z" fill="#acb8bf" />
+<path d="M95 125H417L437 145V384L409 412H103L75 384V145Z" fill="#637782" />
+<path d="M106 141H406L420 155V355L398 377H114L92 355V155Z" fill="#304553" />
+<path d="M92 192H420V355L398 377H114L92 355Z" fill="#8498a4" />
+<path d="M92 155L114 175V355L92 355Z" fill="#93a3ad" />
+<path d="M398 175L420 155V355L398 377Z" fill="#637782" />
+<path d="M92 355L114 377H398L420 355V379L402 398H110L92 379Z" fill="#acb8bf" />
+<path d="M114 377H398V385H114Z" fill="#e6e9e8" />
+<rect x="190" y="90" width="132" height="11" rx="1" fill="#c5e5f5"/>
+<rect x="220" y="427" width="72" height="9" rx="2" fill="#304553"/>
+<g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M64 48H448L482 82V448L456 478H56L30 448V82Z" fill="none" stroke="#000000" stroke-width="38.881720430" stroke-linejoin="miter" stroke-miterlimit="2"/></g>
+</svg>

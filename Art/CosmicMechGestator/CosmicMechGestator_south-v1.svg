@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 512 768">
+  <title>魔法存储 — 宇宙机械体培育器，2×3 南向第一稿</title>
+  <desc>Original south-facing 2×3 mech gestator study. A longitudinal blue-grey formation chamber, two substantial side supports and restrained mechanical clamps sit on a pearl-grey plinth. The formation area remains empty for a future dynamic mech overlay. Sky-blue accents use RGB(197,229,245). Only the exterior outline is pure black and uniformly weighted.</desc>
+  <defs>
+    <linearGradient id="formation-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#68869c"/>
+      <stop offset=".48" stop-color="#91adbf"/>
+      <stop offset="1" stop-color="#7895aa"/>
+    </linearGradient>
+    <linearGradient id="inspection-glass" x1="0" y1="0" x2="1" y2=".8">
+      <stop offset="0" stop-color="#e7f5fd" stop-opacity=".16"/>
+      <stop offset=".4" stop-color="#c5e5f5" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#9ec6df" stop-opacity=".09"/>
+    </linearGradient>
+    <clipPath id="chamber-window">
+      <path d="M166 198H346Q374 198 374 226V521Q374 549 351 565H161Q138 549 138 521V226Q138 198 166 198Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Low continuous plinth; casing depth stays below the working plane. -->
+  <g id="plinth">
+    <rect x="28" y="52" width="456" height="688" rx="28" fill="#798893"/>
+    <path d="M31 705Q31 736 61 736H451Q481 736 481 705" fill="none" stroke="#52616c" stroke-width="5"/>
+    <rect x="28" y="28" width="456" height="686" rx="28" fill="#d8dfe3"/>
+    <path d="M28 686Q28 714 56 714H456Q484 714 484 686" fill="none" stroke="#25313c" stroke-width="3.5"/>
+    <path d="M41 224V62Q41 41 63 41H449Q469 41 471 60" fill="none" stroke="#f2f5f6" stroke-width="3" stroke-linecap="round"/>
+    <path d="M471 75V674Q471 700 445 700H66" fill="none" stroke="#a8b6bf" stroke-width="4" stroke-linecap="round"/>
+    <rect x="204" y="722" width="104" height="7" rx="3.5" fill="#344756"/>
+    <path d="M217 725H243M277 725H296" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- A single rear service block keeps the head end legible without excess panels. -->
+  <g id="rear-service-block">
+    <rect x="74" y="76" width="364" height="88" rx="14" fill="#a8bbc8"/>
+    <rect x="74" y="68" width="364" height="84" rx="13" fill="#e1e7eb"/>
+    <path d="M91 74H419" stroke="#f5f8fa" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="94" y="88" width="102" height="43" rx="5" fill="#c5d1da"/>
+    <path d="M110 98V120M122 98V120M134 98V120M146 98V120M158 98V120M170 98V120" stroke="#849cac" stroke-width="4"/>
+    <rect x="242" y="86" width="167" height="38" rx="5" fill="#aebdc6"/>
+    <rect x="247" y="91" width="157" height="28" rx="3" fill="#344a5b"/>
+    <path d="M261 104H287M299 104H325" stroke="#c5e5f5" stroke-width="3"/>
+    <path d="M349 104H388" stroke="#8daec4" stroke-width="2"/>
+    <path d="M265 140H383" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Long formation chamber with a narrow bevel instead of a decorative outer ring. -->
+  <g id="chamber-floor">
+    <path d="M148 168H364Q397 168 397 200V535Q397 569 369 594H143Q115 569 115 535V200Q115 168 148 168Z" fill="#9fb3c2"/>
+    <path d="M151 172H361Q389 172 389 201V531Q389 560 366 582H146Q123 560 123 531V201Q123 172 151 172Z" fill="#e0e8ee"/>
+    <path d="M163 189H349Q382 189 382 222V523Q382 554 355 574H157Q130 554 130 523V222Q130 189 163 189Z" fill="#4d697f"/>
+    <path d="M166 198H346Q374 198 374 226V521Q374 549 351 565H161Q138 549 138 521V226Q138 198 166 198Z" fill="url(#formation-floor)"/>
+    <path d="M146 241V517Q146 539 166 555H346" fill="none" stroke="#afc4d2" stroke-width="3" stroke-linecap="round"/>
+    <path d="M367 241V517Q367 539 349 553" fill="none" stroke="#66859c" stroke-width="3" stroke-linecap="round"/>
+    <!-- Small mounting fixtures leave the full center free for the developing mech. -->
+    <rect x="218" y="213" width="76" height="25" rx="5" fill="#58758c"/>
+    <rect x="224" y="212" width="64" height="18" rx="4" fill="#b8ccda"/>
+    <path d="M234 218H278" stroke="#e0edf5" stroke-width="2" stroke-linecap="round"/>
+    <path d="M174 489V516H211M301 516H338V489" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="190" y="543" width="132" height="13" rx="4" fill="#607f96"/>
+    <path d="M202 546H310" stroke="#9cbacc" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- The subtle glass layer can later be exported separately above a dynamic mech. -->
+  <g id="inspection-glass-overlay" clip-path="url(#chamber-window)">
+    <rect x="138" y="198" width="236" height="367" fill="url(#inspection-glass)"/>
+    <path d="M167 219Q157 233 157 260V453" fill="none" stroke="#f0f8fc" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"/>
+    <path d="M350 230V298" stroke="#d9eef9" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Two solid support columns carry short opposing clamps. -->
+  <g id="side-supports">
+    <rect x="67" y="180" width="49" height="405" rx="10" fill="#9db1bf"/>
+    <rect x="69" y="170" width="43" height="401" rx="9" fill="#e0e7ec"/>
+    <path d="M76 191V549" stroke="#f3f7f9" stroke-width="3" stroke-linecap="round"/>
+    <rect x="89" y="216" width="11" height="291" rx="3" fill="#b0c6d6"/>
+    <rect x="91" y="221" width="7" height="281" rx="2" fill="#c5e5f5"/>
+    <rect x="396" y="180" width="49" height="405" rx="10" fill="#9db1bf"/>
+    <rect x="400" y="170" width="43" height="401" rx="9" fill="#d7e1e8"/>
+    <path d="M435 192V550" stroke="#b6c6d1" stroke-width="3" stroke-linecap="round"/>
+    <rect x="412" y="216" width="11" height="291" rx="3" fill="#a6bfce"/>
+    <rect x="414" y="221" width="7" height="281" rx="2" fill="#c5e5f5"/>
+  </g>
+
+  <g id="clamp-pairs">
+    <path d="M101 276H135L161 299V317H145V307L126 292H101Z" fill="#748fa3"/>
+    <path d="M101 270H136L161 293V305H147V301L128 285H101Z" fill="#cedce6"/>
+    <path d="M106 275H132L153 294" fill="none" stroke="#edf4f9" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="151" y="300" width="12" height="22" rx="3" fill="#52718a"/>
+    <path d="M411 276H377L351 299V317H367V307L386 292H411Z" fill="#748fa3"/>
+    <path d="M411 270H376L351 293V305H365V301L384 285H411Z" fill="#cedce6"/>
+    <path d="M406 275H380L359 294" fill="none" stroke="#edf4f9" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="349" y="300" width="12" height="22" rx="3" fill="#52718a"/>
+    <path d="M101 455H134L160 433V415H145V425L127 440H101Z" fill="#748fa3"/>
+    <path d="M101 449H132L158 427V415H145V421L126 434H101Z" fill="#cedce6"/>
+    <path d="M106 439H129L150 423" fill="none" stroke="#edf4f9" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="149" y="405" width="12" height="22" rx="3" fill="#52718a"/>
+    <path d="M411 455H378L352 433V415H367V425L385 440H411Z" fill="#748fa3"/>
+    <path d="M411 449H380L354 427V415H367V421L386 434H411Z" fill="#cedce6"/>
+    <path d="M406 439H383L362 423" fill="none" stroke="#edf4f9" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="351" y="405" width="12" height="22" rx="3" fill="#52718a"/>
+  </g>
+
+  <!-- A low foot-end console provides an obvious working side. -->
+  <g id="front-console">
+    <rect x="87" y="627" width="338" height="77" rx="12" fill="#9fb3c2"/>
+    <rect x="87" y="614" width="338" height="76" rx="12" fill="#dce5eb"/>
+    <path d="M103 621H408" stroke="#f1f6f9" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="107" y="637" width="194" height="35" rx="5" fill="#aec1ce"/>
+    <rect x="112" y="641" width="184" height="27" rx="3" fill="#344e64"/>
+    <path d="M124 651H151M124 659H143" stroke="#97b7cd" stroke-width="2"/>
+    <path d="M169 654H194M205 654H230" stroke="#c5e5f5" stroke-width="3"/>
+    <path d="M254 654H282" stroke="#87a6bd" stroke-width="2"/>
+    <rect x="331" y="638" width="69" height="33" rx="4" fill="#b2c5d2"/>
+    <rect x="337" y="643" width="57" height="22" rx="3" fill="#c5e5f5"/>
+    <path d="M343 647H387" stroke="#eaf5fc" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Only this complete outside contour uses pure black. -->
+  <path d="M56 28H456Q484 28 484 56V712Q484 740 456 740H56Q28 740 28 712V56Q28 28 56 28Z" fill="none" stroke="#000000" stroke-width="4"/>
+</svg>

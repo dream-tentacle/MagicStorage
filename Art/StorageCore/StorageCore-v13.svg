@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>魔法存储 — 存储控制核心，第十三稿</title>
+  <desc>Rounded-square control core with a larger exposed energy sphere and an open three-point cradle. Broad metal planes, a dark load-bearing base, one controller and one cooling intake establish the hierarchy. Sky-blue identification uses RGB(197,229,245). Only the exterior silhouette has a uniform pure-black stroke. No ambient glow or continuous inset rim. Revision 12 shares one closed orbit between its rear and front passes; the chassis fill, clipping and exterior use the same geometry. The front seam is a single tangent-continuous curve. Revision 13 restores the swept lower-corner shadow from v11, clipped to the shared chassis contour; the closed orbit and continuous front seam are retained.</desc>
+  <defs>
+    <path id="chassis-outline-geometry" d="M99 60H413Q448 60 448 95V410Q448 446 412 446H100Q64 446 64 410V95Q64 60 99 60Z" />
+    <path id="top-plate-geometry" d="M99 60H413Q448 60 448 95V385Q448 420 413 420H99Q64 420 64 385V95Q64 60 99 60Z" />
+    <clipPath id="chassis-clip">
+      <use href="#chassis-outline-geometry" />
+    </clipPath>
+    <clipPath id="plate-clip">
+      <use href="#top-plate-geometry" />
+    </clipPath>
+    <path id="orbit-loop-geometry" d="M330.17470837 215.03147253A80 31 -22 0 1 181.82529163 274.96852747A80 31 -22 0 1 330.17470837 215.03147253Z" />
+    <path id="orbit-front-geometry" d="M330.17470837 215.03147253A80 31 -22 0 1 181.82529163 274.96852747" />
+  </defs>
+  <g id="base">
+    <use href="#chassis-outline-geometry" fill="#53616b" />
+    <path d="M66 405Q69 439 103 442H409Q443 439 446 405V420Q441 446 412 446H100Q70 444 66 420Z" fill="#414e58" id="rounded-base-shadow" clip-path="url(#chassis-clip)" />
+    <rect x="204" y="427" width="104" height="11" rx="3" fill="#263c4c" />
+    <path d="M218 430H278V435H218Z" fill="#c5e5f5" />
+  </g>
+  <g id="outer-shell">
+    <use href="#top-plate-geometry" fill="#cfd4d5" />
+    <g clip-path="url(#plate-clip)">
+      <path d="M99 60H413Q439 60 446 85L434 91Q428 73 411 73H101Q84 73 77 91L66 86Q72 60 99 60Z" fill="#e4e7e5" />
+      <path d="M66 87L77 94V385Q77 399 92 407L86 416Q64 407 64 385V95Z" fill="#dde1e0" />
+      <path d="M435 91L447 86Q448 90 448 95V385Q448 420 413 420H99Q91 420 86 417L93 405H410Q435 405 435 382Z" fill="#afb8bc" />
+    </g>
+    <path id="front-seam" d="M64 385Q64 420 99 420H413Q448 420 448 385" fill="none" stroke="#52616b" stroke-width="3" />
+  </g>
+  <g id="power-feed">
+    <path d="M321 120V144Q321 151 313 151H269Q256 151 256 164" fill="none" stroke="#74848c" stroke-width="12" stroke-linejoin="round" />
+    <path d="M321 120V141Q321 147 313 147H269Q256 147 256 160" fill="none" stroke="#acb8be" stroke-width="7" stroke-linejoin="round" />
+  </g>
+  <g id="controller">
+    <path d="M298 88H415V121H298Z" fill="#9caab1" />
+    <path d="M302 92H411V117H302Z" fill="#344957" />
+    <path d="M311 99H336V110H311Z" fill="#c5e5f5" />
+    <path d="M348 102H394" stroke="#9eb3bf" stroke-width="3" />
+  </g>
+  <g id="cooling-intake">
+    <path d="M367 294H418V360H367Z" fill="#aab5ba" />
+    <path d="M374 305H411V314H374ZM374 323H411V332H374ZM374 341H411V350H374Z" fill="#465a67" />
+  </g>
+  <g id="core-cradle">
+    <path d="M249 182L180 295M263 182L332 295" fill="none" stroke="#697b87" stroke-width="15" stroke-linejoin="round" />
+    <path d="M248 184L181 291M264 184L331 291" fill="none" stroke="#a4b3bb" stroke-width="5" />
+    <path d="M176 295V309C176 325 212 338 256 338C300 338 336 325 336 309V295Z" fill="#5a6f7c" />
+    <ellipse cx="256" cy="295" rx="80" ry="26" fill="#a6b4bc" />
+    <ellipse cx="256" cy="295" rx="66" ry="20" fill="#344d60" />
+    <path d="M205 313Q256 335 307 313" fill="none" stroke="#748a98" stroke-width="4" />
+    <path d="M243 162H269V196L256 204L243 196Z" fill="#617783" />
+    <path d="M243 158H269V174H243Z" fill="#b4c2c9" />
+    <path d="M247 161H265V168H247Z" fill="#c5e5f5" />
+    <path d="M164 291H194V320L179 327L164 320Z" fill="#607581" />
+    <path d="M164 286H194V303H164Z" fill="#b6c3c9" />
+    <path d="M169 290H189V297H169Z" fill="#c5e5f5" />
+    <path d="M318 291H348V320L333 327L318 320Z" fill="#607581" />
+    <path d="M318 286H348V303H318Z" fill="#b6c3c9" />
+    <path d="M323 290H343V297H323Z" fill="#c5e5f5" />
+  </g>
+  <g id="suspended-core">
+    <ellipse cx="256" cy="295" rx="39" ry="10" fill="#273f50" />
+    <use href="#orbit-loop-geometry" fill="none" stroke="#3d5a70" stroke-width="8" />
+    <use href="#orbit-loop-geometry" fill="none" stroke="#c5e5f5" stroke-width="4" />
+    <circle cx="256" cy="242" r="60" fill="#c5e5f5" stroke="#456176" stroke-width="2.5" />
+    <path d="M282 188C303 200 316 219 316 242C316 275 289 302 256 302C243 302 232 298 222 292C256 297 286 279 295 253C302 232 299 209 282 188Z" fill="#8eafc3" />
+    <path d="M300 254C292 280 267 296 237 297C245 300 252 302 260 302C286 300 310 279 314 252C310 266 301 277 291 284C297 275 300 264 300 254Z" fill="#6b8da5" />
+    <path d="M210 224C214 204 234 189 254 188C239 197 227 209 222 225Z" fill="#e1eff4" />
+    <use href="#orbit-front-geometry" fill="none" stroke="#3d5a70" stroke-width="8" />
+    <use href="#orbit-front-geometry" fill="none" stroke="#c5e5f5" stroke-width="4" />
+  </g>
+  <use href="#chassis-outline-geometry" id="exterior-contour" fill="none" stroke="#000000" stroke-width="4" />
+</svg>

@@ -8,6 +8,7 @@ using Verse.AI;
 
 namespace Verse
 {
+    public partial class Thing { public bool BeingTransportedOnGravship { get; set; } }
     public enum Gender { None, Male, Female }
     public class StageFilter { public bool allowed = true; public bool Has(int stage) => allowed; }
     public class PawnMindState { public bool traderDismissed; public int nextApparelOptimizeTick; public PriorityWork priorityWork = new PriorityWork(); }

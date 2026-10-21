@@ -111,6 +111,8 @@
     <Compile Include="Buildings\Building_FuelSupplier.cs" />
     <Compile Include="Storage\StorageFuelSupply.cs" />
     <Compile Include="Storage\StorageTransportExchange.cs" />
+    <Compile Include="Storage\StorageTransportGroups.cs" />
+    <Compile Include="Storage\StorageTransportGroupPatches.cs" />
     <Compile Include="Storage\StorageTransportPreview.cs" />
     <Compile Include="UI\Dialog_TransportSupplier.cs" />
     <Compile Include="UI\Dialog_SupplierSupply.cs" />
@@ -143,6 +145,9 @@
     <Compile Include="Crafting\ICraftingProductionPolicy.cs" />
     <Compile Include="Crafting\CraftingRunPolicy.cs" />
     <Compile Include="Crafting\CraftingRecipeCatalog.cs" />
+    <Compile Include="Crafting\CraftingWorkbenchUnlocks.cs" />
+    <Compile Include="Crafting\GameComponent_WorkbenchUnlocks.cs" />
+    <Compile Include="UI\Dialog_WorkbenchUnlock.cs" />
     <Compile Include="Crafting\CraftingRecipeCategories.cs" />
     <Compile Include="Crafting\CraftingWorkerPolicy.cs" />
     <Compile Include="Crafting\CraftingMaterialPlanner.cs" />
@@ -152,6 +157,11 @@
     <Compile Include="Crafting\MapComponent_CosmicCrafting.cs" />
     <Compile Include="Crafting\JobDriver_CosmicCrafting.cs" />
     <Compile Include="Buildings\Building_CosmicWorkbench.cs" />
+    <Compile Include="Buildings\Building_CosmicMechGestator.cs" />
+    <Compile Include="Gestation\CosmicGestationCatalog.cs" />
+    <Compile Include="Gestation\CosmicGestationMaterials.cs" />
+    <Compile Include="Gestation\CosmicGestationPatches.cs" />
+    <Compile Include="Gestation\CosmicGestationPower.cs" />
     <Compile Include="UI\Dialog_CosmicCrafting.cs" />
     <Compile Include="UI\GameComponent_CosmicCraftingUI.cs" />
     <Compile Include="Storage\StorageInventory.cs" />
@@ -160,11 +170,14 @@
     <Compile Include="Storage\StorageBuildMaterialPatches.cs" />
     <Compile Include="Storage\StorageWithdrawal.cs" />
     <Compile Include="UI\Dialog_StorageInventory.cs" />
+    <Compile Include="UI\StorageItemFilterPanel.cs" />
+    <Compile Include="UI\StorageNativeItemFilters.cs" />
     <Compile Include="UI\Dialog_StorageInventoryRule.cs" />
     <Compile Include="UI\Dialog_StorageInventoryIcon.cs" />
     <Compile Include="Storage\StorageInventoryFilters.cs" />
     <Compile Include="UI\StorageInventoryEntry.cs" />
     <Compile Include="Storage\StorageTransfer.cs" />
+    <Compile Include="Storage\StorageMaterialTransaction.cs" />
     <Compile Include="Storage\StorageIncomingReservations.cs" />
     <Compile Include="Storage\StorageOutgoingReservations.cs" />
     <Compile Include="Storage\StorageReservation.cs" />

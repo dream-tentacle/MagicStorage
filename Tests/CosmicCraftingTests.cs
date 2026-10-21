@@ -15,7 +15,8 @@ internal static class CosmicCraftingTests
     {
         OrderReordering(); FilteredOrderReordering(); Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
         ProductionCompletion(); ConfigurableWorkSpeed(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
-        ReservationInvalidation();
+        PreparedMaterialsSurviveSourceLoss();
+        ShelfFallbackPreparation(); PreparationRollback(); LegacyWalkingJobPreparation(); AssignmentCleanupIsolation();
         CoreContainerSelection();
         BenchSelectionAndPriority();
         OrderedJobPreflight();
@@ -145,7 +146,7 @@ internal static class CosmicCraftingTests
             FloatMenuMakerMap.makingFor = null;
             unit.Inventory.Contents.Remove(a.Item3);
             var driver = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
-            Equal(false, f.Dispatch.TryClaim(driver, out _), "formal claim rejects materials lost after successful find");
+            Equal(false, f.Dispatch.TryClaim(driver), "formal claim rejects materials lost after successful find");
             Equal(10, policy.Calls, "formal claim still computes a fresh material plan");
             unit.Inventory.Contents.TryAdd(a.Item3, false);
             Equal(true, new WorkGiver_CosmicCrafting { def = f.Giver }.JobOnThing(f.Pawn, a.Item2, true) != null,
@@ -589,20 +590,23 @@ internal static class CosmicCraftingTests
         Equal(0, new List<Thing>((IEnumerable<Thing>)f.Map.GetComponent<MapComponent_StorageNetworks>().GetDirectlyHeldThings()).Count,
             "network root also returns an enumerable direct container");
     }
-    private static void ReservationInvalidation()
+    private static void PreparedMaterialsSurviveSourceLoss()
     {
         var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
         var job = f.Dispatch.FindJob(f.Pawn, f.Giver);
         var pending = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
         f.Pawn.jobs.curDriver = pending; f.Pawn.jobs.curJob = job;
-        Equal(true, pending.TryMakePreToilReservations(false), "walking worker reserves materials");
+        Equal(true, pending.TryMakePreToilReservations(false), "walking worker prepares materials immediately");
+        Equal(6, order.Batch.Ingredients.Sum(t => t.stackCount), "materials are in a saved batch before walking");
+        Equal(4, a.Item3.stackCount, "only the current batch is taken from the source");
+        Equal(4, a.Item1.Network.AvailableToWithdraw(a.Item3), "all remaining source stock is free of crafting claims");
         pending.SetupToils();
         a.Item3.holdingOwner.Remove(a.Item3);
         Equal(false, pending.ended, "inventory callback cannot interrupt jobs reentrantly");
         f.Map.GetComponent<MapComponent_StorageNetworks>().MapComponentTick();
-        Equal(true, pending.ended, "missing material ends walking worker through reservation callback");
-        Equal(null, f.Dispatch.AssignedWorker(order), "missing material releases order assignment");
-        Equal(null, order.Batch, "failed pre-work reservation creates no batch");
+        Equal(false, pending.ended, "source changes cannot invalidate materials already prepared for walking worker");
+        Equal(f.Pawn, f.Dispatch.AssignedWorker(order), "prepared task retains its worker");
+        Equal(6, order.Batch.Ingredients.Sum(t => t.stackCount), "source mutation cannot affect batch contents");
 
         f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1);
         var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
@@ -620,6 +624,163 @@ internal static class CosmicCraftingTests
         Equal(6, order.Batch.Ingredients[0].stackCount, "batch still owns collected ingredients");
         Equal(true, driver.CanContinue(), "work continues while bench and core remain connected");
     }
+    private static void ShelfFallbackPreparation()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        Thing stock = f.ShelfStock(3, 10, out var shelf);
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out var plan), "network can supply current batch");
+        Equal(false, plan.ContainsKey(stock), "shelf supplies are untouched when network stock is sufficient");
+        Equal(10, stock.stackCount, "planning does not take shelf stock");
+        order.Recipe.ingredients[0].count = 16;
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out plan), "shelf stock supplements insufficient network stock");
+        Equal(10, plan[a.Item3], "fallback plan uses all available network material first");
+        Equal(6, plan[stock], "fallback plan takes only the shelf shortfall");
+        var job = f.Dispatch.FindJob(f.Pawn, f.Giver);
+        Equal(null, order.Batch, "job search does not create a prepared batch");
+        Equal(10, a.Item3.stackCount, "job search leaves network inventory intact");
+        var driver = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+        f.Pawn.jobs.curDriver = driver; f.Pawn.jobs.curJob = job;
+        Equal(true, driver.TryMakePreToilReservations(false), "accepting task prepares network and shelf ingredients");
+        Equal(16, order.Batch.Ingredients.Sum(t => t.stackCount), "batch owns complete ingredients before worker travels");
+        Equal(4, stock.stackCount, "shelf retains unused remainder");
+        Equal(false, StorageShelfSupply.Reserved(shelf, stock), "preparation creates no native shelf reservation");
+        Equal(0L, a.Item1.Network.GetTotalCount(f.Material), "network ingredients physically leave public inventory");
+        var prepared = order.Batch;
+        driver.EndJobWith(JobCondition.InterruptForced);
+        f.Pawn.jobs.curDriver = null; f.Pawn.jobs.curJob = null;
+        f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        Equal(prepared, order.Batch, "replacement worker resumes existing prepared batch");
+        Equal(4, stock.stackCount, "replacement worker never takes shelf ingredients twice");
+        a.Item1.Crafting.Remove(order);
+        Equal(16L, a.Item1.Network.GetTotalCount(f.Material), "deleting order returns both ingredient sources to storage");
+
+        f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1, 16);
+        stock = f.ShelfStock(3, 10, out shelf);
+        void Unavailable(string reason) => Equal(false, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out _), reason);
+        stock.forbidden = true; Unavailable("forbidden shelf material is excluded"); stock.forbidden = false;
+        stock.burning = true; Unavailable("burning shelf material is excluded"); stock.burning = false;
+        shelf.forbidden = true; Unavailable("forbidden shelf is excluded"); shelf.forbidden = false;
+        shelf.burning = true; Unavailable("burning shelf is excluded"); shelf.burning = false;
+        f.Map.ShelfFire = true; Unavailable("fire on shelf cell prevents collection"); f.Map.ShelfFire = false;
+        f.Map.reservationManager.Reserved.Add(stock); Unavailable("another pawn's material reservation is respected");
+        f.Map.reservationManager.Reserved.Clear();
+        f.Map.physicalInteractionReservationManager.Reserved.Add(stock); Unavailable("physical interactions are respected");
+        f.Map.physicalInteractionReservationManager.Reserved.Clear();
+        shelf.Faction = new Faction(); Unavailable("foreign shelves are excluded"); shelf.Faction = Faction.OfPlayer;
+        stock.stale = true; order.Recipe.interruptIfIngredientIsRotting = true;
+        Unavailable("recipe freshness rule also applies to shelf stock"); stock.stale = false;
+        stock.hasQuality = true; stock.quality = QualityCategory.Poor;
+        order.Recipe.ingredients[0].filter.AllowedQualityLevels = new QualityRange { min = QualityCategory.Normal, max = QualityCategory.Legendary };
+        Unavailable("ingredient quality filter also applies to shelf stock"); stock.quality = QualityCategory.Normal;
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out _), "usable shelf stock is accepted after restrictions clear");
+        stock.DeSpawn();
+        f.Core(10); f.ShelfStock(13, 100, out _);
+        Unavailable("another network's shelf cannot supply missing materials");
+
+        f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1);
+        stock = f.ShelfStock(3, 6, out shelf);
+        object otherClaim = new object();
+        Equal(6, a.Item1.Network.ReserveOutgoing(otherClaim, a.Item3, 6), "other network consumer holds its own quantity");
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out plan), "shelf covers quantity unavailable due to other network claim");
+        Equal(4, plan[a.Item3], "preparation uses only unreserved network quantity");
+        Equal(2, plan[stock], "shelf supplies the reserved-network shortfall");
+        Equal(true, CraftingMaterialPreparation.Prepare(a.Item1, order, plan), "mixed preparation respects existing network claims");
+        Equal(true, a.Item1.Network.HasOutgoingReservation(otherClaim, a.Item3, 6), "other consumer's full claim survives preparation");
+        a.Item1.Network.ReleaseOutgoing(otherClaim);
+
+        f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1);
+        a.Item3.holdingOwner.Remove(a.Item3);
+        stock = f.ShelfStock(3, 6, out shelf);
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out plan), "shelf alone can supply a batch");
+        Equal(true, CraftingMaterialPreparation.Prepare(a.Item1, order, plan), "whole physical shelf stack transfers to batch");
+        Equal(false, stock.Spawned, "whole transferred stack leaves the map");
+        Equal(true, order.Batch.Ingredients.Contains(stock), "batch holds the original whole stack exactly once");
+        Equal(0, shelf.GetSlotGroup().HeldThingsCount, "empty shelf slot is available for normal restocking");
+    }
+
+    private static void PreparationRollback()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 16);
+        var stock = f.ShelfStock(3, 10, out var shelf);
+        Equal(true, CraftingServices.Materials.TryPlan(a.Item1.Network, order, out var plan), "combined plan initially valid");
+        stock.forbidden = true;
+        Equal(false, CraftingMaterialPreparation.Prepare(a.Item1, order, plan), "changed shelf eligibility aborts preparation");
+        Equal(null, order.Batch, "failed preparation refunds and clears partial batch");
+        Equal(10L, a.Item1.Network.GetTotalCount(f.Material), "network material taken before failure is refunded");
+        Equal(10, stock.stackCount, "rejected shelf material is not taken");
+        stock.forbidden = false;
+        int errors = Log.Errors.Count;
+        ((TestProductionPolicy)CraftingServices.Production).ThrowPreparation = true;
+        Equal(false, CraftingMaterialPreparation.Prepare(a.Item1, order, plan), "recipe callback exception is contained");
+        Equal(null, order.Batch, "exception refunds prepared materials without leaving a hidden batch");
+        Equal(20L, a.Item1.Network.GetTotalCount(f.Material) + stock.stackCount, "exception preserves the total from both sources");
+        Equal(true, order.Suspended, "faulty recipe is suspended rather than repeatedly taking ingredients");
+        Equal(false, StorageShelfSupply.Reserved(shelf, stock), "exception leaves no material reservation behind");
+        Equal(errors + 1, Log.Errors.Count, "controlled preparation exception is reported once");
+        Log.Errors.RemoveAt(errors);
+    }
+
+    private static void LegacyWalkingJobPreparation()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        // Old saves retain the current job but never serialize outgoing reservation tokens.
+        var job = f.Dispatch.FindJob(f.Pawn, f.Giver);
+        var loaded = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+        f.Pawn.jobs.curDriver = loaded; f.Pawn.jobs.curJob = job; loaded.SetupToils();
+        Equal(null, order.Batch, "legacy walking job has no prepared batch");
+        f.Dispatch.FinalizeInit();
+        var prepared = order.Batch;
+        Equal(6, prepared.Ingredients.Sum(t => t.stackCount), "legacy walking job prepares its batch on load");
+        Equal(4, a.Item1.Network.AvailableToWithdraw(a.Item3), "legacy job leaves no material claim on remainder");
+        f.Dispatch.FinalizeInit();
+        Equal(prepared, order.Batch, "loaded prepared batch is reused");
+        Equal(4, a.Item3.stackCount, "repeated load initialization cannot take ingredients twice");
+        // Simulate a broken driver disappearing without invoking its finish callbacks.
+        f.Pawn.jobs.curDriver = null; f.Pawn.jobs.curJob = null;
+        Equal(null, f.Dispatch.AssignedWorker(order), "stale driver does not block a replacement worker");
+        f.Dispatch.MapComponentTick();
+        Equal(prepared, order.Batch, "orphan assignment cleanup preserves actual prepared materials");
+        f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        Equal(prepared, order.Batch, "replacement resumes materials left by broken driver");
+
+        f = new Fixture(); a = f.Core(0); order = f.Order(a.Item1, 20);
+        job = JobMaker.MakeJob(DefDatabase<JobDef>.GetNamed("MS_CosmicCrafting"), a.Item2, a.Item1);
+        job.count = order.Id; job.workGiverDef = f.Giver;
+        loaded = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+        f.Pawn.jobs.curDriver = loaded; f.Pawn.jobs.curJob = job; loaded.SetupToils();
+        f.Dispatch.FinalizeInit();
+        Equal(true, loaded.ended, "legacy walking job with missing materials ends cleanly");
+        Equal(null, order.Batch, "missing legacy ingredients cannot create a partial batch");
+        Equal(10L, a.Item1.Network.GetTotalCount(f.Material), "failed legacy restart preserves stock");
+    }
+
+    private static void AssignmentCleanupIsolation()
+    {
+        var f = new Fixture(); var a = f.Core(0); var b = f.Core(10);
+        var first = f.Order(a.Item1); var second = f.Order(b.Item1);
+        var job = f.Dispatch.FindJob(f.Pawn, f.Giver);
+        var broken = new JobDriver_CosmicCrafting { pawn = f.Pawn, job = job };
+        broken.AddFinishAction(_ => { throw new Exception("controlled broken finish callback"); });
+        f.Pawn.jobs.curDriver = broken; f.Pawn.jobs.curJob = job;
+        Equal(true, broken.TryMakePreToilReservations(false), "broken-callback fixture prepares first batch");
+        var other = new Pawn { Map = f.Map, Spawned = true, Faction = Faction.OfPlayer };
+        job = f.Dispatch.FindJob(other, f.Giver);
+        var healthy = new JobDriver_CosmicCrafting { pawn = other, job = job };
+        other.jobs.curDriver = healthy; other.jobs.curJob = job;
+        Equal(true, healthy.TryMakePreToilReservations(false), "second worker prepares an independent batch");
+        first.Suspended = second.Suspended = true;
+        first.Changed(); second.Changed();
+        int errors = Log.Errors.Count;
+        f.Dispatch.MapComponentTick();
+        Equal(null, f.Dispatch.AssignedWorker(first), "finish callback exception cannot retain first assignment");
+        Equal(true, healthy.ended, "one broken callback cannot prevent later worker cleanup");
+        Equal(null, f.Dispatch.AssignedWorker(second), "later assignment is cleaned normally");
+        Equal(6, first.Batch.Ingredients.Sum(t => t.stackCount), "broken worker's prepared material remains recoverable");
+        Equal(6, second.Batch.Ingredients.Sum(t => t.stackCount), "normal cleanup also preserves unfinished materials");
+        Equal(errors + 1, Log.Errors.Count, "cleanup exception is reported once");
+        Log.Errors.RemoveAt(errors);
+    }
+
     private static void Modes()
     {
         bool paused = false;
@@ -727,7 +888,19 @@ internal static class CosmicCraftingTests
             if(thing is Building_StorageCore core) core.node=node;
             if(thing is Building_StorageUnit unit) unit.node=node;
             if(thing is Building_CosmicWorkbench bench) bench.node=node;
+            if(thing is Building_StorageSupplyShelf shelf)
+            { shelf.node=node; Map.haulDestinationManager.SlotParents[thing.Position]=shelf; }
             Map.GetComponent<MapComponent_StorageNetworks>().Register(node);
+        }
+        internal Thing ShelfStock(int x, int count, out Building_StorageSupplyShelf shelf)
+        {
+            shelf = new Building_StorageSupplyShelf { def = new ThingDef { category = ThingCategory.Building,
+                building = new BuildingProperties() } };
+            Register(shelf, x);
+            Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            var item = new Thing { def = Material, stackCount = count, Spawned = true, Map = Map, Position = shelf.Position };
+            Map.Ground.Add(item);
+            return item;
         }
         internal CraftingOrder Order(Building_StorageCore core,int amount=6)
         {
@@ -792,14 +965,15 @@ internal static class CosmicCraftingTests
         Equal(false,driver.CanContinue(),"deleted order ends current work"); driver.EndJobWith(JobCondition.Incompletable);
 
         oa.Batch.Cancel(); oa.Batch=null;
-        var lease=new CraftingMaterialLease(a.Item1.Network);
         var foreign=new Thing { def=f.Material,stackCount=10 };
-        Equal(false,lease.Acquire(new Dictionary<Thing,int>{{a.Item3,6},{foreign,1}}),"partial reservation rolls back on foreign stack");
+        Equal(false,CraftingMaterialPreparation.Prepare(a.Item1,oa,new Dictionary<Thing,int>{{a.Item3,6},{foreign,1}}),"partial preparation rolls back on foreign stack");
         Equal(10,a.Item1.Network.AvailableToWithdraw(a.Item3),"rollback restores first stack");
-        Equal(true,lease.Acquire(new Dictionary<Thing,int>{{a.Item3,6}}),"lease can be reacquired");
+        Equal(null,oa.Batch,"failed preparation leaves no unfinished batch after successful refund");
+        Equal(true,CraftingMaterialPreparation.Prepare(a.Item1,oa,new Dictionary<Thing,int>{{a.Item3,6}}),"materials can be prepared after rollback");
         f.Map.GetComponent<MapComponent_StorageNetworks>().MarkDirty();
-        Equal(false,lease.Valid(oa),"network invalidation invalidates lease"); lease.Release();
+        Equal(true,oa.Batch.Valid(oa),"prepared materials survive network invalidation");
         f.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+        Equal(true,oa.Batch.Cancel(),"prepared batch refunds materials"); oa.Batch=null;
         Equal(10,a.Item1.Network.AvailableToWithdraw(a.Item3),"rebuild has no stale claim");
 
         oa.Mode=CraftingRepeatMode.TargetCount; oa.TargetCount=10;
@@ -1024,11 +1198,11 @@ internal static class CosmicCraftingTests
         f.Pawn.jobs.curDriver=loaded; loaded.SetupToils();
         f.Dispatch.FinalizeInit();
         Equal(f.Pawn,f.Dispatch.AssignedWorker(order),"loaded job restores order claim before new assignment");
-        Equal(4,a.Item1.Network.AvailableToWithdraw(a.Item3),"loaded job restores material claim");
+        Equal(4,a.Item1.Network.AvailableToWithdraw(a.Item3),"loaded job reuses prepared materials without claiming remainder");
         Equal(true,loaded.CanContinue(),"loaded job remains valid");
         f.Map.GetComponent<MapComponent_StorageNetworks>().FinalizeInit();
         Equal(true,loaded.CanContinue(),"network finalization order does not cancel a loaded job");
-        Equal(4,a.Item1.Network.AvailableToWithdraw(a.Item3),"replacement network restores exact claim");
+        Equal(4,a.Item1.Network.AvailableToWithdraw(a.Item3),"replacement network keeps prepared materials separate");
         // Whole-stack recipes cannot silently take just the unreserved part of a real stack.
         var whole=f.Order(a.Item1,1); whole.Recipe.ignoreIngredientCountTakeEntireStacks=true;
         Equal(true,CraftingServices.Materials.TryPlan(a.Item1.Network,whole,out _),"whole stack can use separate unclaimed remainder");

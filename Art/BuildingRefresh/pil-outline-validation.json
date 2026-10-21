@@ -1,0 +1,182 @@
+[
+  {
+    "name": "StorageCore",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      50,
+      48,
+      462,
+      458
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      512,
+      768
+    ],
+    "bounds": [
+      115,
+      87,
+      397,
+      641
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageReceiver",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      23,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageSupplyShelf",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      528,
+      528
+    ],
+    "bounds": [
+      5,
+      19,
+      523,
+      521
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      522,
+      522
+    ],
+    "bounds": [
+      5,
+      25,
+      517,
+      513
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "ConstructionSupplyUnit",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      518,
+      518
+    ],
+    "bounds": [
+      5,
+      27,
+      513,
+      511
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1044,
+      532
+    ],
+    "bounds": [
+      5,
+      21,
+      1039,
+      527
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "FuelSupplier",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      512,
+      512
+    ],
+    "bounds": [
+      41,
+      43,
+      467,
+      490
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "NivarianCannonExtractor",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      514,
+      514
+    ],
+    "bounds": [
+      5,
+      17,
+      509,
+      505
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CaravanTeleporter",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      532,
+      532
+    ],
+    "bounds": [
+      3,
+      21,
+      529,
+      527
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      1536,
+      1024
+    ],
+    "bounds": [
+      98,
+      19,
+      1438,
+      974
+    ],
+    "changed_opaque_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "outline_mode": "PIL alpha dilation",
+    "size": [
+      768,
+      352
+    ],
+    "bounds": [
+      51,
+      55,
+      717,
+      263
+    ],
+    "changed_opaque_interior_pixels": 0
+  }
+]

@@ -51,7 +51,7 @@ internal static class FuelSupplierTests
     internal static int Run()
     {
         assertions = 0;
-        AreaAndTargets(); NativeRules(); HalfFullGenerator(); ImmediateSupply(); ReservationsAndRecovery(); OverlapAndOrder(); NetworkAndTicking();
+        AreaAndTargets(); NativeRules(); HalfFullGenerator(); ImmediateSupply(); ReservationsAndRecovery(); OverlapAndOrder(); NetworkAndTicking(); CommitBoundaryExceptions();
         return assertions;
     }
     private static void AreaAndTargets()
@@ -180,5 +180,31 @@ internal static class FuelSupplierTests
         target.Fuel = 0; f.Manager.Unregister(f.Supplier.node); f.Supplier.SupplyFuel();
         Equal(0f, target.Fuel, "disconnected supplier cannot deliver");
         Equal(20L, f.Unit.Inventory.GetTotalCount(f.Fuel), "disconnected supplier leaves source stock");
+    }
+
+    private static void CommitBoundaryExceptions()
+    {
+        var f = new Fixture(); f.Store(20); var target = f.Target(3);
+        target.BeforeRefuel = () => { throw new InvalidOperationException("before adding fuel"); };
+        bool threw = false;
+        try { f.Supplier.SupplyFuel(); } catch (InvalidOperationException) { threw = true; }
+        Equal(true, threw, "pre-refuel failure observed");
+        Equal(0f, target.Fuel, "pre-refuel failure adds no fuel");
+        Equal(20L, f.Network.GetTotalCount(f.Fuel), "pre-refuel failure restores entire batch");
+        target.BeforeRefuel = null; f.Supplier.SupplyFuel();
+        Equal(10f, target.Fuel, "retry after pre-refuel failure delivers once");
+        Equal(10L, f.Network.GetTotalCount(f.Fuel), "retry charges exact fuel quantity");
+
+        f = new Fixture(); f.Store(20); f.Store(20); target = f.Target(3); target.TargetFuelLevel = 30;
+        target.AfterRefuel = () => { throw new InvalidOperationException("after adding fuel"); };
+        threw = false;
+        try { f.Supplier.SupplyFuel(); } catch (InvalidOperationException) { threw = true; }
+        Equal(true, threw, "post-refuel signal failure observed");
+        Equal(20f, target.Fuel, "first stack already changed actual fuel");
+        Equal(20L, f.Network.GetTotalCount(f.Fuel), "credited fuel remains charged while unprocessed stack is restored");
+        Equal(0, f.Map.Ground.Count, "unused material returns directly to inventory");
+        target.AfterRefuel = null; f.Supplier.SupplyFuel(true);
+        Equal(30f, target.Fuel, "later supply only fills remaining demand");
+        Equal(10L, f.Network.GetTotalCount(f.Fuel), "post-exception retry does not charge or credit first stack again");
     }
 }

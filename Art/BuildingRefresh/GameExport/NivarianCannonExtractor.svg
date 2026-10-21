@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288"><g transform="matrix(0.476853090714 0 0 0.494679374480 21.925608777094 15.383362635329)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff" /><path d="M105 46H407L478 117V403L407 474H105L34 403V117Z" fill="#000000" stroke="none" /></mask></defs>
+<title>涅瓦莲质量驱动器提取口 · 优化样稿</title>
+<desc>Heavy octagonal extraction collar, dark shaft and two locking clamps; fixed orientation. Review draft only; not installed.</desc>
+<path d="M105 46H407L478 117V403L407 474H105L34 403V117Z" fill="#637782" />
+<path d="M105 46H407L478 117V375L407 446H105L34 375V117Z" fill="#d8dfe3" />
+<path d="M105 46H407L422 62H112L50 124H34V117Z" fill="#e6e9e8" />
+<path d="M460 117H478V375L407 446H105L120 430H400L460 370Z" fill="#acb8bf" />
+<ellipse cx="256" cy="263" rx="153" ry="137" fill="#637782" />
+<ellipse cx="256" cy="249" rx="153" ry="137" fill="#93a3ad" />
+<ellipse cx="256" cy="243" rx="132" ry="117" fill="#e6e9e8" />
+<ellipse cx="256" cy="249" rx="110" ry="97" fill="#304553" />
+<path d="M123.498113 180.500000A153 137 0 0 1 191.339406 124.835833L200.214389 136.961989A132 117 0 0 0 141.684647 184.500000Z" fill="#c5e5f5" />
+<path d="M320.660594 124.835833A153 137 0 0 1 388.501887 180.500000L370.315353 184.500000A132 117 0 0 0 311.785611 136.961989Z" fill="#c5e5f5" />
+<rect x="81" y="213" width="42" height="83" rx="4" fill="#637782" />
+<rect x="81" y="207" width="35" height="73" rx="3" fill="#d8dfe3" />
+<rect x="89" y="226" width="18" height="28" rx="1" fill="#c5e5f5" />
+<rect x="389" y="213" width="42" height="83" rx="4" fill="#637782" />
+<rect x="389" y="207" width="35" height="73" rx="3" fill="#d8dfe3" />
+<rect x="397" y="226" width="18" height="28" rx="1" fill="#c5e5f5" />
+<path d="M219 367H293V404H219Z" fill="#637782" />
+<rect x="226" y="367" width="60" height="23" rx="2" fill="#d8dfe3" />
+<rect x="235" y="373" width="42" height="8" rx="1" fill="#c5e5f5" />
+<g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M105 46H407L478 117V403L407 474H105L34 403V117Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g>
+</g></svg>

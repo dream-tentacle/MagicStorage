@@ -20,10 +20,58 @@ internal static class StorageSelectionTests
                 { new Building_StorageUnit(), new Building_StorageCore(), new Building_TransportSupplier(), new Building_StorageApparelAdapter() })
                 StorageRules(holder);
             UnrelatedContainers();
-            Console.WriteLine("PASS: " + checks + " selection assertions (production Harmony prefix executed; native iterator boundaries stubbed).");
+            SupplyShelfMouseSelection();
+            Console.WriteLine("PASS: " + checks + " selection assertions (production Harmony patches executed; native selection boundaries stubbed).");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+    }
+
+    private static void SupplyShelfMouseSelection()
+    {
+        var map = new Map();
+        var cell = new IntVec3(1);
+        var shelf = new Building_StorageSupplyShelf
+            { Spawned = true, Map = map, Position = cell, def = new ThingDef { category = ThingCategory.Building } };
+        map.haulDestinationManager.Parents[cell] = shelf;
+        var stock = new Thing { Spawned = true, Map = map, Position = cell };
+        var floorItem = new Thing { Spawned = true, Map = map, Position = new IntVec3(2) };
+        var pawn = new Pawn { Spawned = true, Map = map, Position = cell, def = new ThingDef { category = ThingCategory.Pawn } };
+        var ordinaryShelf = new Building { def = new ThingDef { category = ThingCategory.Building } };
+        map.haulDestinationManager.Parents[new IntVec3(3)] = ordinaryShelf;
+        var ordinaryStock = new Thing { Spawned = true, Map = map, Position = new IntVec3(3) };
+        var unspawned = new Thing { Map = map, Position = cell };
+        var zone = new object();
+        var selector = new Selector();
+        selector.Candidates.AddRange(new object[] { stock, shelf, floorItem, pawn, ordinaryStock, unspawned, zone });
+        Equal(true, selector.QueryUnderMouse().SequenceEqual(new object[]
+            { shelf, floorItem, pawn, ordinaryStock, unspawned, zone }), "click hides only spawned items on supply shelves and preserves candidate order");
+        Equal(7, selector.Candidates.Count, "click filtering leaves native candidates intact");
+        selector.Select(stock);
+        Equal(stock, selector.Selected, "explicit selection still reaches shelf stock");
+        stock.Position = floorItem.Position;
+        Equal(true, selector.QueryUnderMouse().Contains(stock), "removed stock immediately becomes clickable");
+        stock.Position = cell;
+        map.haulDestinationManager.Parents.Remove(cell);
+        Equal(true, selector.QueryUnderMouse().Contains(stock), "items become clickable when shelf is removed");
+        map.haulDestinationManager.Parents[cell] = shelf;
+
+        ThingSelectionUtility.Candidates.Clear();
+        ThingSelectionUtility.Candidates.AddRange(new Thing[] { stock, shelf, floorItem, pawn, ordinaryStock });
+        UnityEngine.Event.current = new UnityEngine.Event { rawType = UnityEngine.EventType.MouseUp, button = 0 };
+        Equal(true, ThingSelectionUtility.MultiSelectableThingsInScreenRectDistinct(default(UnityEngine.Rect))
+            .SequenceEqual(new Thing[] { shelf, floorItem, pawn, ordinaryStock }), "left mouse release excludes stock from box selection");
+        Equal(5, ThingSelectionUtility.Candidates.Count, "box filtering leaves native candidates intact");
+        foreach (var current in new UnityEngine.Event[] { null,
+            new UnityEngine.Event { rawType = UnityEngine.EventType.MouseUp, button = 1 },
+            new UnityEngine.Event { rawType = UnityEngine.EventType.MouseDown, button = 0 },
+            new UnityEngine.Event { rawType = UnityEngine.EventType.Repaint, button = 0 } })
+        {
+            UnityEngine.Event.current = current;
+            Equal(true, ThingSelectionUtility.MultiSelectableThingsInScreenRectDistinct(default(UnityEngine.Rect))
+                .Contains(stock), "other rectangle queries retain shelf stock");
+        }
+        UnityEngine.Event.current = null;
     }
 
     private static void StorageRules(TestContainer holder)

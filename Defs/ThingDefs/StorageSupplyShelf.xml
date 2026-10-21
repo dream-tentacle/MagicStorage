@@ -2,6 +2,7 @@
 <Defs>
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageSupplyShelf</defName>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>auto-restocking shelf</label>
     <description>A small shelf that automatically restocks from its connected storage network, providing small quantities of food, medicine and other everyday supplies.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.</description>
     <thingClass>MagicStorage.Building_StorageSupplyShelf</thingClass>

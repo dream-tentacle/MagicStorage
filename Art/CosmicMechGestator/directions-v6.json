@@ -1,0 +1,72 @@
+{
+  "version": 6,
+  "review_only": true,
+  "game_files_changed": false,
+  "approved_source": "CosmicMechGestator_south-v6.svg",
+  "accent": "#C5E5F5",
+  "exterior_stroke": {
+    "color": "#000000",
+    "width": 4
+  },
+  "views": {
+    "south": {
+      "svg": "CosmicMechGestator_south-v6.svg",
+      "viewBox": [
+        0,
+        0,
+        768,
+        512
+      ],
+      "platform_center": [
+        384,
+        275
+      ],
+      "footprint": [
+        3,
+        2
+      ]
+    },
+    "north": {
+      "svg": "CosmicMechGestator_north-v6.svg",
+      "viewBox": [
+        0,
+        0,
+        768,
+        512
+      ],
+      "platform_center": [
+        384,
+        275
+      ],
+      "footprint": [
+        3,
+        2
+      ]
+    },
+    "east": {
+      "svg": "CosmicMechGestator_east-v6.svg",
+      "viewBox": [
+        0,
+        0,
+        768,
+        768
+      ],
+      "platform_center": [
+        384,
+        400
+      ],
+      "footprint": [
+        2,
+        3
+      ],
+      "west": "mirror east"
+    }
+  },
+  "vessel": {
+    "seat_rx": 140,
+    "seat_ry": 98,
+    "lid_rx": 132,
+    "lid_ry": 92.4,
+    "lid_elevation_in_image": 160
+  }
+}

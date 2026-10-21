@@ -1,0 +1,37 @@
+{
+  "source": "CosmicMechGestator_south-v4.svg",
+  "source_png": [
+    1536,
+    1024
+  ],
+  "game_png": [
+    800,
+    544
+  ],
+  "visible_bounds": [
+    16,
+    16,
+    784,
+    528
+  ],
+  "recommended_draw_size": [
+    3.125,
+    2.125
+  ],
+  "center_offset": [
+    0,
+    0
+  ],
+  "footprint": [
+    3,
+    2
+  ],
+  "view": "south",
+  "formation_area": "empty",
+  "review_only": true,
+  "layer_groups": [
+    "gestator-base",
+    "cylinder-glass",
+    "gestator-top"
+  ]
+}

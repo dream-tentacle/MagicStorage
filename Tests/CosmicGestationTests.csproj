@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>obj\CosmicGestation\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputPath>bin\CosmicGestation\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies\0Harmony.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Compile Include="CosmicGestationTests.cs" />
+    <Compile Include="CosmicGestationPowerTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationCatalog.cs" />
+    <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationMaterials.cs" />
+    <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationPower.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_CosmicMechGestator.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterialPlanner.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

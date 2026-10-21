@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -19,58 +18,55 @@ namespace MagicStorage
             return interactable == null || !interactable.Props.cooldownPreventsRefuel || !interactable.OnCooldown;
         }
 
-        private sealed class FuelClaim
-        {
-            internal Thing Item, Received;
-            internal ThingOwner Source;
-            internal int Count;
-        }
-
         internal static void Deliver(Building supplier, StorageNetwork network, CompRefuelable target,
             IEnumerable<ThingDef> fuelTypes, bool immediate = false)
         {
             if (!CanDeliver(supplier, network, target, immediate)) return;
-            var claims = new List<FuelClaim>();
-            var stacks = new List<Thing>();
-            int remaining = target.GetFuelCountToFullyRefuel();
-            foreach (ThingDef itemDef in fuelTypes)
+            using (var transfer = new StorageMaterialTransaction(supplier.Map, supplier.Position))
             {
-                if (itemDef == null || !target.Props.fuelFilter.Allows(itemDef)) continue;
-                stacks.Clear(); network.GetStacks(itemDef, stacks);
-                foreach (Thing item in stacks)
+                var stacks = new List<Thing>();
+                var seen = new HashSet<Thing>();
+                int remaining = target.GetFuelCountToFullyRefuel();
+                foreach (ThingDef itemDef in fuelTypes)
                 {
+                    if (itemDef == null || !target.Props.fuelFilter.Allows(itemDef)) continue;
+                    stacks.Clear(); network.GetStacks(itemDef, stacks);
+                    foreach (Thing item in stacks)
+                    {
+                        if (remaining == 0) break;
+                        if (!seen.Add(item) || item.Destroyed || !target.Props.fuelFilter.Allows(item)) continue;
+                        int count = Math.Min(remaining, network.AvailableToWithdraw(item));
+                        if (count <= 0) continue;
+                        if (!transfer.Add(item, count, network, supplier)) return;
+                        remaining -= count;
+                    }
                     if (remaining == 0) break;
-                    if (item.Destroyed || !target.Props.fuelFilter.Allows(item)) continue;
-                    int count = Math.Min(remaining, network.AvailableToWithdraw(item));
-                    if (count <= 0) continue;
-                    claims.Add(new FuelClaim { Item = item, Source = item.holdingOwner, Count = count });
+                }
+                if (transfer.Requests.Count == 0 || (target.Props.atomicFueling && remaining > 0) || !transfer.TryStage()) return;
+                if (!CanDeliver(supplier, network, target, immediate)) return;
+                remaining = target.GetFuelCountToFullyRefuel();
+                long total = 0; foreach (var request in transfer.Requests) total += request.Count;
+                if (target.Props.atomicFueling && total < remaining) return;
+                foreach (var request in transfer.Requests)
+                {
+                    int count = Math.Min(remaining, request.Count);
+                    if (count <= 0) break;
+                    float before = target.Fuel;
+                    bool refueled = false;
+                    try
+                    {
+                        // Like native Refuel(List<Thing>), apply fuel and its signal before
+                        // destroying that stack. A throwing signal may still have added fuel.
+                        target.Refuel(count);
+                        refueled = true;
+                    }
+                    finally
+                    {
+                        if ((refueled || target.Fuel > before) && !transfer.Consume(request, count))
+                            Log.Error("[MagicStorage] Refueled material could not be consumed.");
+                    }
                     remaining -= count;
                 }
-                if (remaining == 0) break;
-            }
-            if (claims.Count == 0 || (target.Props.atomicFueling && remaining > 0)) return;
-            var manager = supplier.Map.GetComponent<MapComponent_StorageNetworks>();
-            StorageRecoveryBatch staging = manager.CreateRecovery(supplier.Position);
-            try
-            {
-                foreach (FuelClaim claim in claims)
-                    if (network.ReserveOutgoing(claim, claim.Item, claim.Count, supplier) != claim.Count) return;
-                foreach (FuelClaim claim in claims)
-                    if (!network.TryWithdrawReserved(claim, claim.Item, claim.Count, staging.Contents, out claim.Received).Complete) return;
-                if (!CanDeliver(supplier, network, target, immediate)) return;
-                // Native Refuel consumes real Things and pops from the list's end.
-                target.Refuel(claims.AsEnumerable().Reverse().Select(c => c.Received).ToList());
-            }
-            finally
-            {
-                foreach (FuelClaim claim in claims)
-                {
-                    network.ReleaseOutgoing(claim);
-                    if (claim.Received != null && staging.Contents.Contains(claim.Received))
-                        StorageTransfer.Move(staging.Contents, claim.Source, claim.Received,
-                            claim.Received.stackCount, supplier.Map, supplier.Position);
-                }
-                manager.ReleaseRecovery(staging);
             }
         }
 

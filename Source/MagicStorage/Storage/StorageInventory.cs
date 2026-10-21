@@ -24,6 +24,10 @@ namespace MagicStorage
 
         internal StorageThingOwner Contents => contents;
         public int UsedSlots => contents.Count;
+        public long TotalCount
+        {
+            get { long total = 0; foreach (long count in counts.Values) total += count; return total; }
+        }
         public int SlotCapacity => unit.SlotCapacity;
         internal IEnumerable<ThingDef> IndexedDefs => counts.Keys;
 

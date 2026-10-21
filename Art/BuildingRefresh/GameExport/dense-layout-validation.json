@@ -1,0 +1,231 @@
+[
+  {
+    "family": "StorageCore",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageUnit",
+    "direction": "south",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageUnit",
+    "direction": "north",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageUnit",
+    "direction": "east",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageUnit",
+    "direction": "west",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageReceiver",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CosmicWorkbench",
+    "direction": "south",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CosmicWorkbench",
+    "direction": "north",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CosmicWorkbench",
+    "direction": "east",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CosmicWorkbench",
+    "direction": "west",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "ConstructionSupplyUnit",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageApparelAdapter",
+    "direction": "south",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageApparelAdapter",
+    "direction": "north",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageApparelAdapter",
+    "direction": "east",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageApparelAdapter",
+    "direction": "west",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "StorageSupplyShelf",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "TransportSupplier",
+    "direction": "south",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "TransportSupplier",
+    "direction": "north",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "TransportSupplier",
+    "direction": "east",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "TransportSupplier",
+    "direction": "west",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "FuelSupplier",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "NivarianCannonExtractor",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CaravanTeleporter",
+    "direction": "single",
+    "horizontal_gap_pixels": 24,
+    "vertical_gap_pixels": 24,
+    "alpha_overlap_pixels": 0
+  },
+  {
+    "family": "CosmicMechGestator",
+    "direction": "south",
+    "floor_clearance_pixels": [
+      28.261386138613844,
+      15.461386138613875,
+      28.26138613861383,
+      -16.13632814710047
+    ],
+    "platform_plane_clearance_pixels": [
+      28.261386138613844,
+      15.461386138613875,
+      28.26138613861383,
+      15.461386138613811
+    ],
+    "vertical_projection": true
+  },
+  {
+    "family": "CosmicMechGestator",
+    "direction": "north",
+    "floor_clearance_pixels": [
+      28.261386138613844,
+      15.461386138613875,
+      28.26138613861383,
+      -16.13632814710047
+    ],
+    "platform_plane_clearance_pixels": [
+      28.261386138613844,
+      15.461386138613875,
+      28.26138613861383,
+      15.461386138613811
+    ],
+    "vertical_projection": true
+  },
+  {
+    "family": "CosmicMechGestator",
+    "direction": "east",
+    "floor_clearance_pixels": [
+      15.461422138613841,
+      28.2613861386139,
+      15.461422138613784,
+      -3.336328147100403
+    ],
+    "platform_plane_clearance_pixels": [
+      15.461422138613841,
+      28.2613861386139,
+      15.461422138613784,
+      28.26138613861388
+    ],
+    "vertical_projection": true
+  },
+  {
+    "family": "CosmicMechGestator",
+    "direction": "west",
+    "floor_clearance_pixels": [
+      15.461422138613841,
+      28.2613861386139,
+      15.461422138613784,
+      -3.336328147100403
+    ],
+    "platform_plane_clearance_pixels": [
+      15.461422138613841,
+      28.2613861386139,
+      15.461422138613784,
+      28.26138613861388
+    ],
+    "vertical_projection": true
+  }
+]

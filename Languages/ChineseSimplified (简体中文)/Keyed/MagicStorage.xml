@@ -8,6 +8,10 @@
   <MS_Status_Ready>可工作</MS_Status_Ready>
   <MS_NetworkCapacity>已连接单元：{0}\n已用槽位：{1} / {2}</MS_NetworkCapacity>
   <MS_UnitCapacity>已用槽位：{0} / {1}</MS_UnitCapacity>
+  <MS_UnitTransfer_Label>转移库存</MS_UnitTransfer_Label>
+  <MS_UnitTransfer_Desc>取消本单元内物品的预留，并尽量转移到同一网络的其他存储单元。优先合并未满的兼容堆叠，再使用空槽；无法转移的物品保留在本单元。</MS_UnitTransfer_Desc>
+  <MS_UnitTransfer_Empty>本单元没有可转移的物品。</MS_UnitTransfer_Empty>
+  <MS_UnitTransfer_Result>已转移：{0}；本单元剩余：{1}。</MS_UnitTransfer_Result>
   <MS_ManualWithdrawalOnly>普通搬运不会取出已存物品，自动补货架可摆出指定物品供殖民者领取。</MS_ManualWithdrawalOnly>
   <MS_ConduitAlreadyPresent>此处已有存储线或其建造计划。</MS_ConduitAlreadyPresent>
   <MS_UI_Open>查看物品</MS_UI_Open>
@@ -46,6 +50,12 @@
   <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，表面符合条件的物品自动存入单元。</MS_ReceiverUse>
   <MS_SettingsCategory>魔法存储</MS_SettingsCategory>
   <MS_SettingsTabGeneral>通用</MS_SettingsTabGeneral>
+  <MS_SettingsTabAccessibility>易用性</MS_SettingsTabAccessibility>
+  <MS_SettingsAccessibilityNotice>以下选项修改了原版代码，如果开启后报错或者没有生效，说明和其他mod冲突，本mod和其他mod均修改了原版代码。</MS_SettingsAccessibilityNotice>
+  <MS_SettingsCaravanItemFilters>远行队物品过滤器</MS_SettingsCaravanItemFilters>
+  <MS_SettingsTradeItemFilters>交易页物品过滤器</MS_SettingsTradeItemFilters>
+  <MS_SettingsWorkbenchUnlockMode>工作台解锁模式</MS_SettingsWorkbenchUnlockMode>
+  <MS_SettingsWorkbenchUnlockModeHelp>需消耗建造材料解锁工作台，才能添加其配方。无材料成本的工作台默认解锁，解锁状态在当前存档中共享。关闭后可直接使用所有满足研究条件的配方，已解锁的工作台仍会保留记录。</MS_SettingsWorkbenchUnlockModeHelp>
   <MS_SettingsTabPerformance>性能</MS_SettingsTabPerformance>
   <MS_SettingsPerformanceNotice>建议保留初始默认值，因为本mod性能已经足够优秀。</MS_SettingsPerformanceNotice>
   <MS_SettingsUnitSlots>每个存储单元的槽位上限</MS_SettingsUnitSlots>

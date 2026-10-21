@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 512 768">
+  <title>魔法存储 — 宇宙机械体培育器，2×3 南向第二稿</title>
+  <desc>Original 2×3 south-facing mech gestator. A tall cylindrical glass tank with a substantial metal lid and circular lower collar stands on a compact service plinth. Reference study: the vanilla standard and large mech gestator's physical tank construction, rather than a flat assembly bed. Pearl-grey housing, RGB(197,229,245) accents, two side feed pipes, a front control station and a clear formation space. Base, glass and lid are grouped separately for future layering.</desc>
+  <defs>
+    <radialGradient id="lid-metal" cx="35%" cy="24%" r="84%">
+      <stop offset="0" stop-color="#edf2f5"/>
+      <stop offset=".58" stop-color="#d1dce4"/>
+      <stop offset="1" stop-color="#a7bac8"/>
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6e9bb9" stop-opacity=".78"/>
+      <stop offset=".16" stop-color="#c5e5f5" stop-opacity=".66"/>
+      <stop offset=".52" stop-color="#b0d5eb" stop-opacity=".38"/>
+      <stop offset=".84" stop-color="#81b2d1" stop-opacity=".61"/>
+      <stop offset="1" stop-color="#527e9c" stop-opacity=".85"/>
+    </linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8dfef" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#6391b2" stop-opacity=".62"/>
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M126 174C126 111 386 111 386 174V525C386 614 126 614 126 525Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base layer: an actual machine platform, with a circular vessel seat. -->
+  <g id="gestator-base">
+    <rect x="28" y="240" width="456" height="500" rx="28" fill="#798893"/>
+    <rect x="28" y="218" width="456" height="492" rx="28" fill="#d8dfe3"/>
+    <path d="M28 682Q28 710 56 710H456Q484 710 484 682" fill="none" stroke="#526c80" stroke-width="3.5"/>
+    <path d="M41 381V252Q41 231 62 231H123M389 231H451Q471 231 471 251" fill="none" stroke="#f1f6f8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M471 267V673Q471 697 447 697H67" fill="none" stroke="#aabcc8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M55 635H457" stroke="#becbd4" stroke-width="2"/>
+
+    <!-- Left feed manifold, with only two broad tubes. -->
+    <path d="M56 339L67 317H111V584H61L56 571Z" fill="#acbecb"/>
+    <path d="M63 343L72 326H103V574H65Z" fill="#8fa5b5"/>
+    <path d="M97 379H118L145 358M97 497H123L145 519" fill="none" stroke="#738d9f" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M97 373H118L145 352M97 491H123L145 513" fill="none" stroke="#d3e0e9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="76" y="356" width="23" height="32" rx="7" fill="#9db4c4"/>
+    <ellipse cx="87.5" cy="356" rx="11.5" ry="9" fill="#e4ecf2"/>
+    <rect x="76" y="474" width="23" height="32" rx="7" fill="#9db4c4"/>
+    <ellipse cx="87.5" cy="474" rx="11.5" ry="9" fill="#e4ecf2"/>
+    <rect x="76" y="544" width="24" height="7" rx="2" fill="#c5e5f5"/>
+
+    <!-- Right supply cartridge gives the side machinery a clear, simple mass. -->
+    <rect x="399" y="332" width="54" height="252" rx="12" fill="#a5bac9"/>
+    <path d="M406 366Q406 348 426 348Q446 348 446 366V468Q446 485 426 485Q406 485 406 468Z" fill="#cbd9e3"/>
+    <ellipse cx="426" cy="366" rx="20" ry="17" fill="#e6edf2"/>
+    <ellipse cx="426" cy="364" rx="14" ry="10" fill="#b8cddb"/>
+    <path d="M407 421Q426 436 445 421V432Q426 447 407 432Z" fill="#c5e5f5"/>
+    <path d="M416 494V547H441" fill="none" stroke="#7996aa" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M416 493V544H441" fill="none" stroke="#c5e5f5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- The lower tank collar has a visible front face and a recessed inner seat. -->
+    <ellipse cx="256" cy="558" rx="150" ry="86" fill="#718b9e"/>
+    <path d="M106 540V556C106 604 173 644 256 644C339 644 406 604 406 556V540Z" fill="#9db3c3"/>
+    <ellipse cx="256" cy="540" rx="150" ry="86" fill="#d6e1e9"/>
+    <ellipse cx="256" cy="536" rx="133" ry="73" fill="#8aa7ba"/>
+    <ellipse cx="256" cy="534" rx="123" ry="64" fill="#66869e"/>
+    <ellipse cx="256" cy="535" rx="94" ry="47" fill="#adc5d5"/>
+    <ellipse cx="256" cy="533" rx="71" ry="34" fill="#c8dce8"/>
+    <path d="M153 584C202 620 309 620 359 584" fill="none" stroke="#eef4f8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M177 617C222 633 290 633 335 617" fill="none" stroke="#c5e5f5" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Glass layer: a vertical vessel wall, not a horizontal window in a slab. -->
+  <g id="cylinder-glass" clip-path="url(#tank-body-clip)">
+    <path d="M126 174C126 111 386 111 386 174V525C386 614 126 614 126 525Z" fill="url(#tank-glass)" stroke="#7d9eb4" stroke-width="2.5"/>
+    <path d="M133 352C133 297 379 297 379 352V521C379 590 133 590 133 521Z" fill="url(#culture-fluid)"/>
+    <ellipse cx="256" cy="352" rx="123" ry="48" fill="#c5e5f5" fill-opacity=".16"/>
+    <path d="M140 356C140 414 373 414 373 356" fill="none" stroke="#d7edf8" stroke-opacity=".3" stroke-width="2"/>
+    <path d="M151 279V493Q151 538 176 551" fill="none" stroke="#eef8fd" stroke-opacity=".6" stroke-width="9" stroke-linecap="round"/>
+    <path d="M167 302V427" fill="none" stroke="#e9f6fc" stroke-opacity=".23" stroke-width="3" stroke-linecap="round"/>
+    <path d="M367 287V504Q367 542 347 552" fill="none" stroke="#618ba9" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Lid layer: a substantial rounded cap, inspired by the vanilla tank's volume. -->
+  <g id="gestator-top">
+    <path d="M126 156V181C126 246 184 296 256 296C328 296 386 246 386 181V156Z" fill="#8fa8bb"/>
+    <path d="M139 205C171 271 339 271 373 205V225C337 286 176 286 139 225Z" fill="#c5e5f5"/>
+    <ellipse cx="256" cy="156" rx="130" ry="114" fill="url(#lid-metal)"/>
+    <path d="M144 132C158 88 195 59 242 53" fill="none" stroke="#f3f7fa" stroke-width="3" stroke-linecap="round"/>
+    <path d="M183 238C225 264 289 264 331 238" fill="none" stroke="#90a9bb" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Original service boss instead of the vanilla ring of bolts. -->
+    <path d="M213 132V146C213 167 232 183 256 183C280 183 299 167 299 146V132Z" fill="#9eb4c4"/>
+    <ellipse cx="256" cy="132" rx="43" ry="35" fill="#dce7ee"/>
+    <ellipse cx="256" cy="129" rx="34" ry="25" fill="#c6d6e1"/>
+    <path d="M239 120H272M239 129H272" stroke="#95adbf" stroke-width="3" stroke-linecap="round"/>
+    <path d="M242 142H270" stroke="#c5e5f5" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Controls and a short access step sit on the south side of the platform. -->
+  <g id="front-service">
+    <path d="M200 647H356V710H200Z" fill="#90a6b6"/>
+    <path d="M206 642H350V655H206ZM206 664H350V677H206ZM206 686H350V699H206Z" fill="#dce5eb"/>
+    <path d="M211 645H345M211 667H345M211 689H345" stroke="#f2f6f9" stroke-width="2"/>
+    <path d="M206 657H350M206 679H350M206 701H350" stroke="#738ea2" stroke-width="3"/>
+
+    <rect x="51" y="651" width="136" height="63" rx="8" fill="#8fa8ba"/>
+    <rect x="51" y="639" width="136" height="61" rx="8" fill="#dce6ed"/>
+    <rect x="62" y="650" width="114" height="32" rx="4" fill="#a7bdcd"/>
+    <rect x="66" y="654" width="106" height="24" rx="3" fill="#344d62"/>
+    <path d="M75 665H98M108 665H125" stroke="#c5e5f5" stroke-width="3"/>
+    <path d="M143 665H161" stroke="#93b3c9" stroke-width="2"/>
+    <path d="M69 689H113" stroke="#9bb2c3" stroke-width="3" stroke-linecap="round"/>
+    <rect x="146" y="686" width="20" height="7" rx="2" fill="#c5e5f5"/>
+
+    <rect x="385" y="643" width="64" height="57" rx="6" fill="#b8cbd8"/>
+    <rect x="390" y="647" width="54" height="45" rx="4" fill="#dce6ed"/>
+    <path d="M401 656V680M412 656V680M423 656V680M434 656V680" stroke="#8aa4b7" stroke-width="3"/>
+    <rect x="225" y="722" width="92" height="7" rx="3.5" fill="#344d62"/>
+    <path d="M238 725H264M286 725H305" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Uniform black exterior contour follows the raised cap and the platform. -->
+  <path d="M56 218H148C134 200 126 178 126 156C126 93 184 42 256 42C328 42 386 93 386 156C386 178 378 200 364 218H456Q484 218 484 246V712Q484 740 456 740H56Q28 740 28 712V246Q28 218 56 218Z" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -10,12 +10,20 @@ namespace MagicStorage
     {
         private readonly SlotGroup slotGroup;
         private List<IntVec3> cells;
-        private StorageSettings disabledSettings;
+        private readonly StorageSettings disabledSettings;
         private StorageSettings observedSettings;
         private StoragePriority observedPriority;
         private StorageRefreshTimer refreshTimer;
 
-        public Building_StorageReceiver() { slotGroup = new SlotGroup(this); }
+        public Building_StorageReceiver()
+        {
+            slotGroup = new SlotGroup(this);
+            // Priority changes sort the map's haul destinations. Initialize before
+            // spawning so a settings lookup during sorting cannot reenter it.
+            disabledSettings = new StorageSettings(this);
+            disabledSettings.filter.SetDisallowAll();
+            disabledSettings.Priority = StoragePriority.Unstored;
+        }
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
         public bool CanWork => Spawned && Faction == Faction.OfPlayer && Network?.CanWork == true;
         public bool HaulDestinationEnabled => CanWork;
@@ -29,17 +37,7 @@ namespace MagicStorage
         public IEnumerable<IntVec3> AllSlotCells() => AllSlotCellsList();
         public List<IntVec3> AllSlotCellsList() => cells ?? (cells = new List<IntVec3> { Position });
 
-        public StorageSettings GetStoreSettings()
-        {
-            if (CanWork) return Network.Core.Settings;
-            if (disabledSettings == null)
-            {
-                disabledSettings = new StorageSettings(this);
-                disabledSettings.filter.SetDisallowAll();
-                disabledSettings.Priority = StoragePriority.Unstored;
-            }
-            return disabledSettings;
-        }
+        public StorageSettings GetStoreSettings() => CanWork ? Network.Core.Settings : disabledSettings;
 
         public StorageSettings GetParentStoreSettings() => StorageSettings.EverStorableFixedSettings();
         public void Notify_SettingsChanged()

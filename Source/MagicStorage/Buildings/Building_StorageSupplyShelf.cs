@@ -232,6 +232,16 @@ namespace MagicStorage
                 };
                 if (copiedPreset == null) paste.Disable("MS_Shelf_NeedCopiedPreset".Translate());
                 yield return paste;
+                if (Spawned && Find.Selector.NumSelected == 1)
+                {
+                    foreach (Thing item in slotGroup.HeldThings)
+                    {
+                        Gizmo select = ContainingSelectionUtility.CreateSelectStorageGizmo(
+                            "CommandSelectStoredThing".Translate(item), "CommandSelectStoredThingDesc".Translate(),
+                            item, item, groupable: false);
+                        if (select != null) yield return select;
+                    }
+                }
             }
         }
         public override string GetInspectString() =>

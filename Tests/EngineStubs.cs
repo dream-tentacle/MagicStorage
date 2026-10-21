@@ -12,7 +12,7 @@ namespace Verse
     public enum LoadSaveMode { Inactive, PostLoadInit }
     public static class Scribe { public static LoadSaveMode mode; }
     public static class Scribe_Deep { public static void Look<T>(ref T value, string key, params object[] args) { } }
-    public static class Scribe_Collections { public static void Look<T>(ref List<T> value, string key, LookMode mode, params object[] args) { } }
+    public static partial class Scribe_Collections { public static void Look<T>(ref List<T> value, string key, LookMode mode, params object[] args) { } }
     public static class Translation
     {
         public static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
@@ -79,6 +79,9 @@ namespace Verse
         }
         public Thing SplitOff(int count)
         {
+#if MONOLYN_COMPATIBILITY_TESTS
+            BeforeMonolynTestSplit?.Invoke(this);
+#endif
             if (count >= stackCount) { holdingOwner?.Remove(this); if (Spawned) DeSpawn(); return this; }
             stackCount -= count;
             return new Thing { def = def, stackCount = count, variant = variant,

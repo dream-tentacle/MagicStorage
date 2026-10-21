@@ -53,7 +53,12 @@ namespace Verse
     }
     public class RecipeWorker
     { public virtual float GetIngredientCount(IngredientCount ingredient, RimWorld.Bill bill) => ingredient.GetBaseCount(); }
-    public class ThingDefCountClass { public ThingDef thingDef; public int count; }
+    public class ThingDefCountClass
+    {
+        public ThingDef thingDef; public int count;
+        public ThingDefCountClass() { }
+        public ThingDefCountClass(ThingDef def, int count) { thingDef = def; this.count = count; }
+    }
     public enum ThingRequestGroup { MinifiedThing, Blueprint, BuildingFrame, Refuelable }
     public partial struct IntVec3 { public bool Standable(Map map) => true; public bool Fogged(Map map) => map.Fog.Contains(this); }
     public enum Danger { Some }
@@ -207,11 +212,12 @@ namespace MagicStorage
     {
         internal float Required = 10000, Speed = 1;
         internal int MakeCalls, ConsumeCalls, NotifyCalls;
-        internal bool ThrowGeneration;
+        internal bool ThrowGeneration, ThrowPreparation;
         internal ThingDef Product = new ThingDef();
         internal int ProductCount = 4;
         public Thing SelectDominant(RecipeDef recipe, List<Thing> input) => input.FirstOrDefault();
-        public float WorkRequired(RecipeDef recipe, Thing dominant) => Required;
+        public float WorkRequired(RecipeDef recipe, Thing dominant)
+        { if (ThrowPreparation) throw new Exception("controlled preparation failure"); return Required; }
         public float WorkSpeed(RecipeDef recipe, Pawn pawn, Building_CosmicWorkbench bench) => Speed;
         public void Learn(RecipeDef recipe, Pawn worker, int ticks) { worker.CraftingXp += ticks * 0.1f; }
         public IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> input, Thing dominant)

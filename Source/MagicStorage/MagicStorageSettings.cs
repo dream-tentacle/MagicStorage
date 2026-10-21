@@ -31,6 +31,9 @@ namespace MagicStorage
         public const int MinRefreshSeconds = 1;
         public const int MaxRefreshSeconds = 60;
         public bool SimplifiedMode = true;
+        public bool WorkbenchUnlockMode;
+        public bool CaravanItemFilters;
+        public bool TradeItemFilters;
         private int overallRefreshSeconds = DefaultRefreshSeconds;
         private List<int> refreshSeconds = CreateRefreshDefaults();
         public const int DefaultCraftingMaterialRecheckSeconds = 30;
@@ -64,6 +67,9 @@ namespace MagicStorage
         {
             StorageUnitSlots = DefaultUnitSlots;
             CosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
+            WorkbenchUnlockMode = false;
+            CaravanItemFilters = false;
+            TradeItemFilters = false;
             SimplifiedMode = true;
             OverallRefreshSeconds = DefaultRefreshSeconds;
             refreshSeconds = CreateRefreshDefaults();
@@ -90,6 +96,9 @@ namespace MagicStorage
             Scribe_Values.Look(ref cosmicWorkbenchWorkSpeedPercent, "cosmicWorkbenchWorkSpeedPercent", DefaultCosmicWorkbenchWorkSpeedPercent);
             CosmicWorkbenchWorkSpeedPercent = cosmicWorkbenchWorkSpeedPercent;
             Scribe_Values.Look(ref SimplifiedMode, "simplifiedMode", true);
+            Scribe_Values.Look(ref WorkbenchUnlockMode, "workbenchUnlockMode", false);
+            Scribe_Values.Look(ref CaravanItemFilters, "caravanItemFilters", false);
+            Scribe_Values.Look(ref TradeItemFilters, "tradeItemFilters", false);
             Scribe_Values.Look(ref overallRefreshSeconds, "overallRefreshSeconds", DefaultRefreshSeconds);
             Scribe_Values.Look(ref craftingMaterialRecheckSeconds, "craftingMaterialRecheckSeconds", DefaultCraftingMaterialRecheckSeconds);
             CraftingMaterialRecheckSeconds = craftingMaterialRecheckSeconds;

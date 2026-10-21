@@ -69,6 +69,38 @@ namespace MagicStorage
             if (batch != null) releaseMap.GetComponent<MapComponent_StorageNetworks>().ReleaseRecovery(batch);
         }
 
+        public override IEnumerable<Gizmo> GetGizmos()
+        {
+            foreach (Gizmo gizmo in base.GetGizmos()) yield return gizmo;
+            if (!Spawned || Faction != Faction.OfPlayer) yield break;
+            Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            var transfer = new Command_Action
+            {
+                defaultLabel = "MS_UnitTransfer_Label".Translate(),
+                defaultDesc = "MS_UnitTransfer_Desc".Translate(),
+                icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/TransferInventory"),
+                alsoClickIfOtherInGroupClicked = false,
+                action = TransferInventory
+            };
+            if (Network?.CanWork != true) transfer.Disable(StorageNetwork.StatusLabel(Network));
+            else if (Inventory.UsedSlots == 0) transfer.Disable("MS_UnitTransfer_Empty".Translate());
+            yield return transfer;
+        }
+
+        private void TransferInventory()
+        {
+            if (!Spawned || Faction != Faction.OfPlayer) return;
+            Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            if (Network?.CanWork != true)
+            {
+                Messages.Message(StorageNetwork.StatusLabel(Network), MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+            long transferred = Network.TransferInventory(this);
+            Messages.Message("MS_UnitTransfer_Result".Translate(transferred, Inventory.TotalCount),
+                this, MessageTypeDefOf.NeutralEvent, false);
+        }
+
         public override string GetInspectString()
         {
             return (base.GetInspectString() + "\n" + "MS_UnitCapacity".Translate(Inventory.UsedSlots, SlotCapacity)).Trim();

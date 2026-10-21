@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Craft_WorkbenchLockedHint>尚未解锁。点击消耗建造材料解锁此工作台。</MS_Craft_WorkbenchLockedHint>
+  <MS_Craft_UnlockWorkbench>解锁工作台</MS_Craft_UnlockWorkbench>
+  <MS_Craft_UnlockWorkbenchQuestion>是否消耗以下材料解锁{0}？材料从当前存储网络及相连的自动补货架中取用。</MS_Craft_UnlockWorkbenchQuestion>
+  <MS_Craft_UnlockStuff>建造材质：{0}</MS_Craft_UnlockStuff>
+  <MS_Craft_UnlockMaterials>解锁材料（可用 / 需要）</MS_Craft_UnlockMaterials>
+  <MS_Craft_NoLegalStuff>没有可用的合法建造材质。</MS_Craft_NoLegalStuff>
+  <MS_Craft_UnlockMissingMaterials>可用材料不足，或当前存储网络不可用。</MS_Craft_UnlockMissingMaterials>
+  <MS_Craft_UnlockSharedHint>解锁后，当前存档中的所有存储网络均可使用此工作台的配方。</MS_Craft_UnlockSharedHint>
+  <MS_Craft_UnlockFailed>解锁未完成，材料或网络状态已发生变化。请检查后重试。</MS_Craft_UnlockFailed>
   <MS_Craft_ProductionNotice>中断后可继续制作。产物默认优先存入网络，存不下则放在核心周围；也可设置为放在地面。</MS_Craft_ProductionNotice>
   <MS_Craft_DropProductsOnFloor>制作后放到地面</MS_Craft_DropProductsOnFloor>
   <MS_Craft_StoreProductsInNetwork>产物存入网络</MS_Craft_StoreProductsInNetwork>
@@ -15,8 +24,8 @@
   <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
   <MS_Craft_Orders>已添加的制作任务</MS_Craft_Orders>
-  <MS_Craft_DragToSort>拖拽以排序</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
+  <MS_Craft_DragToSort>右键拖拽以排序</MS_Craft_DragToSort>
+  <MS_Craft_DragOrder>按住右键拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
   <MS_Craft_Details>详细</MS_Craft_Details>
   <MS_Craft_Workbenches>工作台</MS_Craft_Workbenches>
   <MS_Craft_CompactModeOff>开启工作台列表的紧凑模式。</MS_Craft_CompactModeOff>

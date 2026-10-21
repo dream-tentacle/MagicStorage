@@ -2,8 +2,37 @@
 using System.Collections.Generic;
 using MagicStorage;
 using Verse;
+namespace UnityEngine
+{
+    public sealed class Material { }
+    public static class Time { public static float realtimeSinceStartup; }
+}
 namespace Verse
 {
+    public struct GizmoRenderParms { }
+    public partial class Command_Action
+    {
+        public float iconAngle;
+        public virtual void DrawIcon(UnityEngine.Rect rect, UnityEngine.Material material, GizmoRenderParms parms) { }
+    }
+    public sealed class Command_Toggle : Gizmo
+    {
+        public string defaultLabel, defaultDesc;
+        public object icon;
+        public System.Func<bool> isActive;
+        public System.Action toggleAction;
+    }
+    public sealed class FloatMenuOption
+    {
+        public string Label;
+        public System.Action action;
+        public FloatMenuOption(string label, System.Action action) { Label = label; this.action = action; }
+    }
+    public sealed class FloatMenu
+    {
+        public readonly List<FloatMenuOption> options;
+        public FloatMenu(List<FloatMenuOption> options) { this.options = options; }
+    }
     public static class Gen
     {
         public static bool IsHashIntervalTick(this Thing thing, int interval) =>
@@ -54,15 +83,22 @@ namespace RimWorld
         public int GetFuelCountToFullyRefuel() => (int)System.Math.Ceiling(
             (Props.atomicFueling ? Props.fuelCapacity : System.Math.Max(0, TargetFuelLevel - Fuel)) / Props.FuelMultiplierCurrentDifficulty);
         public int RefuelCalls;
+        public System.Action BeforeRefuel, AfterRefuel;
+        public void Refuel(float amount)
+        {
+            BeforeRefuel?.Invoke();
+            RefuelCalls++;
+            Fuel = System.Math.Min(Props.fuelCapacity, Fuel + amount * Props.FuelMultiplierCurrentDifficulty);
+            AfterRefuel?.Invoke();
+        }
         public void Refuel(List<Thing> things)
         {
-            RefuelCalls++;
             int remaining = GetFuelCountToFullyRefuel();
             while (remaining > 0 && things.Count > 0)
             {
                 Thing item = things[things.Count - 1]; things.RemoveAt(things.Count - 1);
                 int count = System.Math.Min(remaining, item.stackCount);
-                Fuel = System.Math.Min(Props.fuelCapacity, Fuel + count * Props.FuelMultiplierCurrentDifficulty);
+                Refuel(count);
                 item.SplitOff(count).Destroy(); remaining -= count;
             }
         }
@@ -72,13 +108,40 @@ namespace RimWorld
     public sealed class CompTransporter : ThingComp, IThingHolder
     {
         public new Thing parent;
+        public int groupID = -1;
+        public bool Groupable = true;
+        public CompLaunchable Launchable;
+        public object Shuttle;
+        public List<TransferableOneWay> leftToLoad;
         public float MassCapacity = 150;
         public ThingOwner innerContainer;
         public float MassUsage => (float)StorageTransportExchange.ContainerMass(innerContainer);
+        public bool OverMassCapacity => MassUsage > MassCapacity;
         public CompTransporter() { innerContainer = new ThingOwner(this); }
         public IThingHolder ParentHolder => parent as IThingHolder;
         public ThingOwner GetDirectlyHeldThings() => innerContainer;
         public void GetChildHolders(List<IThingHolder> children) { }
+    }
+    public class CompLaunchable { }
+    public sealed class CompLaunchable_TransportPod : CompLaunchable { }
+    public static class TransporterUtility
+    {
+        private static int nextGroup;
+        public static int InitiateLoading(IEnumerable<CompTransporter> transporters)
+        {
+            int id = nextGroup++;
+            foreach (var transporter in transporters) transporter.groupID = id;
+            return id;
+        }
+        public static void GetTransportersInGroup(int id, Map map, List<CompTransporter> results)
+        {
+            results.Clear();
+            foreach (var thing in map.Ground)
+            {
+                var transporter = thing.TryGetComp<CompTransporter>();
+                if (thing.Spawned && transporter != null && transporter.groupID == id) results.Add(transporter);
+            }
+        }
     }
 }
 namespace MagicStorage

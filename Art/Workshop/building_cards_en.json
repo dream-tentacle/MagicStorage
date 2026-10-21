@@ -1,0 +1,114 @@
+[
+  {
+    "defName": "MS_StorageCore",
+    "name": "Storage Control Core",
+    "body": "Manage your storage network here. View stock, withdraw items, and assign production to all connected cosmic workbenches.",
+    "effects": [
+      "Set the storage filter for the entire network.",
+      "Withdraw items manually.",
+      "Use the added Magic Storage options to trade with traders or trade ships.",
+      "Only one control core is allowed per network."
+    ]
+  },
+  {
+    "defName": "MS_StorageUnit",
+    "name": "Storage Unit",
+    "body": "Provides storage capacity for the network.",
+    "effects": [
+      "Each unit provides 64 stack slots by default, using normal item stack limits.",
+      "Adjust slots from 1 to 10,000 in the mod settings.",
+      "Stored items do not rot or tick."
+    ]
+  },
+  {
+    "defName": "MS_StorageReceiver",
+    "name": "Storage Receiver",
+    "body": "The network's intake point. Colonists must haul items here to put them into storage.",
+    "effects": [
+      "The control core sets the filter for incoming items.",
+      "Leave space between it and the core to avoid absorbing manually withdrawn items again."
+    ]
+  },
+  {
+    "defName": "MS_CosmicWorkbench",
+    "name": "Cosmic Workbench",
+    "body": "Combines multiple crafting jobs at one bench. Materials come directly from the network, so workers do not need to fetch them.",
+    "effects": [
+      "Supports all crafting recipes, including modded recipes.",
+      "Products go into the network by default, or can be set to drop on the ground."
+    ]
+  },
+  {
+    "defName": "MS_StorageSupplyShelf",
+    "name": "Auto-Restocking Shelf",
+    "body": "Keeps small amounts available for frequent use by colonists or detection by other mods.",
+    "effects": [
+      "Choose up to three item types, one stack each, with separate restock limits.",
+      "Recommended for everyday supplies such as food and medicine."
+    ]
+  },
+  {
+    "defName": "MS_ConstructionSupplyUnit",
+    "name": "Construction Supply Unit",
+    "body": "Delivers building materials directly to construction blueprints.",
+    "effects": [
+      "Automatically supplies construction sites within 40 cells.",
+      "Colonists still do the construction work."
+    ]
+  },
+  {
+    "defName": "MS_StorageApparelAdapter",
+    "name": "Apparel Adapter",
+    "body": "Colonists choose suitable apparel from storage and come here to collect it, following their apparel policies.",
+    "effects": [
+      "Follows vanilla apparel settings.",
+      "Serves one colonist at a time."
+    ]
+  },
+  {
+    "defName": "MS_TransportSupplier",
+    "name": "Material Supplier",
+    "body": "A directional terminal that feeds network stock into the transporter or fuel device directly ahead.",
+    "effects": [
+      "Use this building to load shuttles and transport pods.",
+      "Continuous mode sends up to three item types in priority order, with no internal storage.",
+      "Transport loading takes priority when a target also uses fuel."
+    ]
+  },
+  {
+    "defName": "MS_FuelSupplier",
+    "name": "Fuel Supplier",
+    "body": "Automatically supplies fuel to nearby buildings.",
+    "effects": [
+      "Automatically supplies fuel within 20 cells."
+    ]
+  },
+  {
+    "defName": "MS_CaravanTeleporter",
+    "name": "Caravan Teleporter",
+    "body": "Send a prepared caravan on its way immediately.",
+    "effects": [
+      "Choose people, animals, items, and travel supplies in the caravan formation menu.",
+      "On confirmation, supplies enter the members' inventories and the caravan appears on the world map."
+    ]
+  },
+  {
+    "defName": "MS_NivarianCannonExtractor",
+    "name": "Nivarian Mass Driver Extractor",
+    "body": "Nivarian integration. Connects Magic Storage to the Nivarian mass driver logistics network.",
+    "effects": [
+      "Delivers items requested by logistics orders directly to the adjacent mass driver.",
+      "Requires power, an active storage network, and an adjacent mass driver. Diagonal placement is allowed."
+    ]
+  },
+  {
+    "defName": "MS_CosmicMechGestator",
+    "name": "Cosmic Mech Gestator",
+    "body": "Gestates mechs using materials directly from the storage network, with no hauling. Each gestator has its own bills.",
+    "effects": [
+      "Requires no electricity. Pauses when the storage network is unavailable.",
+      "Supports standard mech gestation recipes, with the relevant research completed.",
+      "Mechanitor work, bandwidth, gestation cycles, and toxic waste follow normal rules."
+    ]
+  }
+]

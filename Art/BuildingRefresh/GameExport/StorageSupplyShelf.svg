@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288"><g transform="matrix(0.464304325169 0 0 0.481188118812 25.138092756644 17.928712871287)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff" /><path d="M38 42H474L484 52V476L478 482H432V446H80V482H34L28 476V52Z" fill="#000000" stroke="none" /></mask></defs>
+<title>自动补货架 · 优化样稿</title>
+<desc>Two empty open shelves; fewer trim lines; original frame and fixed orientation retained. Review draft only; not installed.</desc>
+<path d="M38 42H474L484 52V476L478 482H432V446H80V482H34L28 476V52Z" fill="#637782" />
+<rect x="76" y="117" width="360" height="319" rx="0" fill="#304553" />
+<path d="M38 42L474 42L484 52L484 122L474 132L38 132L28 122L28 52Z" fill="#d8dfe3" />
+<path d="M38 42H474L484 52H38V117H28V52Z" fill="#e6e9e8" />
+<rect x="77" y="75" width="83" height="13" rx="1" fill="#c5e5f5" />
+<rect x="361" y="76" width="68" height="11" rx="1" fill="#637782" />
+<rect x="78" y="173" width="356" height="99" rx="0" fill="#8498a4" />
+<rect x="78" y="173" width="356" height="24" rx="0" fill="#637782" />
+<rect x="78" y="250" width="356" height="22" rx="0" fill="#d8dfe3" />
+<rect x="78" y="250" width="356" height="7" rx="0" fill="#e6e9e8" />
+<rect x="78" y="267" width="356" height="5" rx="0" fill="#93a3ad" />
+<rect x="78" y="311" width="356" height="111" rx="0" fill="#8498a4" />
+<rect x="78" y="311" width="356" height="24" rx="0" fill="#637782" />
+<rect x="78" y="400" width="356" height="22" rx="0" fill="#d8dfe3" />
+<rect x="78" y="400" width="356" height="7" rx="0" fill="#e6e9e8" />
+<rect x="78" y="417" width="356" height="5" rx="0" fill="#93a3ad" />
+<path d="M28 117H78V453H80V482H34L28 476Z" fill="#d8dfe3" />
+<path d="M434 117H484V476L478 482H432V453H434Z" fill="#acb8bf" />
+<rect x="434" y="117" width="32" height="336" rx="0" fill="#d8dfe3" />
+<rect x="36" y="132" width="9" height="310" rx="0" fill="#e6e9e8" />
+<rect x="51" y="347" width="12" height="58" rx="1" fill="#c5e5f5" />
+<rect x="446" y="347" width="12" height="58" rx="1" fill="#c5e5f5" />
+<path d="M28 453H80V482H34L28 476ZM432 453H484V476L478 482H432Z" fill="#637782" />
+<g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M38 42H474L484 52V476L478 482H432V446H80V482H34L28 476V52Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g>
+</g></svg>

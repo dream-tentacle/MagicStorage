@@ -1,0 +1,380 @@
+[
+  {
+    "name": "StorageUnit_south",
+    "title": "存储单元",
+    "source": "Art/StorageUnit/StorageUnit_south-v2.svg",
+    "svg": "StorageUnit_south.svg",
+    "png": "StorageUnit_south.png",
+    "footprint": [
+      1,
+      2
+    ],
+    "note": "Two removable lids; original chassis bounds retained; flat metal planes and stronger cartridge gaps.",
+    "outline_width": 10.666666667,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 248,
+    "outline_mode": "outside",
+    "transparent_padding": 0,
+    "family": "StorageUnit",
+    "direction": "south",
+    "approved_view": true,
+    "approved_source_svg": "StorageUnit_south-refresh-v1.svg",
+    "approved_source_png": "StorageUnit_south-refresh-v1.png"
+  },
+  {
+    "name": "StorageUnit_north",
+    "family": "StorageUnit",
+    "direction": "north",
+    "title": "存储单元",
+    "svg": "StorageUnit_north.svg",
+    "png": "StorageUnit_north.png",
+    "footprint": [
+      1,
+      2
+    ],
+    "approved_view": false,
+    "outline_width": 10.666666667,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 248,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageUnit_east",
+    "family": "StorageUnit",
+    "direction": "east",
+    "title": "存储单元",
+    "svg": "StorageUnit_east.svg",
+    "png": "StorageUnit_east.png",
+    "footprint": [
+      2,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 10.721649485,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 520,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageUnit_west",
+    "family": "StorageUnit",
+    "direction": "west",
+    "title": "存储单元",
+    "svg": "StorageUnit_west.svg",
+    "png": "StorageUnit_west.png",
+    "footprint": [
+      2,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 10.721649485,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 520,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicWorkbench_south",
+    "family": "CosmicWorkbench",
+    "direction": "south",
+    "title": "宇宙工作台",
+    "svg": "CosmicWorkbench_south.svg",
+    "png": "CosmicWorkbench_south.png",
+    "footprint": [
+      3,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640.0,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "title": "宇宙工作台",
+    "svg": "CosmicWorkbench_north.svg",
+    "png": "CosmicWorkbench_north.png",
+    "footprint": [
+      3,
+      1
+    ],
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640,
+    "outline_mode": "outside",
+    "transparent_padding": 0,
+    "family": "CosmicWorkbench",
+    "direction": "north",
+    "approved_view": true,
+    "approved_source_svg": "CosmicWorkbench_north-refresh-v1.svg",
+    "approved_source_png": "CosmicWorkbench_north-refresh-v1.png"
+  },
+  {
+    "name": "CosmicWorkbench_east",
+    "family": "CosmicWorkbench",
+    "direction": "east",
+    "title": "宇宙工作台",
+    "svg": "CosmicWorkbench_east.svg",
+    "png": "CosmicWorkbench_east.png",
+    "footprint": [
+      1,
+      3
+    ],
+    "approved_view": false,
+    "outline_width": 9.17562724,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 213.33333333333331,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicWorkbench_west",
+    "family": "CosmicWorkbench",
+    "direction": "west",
+    "title": "宇宙工作台",
+    "svg": "CosmicWorkbench_west.svg",
+    "png": "CosmicWorkbench_west.png",
+    "footprint": [
+      1,
+      3
+    ],
+    "approved_view": false,
+    "outline_width": 9.17562724,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 213.33333333333334,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "title": "衣物适配器",
+    "source": "Art/RemainingBuildings/StorageApparelAdapter_south-v2.svg",
+    "svg": "StorageApparelAdapter_south.svg",
+    "png": "StorageApparelAdapter_south.png",
+    "footprint": [
+      2,
+      1
+    ],
+    "note": "Open garment bay and one plain service compartment; larger value groups, fewer interface frames.",
+    "outline_width": 20.041237113,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 972,
+    "outline_mode": "outside",
+    "transparent_padding": 0,
+    "family": "StorageApparelAdapter",
+    "direction": "south",
+    "approved_view": true,
+    "approved_source_svg": "StorageApparelAdapter_south-refresh-v1.svg",
+    "approved_source_png": "StorageApparelAdapter_south-refresh-v1.png"
+  },
+  {
+    "name": "StorageApparelAdapter_north",
+    "family": "StorageApparelAdapter",
+    "direction": "north",
+    "title": "衣物适配器",
+    "svg": "StorageApparelAdapter_north.svg",
+    "png": "StorageApparelAdapter_north.png",
+    "footprint": [
+      2,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 20.041237113,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 972,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageApparelAdapter_east",
+    "family": "StorageApparelAdapter",
+    "direction": "east",
+    "title": "衣物适配器",
+    "svg": "StorageApparelAdapter_east.svg",
+    "png": "StorageApparelAdapter_east.png",
+    "footprint": [
+      1,
+      2
+    ],
+    "approved_view": false,
+    "outline_width": 19.784946237,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 460,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageApparelAdapter_west",
+    "family": "StorageApparelAdapter",
+    "direction": "west",
+    "title": "衣物适配器",
+    "svg": "StorageApparelAdapter_west.svg",
+    "png": "StorageApparelAdapter_west.png",
+    "footprint": [
+      1,
+      2
+    ],
+    "approved_view": false,
+    "outline_width": 19.784946237,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 460,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "TransportSupplier_south",
+    "title": "物资补给器",
+    "source": "Art/StorageEndpoints/TransportSupplier_south-v4.svg",
+    "svg": "TransportSupplier_south.svg",
+    "png": "TransportSupplier_south.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Low output deck and physical discharge lip; dark-blue directional arrow retained.",
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0,
+    "family": "TransportSupplier",
+    "direction": "south",
+    "approved_view": true,
+    "approved_source_svg": "TransportSupplier_south-refresh-v1.svg",
+    "approved_source_png": "TransportSupplier_south-refresh-v1.png"
+  },
+  {
+    "name": "TransportSupplier_north",
+    "family": "TransportSupplier",
+    "direction": "north",
+    "title": "物资补给器",
+    "svg": "TransportSupplier_north.svg",
+    "png": "TransportSupplier_north.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "TransportSupplier_east",
+    "family": "TransportSupplier",
+    "direction": "east",
+    "title": "物资补给器",
+    "svg": "TransportSupplier_east.svg",
+    "png": "TransportSupplier_east.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "TransportSupplier_west",
+    "family": "TransportSupplier",
+    "direction": "west",
+    "title": "物资补给器",
+    "svg": "TransportSupplier_west.svg",
+    "png": "TransportSupplier_west.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "approved_view": false,
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "title": "宇宙培育器",
+    "source": "Art/CosmicMechGestator/CosmicMechGestator_south-v6.svg",
+    "svg": "CosmicMechGestator_south.svg",
+    "png": "CosmicMechGestator_south.png",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "Exact original platform, cylinder and seat coordinates; simplified materials only.",
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640,
+    "outline_mode": "outside",
+    "transparent_padding": 0,
+    "family": "CosmicMechGestator",
+    "direction": "south",
+    "approved_view": true,
+    "approved_source_svg": "CosmicMechGestator_south-refresh-v1.svg",
+    "approved_source_png": "CosmicMechGestator_south-refresh-v1.png"
+  },
+  {
+    "name": "CosmicMechGestator_north",
+    "family": "CosmicMechGestator",
+    "direction": "north",
+    "title": "宇宙培育器",
+    "svg": "CosmicMechGestator_north.svg",
+    "png": "CosmicMechGestator_north.png",
+    "footprint": [
+      3,
+      2
+    ],
+    "approved_view": false,
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicMechGestator_east",
+    "family": "CosmicMechGestator",
+    "direction": "east",
+    "title": "宇宙培育器",
+    "svg": "CosmicMechGestator_east.svg",
+    "png": "CosmicMechGestator_east.png",
+    "footprint": [
+      2,
+      3
+    ],
+    "approved_view": false,
+    "outline_width": 8.797249485,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 426.6666,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicMechGestator_west",
+    "family": "CosmicMechGestator",
+    "direction": "west",
+    "title": "宇宙培育器",
+    "svg": "CosmicMechGestator_west.svg",
+    "png": "CosmicMechGestator_west.png",
+    "footprint": [
+      2,
+      3
+    ],
+    "approved_view": false,
+    "outline_width": 8.797249485,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 426.6666,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  }
+]

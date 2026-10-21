@@ -6,7 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath>bin\Caravan\</OutputPath>
     <AssemblyName>StorageCaravanIntegrationTests</AssemblyName>
-    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;CARAVAN_FILTER_INTEGRATION_STUBS</DefineConstants>
     <StartupObject>StorageCaravanIntegrationTests</StartupObject>
     <IntermediateOutputPath>obj\Caravan\</IntermediateOutputPath>
   </PropertyGroup>
@@ -25,6 +25,7 @@
     <Compile Include="StorageIndexTests.cs" />
     <Compile Include="MonolynCompatibilityStubs.cs" />
     <Compile Include="MonolynCompatibilityTests.cs" />
+    <Compile Include="StorageMaterialTransactionTests.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\MonolynCompatibility.cs" />
     <Compile Include="ModSettingsStubs.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />
     <Compile Include="CosmicCraftingTests.cs" />
     <Compile Include="StorageReservationTests.cs" />
+    <Compile Include="StorageUnitTransferTests.cs" />
     <Compile Include="StorageTradeTests.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeTransaction.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingOrder.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageFuelSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_TransportSupplier.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransportExchange.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageTransportGroups.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransportPreview.cs" />
     <Compile Include="StorageWithdrawalTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageWithdrawal.cs" />
@@ -101,12 +104,14 @@
     <Compile Include="..\Source\MagicStorage\Networks\MapComponent_StorageNetworks.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageInventory.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialTransaction.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageIncomingReservations.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageOutgoingReservations.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReservation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaravanStubs.cs" />
+    <Compile Include="ItemFilterIntegrationStubs.cs" />
     <Compile Include="StorageCaravanIntegrationTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_CaravanTeleporter.cs" />
     <Compile Include="..\Source\MagicStorage\UI\Dialog_StorageCaravan.cs" />

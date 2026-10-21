@@ -25,14 +25,15 @@ namespace MagicStorage
             if (___map == null) return;
             var manager = ___map.GetComponent<MapComponent_StorageNetworks>();
             if (manager == null) return;
+            manager.EnsureCurrent();
             var counts = __instance.AllCountedAmounts;
             List<Thing> stacks = null;
-            // Ownership and physical inventory determine counts, not network availability
-            // or reservations. Spawned output shelves are already counted by vanilla.
+            // Only working networks expose their stored resources. Reservations do not
+            // subtract owned stock; spawned output shelves are counted by vanilla.
             foreach (Building_StorageUnit unit in manager.StorageUnits)
             {
                 if (!unit.Spawned || unit.Destroyed || unit.Map != ___map || unit.Faction != Faction.OfPlayer ||
-                    unit.Position.Fogged(___map)) continue;
+                    unit.Position.Fogged(___map) || unit.Network?.CanWork != true) continue;
                 foreach (ThingDef def in unit.Inventory.IndexedDefs)
                 {
                     bool minified = def.thingClass != null && typeof(MinifiedThing).IsAssignableFrom(def.thingClass);

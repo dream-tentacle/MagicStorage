@@ -1,0 +1,29 @@
+{
+  "source": "CaravanTeleporter-v1.svg",
+  "source_png": [
+    512,
+    512
+  ],
+  "game_png": [
+    288,
+    288
+  ],
+  "visible_bounds": [
+    16,
+    16,
+    272,
+    272
+  ],
+  "recommended_draw_size": [
+    1.125,
+    1.125
+  ],
+  "center_offset": [
+    0,
+    0
+  ],
+  "footprint": [
+    1,
+    1
+  ]
+}

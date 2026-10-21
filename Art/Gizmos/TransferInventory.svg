@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>转移库存</title>
+  <desc>两个等大的立方体存储箱，中间以独立的青色单向箭头表示转移。</desc>
+  <g stroke="#E7EEF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m8 53 19-11 19 11-19 11Z"/>
+    <path d="M8 53v22l19 11 19-11V53M27 64v22"/>
+    <g transform="translate(74 0)">
+      <path d="m8 53 19-11 19 11-19 11Z"/>
+      <path d="M8 53v22l19 11 19-11V53M27 64v22"/>
+    </g>
+    <path d="M56 64h16m-7-7 7 7-7 7" stroke="#63D5ED" stroke-width="7"/>
+  </g>
+</svg>

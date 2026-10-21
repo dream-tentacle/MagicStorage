@@ -1,0 +1,23 @@
+{
+  "source": "CosmicWorkbench_north-v8.svg",
+  "view": "north",
+  "footprint": [
+    3,
+    1
+  ],
+  "operator_notch": {
+    "center_x": 384,
+    "mouth_width": 136,
+    "inner_width": 92,
+    "depth": 22
+  },
+  "silhouette": "chamfered worktop with concealed supports and a shallow central recess",
+  "exterior_stroke": {
+    "color": "#000000",
+    "width": 8
+  },
+  "accent": "#C5E5F5",
+  "controls": "mechanical vise and a flat inset display without an upright stand",
+  "review_only": true,
+  "game_files_changed": false
+}

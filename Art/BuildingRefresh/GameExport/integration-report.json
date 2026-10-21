@@ -1,0 +1,649 @@
+{
+  "texture_count": 44,
+  "pixels_per_cell": 256,
+  "outline_pixels": 10.138613861386137,
+  "ordinary": [
+    {
+      "family": "StorageCore",
+      "direction": "single",
+      "target": "Textures/Things/Building/StorageCore/StorageCore.png",
+      "size": [
+        544,
+        544
+      ],
+      "visible_cells": [
+        1.90625,
+        1.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "south",
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_south.png",
+      "size": [
+        288,
+        544
+      ],
+      "visible_cells": [
+        0.90625,
+        1.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "north",
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_north.png",
+      "size": [
+        288,
+        544
+      ],
+      "visible_cells": [
+        0.90625,
+        1.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "east",
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_east.png",
+      "size": [
+        544,
+        288
+      ],
+      "visible_cells": [
+        1.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageUnit",
+      "direction": "west",
+      "target": "Textures/Things/Building/StorageUnit/StorageUnit_west.png",
+      "size": [
+        544,
+        288
+      ],
+      "visible_cells": [
+        1.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageReceiver",
+      "direction": "single",
+      "target": "Textures/Things/Building/StorageReceiver/StorageReceiver.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "south",
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_south.png",
+      "size": [
+        800,
+        288
+      ],
+      "visible_cells": [
+        2.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "north",
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_north.png",
+      "size": [
+        800,
+        288
+      ],
+      "visible_cells": [
+        2.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "east",
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_east.png",
+      "size": [
+        288,
+        800
+      ],
+      "visible_cells": [
+        0.90625,
+        2.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "CosmicWorkbench",
+      "direction": "west",
+      "target": "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_west.png",
+      "size": [
+        288,
+        800
+      ],
+      "visible_cells": [
+        0.90625,
+        2.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "ConstructionSupplyUnit",
+      "direction": "single",
+      "target": "Textures/Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "south",
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_south.png",
+      "size": [
+        544,
+        288
+      ],
+      "visible_cells": [
+        1.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "north",
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_north.png",
+      "size": [
+        544,
+        288
+      ],
+      "visible_cells": [
+        1.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "east",
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_east.png",
+      "size": [
+        288,
+        544
+      ],
+      "visible_cells": [
+        0.90625,
+        1.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageApparelAdapter",
+      "direction": "west",
+      "target": "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_west.png",
+      "size": [
+        288,
+        544
+      ],
+      "visible_cells": [
+        0.90625,
+        1.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "StorageSupplyShelf",
+      "direction": "single",
+      "target": "Textures/Things/Building/StorageSupplyShelf/StorageSupplyShelf.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "south",
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_south.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "north",
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_north.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "east",
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_east.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "TransportSupplier",
+      "direction": "west",
+      "target": "Textures/Things/Building/TransportSupplier/TransportSupplier_west.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "FuelSupplier",
+      "direction": "single",
+      "target": "Textures/Things/Building/FuelSupplier/FuelSupplier.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "NivarianCannonExtractor",
+      "direction": "single",
+      "target": "Textures/Things/Building/NivarianCannonExtractor/NivarianCannonExtractor.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    },
+    {
+      "family": "CaravanTeleporter",
+      "direction": "single",
+      "target": "Textures/Things/Building/CaravanTeleporter/CaravanTeleporter.png",
+      "size": [
+        288,
+        288
+      ],
+      "visible_cells": [
+        0.90625,
+        0.90625
+      ],
+      "inset_cells": 0.046875,
+      "adjacent_gap_cells": 0.09375,
+      "center_world": [
+        0,
+        0
+      ]
+    }
+  ],
+  "gestator": [
+    {
+      "direction": "south",
+      "size": [
+        928,
+        800
+      ],
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "platform_center_svg": [
+        384,
+        275
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        -16.13632814710047
+      ],
+      "platform_plane_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        15.461386138613811
+      ],
+      "visible_cells": [
+        2.78125,
+        2.40625
+      ],
+      "reconstruction_mean_error": 0.07217358117816092
+    },
+    {
+      "direction": "north",
+      "size": [
+        928,
+        800
+      ],
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "platform_center_svg": [
+        384,
+        275
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        -16.13632814710047
+      ],
+      "platform_plane_clearance_pixels": [
+        28.261386138613844,
+        15.461386138613875,
+        28.26138613861383,
+        15.461386138613811
+      ],
+      "visible_cells": [
+        2.78125,
+        2.40625
+      ],
+      "reconstruction_mean_error": 0.0721282327586207
+    },
+    {
+      "direction": "east",
+      "size": [
+        800,
+        928
+      ],
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "platform_center_svg": [
+        384,
+        400
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        -3.336328147100403
+      ],
+      "platform_plane_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        28.26138613861388
+      ],
+      "visible_cells": [
+        1.8828125,
+        2.90625
+      ],
+      "reconstruction_mean_error": 0.03159392959770115
+    },
+    {
+      "direction": "west",
+      "size": [
+        800,
+        928
+      ],
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "platform_center_svg": [
+        384,
+        400
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "visual_scale": 0.9,
+      "floor_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        -3.336328147100403
+      ],
+      "platform_plane_clearance_pixels": [
+        15.461422138613841,
+        28.2613861386139,
+        15.461422138613784,
+        28.26138613861388
+      ],
+      "visible_cells": [
+        1.8828125,
+        2.90625
+      ],
+      "reconstruction_mean_error": 0.03160335847701149
+    }
+  ],
+  "xml_files": [
+    "Defs\\ThingDefs\\StorageBuildings.xml",
+    "Defs\\ThingDefs\\StorageSupplyShelf.xml",
+    "Defs\\ThingDefs\\TransportSupplier.xml",
+    "Defs\\ThingDefs\\FuelSupplier.xml",
+    "Defs\\ThingDefs\\NivarianCannonExtractor.xml",
+    "Defs\\ThingDefs\\CaravanTeleporter.xml",
+    "Defs\\ThingDefs\\CosmicMechGestator.xml"
+  ],
+  "outputs": [
+    "Textures/Things/Building/StorageCore/StorageCore.png",
+    "Textures/Things/Building/StorageUnit/StorageUnit_south.png",
+    "Textures/Things/Building/StorageUnit/StorageUnit_north.png",
+    "Textures/Things/Building/StorageUnit/StorageUnit_east.png",
+    "Textures/Things/Building/StorageUnit/StorageUnit_west.png",
+    "Textures/Things/Building/StorageReceiver/StorageReceiver.png",
+    "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_south.png",
+    "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_north.png",
+    "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_east.png",
+    "Textures/Things/Building/CosmicWorkbench/CosmicWorkbench_west.png",
+    "Textures/Things/Building/ConstructionSupplyUnit/ConstructionSupplyUnit.png",
+    "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_south.png",
+    "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_north.png",
+    "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_east.png",
+    "Textures/Things/Building/StorageApparelAdapter/StorageApparelAdapter_west.png",
+    "Textures/Things/Building/StorageSupplyShelf/StorageSupplyShelf.png",
+    "Textures/Things/Building/TransportSupplier/TransportSupplier_south.png",
+    "Textures/Things/Building/TransportSupplier/TransportSupplier_north.png",
+    "Textures/Things/Building/TransportSupplier/TransportSupplier_east.png",
+    "Textures/Things/Building/TransportSupplier/TransportSupplier_west.png",
+    "Textures/Things/Building/FuelSupplier/FuelSupplier.png",
+    "Textures/Things/Building/NivarianCannonExtractor/NivarianCannonExtractor.png",
+    "Textures/Things/Building/CaravanTeleporter/CaravanTeleporter.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_south.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_south.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_south.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_south.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_south.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_MenuIcon.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_north.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_north.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_north.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_north.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_north.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_east.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_east.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_east.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_east.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_east.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlow_west.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlowSoft_west.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestator_west.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorGlass_west.png",
+    "Textures/Things/Building/CosmicMechGestator/CosmicMechGestatorTop_west.png"
+  ]
+}

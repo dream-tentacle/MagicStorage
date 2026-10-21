@@ -37,13 +37,18 @@ internal static class StorageFoundationTests
             assertions += CosmicCraftingTests.Run();
             assertions += ConstructionSupplyTests.Run();
             assertions += StorageReservationTests.Run();
+            assertions += StorageUnitTransferTests.Run();
             assertions += StorageTradeTests.Run();
             IncomingSlotCompetition(); IncomingMergeCompetition(); IncomingExactAllocation(); IncomingLifecycle();
             assertions += StorageReceiverTests.Run();
             assertions += StorageSupplyShelfTests.Run();
+#if WORKBENCH_UNLOCK_TESTS
+            assertions += WorkbenchUnlockTests.Run();
+#endif
             assertions += StorageResourceCounterTests.Run();
 #if MONOLYN_COMPATIBILITY_TESTS
             assertions += MonolynCompatibilityTests.Run();
+            assertions += StorageMaterialTransactionTests.Run();
 #endif
 #if STORAGE_INDEX_TESTS
             assertions += StorageIndexTests.Run();

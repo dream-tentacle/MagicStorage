@@ -71,6 +71,7 @@ internal static class NivarianCannonTests
     {
         new NivarianCannonCompatibility().Apply(new Harmony("mjcg.magicstorage.tests.nivarian"));
         BasicAndRemainder(); CapacityAndRouting(); ReservationsAndFailures(); LifecycleAndSources(); FuelOrderAndNativeReservations();
+        AcceptanceBoundaries();
         return assertions;
     }
     private static void BasicAndRemainder()
@@ -158,5 +159,39 @@ internal static class NivarianCannonTests
         var line = f.Cannon.Accepted.Last().lines[0];
         Equal(CannonCargoSinkKind.Fuel, line.sink, "fuel sink preserved"); Equal(2, line.fuelCompIndex, "specific fuel component index preserved");
         Equal(0, f.Ledger.GroundCalls, "remaining demand met without duplicate native intake");
+    }
+
+    private static void AcceptanceBoundaries()
+    {
+        foreach (bool throws in new[] { false, true })
+        {
+            var f = new Fixture(); f.Store(60);
+            f.Cannon.ThrowAfterAccept = throws; f.Cannon.ReturnFalseAfterAccept = !throws;
+            f.Match(20);
+            Equal(20, f.Cargo, "accepted cargo survives false return or post-acceptance exception");
+            Equal(40L, f.Network.GetTotalCount(f.Steel), "accepted cargo not refunded");
+            Equal(false, f.Ledger.Orders.Single().Cancelled, "actual accepted order is never cancelled");
+            Equal(0, f.Ledger.GroundDeficit, "accepted cargo does not trigger duplicate ground supply");
+            f.Match(20);
+            Equal(20, f.Cargo, "later demand matching does not duplicate accepted order");
+        }
+
+        var partial = new Fixture(); partial.Store(60); partial.Cannon.AcceptLimit = 7;
+        partial.Cannon.ReturnFalseAfterAccept = true; partial.Match(20);
+        Equal(7, partial.Cargo, "partial enqueue retains only actually accepted cargo");
+        Equal(53L, partial.Network.GetTotalCount(partial.Steel), "partial enqueue returns unaccepted remainder");
+        Equal(7, partial.Ledger.Orders.Single().lines[0].count, "partial receipt corrects native order reservation");
+        Equal(7, partial.Ledger.Orders.Single().lines[0].originalCount, "partial receipt keeps original order quantity consistent");
+        Equal(13, partial.Ledger.GroundDeficit, "only actual partial shortage falls back to ground supply");
+        partial.Cannon.AcceptLimit = int.MaxValue; partial.Cannon.ReturnFalseAfterAccept = false;
+        partial.Match(20);
+        Equal(20, partial.Cargo, "later matching fulfils only remaining partial demand");
+        Equal(40L, partial.Network.GetTotalCount(partial.Steel), "partial retry charges total requested quantity once");
+
+        var noAccept = new Fixture(); noAccept.Store(60); noAccept.Cannon.ReturnTrueWithoutAccept = true; noAccept.Match(20);
+        Equal(0, noAccept.Cargo, "success status alone is not treated as physical acceptance");
+        Equal(60L, noAccept.Network.GetTotalCount(noAccept.Steel), "false success restores source stock");
+        Equal(true, noAccept.Ledger.Orders.All(order => order.Cancelled), "unstocked false-success order cancelled");
+        Equal(20, noAccept.Ledger.GroundDeficit, "unaccepted demand retains native fallback");
     }
 }

@@ -124,6 +124,8 @@ namespace MagicStorage
                 var row = new Rect(4, y, view.width - 8, heights[index] - (CompactMode ? 0f : 4f));
                 y += heights[index];
                 if (row.yMax < workbenchScroll.y || row.y > workbenchScroll.y + outer.height) continue;
+                bool locked = !CraftingWorkbenchUnlocks.IsUnlocked(table);
+                if (locked) Widgets.DrawBoxSolid(row, new Color(1f, 0.9f, 0.45f, 0.18f));
                 Widgets.DrawHighlightIfMouseover(row);
                 var pack = table.modContentPack;
                 string source = pack?.ModMetaData?.ShortName ?? pack?.Name ?? "";
@@ -133,7 +135,6 @@ namespace MagicStorage
                     Text.Anchor = TextAnchor.MiddleLeft;
                     Widgets.Label(new Rect(row.x + 36, row.y + 4, row.width - 72, row.height - 8), table.LabelCap);
                     Text.Anchor = TextAnchor.UpperLeft;
-                    TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 36, row.height), table.LabelCap + "\n" + source);
                     Widgets.DrawLineHorizontal(row.x, row.yMax - 1f, row.width, Widgets.SeparatorLineColor);
                 }
                 else
@@ -143,6 +144,8 @@ namespace MagicStorage
                     Widgets.Label(new Rect(row.x + 56, row.y + 31, row.width - 94, 26), source);
                 }
                 Widgets.InfoCardButton(row.xMax - 30, row.y + (row.height - 24f) / 2f, table);
+                TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 36, row.height),
+                    table.LabelCap + "\n" + source + (locked ? "\n" + "MS_Craft_WorkbenchLockedHint".Translate().ToString() : ""));
                 if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, row.height)))
                     OpenRecipePicker(table);
             }
@@ -150,8 +153,14 @@ namespace MagicStorage
         }
         private void OpenRecipePicker(ThingDef table = null)
         {
+            if (table != null && !CraftingWorkbenchUnlocks.IsUnlocked(table))
+            {
+                Find.WindowStack.Add(new Dialog_WorkbenchUnlock(core, table, () => OpenRecipePicker(table)));
+                return;
+            }
             Find.WindowStack.Add(new Dialog_CosmicRecipePicker(core, table, recipe =>
             {
+                if (!CraftingRecipeCatalog.CanAdd(recipe)) return;
                 core.Crafting.Add(recipe);
                 scroll = Vector2.zero; refreshAt = 0;
             }));
@@ -194,9 +203,9 @@ namespace MagicStorage
                             GUI.color = borderColor;
                             DrawOrderRow(row, icon, title, order);
                         }
-                        // Buttons consume their mouse-down events first. The rest of the whole block can start a drag.
+                        // Right-button dragging reorders the block independently of left-button window dragging.
                         // Register offscreen rows too so native drag indexes remain stable while scrolling.
-                        ReorderableWidget.Reorderable(orderReorderGroup, row);
+                        ReorderableWidget.Reorderable(orderReorderGroup, row, useRightButton: true);
                     }
                 }
                 finally { Widgets.EndScrollView(); }

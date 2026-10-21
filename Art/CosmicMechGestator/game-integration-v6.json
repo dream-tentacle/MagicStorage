@@ -1,0 +1,107 @@
+{
+  "pixels_per_cell": 256,
+  "draw_size": [
+    3.625,
+    3.125
+  ],
+  "source_to_world": [
+    0.0046875,
+    0.005714285714285714
+  ],
+  "views": {
+    "south": {
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "png_size": [
+        928,
+        800
+      ],
+      "platform_center_svg": [
+        384,
+        275
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "layer_reconstruction_mean_error": 0.11722967359754775,
+      "bar_center_world": [
+        -0.98671875,
+        -0.8685714285714285
+      ]
+    },
+    "north": {
+      "world_size": [
+        3.625,
+        3.125
+      ],
+      "png_size": [
+        928,
+        800
+      ],
+      "platform_center_svg": [
+        384,
+        275
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "layer_reconstruction_mean_error": 0.11718983120388456,
+      "bar_center_world": [
+        0.98671875,
+        0.8742857142857143
+      ]
+    },
+    "east": {
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "png_size": [
+        800,
+        928
+      ],
+      "platform_center_svg": [
+        384,
+        400
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "layer_reconstruction_mean_error": 0.026048307065610534,
+      "bar_center_world": [
+        0.86953125,
+        -0.9742857142857143
+      ]
+    },
+    "west": {
+      "world_size": [
+        3.125,
+        3.625
+      ],
+      "png_size": [
+        800,
+        928
+      ],
+      "platform_center_svg": [
+        384,
+        400
+      ],
+      "platform_center_world": [
+        0,
+        0
+      ],
+      "layer_reconstruction_mean_error": 0.026048307065610534,
+      "mirrored_from": "east",
+      "bar_center_world": [
+        -0.86953125,
+        -0.9742857142857143
+      ]
+    }
+  },
+  "texture_count": 21
+}

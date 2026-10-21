@@ -37,71 +37,83 @@ namespace MagicStorage
         {
             if (map == null || buildingDef == null) return false;
             if (buildingDef.costList == null) return true;
+            var manager = map.GetComponent<MapComponent_StorageNetworks>();
+            if (manager == null) return false;
             try
             {
-                var manager = map.GetComponent<MapComponent_StorageNetworks>();
-                foreach (var cost in buildingDef.costList)
+                manager.EnsureCurrent();
+                using (var transfer = new StorageMaterialTransaction(map, IntVec3.Invalid))
                 {
-                    int remaining = cost.count;
-                    if (remaining <= 0) continue;
-                    var materials = map.listerThings.ThingsOfDef(cost.thingDef)
-                        .Where(item => !item.Destroyed && item.Spawned).ToList();
-                    ConsumeStacks(map, materials, ref remaining);
-                    if (manager != null && remaining > 0)
+                    if (!TryPlan(map, manager, buildingDef, transfer)) return false;
+                    if (transfer.Requests.Count == 0) return true;
+                    if (!transfer.TryStage() || !transfer.ConsumeAll()) return false;
+                    foreach (var request in transfer.Requests)
                     {
-                        foreach (var unit in manager.StorageUnits)
-                        {
-                            if (remaining <= 0) break;
-                            if (!CanConsumeFrom(unit, map) || unit.Inventory.GetTotalCount(cost.thingDef) == 0) continue;
-                            materials.Clear();
-                            unit.Inventory.GetStacks(cost.thingDef, materials);
-                            ConsumeStacks(map, materials, ref remaining);
-                        }
+                        // Cosmetic callbacks must never turn a paid operation into a failure.
+                        try { ShowTransferEffect(new TargetInfo(request.Cell, map)); }
+                        catch (Exception exception) { Log.Warning("[MagicStorage] Monolyn transfer effect failed: " + exception); }
                     }
-                    if (remaining > 0)
-                    {
-                        Log.Warning("Not enough " + cost.thingDef.defName + " to consume.");
-                        return false;
-                    }
+                    return true;
                 }
-                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.Error("[MagicStorage] Monolyn resource transfer failed: " + exception);
+                return false;
             }
             finally { map.resourceCounter.UpdateResourceCounts(); }
         }
 
-        private static void ConsumeStacks(Map map, List<Thing> materials, ref int remaining)
+        private static bool TryPlan(Map map, MapComponent_StorageNetworks manager, ThingDef buildingDef,
+            StorageMaterialTransaction transfer)
         {
-            foreach (Thing item in materials)
+            // Aggregate repeated entries so one stack cannot pay for two costs twice.
+            foreach (var cost in buildingDef.costList.Where(c => c.count > 0).GroupBy(c => c.thingDef))
             {
-                if (remaining <= 0) break;
-                if (item.Destroyed || item.stackCount <= 0) continue;
-                var unit = item.holdingOwner?.Owner as Building_StorageUnit;
-                if (unit == null ? !item.Spawned || item.Map != map :
-                    !CanConsumeFrom(unit, map) || item.holdingOwner != unit.Inventory.Contents) continue;
-                int amount = Math.Min(item.stackCount, remaining);
-                ShowTransferEffect(unit ?? item);
-                try
+                if (cost.Key == null) return false;
+                long remaining = cost.Sum(c => (long)c.count);
+                var seen = new HashSet<Thing>();
+                foreach (Thing item in map.listerThings.ThingsOfDef(cost.Key))
                 {
-                    Thing consumed = unit == null ? item.SplitOff(amount) : unit.Inventory.Contents.Take(item, amount);
-                    if (consumed == null) continue;
-                    remaining -= consumed.stackCount;
-                    consumed.Destroy(DestroyMode.Vanish);
+                    if (remaining == 0) break;
+                    if (!seen.Add(item) || !StorageMaterialTransaction.GroundAvailable(map, item)) continue;
+                    int count = (int)Math.Min(remaining, item.stackCount);
+                    if (!transfer.Add(item, count)) return false;
+                    remaining -= count;
                 }
-                // Partial Take needs a count update; whole removal already updates the index.
-                finally { unit?.Inventory.RefreshStack(item); }
+                if (remaining > 0)
+                {
+                    var stacks = new List<Thing>();
+                    foreach (var unit in manager.StorageUnits)
+                    {
+                        if (remaining == 0) break;
+                        if (!CanConsumeFrom(unit, map)) continue;
+                        stacks.Clear(); unit.Inventory.GetStacks(cost.Key, stacks);
+                        foreach (Thing item in stacks)
+                        {
+                            if (remaining == 0) break;
+                            if (!seen.Add(item)) continue;
+                            int count = (int)Math.Min(remaining, unit.Network.AvailableToWithdraw(item));
+                            if (count <= 0) continue;
+                            if (!transfer.Add(item, count, unit.Network)) return false;
+                            remaining -= count;
+                        }
+                    }
+                }
+                if (remaining > 0) return false;
             }
+            return true;
         }
 
-        // ResourceCounter includes physical player-owned stock even without a working network.
         private static bool CanConsumeFrom(Building_StorageUnit unit, Map map) =>
-            unit.Spawned && !unit.Destroyed && unit.Map == map && unit.Faction == Faction.OfPlayer;
+            unit.Spawned && !unit.Destroyed && unit.Map == map && unit.Faction == Faction.OfPlayer &&
+            !unit.Position.Fogged(map) && unit.Network?.CanWork == true;
 
-        private static void ShowTransferEffect(Thing source)
+        private static void ShowTransferEffect(TargetInfo target)
         {
             var def = lanternTransfer?.GetValue(null) as EffecterDef;
             if (def == null) return;
             Effecter effect = def.Spawn();
-            var target = new TargetInfo(source.Position, source.Map);
             try { effect.Trigger(target, target, -1); }
             finally { effect.Cleanup(); }
         }

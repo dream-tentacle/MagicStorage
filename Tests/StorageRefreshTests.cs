@@ -155,7 +155,21 @@ internal static class StorageRefreshTests
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
         Equal(1, Listing_Standard.NumericLabels.Count, "returning to general hides the detailed intervals");
         Equal(false, MagicStorageMod.Settings.SimplifiedMode, "switching tabs preserves performance settings");
+        Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "caravan item filters default off");
+        Equal(false, MagicStorageMod.Settings.TradeItemFilters, "trade item filters default off");
+        TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabAccessibility").clickedAction();
+        Listing_Standard.Events.Clear();
+        Listing_Standard.NumericLabels.Clear();
+        mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal("MS_SettingsAccessibilityNotice", Listing_Standard.Events[0], "conflict explanation is first on accessibility tab");
+        Equal("MS_SettingsCaravanItemFilters", Listing_Standard.Events[1], "accessibility tab exposes caravan toggle");
+        Equal("MS_SettingsTradeItemFilters", Listing_Standard.Events[2], "accessibility tab exposes independent trade toggle");
+        Equal(0, Listing_Standard.NumericLabels.Count, "accessibility tab has no performance or storage numeric settings");
+        MagicStorageMod.Settings.CaravanItemFilters = true;
+        MagicStorageMod.Settings.TradeItemFilters = true;
         MagicStorageMod.Settings.RestoreDefaults();
+        Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "restore defaults disables caravan filter hook");
+        Equal(false, MagicStorageMod.Settings.TradeItemFilters, "restore defaults disables trade filter hook");
     }
 
     private sealed class Fixture

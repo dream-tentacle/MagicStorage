@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="282" viewBox="-100 -55 200 110">
+  <defs>
+    <path id="chassis-outline-geometry" d="M99 60H413Q448 60 448 95V410Q448 446 412 446H100Q64 446 64 410V95Q64 60 99 60Z" />
+    <path id="top-plate-geometry" d="M99 60H413Q448 60 448 95V385Q448 420 413 420H99Q64 420 64 385V95Q64 60 99 60Z" />
+    <clipPath id="chassis-clip">
+      <use href="#chassis-outline-geometry" />
+    </clipPath>
+    <clipPath id="plate-clip">
+      <use href="#top-plate-geometry" />
+    </clipPath>
+    <path id="orbit-loop-geometry" d="M82 0A82 34 0 1 1 -82 0A82 34 0 1 1 82 0Z M76 0A76 28 0 1 1 -76 0A76 28 0 1 1 76 0Z" fill-rule="evenodd" />
+    <clipPath id="orbit-rear-half">
+      <rect x="-100" y="-100" width="200" height="100" />
+    </clipPath>
+    <mask id="orbit-visibility" maskUnits="userSpaceOnUse" x="-100" y="-100" width="200" height="200">
+      <rect x="-100" y="-100" width="200" height="200" fill="#ffffff" />
+      <circle cx="0.87711511" cy="-2.86891427" r="61.25" fill="#000000" clip-path="url(#orbit-rear-half)" />
+    </mask>
+  </defs>
+  <g id="energy-orbit" transform="rotate(-17)">
+    <use id="orbit-blue-band" href="#orbit-loop-geometry" fill="#c5e5f5" />
+    <path id="orbit-front-shadow" d="M82 0A82 34 0 0 1 -82 0A82 29.5 0 0 0 82 0Z" fill="#3d5a70" />
+  </g>
+</svg>

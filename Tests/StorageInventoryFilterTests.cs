@@ -49,7 +49,19 @@ internal static class StorageInventoryFilterTests
         Equal(true, StorageInventoryFilters.Allows(new Thing { Inner = weapon }, options), "category filter handles minified contents");
         Equal(false, StorageInventoryFilters.Allows(new Thing { def = gun, Quality = 0 },
             new[] { new StorageInventoryFilterOption(rule) { Mode = StorageInventoryFilterMode.Include } }), "custom rule uses individual quality");
+        Equal(true, StorageInventoryFilters.CanGroup(meal, new Thing { def = food }, new StorageInventoryRule[0]), "same source without rule differences can group");
+        Equal(false, StorageInventoryFilters.CanGroup(weapon, new Thing { def = gun, Quality = 0 }, new[] { rule }), "custom rule differences prevent grouping");
+        Equal(false, StorageInventoryFilters.CanGroup(null, meal, new[] { rule }), "empty representatives cannot group");
         var settings = new MagicStorageSettings();
+        Equal(false, settings.CaravanItemFilters, "caravan filters default off");
+        Equal(false, settings.TradeItemFilters, "trade filters default off");
+        Scribe.mode = LoadSaveMode.Saving;
+        settings.CaravanItemFilters = true; settings.TradeItemFilters = false; settings.ExposeData();
+        Scribe.mode = LoadSaveMode.LoadingVars;
+        var loadedSettings = new MagicStorageSettings(); loadedSettings.ExposeData();
+        Equal(true, loadedSettings.CaravanItemFilters, "caravan toggle persists");
+        Equal(false, loadedSettings.TradeItemFilters, "trade toggle persists independently");
+        Scribe.mode = LoadSaveMode.Inactive;
         settings.InventoryFilters.Add(rule);
         settings.RestoreDefaults();
         Equal(rule, settings.InventoryFilters[0], "resetting tuning settings preserves user rules");

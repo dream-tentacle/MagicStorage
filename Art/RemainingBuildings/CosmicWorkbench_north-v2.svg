@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="704" height="320" viewBox="0 0 704 320">
+  <title>魔法存储 — 宇宙工作台，操作侧第二稿</title>
+  <desc>North-facing 3×1 workbench, matching the finished StorageCore v27 palette, planar shading and uniform 12-unit exterior stroke. The worker stands on the south edge for the existing interaction offset (0,0,-1). A shallow centered trapezoid recess opens toward that interaction cell. One working bed, two sliding jaws, an empty stock tray and a small raised console explain the function. Sky-blue accents are RGB(197,229,245). Transparent draft, not installed.</desc>
+  <defs>
+    <path id="chassis-geometry" d="M92 60H612Q640 60 640 88V246Q640 266 620 266H421L398 243H306L283 266H84Q64 266 64 246V88Q64 60 92 60Z"/>
+    <path id="top-geometry" d="M92 60H612Q640 60 640 88V224Q640 244 620 244H421L398 221H306L283 244H84Q64 244 64 224V88Q64 60 92 60Z"/>
+    <clipPath id="chassis-clip"><use href="#chassis-geometry"/></clipPath>
+    <clipPath id="top-clip"><use href="#top-geometry"/></clipPath>
+    <path id="exterior-geometry" d="M92 56H612Q644 56 644 88V246Q644 270 620 270H419.343L396.343 247H307.657L284.657 270H84Q60 270 60 246V88Q60 56 92 56Z"/>
+  </defs>
+
+  <g id="base">
+    <use href="#chassis-geometry" fill="#53616b"/>
+    <path d="M60 262H648V282H56Z" fill="#414e58" clip-path="url(#chassis-clip)"/>
+    <!-- The notch has real vertical faces, not a symbol drawn on the surface. -->
+    <path d="M283 244L306 221H398L421 244V266L398 243H306L283 266Z" fill="#617783"/>
+    <path d="M398 221L421 244V266L398 243Z" fill="#414e58"/>
+    <path d="M283 244L306 221V243L283 266Z" fill="#748894"/>
+    <path d="M306 239H398V243H306Z" fill="#4d626f"/>
+  </g>
+
+  <g id="tabletop">
+    <use href="#top-geometry" fill="#cfd4d5"/>
+    <g clip-path="url(#top-clip)">
+      <path d="M92 60H612Q633 60 639 82L627 88Q622 72 610 72H94Q81 72 76 88L65 83Q70 60 92 60Z" fill="#e4e7e5"/>
+      <path d="M65 83L76 90V219Q76 230 89 233L83 244Q64 241 64 224V88Z" fill="#dde1e0"/>
+      <path d="M627 88L639 82Q640 85 640 88V224Q640 244 620 244H421L398 221H306L283 244H84L89 232H278L301 209H403L426 232H618Q627 232 627 219Z" fill="#afb8bc"/>
+    </g>
+    <path d="M64 224Q64 244 84 244H283L306 221H398L421 244H620Q640 244 640 224" fill="none" stroke="#52616b" stroke-width="3"/>
+  </g>
+
+  <!-- A low open receiving tray, kept empty for arbitrary recipe materials. -->
+  <g id="stock-tray">
+    <path d="M95 107H181V196H95Z" fill="#97a8b2"/>
+    <path d="M99 111H177V192H99Z" fill="#536b7a"/>
+    <path d="M105 117H171V181H105Z" fill="#a6b4bc"/>
+    <path d="M105 175H171V184H105Z" fill="#748894"/>
+    <path d="M99 184H177V192H99Z" fill="#b6c3c9"/>
+    <path d="M113 186H140V190H113Z" fill="#c5e5f5"/>
+  </g>
+
+  <!-- The work area is the dominant dark shape. Hardware grips an open center. -->
+  <g id="working-bed">
+    <path d="M214 100H489L497 108V197H206V108Z" fill="#617783"/>
+    <path d="M215 104H488L492 110V190H211V110Z" fill="#8e9faa"/>
+    <path d="M211 181H492V190H211Z" fill="#536b7a"/>
+    <path d="M229 182H474V187H229Z" fill="#aebdc6"/>
+    <path d="M211 191H492V197H211Z" fill="#b6c3c9"/>
+
+    <g id="left-jaw">
+      <path d="M221 123H247V177H221Z" fill="#4d626f"/>
+      <path d="M221 117H244V168H221Z" fill="#b6c3c9"/>
+      <path d="M238 117H247V168H238Z" fill="#748894"/>
+      <path d="M240 131H247V155H240Z" fill="#c5e5f5"/>
+    </g>
+    <g id="right-jaw">
+      <path d="M452 123H478V177H452Z" fill="#4d626f"/>
+      <path d="M455 117H478V168H455Z" fill="#b6c3c9"/>
+      <path d="M452 117H461V168H452Z" fill="#748894"/>
+      <path d="M452 131H459V155H452Z" fill="#c5e5f5"/>
+    </g>
+  </g>
+
+  <!-- The control head is visibly raised rather than another flush inset pane. -->
+  <g id="controller">
+    <path d="M530 103H610V153L603 163H537L530 153Z" fill="#617783"/>
+    <path d="M530 103H610V151H530Z" fill="#aebdc6"/>
+    <path d="M534 99H606Q610 99 610 103V145H530V103Q530 99 534 99Z" fill="#b6c3c9"/>
+    <rect x="536" y="105" width="68" height="34" rx="3" fill="#344a5b"/>
+    <path d="M544 114H555M544 120H552" stroke="#9bbccb" stroke-width="2"/>
+    <path d="M565 115H575L584 126H596" fill="none" stroke="#849fb2" stroke-width="2.25" stroke-linejoin="round"/>
+    <circle cx="566" cy="115" r="2.5" fill="#c5e5f5"/>
+    <circle cx="595" cy="126" r="2.5" fill="#c5e5f5"/>
+    <path d="M536 145H604V151H536Z" fill="#748894"/>
+    <path d="M537 174H562V187H537Z" fill="#97a8b2"/>
+    <path d="M540 174H559V182H540Z" fill="#c5e5f5"/>
+    <path d="M578 174H603V187H578Z" fill="#97a8b2"/>
+    <path d="M581 174H600V182H581Z" fill="#b6c3c9"/>
+  </g>
+
+  <use id="exterior-contour" href="#exterior-geometry" fill="none" stroke="#000000" stroke-width="12" stroke-linejoin="round"/>
+</svg>

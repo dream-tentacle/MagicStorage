@@ -136,6 +136,11 @@ namespace MagicStorage
 
     internal static class StorageInventoryFilters
     {
+        internal static bool CanGroup(Thing left, Thing right, IEnumerable<StorageInventoryRule> rules) =>
+            left != null && right != null &&
+            string.Equals(SourceOf(left)?.PackageId, SourceOf(right)?.PackageId, StringComparison.OrdinalIgnoreCase) &&
+            rules.All(rule => rule.Filter.Allows(left) == rule.Filter.Allows(right));
+
         internal static ModContentPack SourceOf(Thing item) => item?.GetInnerIfMinified()?.ContentSource;
 
         internal static bool Allows(Thing item, IEnumerable<StorageInventoryFilterOption> options, ModContentPack source = null)

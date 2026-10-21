@@ -255,7 +255,7 @@ namespace MagicStorage
                 !CanWork ? StorageFailure.NetworkUnavailable : StorageFailure.InsufficientCapacity);
         }
 
-        public StorageTransferResult TryTransferTo(Thing item, int count, ThingOwner destination)
+        public StorageTransferResult TryTransferTo(Thing item, int count, ThingOwner destination, bool merge = true)
         {
             if (!CanWork || transferring) return StorageTransferResult.Failed(count, StorageFailure.NetworkUnavailable);
             if (item == null || count <= 0 || destination == null || destination.Owner is Building_StorageUnit ||
@@ -263,13 +263,47 @@ namespace MagicStorage
                 return StorageTransferResult.Failed(count, StorageFailure.InvalidSource);
             // Keep incoming stack claims stable; the future withdrawal UI can retry once delivery ends.
             if (incoming.IsStackReserved(item)) return StorageTransferResult.Failed(count, StorageFailure.Reserved);
-            int amount = Math.Min(count, Math.Min(outgoing.Available(item), destination.GetCountCanAccept(item)));
+            int amount = Math.Min(count, Math.Min(outgoing.Available(item), destination.GetCountCanAccept(item, merge)));
             if (amount <= 0) return StorageTransferResult.Failed(count, StorageFailure.InsufficientCapacity);
             transferring = true;
             int moved;
-            try { moved = StorageTransfer.Move(unit.Inventory.Contents, destination, item, amount, Core.Map, Core.Position); }
+            try { moved = StorageTransfer.Move(unit.Inventory.Contents, destination, item, amount, Core.Map, Core.Position, merge); }
             finally { transferring = false; }
             return new StorageTransferResult(count, moved, moved == count ? StorageFailure.None : StorageFailure.InsufficientCapacity);
+        }
+
+        internal long TransferInventory(Building_StorageUnit source)
+        {
+            if (!CanWork || transferring || source == null || !source.Spawned || source.Destroyed ||
+                source.Network != this || !nodes.Contains(source)) return 0;
+            long transferred = 0;
+            transferring = true;
+            try
+            {
+                // Invalidate claims before changing ownership. Client callbacks stay deferred.
+                outgoing.CancelForSource(source);
+                incoming.ReleaseForUnit(source);
+                foreach (Thing item in new List<Thing>(source.Inventory.Contents))
+                {
+                    if (!CanWork || source.Network != this) break;
+                    if (item.Destroyed || !source.Inventory.Contents.Contains(item)) continue;
+                    // This is existing stock, so the core's incoming filter does not apply.
+                    // Exclude the source without discarding anyone else's capacity claims.
+                    var plan = incoming.Plan(item, item.stackCount, excludedUnit: source);
+                    foreach (var allocation in plan.Allocations)
+                    {
+                        if (!CanWork || source.Network != this || item.Destroyed ||
+                            !source.Inventory.Contents.Contains(item)) break;
+                        if (!allocation.Unit.Spawned || allocation.Unit.Destroyed ||
+                            allocation.Unit.Network != this || allocation.Unit.Map != source.Map) continue;
+                        transferred += StorageTransfer.Move(source.Inventory.Contents,
+                            allocation.Unit.Inventory.Contents, item, allocation.Count,
+                            source.Map, source.Position, allocation.Stack != null, allocation.Stack);
+                    }
+                }
+            }
+            finally { transferring = false; }
+            return transferred;
         }
 
         public static string StatusLabel(StorageNetwork network)

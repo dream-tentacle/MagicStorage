@@ -58,7 +58,7 @@ namespace RimWorld
             counts.Sum(entry => entry.Thing is Pawn pawn ? pawn.inventory.innerContainer.Sum(item => item.GetStatValue(null) * item.stackCount) :
                 entry.Thing.GetStatValue(null) * entry.Count);
     }
-    public class Dialog_FormCaravan
+    public class Dialog_FormCaravan : Window
     {
         private readonly Map map;
         private PlanetTile startingTile = new PlanetTile(2), destinationTile = new PlanetTile(3);

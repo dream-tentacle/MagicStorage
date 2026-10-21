@@ -94,15 +94,22 @@ namespace MagicStorage
             (int)fresh.Invoke(ledger, new object[] { demand.Target, demand.Def, demand.Sink, demand.FuelIndex }) -
             (int)reserved.Invoke(ledger, new[] { demand.Key }));
 
-        internal int PlaceOrder(object ledger, Demand demand, int count, int groupId, object source)
+        internal int PlaceOrder(object ledger, Demand demand, int count, int groupId, object source, out object line)
         {
-            object line = Activator.CreateInstance(lineType);
+            line = Activator.CreateInstance(lineType);
             lineDef.SetValue(line, demand.Def); lineCount.SetValue(line, count); lineOriginalCount.SetValue(line, count);
             lineSink.SetValue(line, demand.Sink); lineFuelIndex.SetValue(line, demand.FuelIndex);
             var lines = (IList)Activator.CreateInstance(lineListType); lines.Add(line);
             // No ground intake return point: later cancelled cargo uses Nivarian's safe drop handling.
             object order = place.Invoke(ledger, new object[] { demand.Target, lines, demand.Priority, groupId, source, null });
             return (int)orderId.GetValue(order);
+        }
+        internal void ResizeOrderLine(object ledger, object line, int count)
+        {
+            // This line belongs to our single-material order. Keep the ledger's demand
+            // reservation equal to the quantity actually accepted by a partial enqueue.
+            lineCount.SetValue(line, count); lineOriginalCount.SetValue(line, count);
+            rebuild.Invoke(ledger, null);
         }
         internal bool Enqueue(object node, Thing item, Demand demand, int id, int groupId) =>
             (bool)enqueue.Invoke(node, new object[] { item, demand.Target, demand.Sink, demand.FuelIndex, id, groupId, false });

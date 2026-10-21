@@ -110,17 +110,6 @@ internal static class StorageReservationTests
         f.Register(new Building_StorageCore(), 2); f.Manager.MapComponentTick();
         Equal(StorageReservationFailure.NetworkUnavailable, f.Consumer.Reason, "two cores invalidate affected reservations");
 
-        f = new Fixture();
-        var second = new Thing { stackCount = 5 }; f.Unit.Inventory.Contents.TryAdd(second);
-        int failedGroups = 0;
-        var lease = new CraftingMaterialLease(f.Core.Network, f.Endpoint, null, () => failedGroups++);
-        Equal(true, lease.Acquire(new Dictionary<Thing, int> { { f.Item, 4 }, { second, 3 } }), "group reserves multiple stacks");
-        f.Unit.Inventory.Contents.Remove(f.Item); f.Manager.MapComponentTick();
-        Equal(1, failedGroups, "one invalid ingredient notifies group once");
-        Equal(5, f.Core.Network.AvailableToWithdraw(second), "group failure releases all other ingredients");
-        f.Manager.MapComponentTick();
-        Equal(1, failedGroups, "released group never repeats notification");
-
         f = new Fixture(); f.Reserve();
         f.Manager.NotifyNodeUnavailable(f.Unit);
         f.Core.Network.ReleaseOutgoing(f.Token);

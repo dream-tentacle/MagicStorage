@@ -31,7 +31,9 @@ namespace MagicStorage
 
         internal void ReturnApparel()
         {
-            if (!HasApparel || !Spawned) return;
+            // Job cleanup can run after the ship manifest was captured. Keep the
+            // garment in this saved holder until the map swap has completed.
+            if (!HasApparel || !Spawned || BeingTransportedOnGravship) return;
             var manager = Map.GetComponent<MapComponent_StorageNetworks>();
             manager.EnsureCurrent();
             var recovery = manager.CreateRecovery(Position);
@@ -65,6 +67,13 @@ namespace MagicStorage
         }
         public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
         {
+            if (BeingTransportedOnGravship)
+            {
+                // The same building and its contents travel together. Base despawn
+                // still unregisters the node; landing resumes normal apparel cleanup.
+                base.DeSpawn(mode);
+                return;
+            }
             var manager = Map.GetComponent<MapComponent_StorageNetworks>();
             manager.NotifyNodeUnavailable(this);
             ReturnApparel();

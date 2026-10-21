@@ -1,0 +1,102 @@
+[
+  {
+    "name": "StorageUnit_south",
+    "interior_pixels": 128740,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_north",
+    "interior_pixels": 128740,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_east",
+    "interior_pixels": 128740,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageUnit_west",
+    "interior_pixels": 128740,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_south",
+    "interior_pixels": 113388,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "interior_pixels": 113468,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_east",
+    "interior_pixels": 105810,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicWorkbench_west",
+    "interior_pixels": 105812,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "interior_pixels": 431348,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_north",
+    "interior_pixels": 431348,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_east",
+    "interior_pixels": 439540,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "StorageApparelAdapter_west",
+    "interior_pixels": 439540,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_south",
+    "interior_pixels": 191864,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_north",
+    "interior_pixels": 191864,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_east",
+    "interior_pixels": 191864,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "TransportSupplier_west",
+    "interior_pixels": 191864,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "interior_pixels": 1016369,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_north",
+    "interior_pixels": 1016369,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_east",
+    "interior_pixels": 934075,
+    "changed_interior_pixels": 0
+  },
+  {
+    "name": "CosmicMechGestator_west",
+    "interior_pixels": 934075,
+    "changed_interior_pixels": 0
+  }
+]

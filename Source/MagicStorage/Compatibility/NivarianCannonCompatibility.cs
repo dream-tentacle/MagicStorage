@@ -94,12 +94,12 @@ namespace MagicStorage
             foreach (var candidate in candidates)
             {
                 if (deficit <= 0) break;
-                Supply(candidate, demand, ledger, cannonNetwork, destination, manager, group, ref deficit);
+                Supply(candidate, demand, ledger, cannonNetwork, destination, group, ref deficit);
             }
         }
 
         private static void Supply(Candidate candidate, NivarianCannonApi.Demand demand, object ledger,
-            object cannonNetwork, object destination, MapComponent_StorageNetworks manager, int group, ref int deficit)
+            object cannonNetwork, object destination, int group, ref int deficit)
         {
             var port = candidate.Port;
             StorageNetwork network = port.Network;
@@ -111,33 +111,31 @@ namespace MagicStorage
                 int count = Math.Min(deficit, Math.Min(api.AvailableDemand(ledger, demand), Math.Min(
                     network.AvailableToWithdraw(item), Math.Min(api.Capacity(candidate.Node), api.ShotLimit(candidate.Node)))));
                 if (count <= 0) continue;
-                object claim = new object();
-                ThingOwner original = item.holdingOwner;
-                var staging = manager.CreateRecovery(port.Position);
-                Thing received = null;
-                int id = 0;
-                bool committed = false;
-                try
+                using (var transfer = new StorageMaterialTransaction(port.Map, port.Position))
                 {
-                    if (network.ReserveOutgoing(claim, item, count, port) != count) continue;
-                    if (!network.TryWithdrawReserved(claim, item, count, staging.Contents, out received).Complete) continue;
-                    if (!port.CanWork || port.Network != network || !api.Operational(candidate.Node) ||
-                        api.Capacity(candidate.Node) < count || api.AvailableDemand(ledger, demand) < count ||
-                        api.Hops(cannonNetwork, candidate.Node, destination) == int.MaxValue) continue;
-                    id = api.PlaceOrder(ledger, demand, count, group, candidate.Node);
-                    if (id <= 0 || !api.Enqueue(candidate.Node, received, demand, id, group)) continue;
-                    committed = true;
-                    deficit -= count;
-                }
-                finally
-                {
-                    network.ReleaseOutgoing(claim);
-                    try { if (!committed && id > 0) api.Cancel(ledger, id); }
+                    if (!transfer.Add(item, count, network, port) || !transfer.TryStage()) continue;
+                    var request = transfer.Requests[0];
+                    int id = 0;
+                    object line = null;
+                    try
+                    {
+                        if (!port.CanWork || port.Network != network || !api.Operational(candidate.Node) ||
+                            api.Capacity(candidate.Node) < count || api.AvailableDemand(ledger, demand) < count ||
+                            api.Hops(cannonNetwork, candidate.Node, destination) == int.MaxValue) continue;
+                        id = api.PlaceOrder(ledger, demand, count, group, candidate.Node, out line);
+                        if (id <= 0) continue;
+                        transfer.Deliver(request, received => api.Enqueue(candidate.Node, received, demand, id, group));
+                    }
                     finally
                     {
-                        if (received != null && staging.Contents.Contains(received))
-                            StorageTransfer.Move(staging.Contents, original, received, received.stackCount, port.Map, port.Position);
-                        manager.ReleaseRecovery(staging);
+                        // An exception/false return after actual acceptance must not cancel
+                        // that order or send the same demand through ground intake again.
+                        if (request.Delivered)
+                        {
+                            deficit -= request.DeliveredCount;
+                            if (request.DeliveredCount != count) api.ResizeOrderLine(ledger, line, request.DeliveredCount);
+                        }
+                        else if (id > 0) api.Cancel(ledger, id);
                     }
                 }
             }

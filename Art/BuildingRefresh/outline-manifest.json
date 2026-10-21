@@ -1,0 +1,202 @@
+[
+  {
+    "name": "StorageCore",
+    "title": "存储控制核心",
+    "svg": "StorageCore-refresh-v1.svg",
+    "png": "StorageCore-refresh-v1.png",
+    "footprint": [
+      2,
+      2
+    ],
+    "outline_width": 7.917525773,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 384,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageUnit_south",
+    "title": "存储单元",
+    "source": "Art/StorageUnit/StorageUnit_south-v2.svg",
+    "svg": "StorageUnit_south-refresh-v1.svg",
+    "png": "StorageUnit_south-refresh-v1.png",
+    "footprint": [
+      1,
+      2
+    ],
+    "note": "Two removable lids; original chassis bounds retained; flat metal planes and stronger cartridge gaps.",
+    "outline_width": 10.666666667,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 248,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageReceiver",
+    "title": "存储接收器",
+    "source": "Art/StorageEndpoints/StorageReceiver-v1.svg",
+    "svg": "StorageReceiver-refresh-v1.svg",
+    "png": "StorageReceiver-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Receiving tray with a dark back wall, open landing floor and one loading lip; fixed orientation.",
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageSupplyShelf",
+    "title": "自动补货架",
+    "source": "Art/StorageEndpoints/StorageSupplyShelf_south-v1.svg",
+    "svg": "StorageSupplyShelf-refresh-v1.svg",
+    "png": "StorageSupplyShelf-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Two empty open shelves; fewer trim lines; original frame and fixed orientation retained.",
+    "outline_width": 19.612903226,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 456,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "TransportSupplier_south",
+    "title": "物资补给器",
+    "source": "Art/StorageEndpoints/TransportSupplier_south-v4.svg",
+    "svg": "TransportSupplier_south-refresh-v1.svg",
+    "png": "TransportSupplier_south-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Low output deck and physical discharge lip; dark-blue directional arrow retained.",
+    "outline_width": 19.440860215,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 452,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "ConstructionSupplyUnit",
+    "title": "建筑供给单元",
+    "source": "Art/RemainingBuildings/ConstructionSupplyUnit-v1.svg",
+    "svg": "ConstructionSupplyUnit-refresh-v1.svg",
+    "png": "ConstructionSupplyUnit-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Simplified raised hatch with one shutter seam and one sky-blue inlay; blank surrounding casing; no side trims, status marks or service panel.",
+    "outline_width": 19.268817204,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 448,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "StorageApparelAdapter_south",
+    "title": "衣物适配器",
+    "source": "Art/RemainingBuildings/StorageApparelAdapter_south-v2.svg",
+    "svg": "StorageApparelAdapter_south-refresh-v1.svg",
+    "png": "StorageApparelAdapter_south-refresh-v1.png",
+    "footprint": [
+      2,
+      1
+    ],
+    "note": "Open garment bay and one plain service compartment; larger value groups, fewer interface frames.",
+    "outline_width": 20.041237113,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 972,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "FuelSupplier",
+    "title": "燃料供给器",
+    "source": "Art/RemainingBuildings/FuelSupplier-v1.svg",
+    "svg": "FuelSupplier-refresh-v1.svg",
+    "png": "FuelSupplier-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "A sealed cylindrical fuel reservoir with a compact pump and one feed connection; flat metal shading.",
+    "outline_width": 16.172043011,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 376,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "NivarianCannonExtractor",
+    "title": "涅瓦莲质量驱动器提取口",
+    "source": "Art/RemainingBuildings/NivarianCannonExtractor-v1.svg",
+    "svg": "NivarianCannonExtractor-refresh-v1.svg",
+    "png": "NivarianCannonExtractor-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Heavy octagonal extraction collar, dark shaft and two locking clamps; fixed orientation.",
+    "outline_width": 19.096774194,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 444,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CaravanTeleporter",
+    "title": "远行队传送器",
+    "source": "Art/CaravanTeleporter/CaravanTeleporter-v2.svg",
+    "svg": "CaravanTeleporter-refresh-v1.svg",
+    "png": "CaravanTeleporter-refresh-v1.png",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Exact approved spiral and clip preserved; simplify only the casing and collar.",
+    "outline_width": 19.784946237,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 460,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicMechGestator_south",
+    "title": "宇宙培育器",
+    "source": "Art/CosmicMechGestator/CosmicMechGestator_south-v6.svg",
+    "svg": "CosmicMechGestator_south-refresh-v1.svg",
+    "png": "CosmicMechGestator_south-refresh-v1.png",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "Exact original platform, cylinder and seat coordinates; simplified materials only.",
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  },
+  {
+    "name": "CosmicWorkbench_north",
+    "title": "宇宙工作台",
+    "svg": "CosmicWorkbench_north-refresh-v1.svg",
+    "png": "CosmicWorkbench_north-refresh-v1.png",
+    "footprint": [
+      3,
+      1
+    ],
+    "outline_width": 8.677966102,
+    "outline_cells": 0.0396039603960396,
+    "path_width": 640,
+    "outline_mode": "outside",
+    "transparent_padding": 0
+  }
+]

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288"><g transform="matrix(0.468413213003 0 0 0.494679374480 24.086217471305 13.404645137411)"><defs id="exterior-outline-mask-defs"><mask id="exterior-outside-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect x="0" y="0" width="512" height="512" fill="#ffffff" /><path d="M58 50H454L482 78V450L456 478H56L30 450V78Z" fill="#000000" stroke="none" /></mask></defs><title>物资补给器 · 北向</title><desc>Directional companion to latest approved SVG study; outside-only black contour; not installed.</desc><path d="M58 50H454L482 78V450L456 478H56L30 450V78Z" fill="#637782" />
+<path d="M58 50H454L482 78V422L456 450H56L30 422V78Z" fill="#d8dfe3" />
+<path d="M58 50H454L469 66H51L43 78H30Z" fill="#e6e9e8" />
+<path d="M468 78H482V422L456 450H56L65 436H448L468 416Z" fill="#acb8bf" />
+<g transform="rotate(180 256 256)" id="directional-output-deck"><path d="M87 112H425V178H87Z" fill="#637782" />
+<rect x="96" y="112" width="320" height="47" rx="4" fill="#93a3ad" />
+<rect x="116" y="124" width="88" height="10" rx="1" fill="#c5e5f5" />
+<rect x="339" y="124" width="56" height="10" rx="1" fill="#304553" />
+<path d="M94 184H418V373L396 397H116L94 373Z" fill="#acb8bf" />
+<path d="M108 184H404V365L387 383H125L108 365Z" fill="#d8dfe3" />
+<path d="M108 184H404V196H108Z" fill="#637782" />
+<path d="M256 211V292M202 283L256 337L310 283" fill="none" stroke="#204570" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M91 383H421V409L405 424H107L91 409Z" fill="#637782" />
+<path d="M91 383H421V394H91Z" fill="#93a3ad" />
+<rect x="191" y="404" width="130" height="8" rx="2" fill="#304553" />
+</g><g id="outer-only-outline" mask="url(#exterior-outside-mask)"><path d="M58 50H454L482 78V450L456 478H56L30 450V78Z" fill="none" stroke="#000000" stroke-width="20.277227722772274" stroke-linejoin="miter" stroke-miterlimit="2" vector-effect="non-scaling-stroke" /></g></g></svg>

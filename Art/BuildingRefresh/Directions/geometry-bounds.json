@@ -1,0 +1,122 @@
+{
+  "StorageUnit_south": [
+    132,
+    104,
+    380,
+    624
+  ],
+  "StorageUnit_north": [
+    132,
+    104,
+    380,
+    624
+  ],
+  "StorageUnit_east": [
+    124,
+    132,
+    644,
+    380
+  ],
+  "StorageUnit_west": [
+    124,
+    132,
+    644,
+    380
+  ],
+  "CosmicWorkbench_south": [
+    64.0,
+    68.0,
+    704.0,
+    250.0
+  ],
+  "CosmicWorkbench_north": [
+    64,
+    68,
+    704,
+    250
+  ],
+  "CosmicWorkbench_east": [
+    69.33333333333331,
+    104.87500000000004,
+    282.66666666666663,
+    616.375
+  ],
+  "CosmicWorkbench_west": [
+    69.33333333333334,
+    104.875,
+    282.6666666666667,
+    616.375
+  ],
+  "StorageApparelAdapter_south": [
+    26,
+    42,
+    998,
+    486
+  ],
+  "StorageApparelAdapter_north": [
+    26,
+    42,
+    998,
+    486
+  ],
+  "StorageApparelAdapter_east": [
+    26,
+    42,
+    486,
+    998
+  ],
+  "StorageApparelAdapter_west": [
+    26,
+    42,
+    486,
+    998
+  ],
+  "TransportSupplier_south": [
+    30,
+    50,
+    482,
+    478
+  ],
+  "TransportSupplier_north": [
+    30,
+    50,
+    482,
+    478
+  ],
+  "TransportSupplier_east": [
+    30,
+    50,
+    482,
+    478
+  ],
+  "TransportSupplier_west": [
+    30,
+    50,
+    482,
+    478
+  ],
+  "CosmicMechGestator_south": [
+    64,
+    22.6,
+    704,
+    474
+  ],
+  "CosmicMechGestator_north": [
+    64,
+    22.6,
+    704,
+    474
+  ],
+  "CosmicMechGestator_east": [
+    170.6667,
+    137.5,
+    597.3333,
+    686.5
+  ],
+  "CosmicMechGestator_west": [
+    170.6667,
+    137.5,
+    597.3333,
+    686.5
+  ]
+}

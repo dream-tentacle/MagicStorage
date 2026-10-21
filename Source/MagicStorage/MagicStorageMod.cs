@@ -13,7 +13,8 @@ namespace MagicStorage
         private readonly string[] refreshBuffers = new string[(int)StorageRefreshTask.Count];
         private Vector2 settingsScroll;
         private float settingsHeight;
-        private bool performanceTab;
+        private enum SettingsTab { General, Performance, Accessibility }
+        private SettingsTab settingsTab;
 
         public MagicStorageMod(ModContentPack content) : base(content)
         {
@@ -37,15 +38,17 @@ namespace MagicStorage
             Widgets.DrawMenuSection(body);
             TabDrawer.DrawTabs(body, new List<TabRecord>
             {
-                new TabRecord("MS_SettingsTabGeneral".Translate(), () => SelectSettingsTab(false), !performanceTab),
-                new TabRecord("MS_SettingsTabPerformance".Translate(), () => SelectSettingsTab(true), performanceTab)
+                new TabRecord("MS_SettingsTabGeneral".Translate(), () => SelectSettingsTab(SettingsTab.General), settingsTab == SettingsTab.General),
+                new TabRecord("MS_SettingsTabPerformance".Translate(), () => SelectSettingsTab(SettingsTab.Performance), settingsTab == SettingsTab.Performance),
+                new TabRecord("MS_SettingsTabAccessibility".Translate(), () => SelectSettingsTab(SettingsTab.Accessibility), settingsTab == SettingsTab.Accessibility)
             });
             var viewport = new Rect(body.x + 12f, body.y + 12f, body.width - 24f, Mathf.Max(0f, body.height - 24f));
             var view = new Rect(0, 0, viewport.width - 20, Mathf.Max(viewport.height, settingsHeight));
             Widgets.BeginScrollView(viewport, ref settingsScroll, view);
             var listing = new Listing_Standard();
             listing.Begin(view);
-            if (performanceTab) DrawPerformanceSettings(listing);
+            if (settingsTab == SettingsTab.Accessibility) DrawAccessibilitySettings(listing);
+            else if (settingsTab == SettingsTab.Performance) DrawPerformanceSettings(listing);
             else DrawGeneralSettings(listing);
             listing.Gap();
             if (listing.ButtonText("MS_SettingsRestoreDefaults".Translate()))
@@ -59,16 +62,19 @@ namespace MagicStorage
             Widgets.EndScrollView();
         }
 
-        private void SelectSettingsTab(bool performance)
+        private void SelectSettingsTab(SettingsTab tab)
         {
-            if (performanceTab == performance) return;
-            performanceTab = performance;
+            if (settingsTab == tab) return;
+            settingsTab = tab;
             settingsScroll = Vector2.zero;
             settingsHeight = 0f;
         }
 
         private void DrawGeneralSettings(Listing_Standard listing)
         {
+            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode);
+            listing.Label("MS_SettingsWorkbenchUnlockModeHelp".Translate());
+            listing.Gap();
             listing.Label("MS_SettingsUnitSlotsHelp".Translate());
             int slots = Settings.StorageUnitSlots;
             listing.TextFieldNumericLabeled("MS_SettingsUnitSlots".Translate(), ref slots, ref unitSlotsBuffer,
@@ -82,6 +88,14 @@ namespace MagicStorage
                 MagicStorageSettings.MinCosmicWorkbenchWorkSpeedPercent / (float)speedStep,
                 MagicStorageSettings.MaxCosmicWorkbenchWorkSpeedPercent / (float)speedStep),
                 System.MidpointRounding.AwayFromZero) * speedStep;
+        }
+
+        private void DrawAccessibilitySettings(Listing_Standard listing)
+        {
+            listing.Label("MS_SettingsAccessibilityNotice".Translate());
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsCaravanItemFilters".Translate(), ref Settings.CaravanItemFilters);
+            listing.CheckboxLabeled("MS_SettingsTradeItemFilters".Translate(), ref Settings.TradeItemFilters);
         }
 
         private void DrawPerformanceSettings(Listing_Standard listing)

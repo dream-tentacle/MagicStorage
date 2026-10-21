@@ -56,24 +56,26 @@ namespace MagicStorage
             return (int)Math.Min(item.stackCount, Math.Floor((freeMass + tolerance) / mass));
         }
 
-        internal static List<StorageTransportRow> Snapshot(Building_TransportSupplier supplier, StorageNetwork network)
+        internal static List<StorageTransportRow> Snapshot(Building_TransportSupplier supplier, StorageNetwork network,
+            Func<Thing, Thing, bool> canGroup = null)
         {
             var rows = new List<StorageTransportRow>();
             var byDef = new Dictionary<ThingDef, List<StorageTransportRow>>();
             var stacks = new List<Thing>();
             network?.GetAllStacks(stacks);
-            foreach (Thing item in stacks) Add(rows, byDef, item, true, network);
-            foreach (Thing item in supplier.Contents) Add(rows, byDef, item, false, network);
+            foreach (Thing item in stacks) Add(rows, byDef, item, true, network, canGroup);
+            foreach (Thing item in supplier.Contents) Add(rows, byDef, item, false, network, canGroup);
             return rows;
         }
 
         private static void Add(List<StorageTransportRow> rows, Dictionary<ThingDef, List<StorageTransportRow>> byDef,
-            Thing item, bool fromNetwork, StorageNetwork network)
+            Thing item, bool fromNetwork, StorageNetwork network, Func<Thing, Thing, bool> canGroup)
         {
             if (!byDef.TryGetValue(item.def, out var candidates)) byDef.Add(item.def, candidates = new List<StorageTransportRow>());
             StorageTransportRow row = null;
             foreach (var candidate in candidates)
-                if (TransferableUtility.TransferAsOne(item, candidate.Representative, TransferAsOneMode.Normal)) { row = candidate; break; }
+                if (TransferableUtility.TransferAsOne(item, candidate.Representative, TransferAsOneMode.Normal) &&
+                    (canGroup == null || canGroup(item, candidate.Representative))) { row = candidate; break; }
             if (row == null) { row = new StorageTransportRow(); rows.Add(row); candidates.Add(row); }
             row.things.Add(item);
             if (fromNetwork)
@@ -82,6 +84,38 @@ namespace MagicStorage
                 row.Available += network.AvailableToWithdraw(item);
             }
             else { row.SupplyStacks.Add(item); row.SupplyCount += item.stackCount; }
+        }
+
+        // Rule edits can split or merge rows. Rebuild selections from the original physical
+        // stacks on each side, rather than matching only a representative or a Def.
+        internal static void RestoreSelections(IEnumerable<StorageTransportRow> previous, IList<StorageTransportRow> current,
+            StorageNetwork network)
+        {
+            var outgoing = new Dictionary<Thing, long>();
+            var returning = new Dictionary<Thing, long>();
+            foreach (var row in previous)
+            {
+                bool toSupplier = row.Change > 0;
+                long remaining = toSupplier ? row.Change : -row.Change;
+                var selected = toSupplier ? outgoing : returning;
+                foreach (var item in toSupplier ? row.NetworkStacks : row.SupplyStacks)
+                {
+                    if (remaining == 0) break;
+                    long available = toSupplier ? network?.AvailableToWithdraw(item) ?? 0 : item.Destroyed ? 0 : item.stackCount;
+                    long count = Math.Min(remaining, available);
+                    selected[item] = count;
+                    remaining -= count;
+                }
+            }
+            foreach (var row in current)
+            {
+                long change = 0;
+                foreach (var item in row.NetworkStacks)
+                    if (outgoing.TryGetValue(item, out long count)) change += count;
+                foreach (var item in row.SupplyStacks)
+                    if (returning.TryGetValue(item, out long count)) change -= count;
+                row.SetChange(change);
+            }
         }
 
         // Use each actual stack's stat; native grouping can combine items with different mass.

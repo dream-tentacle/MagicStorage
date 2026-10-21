@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 768 512">
+  <title>魔法存储 — 宇宙机械体培育器，3×2 南向第四稿</title>
+  <desc>Three cells horizontally and two in depth. A rounded, moderately raised lid and a visibly deeper glass vessel balance the low wide platform. Pearl-grey metal and sky-blue accents. Base layout and south-facing controls retain the previous design.</desc>
+  <defs>
+    <radialGradient id="lid-metal" cx="35%" cy="25%" r="80%">
+      <stop offset="0" stop-color="#edf3f7" />
+      <stop offset=".6" stop-color="#d0dce5" />
+      <stop offset="1" stop-color="#a9bdcc" />
+    </radialGradient>
+    <linearGradient id="tank-glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#638ca9" stop-opacity=".8" />
+      <stop offset=".15" stop-color="#c5e5f5" stop-opacity=".65" />
+      <stop offset=".52" stop-color="#b0d4e9" stop-opacity=".34" />
+      <stop offset=".83" stop-color="#87b4d0" stop-opacity=".59" />
+      <stop offset="1" stop-color="#527c9b" stop-opacity=".85" />
+    </linearGradient>
+    <linearGradient id="culture-fluid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c5e5f5" stop-opacity=".17" />
+      <stop offset="1" stop-color="#6390b0" stop-opacity=".55" />
+    </linearGradient>
+    <clipPath id="tank-body-clip">
+      <path d="M263 148C263 94 505 94 505 148V311C505 402 263 402 263 311Z" />
+    </clipPath>
+  </defs>
+  <g id="gestator-base">
+    <rect x="36" y="106" width="696" height="370" rx="20" fill="#798e9d" />
+    <rect x="36" y="84" width="696" height="366" rx="20" fill="#d8dfe3" />
+    <path d="M36 430Q36 450 56 450H712Q732 450 732 430" fill="none" stroke="#526b7e" stroke-width="3.5" />
+    <path d="M49 222V112Q49 97 65 97H268M500 97H702Q719 97 719 113" fill="none" stroke="#f2f6f9" stroke-width="3" stroke-linecap="round" />
+    <path d="M719 126V419Q719 437 701 437H68" fill="none" stroke="#a9bbc8" stroke-width="4" stroke-linecap="round" />
+    <path d="M67 386H701" stroke="#bdcbd5" stroke-width="2" />
+    <path d="M77 173L89 155H208V365H77Z" fill="#b2c3cf" />
+    <path d="M85 178L95 164H196V355H85Z" fill="#98aebf" />
+    <path d="M110 181V208M122 181V208M134 181V208M146 181V208" stroke="#e3edf4" stroke-width="4" />
+    <path d="M164 235H224L272 213M164 317H226L272 339" fill="none" stroke="#7892a6" stroke-width="19" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M164 230H224L272 208M164 312H226L272 334" fill="none" stroke="#d4e1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="148" y="216" width="28" height="29" rx="7" fill="#a9c0d0" />
+    <ellipse cx="162" cy="216" rx="14" ry="10" fill="#e6eef4" />
+    <rect x="148" y="298" width="28" height="29" rx="7" fill="#a9c0d0" />
+    <ellipse cx="162" cy="298" rx="14" ry="10" fill="#e6eef4" />
+    <rect x="100" y="335" width="30" height="7" rx="2" fill="#c5e5f5" />
+    <rect x="554" y="174" width="125" height="190" rx="12" fill="#b4c6d3" />
+    <rect x="562" y="169" width="109" height="187" rx="10" fill="#e0e8ee" />
+    <path d="M580 217Q580 191 617 191Q654 191 654 217V291Q654 317 617 317Q580 317 580 291Z" fill="#bccfdd" />
+    <ellipse cx="617" cy="217" rx="37" ry="26" fill="#edf3f7" />
+    <ellipse cx="617" cy="214" rx="28" ry="17" fill="#c3d6e3" />
+    <path d="M582 266Q617 289 652 266V277Q617 300 582 277Z" fill="#c5e5f5" />
+    <path d="M592 328H643" stroke="#89a5b9" stroke-width="5" stroke-linecap="round" />
+    <g id="vessel-seat" transform="translate(0 8)">
+      <ellipse cx="384" cy="342" rx="144" ry="71" fill="#8ca5b8" />
+      <path d="M240 326V340C240 380 304 412 384 412C464 412 528 380 528 340V326Z" fill="#a6bdcd" />
+      <ellipse cx="384" cy="326" rx="144" ry="71" fill="#d9e5ed" />
+      <ellipse cx="384" cy="325" rx="126" ry="59" fill="#86a4ba" />
+      <ellipse cx="384" cy="325" rx="113" ry="51" fill="#7596ae" />
+      <ellipse cx="384" cy="326" rx="76" ry="34" fill="#bed5e4" />
+      <path d="M279 371C331 401 437 401 489 371" fill="none" stroke="#f0f6fa" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M321 400Q384 416 447 400" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round" />
+    </g>
+  </g>
+  <g id="cylinder-glass" clip-path="url(#tank-body-clip)" transform="translate(384 0) scale(.94 1) translate(-384 0)">
+    <path d="M263 148C263 94 505 94 505 148V311C505 402 263 402 263 311Z" fill="url(#tank-glass)" stroke="#7f9fb7" stroke-width="2.5" />
+    <path d="M269 262C269 217 499 217 499 262V312C499 388 269 388 269 312Z" fill="url(#culture-fluid)" />
+    <ellipse cx="384" cy="262" rx="115" ry="39" fill="#c5e5f5" fill-opacity=".14" />
+    <path d="M275 265C275 310 493 310 493 265" fill="none" stroke="#e2f2fb" stroke-opacity=".26" stroke-width="2" />
+    <path d="M285 224V307Q285 341 305 352" fill="none" stroke="#f0f9fd" stroke-opacity=".58" stroke-width="8" stroke-linecap="round" />
+    <path d="M299 234V279" stroke="#e5f5fc" stroke-opacity=".27" stroke-width="3" stroke-linecap="round" />
+    <path d="M486 224V310Q486 343 466 354" fill="none" stroke="#658da9" stroke-opacity=".48" stroke-width="4" stroke-linecap="round" />
+  </g>
+  <g id="gestator-top">
+    <path d="M266 115V129C266 182 319 225 384 225C449 225 502 182 502 129V115Z" fill="#91aabd" />
+    <path d="M280 165C322 218 446 218 488 165V175C446 225 322 225 280 175Z" fill="#c5e5f5" />
+    <ellipse cx="384" cy="115" rx="118" ry="96" fill="url(#lid-metal)" />
+    <path d="M283 98C304 54 344 29 375 27" fill="none" stroke="#f4f8fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M321 190Q384 219 447 190" fill="none" stroke="#95afc2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="350" y="88" width="68" height="32" rx="8" fill="#b5c9d8" />
+    <rect x="354" y="91" width="60" height="25" rx="6" fill="#dce9f1" />
+    <path d="M366 100H401" fill="none" stroke="#9bb5c9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M370 110H397" fill="none" stroke="#c5e5f5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="front-service">
+    <rect x="68" y="408" width="171" height="49" rx="7" fill="#95afc1" />
+    <rect x="68" y="399" width="171" height="48" rx="7" fill="#dfe8ee" />
+    <rect x="79" y="409" width="147" height="27" rx="4" fill="#afc4d3" />
+    <rect x="83" y="413" width="139" height="19" rx="2" fill="#344e64" />
+    <path d="M94 422H122M133 422H155M181 422H210" stroke="#c5e5f5" stroke-width="2.5" />
+    <path d="M282 406H486V452H282Z" fill="#9bb2c3" />
+    <path d="M287 401H481V415H287ZM287 424H481V438H287Z" fill="#e0e9ef" />
+    <path d="M293 405H475M293 428H475" stroke="#f4f8fa" stroke-width="2" />
+    <path d="M287 417H481M287 440H481" stroke="#809caf" stroke-width="3" />
+    <rect x="563" y="405" width="111" height="35" rx="5" fill="#b7cbd9" />
+    <rect x="568" y="409" width="101" height="26" rx="3" fill="#e3ecf2" />
+    <path d="M581 419H608M581 426H601" stroke="#99b2c5" stroke-width="2" />
+    <rect x="635" y="417" width="20" height="10" rx="2" fill="#c5e5f5" />
+    <rect x="340" y="461" width="88" height="7" rx="3.5" fill="#344e64" />
+    <path d="M353 464H378M402 464H416" stroke="#c5e5f5" stroke-width="2" stroke-linecap="round" />
+  </g>
+  <path d="M56 84H272.32A118 96 0 0 1 495.68 84H712Q732 84 732 104V456Q732 476 712 476H56Q36 476 36 456V104Q36 84 56 84Z" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

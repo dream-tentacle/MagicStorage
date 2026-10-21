@@ -57,7 +57,33 @@ internal static class StorageSupplyShelfTests
         PresetClipboard();
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
         StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
+        StockSelectionCommands();
         return assertions;
+    }
+
+    private static void StockSelectionCommands()
+    {
+        var previousSelection = Find.Selector.Selected;
+        try
+        {
+            var f = new Fixture();
+            f.Shelf.SetSelection(0, f.X); f.Shelf.SetSelection(1, f.Y);
+            f.Store(f.X, 5); f.Store(f.Y, 3); f.Tick();
+            Find.Selector.Selected = f.Shelf;
+            var commands = f.Shelf.GetGizmos().OfType<Command_SelectStorage>().ToList();
+            Equal(2, commands.Count, "selected shelf offers one command per physical stock stack");
+            Equal(true, commands.Any(command => command.Target == f.Stock(f.X)), "first stock stack has a selection command");
+            Equal(true, commands.Any(command => command.Target == f.Stock(f.Y)), "second stock stack has a selection command");
+            commands[0].action();
+            Equal(commands[0].Target, Find.Selector.Selected, "stock command selects the physical item");
+            Equal(8, f.Shelf.GetSlotGroup().HeldThings.Sum(item => item.stackCount), "selecting stock leaves shelf inventory intact");
+            Find.Selector.Selected = null;
+            Equal(0, f.Shelf.GetGizmos().OfType<Command_SelectStorage>().Count(), "stock buttons require a single selection");
+            Find.Selector.Selected = f.Shelf;
+            f.Shelf.Spawned = false;
+            Equal(0, f.Shelf.GetGizmos().OfType<Command_SelectStorage>().Count(), "unspawned shelf does not offer stock selection");
+        }
+        finally { Find.Selector.Selected = previousSelection; }
     }
 
     private static Command_Action PresetCommand(Building_StorageSupplyShelf shelf, string key) =>
