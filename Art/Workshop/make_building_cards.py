@@ -25,7 +25,7 @@ IDS = ['MS_StorageCore', 'MS_StorageUnit', 'MS_StorageReceiver',
 
 @lru_cache(maxsize=None)
 def font(size):
-    return ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc', size*SCALE)
+    return ImageFont.truetype('HarmonyOS_Sans_SC_Bold.ttf', size*SCALE)
 
 
 def save_png(image, path):
@@ -245,7 +245,7 @@ def render_card(card):
 
     save_png(canvas.resize(FINAL_SIZE,Image.Resampling.LANCZOS),png_path)
     save_text('<svg xmlns="http://www.w3.org/2000/svg" width="2800" height="800" '
-                        'viewBox="0 0 1400 400"><g font-family="Microsoft YaHei,sans-serif" '
+                        'viewBox="0 0 1400 400"><g font-family="HarmonyOS Sans SC,HarmonyOS Sans,sans-serif" '
                         'font-weight="700">'+''.join(svg)+'</g></svg>',svg_path)
     return png_path,svg_path
 

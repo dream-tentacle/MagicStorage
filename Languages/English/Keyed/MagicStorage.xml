@@ -54,7 +54,10 @@
   <MS_SettingsAccessibilityNotice>The following options modify vanilla code. If enabling them causes errors or has no effect, this indicates a conflict with another mod: both this mod and the other mod modify vanilla code.</MS_SettingsAccessibilityNotice>
   <MS_SettingsCaravanItemFilters>Caravan item filters</MS_SettingsCaravanItemFilters>
   <MS_SettingsTradeItemFilters>Trade window item filters</MS_SettingsTradeItemFilters>
+  <MS_SettingsTidySupplyShelf>Tidy restocking shelves</MS_SettingsTidySupplyShelf>
+  <MS_SettingsTidySupplyShelfHelp>Improve how items are displayed on restocking shelves.</MS_SettingsTidySupplyShelfHelp>
   <MS_SettingsWorkbenchUnlockMode>Workbench unlock mode</MS_SettingsWorkbenchUnlockMode>
+  <MS_SettingsAllowPrinterParameterChanges>Allow printer parameter changes</MS_SettingsAllowPrinterParameterChanges>
   <MS_SettingsWorkbenchUnlockModeHelp>Spend construction materials to unlock workbenches before adding their recipes. Workbenches with no material cost are unlocked automatically. Unlocks are shared throughout the current save. Disabling this mode makes all researched recipes available and preserves recorded unlocks.</MS_SettingsWorkbenchUnlockModeHelp>
   <MS_SettingsTabPerformance>Performance</MS_SettingsTabPerformance>
   <MS_SettingsPerformanceNotice>We recommend keeping the initial defaults, as this mod already performs very well.</MS_SettingsPerformanceNotice>

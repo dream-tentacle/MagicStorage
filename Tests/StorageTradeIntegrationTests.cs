@@ -34,10 +34,21 @@ internal static class StorageTradeIntegrationTests
             var node = new CompStorageNode { parent = thing };
             if (thing is Building_StorageCore core) { core.node = node; Map.listerBuildings.allBuildingsColonist.Add(core); }
             if (thing is Building_StorageUnit unit) unit.node = node;
+            if (thing is Building_StorageSupplyShelf shelf)
+            { shelf.node = node; Map.haulDestinationManager.SlotParents[thing.Position] = shelf; }
             Map.GetComponent<MapComponent_StorageNetworks>().Register(node);
         }
         internal Thing Stock(ThingDef def, int count)
         { var item = new Thing { def = def, stackCount = count }; Unit.Inventory.Contents.TryAdd(item, false); return item; }
+        internal Thing ShelfStock(ThingDef def, int count, out Building_StorageSupplyShelf shelf)
+        {
+            shelf = new Building_StorageSupplyShelf();
+            Register(shelf, 2);
+            Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            var item = new Thing { def = def, stackCount = count, Spawned = true, Map = Map, Position = shelf.Position };
+            Map.Ground.Add(item);
+            return item;
+        }
         internal Dialog_Trade Open()
         { StorageTradeSession.Open(Negotiator, Trader); return Find.WindowStack.WindowOfType<Dialog_Trade>(); }
         internal void Close(Dialog_Trade dialog)
@@ -50,11 +61,14 @@ internal static class StorageTradeIntegrationTests
         {
             RuntimeHelpers.RunClassConstructor(typeof(StorageTradePatches).TypeHandle);
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver(); RefusalAndCancellation(); ChangedSources(); MultiCoreAndGifts(); Orbital();
+            ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading();
             var harmony = new Harmony("magicstorage.tests.dynamictrade");
             harmony.Patch(AccessTools.Method(typeof(Dialog_Trade), nameof(Dialog_Trade.PostOpen)),
                 prefix: new HarmonyMethod(AccessTools.DeclaredMethod(typeof(Dialog_TradePatches), "Prefix")));
             new DynamicTradeInterfaceCompatibility().Apply(harmony);
             DynamicNativeFallback(); DynamicOrdinary(); DynamicSaleAndPurchase(); DynamicCancelAndFailures(); DynamicOrbital();
+            DynamicShelfTrading();
+            checks += StorageLaunchPaymentTests.Run();
             Console.WriteLine("PASS: " + checks + " trade integration assertions (actual production Harmony hooks and sessions; native UI, pricing and delivery boundaries stubbed).");
             return 0;
         }
@@ -237,6 +251,147 @@ internal static class StorageTradeIntegrationTests
         f.Close(dialog);
         var ordinary = new Dialog_Trade(f.Negotiator, ship);
         Equal(false, StorageTradeSession.TryGet(TradeSession.deal, out _), "ordinary orbital trade retains native scope");
+    }
+
+    private static void ShelfTrading()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Stock(def, 4);
+        var shelfStock = f.ShelfStock(def, 6, out var shelf);
+        var dialog = f.Open(); var deal = TradeSession.deal;
+        var line = deal.AllTradeables.Find(t => t.ThingDef == def);
+        Equal(10, line.CountHeldBy(Transactor.Colony), "network and connected shelf stock aggregate without duplicates");
+        Equal(2, line.thingsColony.Count, "one real stack per inventory source");
+        line.CountToTransfer = -7;
+        Equal(true, deal.TryExecute(out _), "sale combines network and shelf goods");
+        Equal(0L, f.Core.Network.GetTotalCount(def), "sale uses network goods before shelf supplies");
+        Equal(3, shelfStock.stackCount, "sale takes only the shortfall from the shelf");
+        Equal(7, f.Trader.Goods.Where(item => item.def == def).Sum(item => item.stackCount), "merchant receives exact mixed-source sale");
+        Equal(3, deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "reset shows remaining shelf stock once");
+        f.Close(dialog);
+
+        f = new Fixture(); f.Stock(ThingDefOf.Silver, 2);
+        shelfStock = f.ShelfStock(ThingDefOf.Silver, 10, out shelf);
+        f.Trader.inventory.innerContainer.TryAdd(new Thing { def = def, stackCount = 6 });
+        dialog = f.Open(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = 5;
+        Equal(true, deal.TryExecute(out _), "shelf silver can supplement network currency");
+        Equal(0L, f.Core.Network.GetTotalCount(ThingDefOf.Silver), "payment takes network silver first");
+        Equal(7, shelfStock.stackCount, "payment consumes exact remaining silver from the shelf");
+        Equal(5, f.Map.Ground.Where(item => item.def == def).Sum(item => item.stackCount), "purchases keep native ground delivery");
+        f.Close(dialog);
+
+        f = new Fixture(); shelfStock = f.ShelfStock(def, 6, out shelf);
+        dialog = f.Open(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+        TradeDeal.RefuseExecution = true;
+        Equal(false, deal.TryExecute(out _), "native refusal preserves shelf-only goods");
+        Equal(6, shelfStock.stackCount, "preflight does not extract shelf stock");
+        Equal(true, shelfStock.Spawned, "refusal leaves shelf placement intact");
+        TradeDeal.RefuseExecution = false; TradeDeal.ThrowExecution = true;
+        try { deal.TryExecute(out _); throw new Exception("Expected controlled exception"); }
+        catch (InvalidOperationException) { }
+        TradeDeal.ThrowExecution = false;
+        Equal(6, shelfStock.stackCount, "native exception before delivery does not extract shelf stock");
+        TradeSession.giftMode = true; deal.Reset();
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        Equal(true, deal.TryExecute(out _), "shelf-only goods can be gifted");
+        Equal(3, shelfStock.stackCount, "gift deducts exact shelf quantity");
+        f.Close(dialog);
+
+        f = new Fixture(); f.ShelfStock(def, 6, out shelf);
+        dialog = f.Open(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        f.Trader.BeforeReceivingTrade = item => { throw new InvalidOperationException("Controlled delivery failure"); };
+        try { deal.TryExecute(out _); throw new Exception("Expected delivery exception"); }
+        catch (InvalidOperationException) { }
+        Equal(6, f.Map.Ground.Where(item => item.def == def && item.Position == shelf.Position).Sum(item => item.stackCount),
+            "failed merchant delivery restores all uncommitted goods to the shelf");
+        Equal(0L, f.Core.Network.GetTotalCount(def), "shelf restoration does not silently move goods into network inventory");
+        Equal(0, f.Trader.Goods.Where(item => item.def == def).Sum(item => item.stackCount), "failed delivery gives merchant no goods");
+        f.Close(dialog);
+
+        f = new Fixture(); f.ShelfStock(def, 6, out shelf);
+        dialog = f.Open(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        f.Trader.BeforeReceivingTrade = item =>
+        {
+            f.Trader.inventory.innerContainer.TryAdd(item.SplitOff(item.stackCount), false);
+            throw new InvalidOperationException("Controlled exception after acceptance");
+        };
+        try { deal.TryExecute(out _); throw new Exception("Expected post-acceptance exception"); }
+        catch (InvalidOperationException) { }
+        Equal(3, f.Map.Ground.Where(item => item.def == def).Sum(item => item.stackCount), "accepted shelf goods are never duplicated by rollback");
+        Equal(3, f.Trader.Goods.Where(item => item.def == def).Sum(item => item.stackCount), "merchant retains goods already accepted before exception");
+        f.Close(dialog);
+    }
+
+    private static void ShelfEligibility()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Stock(def, 2);
+        var stock = f.ShelfStock(def, 6, out var shelf);
+        var dialog = f.Open(); var deal = TradeSession.deal;
+        var line = deal.AllTradeables.Find(t => t.ThingDef == def);
+        line.CountToTransfer = -7;
+        int executed = TradeDeal.NativeExecutions;
+        f.Map.reservationManager.Reserved.Add(stock);
+        Equal(2, line.CountHeldBy(Transactor.Colony), "live count excludes newly reserved shelf stock");
+        Equal(false, deal.TryExecute(out _), "stale sale cannot take job-reserved shelf goods");
+        Equal(executed, TradeDeal.NativeExecutions, "unavailable shelf stock blocks native execution");
+        f.Map.reservationManager.Reserved.Clear(); f.Map.physicalInteractionReservationManager.Reserved.Add(stock);
+        Equal(false, deal.TryExecute(out _), "physical interactions also block shelf sales");
+        f.Map.physicalInteractionReservationManager.Reserved.Clear();
+        shelf.forbidden = true;
+        Equal(false, deal.TryExecute(out _), "forbidden shelves are not trade sources");
+        shelf.forbidden = false; stock.forbidden = true;
+        Equal(false, deal.TryExecute(out _), "forbidden shelf items are not trade sources");
+        stock.forbidden = false; f.Map.ShelfFire = true;
+        Equal(false, deal.TryExecute(out _), "burning shelf cells are not trade sources");
+        f.Map.ShelfFire = false; shelf.node.Network = new StorageNetwork();
+        Equal(false, deal.TryExecute(out _), "a shelf disconnected from its listed network cannot sell");
+        shelf.node.Network = f.Core.Network; stock.stale = true;
+        Equal(false, deal.TryExecute(out _), "native sellability is rechecked for shelf goods");
+        Equal(6, stock.stackCount, "rejected shelf sales leave real stock intact");
+        Equal(2L, f.Core.Network.GetTotalCount(def), "rejected shelf sales leave network stock intact");
+        stock.stale = false; f.Close(dialog);
+        f.Map.reservationManager.Reserved.Add(stock);
+        dialog = f.Open();
+        Equal(2, TradeSession.deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "initial inventory also omits reserved shelf stock");
+        f.Close(dialog);
+    }
+
+    private static void OrbitalShelfTrading()
+    {
+        var f = new Fixture(); var def = new ThingDef();
+        var stock = f.ShelfStock(def, 8, out var shelf);
+        var ship = new TradeShip { Map = f.Map }; f.Map.passingShipManager.passingShips.Add(ship);
+        var console = new Building_CommsConsole { Spawned = true, Map = f.Map };
+        var beacon = new Building_OrbitalTradeBeacon(); f.Map.Beacons.Add(beacon);
+        beacon.TradeableCells.Add(f.Core.Position);
+        Equal(false, beacon.TradeableCells.Contains(shelf.Position), "shelf itself is outside beacon coverage");
+        StorageTradeSession.Open(f.Negotiator, ship, console);
+        var dialog = Find.WindowStack.WindowOfType<Dialog_Trade>(); var deal = TradeSession.deal;
+        var line = deal.AllTradeables.Find(t => t.ThingDef == def);
+        Equal(8, line.CountHeldBy(Transactor.Colony), "covered core exposes connected shelf inventory");
+        line.CountToTransfer = -3; beacon.Powered = false;
+        Equal(false, deal.TryExecute(out _), "lost core coverage blocks shelf sale too");
+        Equal(8, stock.stackCount, "lost beacon never deducts shelf stock");
+        beacon.Powered = true;
+        Equal(true, deal.TryExecute(out _), "orbital shelf-only sale succeeds through covered core");
+        Equal(5, stock.stackCount, "orbital shelf sale deducts exact amount");
+        Equal(3, ship.Goods.Where(item => item.def == def).Sum(item => item.stackCount), "ship receives actual shelf goods");
+        f.Close(dialog);
+    }
+
+    private static void DynamicShelfTrading()
+    {
+        var f = new Fixture(); var def = new ThingDef();
+        var stock = f.ShelfStock(def, 8, out _);
+        var window = OpenDynamic(f); var deal = TradeSession.deal;
+        Equal(8, window.ColonyCounts[def], "dynamic interface displays shelf-only inventory");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        Equal(true, window.Accept(), "dynamic interface delivers shelf-only sale");
+        Equal(5, stock.stackCount, "dynamic shelf sale consumes exact quantity");
+        Equal(3, f.Trader.Goods.Where(item => item.def == def).Sum(item => item.stackCount), "dynamic sale delivers real shelf goods");
     }
 
     private static Window_DynamicTrade OpenDynamic(Fixture f)

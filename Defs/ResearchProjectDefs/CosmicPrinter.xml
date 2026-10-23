@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ResearchProjectDef>
+    <defName>MS_CosmicPrinter</defName>
+    <label>cosmic printer</label>
+    <description>Allows construction of cosmic printers. This technology is very cheaty.</description>
+    <baseCost>5000</baseCost>
+    <techLevel>Industrial</techLevel>
+    <tab>MS_MagicStorage</tab>
+    <prerequisites><li>MS_MagicDrive</li><li>Fabrication</li></prerequisites>
+    <researchViewX>2</researchViewX>
+    <researchViewY>1</researchViewY>
+  </ResearchProjectDef>
+</Defs>

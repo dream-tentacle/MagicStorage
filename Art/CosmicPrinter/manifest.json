@@ -1,0 +1,49 @@
+{
+  "size": [
+    544,
+    544
+  ],
+  "footprint": [
+    2,
+    2
+  ],
+  "draw_size": [
+    2.2325,
+    2.2325
+  ],
+  "palette": {
+    "shell": "#d8dfe3",
+    "lid": "#cfd4d5",
+    "light": "#e6e9e8",
+    "bevel": "#acb8bf",
+    "body": "#8498a4",
+    "side": "#637782",
+    "base": "#53616b",
+    "bottom": "#414e58",
+    "recess": "#304553",
+    "deep": "#263c4c",
+    "screen": "#344a5b",
+    "blue": "#c5e5f5",
+    "blue_dim": "#91adbf",
+    "seam": "#74848c",
+    "edge": "#b9c4ca"
+  },
+  "outline_pixels": 10,
+  "alpha_bbox": [
+    28,
+    28,
+    516,
+    516
+  ],
+  "transparent_background": true,
+  "generator": "PIL",
+  "supersampling": 4,
+  "view": "elevated orthographic; parallel casing edges; compressed front faces",
+  "reference_shape": "wide all-in-one printer, left-front controls, central output slot",
+  "style_sources": [
+    "Art/BuildingRefresh/GameExport/StorageCore.svg",
+    "Art/BuildingRefresh/GameExport/CosmicWorkbench_south.svg",
+    "Art/BuildingRefresh/GameExport/StorageReceiver.svg"
+  ],
+  "target": "Textures/Things/Building/CosmicPrinter/CosmicPrinter.png"
+}

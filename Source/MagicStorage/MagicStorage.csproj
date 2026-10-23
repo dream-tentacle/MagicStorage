@@ -105,6 +105,8 @@
     <Compile Include="Storage\StorageCaravanPatches.cs" />
     <Compile Include="Storage\StoragePawnScanPatches.cs" />
     <Compile Include="Storage\StorageSelectionPatches.cs" />
+    <Compile Include="Storage\StorageShelfLayout.cs" />
+    <Compile Include="Storage\StorageShelfDrawing.cs" />
     <Compile Include="Storage\StorageRefreshTimer.cs" />
     <Compile Include="Storage\StorageCaravanWorldGizmos.cs" />
     <Compile Include="Storage\StorageCaravanTransfer.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="Trading\StorageTradeSession.cs" />
     <Compile Include="Trading\Tradeable_Storage.cs" />
     <Compile Include="Trading\StorageTradePatches.cs" />
+    <Compile Include="Trading\StorageLaunchPaymentPatches.cs" />
     <Compile Include="Trading\StorageTradeWarning.cs" />
     <Compile Include="Trading\FloatMenuOptionProvider_StorageTrade.cs" />
     <Compile Include="Trading\FloatMenuOptionProvider_StorageOrbitalTrade.cs" />
@@ -141,6 +144,11 @@
     <Compile Include="Construction\ConstructionSite.cs" />
     <Compile Include="Crafting\CraftingOrder.cs" />
     <Compile Include="Crafting\CraftingBatch.cs" />
+    <Compile Include="Crafting\ICraftingExecutor.cs" />
+    <Compile Include="Crafting\CosmicPrinterSettings.cs" />
+    <Compile Include="Crafting\PrinterCraftingProduction.cs" />
+    <Compile Include="Buildings\Building_CosmicPrinter.cs" />
+    <Compile Include="UI\Dialog_CosmicPrinter.cs" />
     <Compile Include="Crafting\CraftingProductionPolicy.cs" />
     <Compile Include="Crafting\ICraftingProductionPolicy.cs" />
     <Compile Include="Crafting\CraftingRunPolicy.cs" />

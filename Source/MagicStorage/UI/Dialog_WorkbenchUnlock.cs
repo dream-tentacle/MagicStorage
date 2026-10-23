@@ -55,11 +55,8 @@ namespace MagicStorage
             }
 
             bool valid = CraftingWorkbenchUnlocks.TryGetCosts(table, stuff, out var costs);
-            var stocks = valid ? CraftingWorkbenchUnlocks.Stocks(core, costs) : new List<Thing>();
-            var counts = stocks.GroupBy(item => item.def).ToDictionary(group => group.Key,
-                group => group.Sum(item => (long)CraftingWorkbenchUnlocks.Available(core.Network, item)));
-            bool enough = valid && core.Network?.CanWork == true && costs.All(cost =>
-                counts.TryGetValue(cost.thingDef, out long count) && count >= cost.count);
+            var counts = new Dictionary<ThingDef, long>();
+            bool enough = valid && CraftingWorkbenchUnlocks.TryPlan(core, costs, out counts, out _);
 
             Widgets.Label(new Rect(0, y, rect.width, 28f), "MS_Craft_UnlockMaterials".Translate());
             y += 30f;

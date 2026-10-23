@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -30,7 +29,7 @@ namespace MagicStorage
         }
 
         // Network stacks come first; only connected, usable shelf stock can supplement them.
-        internal static List<Thing> Stocks(Building_StorageCore core, List<ThingDefCountClass> costs)
+        private static List<Thing> Stocks(Building_StorageCore core, List<ThingDefCountClass> costs)
         {
             var result = new List<Thing>();
             if (core == null || !core.Spawned || core.Destroyed || core.Faction != Faction.OfPlayer) return result;
@@ -47,11 +46,30 @@ namespace MagicStorage
                     if (defs.Contains(item.def) && NetworkCraftingMaterialPolicy.Available(network, item) > 0 &&
                         StorageMaterialTransaction.GroundAvailable(core.Map, item)) result.Add(item);
             }
-            return result.Distinct().Where(item => Available(network, item) > 0).ToList();
+            return result.Distinct().ToList();
         }
 
-        internal static int Available(StorageNetwork network, Thing item) =>
-            NetworkCraftingMaterialPolicy.Available(network, item);
+        // Preview and payment use the same availability snapshot and allocation rules.
+        internal static bool TryPlan(Building_StorageCore core, List<ThingDefCountClass> costs,
+            out Dictionary<ThingDef, long> counts, out Dictionary<Thing, int> allocations)
+        {
+            counts = new Dictionary<ThingDef, long>();
+            allocations = null;
+            if (costs == null) return false;
+            var stocks = Stocks(core, costs).Select(item => new CraftingMaterialStock<Thing>
+            {
+                Item = item, Kind = item.def,
+                Count = NetworkCraftingMaterialPolicy.Available(core.Network, item), Value = 1d
+            }).Where(stock => stock.Count > 0).ToList();
+            counts = stocks.GroupBy(stock => stock.Item.def).ToDictionary(group => group.Key,
+                group => group.Sum(stock => (long)stock.Count));
+            if (core?.Network?.CanWork != true) return false;
+            var needs = costs.Select(cost => new CraftingMaterialNeed<Thing>
+            {
+                Value = cost.count, Allows = item => item.def == cost.thingDef
+            }).ToList();
+            return CraftingMaterialPlanner.TryPlan(stocks, needs, false, false, out allocations);
+        }
 
         internal static bool TryUnlock(Building_StorageCore core, ThingDef table, ThingDef stuff)
         {
@@ -59,24 +77,8 @@ namespace MagicStorage
             if (state == null || !MagicStorageMod.Settings.WorkbenchUnlockMode || table == null) return false;
             if (!GameComponent_WorkbenchUnlocks.ValidateDefName(table.defName) || !table.IsResearchFinished) return false;
             if (IsUnlocked(table)) return true;
-            if (!TryGetCosts(table, stuff, out var costs)) return false;
-            var stocks = Stocks(core, costs);
-            var network = core?.Network;
-            if (network?.CanWork != true) return false;
-            var allocations = new Dictionary<Thing, int>();
-            foreach (var cost in costs)
-            {
-                int remaining = cost.count;
-                foreach (var item in stocks.Where(item => item.def == cost.thingDef))
-                {
-                    int take = Math.Min(remaining, Available(network, item));
-                    if (take <= 0) continue;
-                    allocations.Add(item, take);
-                    remaining -= take;
-                    if (remaining == 0) break;
-                }
-                if (remaining > 0) return false;
-            }
+            if (!TryGetCosts(table, stuff, out var costs) || !TryPlan(core, costs, out _, out var allocations)) return false;
+            var network = core.Network;
             using (var transaction = new StorageMaterialTransaction(core.Map, core.Position))
             {
                 foreach (var allocation in allocations)

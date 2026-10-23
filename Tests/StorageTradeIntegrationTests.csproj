@@ -6,7 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath>bin\Trading\</OutputPath>
     <AssemblyName>StorageTradeIntegrationTests</AssemblyName>
-    <DefineConstants>$(DefineConstants);TRADING_STUB_RECT</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRADING_STUB_RECT;LAUNCH_PAYMENT_TESTS</DefineConstants>
     <StartupObject>StorageTradeIntegrationTests</StartupObject>
     <IntermediateOutputPath>obj\Trading\</IntermediateOutputPath>
   </PropertyGroup>
@@ -40,6 +40,8 @@
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingBatch.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\ICraftingExecutor.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CosmicPrinterSettings.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\ICraftingProductionPolicy.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />
@@ -96,6 +98,10 @@
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeSession.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\Tradeable_Storage.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradePatches.cs" />
+    <Compile Include="..\Source\MagicStorage\Trading\StorageLaunchPaymentPatches.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialTransaction.cs" />
+    <Compile Include="StorageLaunchPaymentTests.cs" />
+    <Compile Include="LaunchPaymentStubs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

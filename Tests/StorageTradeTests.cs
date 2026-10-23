@@ -22,10 +22,12 @@ internal static class StorageTradeTests
         }
         internal void Register(Thing thing, int x)
         {
-            thing.Spawned = true; thing.Map = Map; thing.Position = new IntVec3(x, 0);
+            thing.Spawned = true; thing.Map = Map; thing.Position = new IntVec3(x, 0); thing.Faction = Faction.OfPlayer;
             var node = new CompStorageNode { parent = thing };
             if (thing is Building_StorageCore core) core.node = node;
             if (thing is Building_StorageUnit unit) unit.node = node;
+            if (thing is Building_StorageSupplyShelf shelf)
+            { shelf.node = node; Map.haulDestinationManager.SlotParents[thing.Position] = shelf; }
             Manager.Register(node);
         }
         internal Thing Stock(int count, ThingDef def = null)
@@ -35,12 +37,19 @@ internal static class StorageTradeTests
         }
         internal StorageTradeRequest Request(object line, Thing item, int count) =>
             new StorageTradeRequest { Line = line, Network = Core.Network, Item = item, Count = count };
+        internal Thing ShelfStock(out Building_StorageSupplyShelf shelf)
+        {
+            shelf = new Building_StorageSupplyShelf(); Register(shelf, 2); Manager.EnsureCurrent();
+            var item = new Thing { stackCount = 6, Spawned = true, Map = Map, Position = shelf.Position };
+            Map.Ground.Add(item); return item;
+        }
     }
 
     internal static int Run()
     {
         checks = 0;
         ReservedStacks(); FailedPayment(); NodeFailure(); DuplicateRequests(); MultiNetwork(); CollectionFailure();
+        ShelfCollection(); ShelfCollectionFailure();
         return checks;
     }
 
@@ -153,6 +162,54 @@ internal static class StorageTradeTests
     {
         internal RejectSecond() : base(null) { }
         public override bool TryAdd(Thing item, bool merge = true) => Count == 0 && base.TryAdd(item, merge);
+    }
+
+    private static void ShelfCollection()
+    {
+        var f = new Fixture(); var item = f.ShelfStock(out var shelf); var line = new object();
+        var request = f.Request(line, item, 4); request.Shelf = shelf;
+        using (var tx = new StorageTradeTransaction(new List<StorageTradeRequest> { request }, () => true))
+        {
+            Equal(true, tx.Reserve(), "shelf preflight validates real stock without extracting it");
+            Equal(6, item.stackCount, "shelf preflight preserves original count");
+            var output = new ThingOwner(null); var received = new List<Thing>();
+            f.Map.physicalInteractionReservationManager.Reserved.Add(item);
+            Equal(false, tx.Valid(), "shelf reservations acquired after preflight invalidate collection");
+            Equal(false, tx.Collect(line, output, received), "newly reserved shelf stock cannot be collected");
+            Equal(0, received.Count, "failed shelf validation delivers no pieces");
+            f.Map.physicalInteractionReservationManager.Reserved.Clear();
+            Equal(true, tx.Collect(line, output, received), "released shelf stock uses the shared material transaction");
+            Equal(2, item.stackCount, "only selected shelf count was extracted");
+            Equal(4, received[0].stackCount, "destination owns the exact real shelf piece");
+            Equal(0L, tx.PendingFor(line), "collected shelf request cannot be replayed");
+            Equal(true, tx.Collect(line, output, received), "repeat collection is harmless");
+            Equal(1, received.Count, "repeat collection does not duplicate shelf items");
+            tx.Restore(output, received[0]);
+            Equal(0, output.Count, "undelivered shelf piece leaves the temporary holder");
+            int count = 0;
+            foreach (Thing stock in shelf.GetSlotGroup().HeldThings) count += stock.stackCount;
+            Equal(6, count, "rollback returns all shelf material to its original cell");
+        }
+    }
+
+    private static void ShelfCollectionFailure()
+    {
+        var f = new Fixture(); var item = f.Stock(10); var ground = f.ShelfStock(out var shelf); var line = new object();
+        var request = f.Request(line, ground, 4); request.Shelf = shelf;
+        using (var tx = new StorageTradeTransaction(new List<StorageTradeRequest> {
+            f.Request(line, item, 3), request }, () => true))
+        {
+            Equal(true, tx.Reserve(), "mixed sources pass preflight before destination failure");
+            var output = new RejectSecond(); var received = new List<Thing>();
+            Equal(false, tx.Collect(line, output, received), "rejected shelf delivery fails the line");
+            Equal(1, received.Count, "only the earlier network piece requires external recovery");
+            int count = 0;
+            foreach (Thing stock in shelf.GetSlotGroup().HeldThings) count += stock.stackCount;
+            Equal(6, count, "shared material transaction restores rejected shelf stock");
+            tx.Restore(output, received[0]);
+            Equal(10L, f.Core.Network.GetTotalCount(item.def), "mixed-source failure also restores the network piece");
+            Equal(0, output.Count, "failed collection leaves no unowned items");
+        }
     }
 
     private static void CollectionFailure()

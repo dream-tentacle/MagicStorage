@@ -61,16 +61,34 @@ namespace MagicStorage
         }
         internal void Work(CraftingOrder order, Pawn worker, Building_CosmicWorkbench bench, int delta)
         {
-            if (delta <= 0 || Finished || !Valid(order)) return;
             float speed = CraftingServices.Production.WorkSpeed(order.Recipe, worker, bench) *
                 MagicStorageMod.Settings.CosmicWorkbenchWorkSpeedFactor;
-            if (speed <= 0 || float.IsNaN(speed) || float.IsInfinity(speed)) return;
+            int appliedTicks = Advance(order, speed, delta);
+            if (appliedTicks > 0) CraftingServices.Production.Learn(order.Recipe, worker, appliedTicks);
+        }
+
+        internal void WorkWith(CraftingOrder order, ICraftingExecutor executor, int delta)
+        {
+            int appliedTicks = Advance(order, executor.WorkSpeed(order.Recipe), delta);
+            if (appliedTicks > 0) executor.Learn(order.Recipe, appliedTicks);
+        }
+
+        private int Advance(CraftingOrder order, float speed, int delta)
+        {
+            if (delta <= 0 || Finished || !Valid(order)) return 0;
+            if (speed <= 0 || float.IsNaN(speed) || float.IsInfinity(speed)) return 0;
             int appliedTicks = Math.Min(delta, Math.Max(1, (int)Math.Ceiling((requiredWork - completedWork) / speed)));
             completedWork = Math.Min(requiredWork, completedWork + speed * appliedTicks);
-            CraftingServices.Production.Learn(order.Recipe, worker, appliedTicks);
+            return appliedTicks;
         }
 
         internal bool Complete(CraftingOrder order, Pawn worker)
+            => CompleteInternal(order, worker, null);
+
+        internal bool CompleteWith(CraftingOrder order, ICraftingExecutor executor)
+            => CompleteInternal(order, executor.WorkerThing as Pawn, executor);
+
+        private bool CompleteInternal(CraftingOrder order, Pawn worker, ICraftingExecutor executor)
         {
             if (faulted || !Finished || !core.CanWork) return false;
             try
@@ -83,7 +101,10 @@ namespace MagicStorage
                     {
                         // Stage all output before consuming anything. These containers are
                         // saved with the order, and products are never regenerated on retry.
-                        foreach (var product in CraftingServices.Production.MakeProducts(order.Recipe, worker, input, dominant))
+                        var generatedProducts = executor != null
+                            ? executor.MakeProducts(order.Recipe, input, dominant)
+                            : CraftingServices.Production.MakeProducts(order.Recipe, worker, input, dominant);
+                        foreach (var product in generatedProducts)
                         {
                             if (product == null || product.Destroyed) continue;
                             if (!products.TryAdd(product, false)) throw new InvalidOperationException("Could not stage recipe product.");
@@ -99,13 +120,18 @@ namespace MagicStorage
                 {
                     credited = true;
                     if (order.Mode == CraftingRepeatMode.RepeatCount) order.RepeatCount = Math.Max(0, order.RepeatCount - 1);
-                    try { CraftingServices.Production.NotifyCompleted(worker, Snapshot(products)); }
+                    try
+                    {
+                        if (executor != null) executor.NotifyCompleted(Snapshot(products));
+                        else CraftingServices.Production.NotifyCompleted(worker, Snapshot(products));
+                    }
                     catch (Exception exception) { Log.Error("[MagicStorage] Production notification failed: " + exception); }
                 }
                 // Like vanilla DropOnFloor, release beside the worker at the workbench.
                 // Read the order at completion so changing delivery does not interrupt work.
-                IntVec3 dropCell = order.DropProductsOnFloor && worker != null && worker.Spawned && worker.Map == core.MapHeld
-                    ? worker.Position : core.PositionHeld;
+                Thing finisher = executor?.WorkerThing ?? worker;
+                IntVec3 dropCell = order.DropProductsOnFloor && finisher != null && finisher.Spawned && finisher.Map == core.MapHeld
+                    ? finisher.Position : core.PositionHeld;
                 return ReturnContents(products, !order.DropProductsOnFloor, dropCell);
             }
             catch (Exception exception)

@@ -128,6 +128,7 @@ internal static class WorkbenchUnlockTests
                 Equal(false, Current.Game.Unlocks.IsUnlocked(invalidName), "invalid name is never recorded");
                 Log.Errors.RemoveRange(errors, Log.Errors.Count - errors);
             }
+            PlanningAndShelfPayment();
             return assertions;
         }
         finally
@@ -135,5 +136,55 @@ internal static class WorkbenchUnlockTests
             Current.Game = oldGame; MagicStorageMod.Settings.WorkbenchUnlockMode = oldMode;
             Scribe_Collections.LoadingUnlocks = false;
         }
+    }
+
+    private static void PlanningAndShelfPayment()
+    {
+        Current.Game = new Game();
+        var f = new Fixture();
+        var shelfStock = f.Stock(6);
+        var stored = f.Store(f.Steel, 14);
+        f.Store(f.Component, 2);
+        Equal(true, CraftingWorkbenchUnlocks.TryGetCosts(f.Table, null, out var costs), "preview resolves fixed costs");
+        Equal(true, CraftingWorkbenchUnlocks.TryPlan(f.Core, costs, out var counts, out var plan), "preview finds a complete payment");
+        Equal(20L, counts[f.Steel], "preview includes both network and shelf quantities");
+        Equal(10, plan[stored], "shared planner takes the exact cost from the network first");
+        Equal(false, plan.ContainsKey(shelfStock), "shelf supplies are spared when network stock is sufficient");
+        Equal(14, stored.stackCount, "preview does not withdraw network stock");
+        Equal(6, shelfStock.stackCount, "preview does not withdraw shelf stock");
+        Equal(true, CraftingWorkbenchUnlocks.TryUnlock(f.Core, f.Table, null), "network-first preview agrees with payment");
+        Equal(4L, f.Core.Network.GetTotalCount(f.Steel), "payment leaves excess network stock");
+        Equal(6, shelfStock.stackCount, "payment preserves unused shelf supplies");
+
+        Current.Game = new Game();
+        f = new Fixture(); shelfStock = f.Stock(10); f.Store(f.Component, 2);
+        CraftingWorkbenchUnlocks.TryGetCosts(f.Table, null, out costs);
+        Equal(true, CraftingWorkbenchUnlocks.TryPlan(f.Core, costs, out counts, out plan), "shelf alone can supply a required material");
+        Equal(10L, counts[f.Steel], "preview reports shelf-only material availability");
+        Equal(10, plan[shelfStock], "shelf-only payment is included in the shared plan");
+        f.Map.physicalInteractionReservationManager.Reserved.Add(shelfStock);
+        Equal(false, CraftingWorkbenchUnlocks.TryUnlock(f.Core, f.Table, null), "confirm replans when shelf stock becomes reserved after preview");
+        Equal(10, shelfStock.stackCount, "stale preview cannot consume reserved shelf stock");
+        Equal(2L, f.Core.Network.GetTotalCount(f.Component), "stale preview consumes none of the other materials");
+        Equal(false, CraftingWorkbenchUnlocks.TryPlan(f.Core, costs, out counts, out plan), "updated preview also rejects reserved shelf stock");
+        Equal(false, counts.ContainsKey(f.Steel), "unavailable shelf stock disappears from preview counts");
+        f.Map.physicalInteractionReservationManager.Reserved.Clear();
+        Equal(true, CraftingWorkbenchUnlocks.TryUnlock(f.Core, f.Table, null), "released shelf stock can pay for the unlock");
+        Equal(true, shelfStock.Destroyed, "successful payment consumes the real shelf stock");
+
+        Current.Game = new Game();
+        f = new Fixture(); shelfStock = f.Stock(6); stored = f.Store(f.Steel, 4); f.Store(f.Component, 2);
+        CraftingWorkbenchUnlocks.TryGetCosts(f.Table, null, out costs);
+        var owner = new object();
+        Equal(2, f.Core.Network.ReserveOutgoing(owner, stored, 2), "another consumer reserves part of the network stock");
+        Equal(false, CraftingWorkbenchUnlocks.TryPlan(f.Core, costs, out counts, out plan), "shared plan respects partial network reservations");
+        Equal(8L, counts[f.Steel], "preview sums only unreserved network stock and usable shelf stock");
+        Equal(false, CraftingWorkbenchUnlocks.TryUnlock(f.Core, f.Table, null), "payment agrees with the insufficient preview");
+        Equal(6, shelfStock.stackCount, "shortage leaves shelf stock untouched");
+        f.Core.Network.ReleaseOutgoing(owner);
+        Equal(true, CraftingWorkbenchUnlocks.TryPlan(f.Core, costs, out counts, out plan), "released network stock completes the mixed-source plan");
+        Equal(4, plan[stored], "mixed-source plan uses network stock first");
+        Equal(6, plan[shelfStock], "mixed-source plan fills the shortfall from the shelf");
+        Equal(true, CraftingWorkbenchUnlocks.TryUnlock(f.Core, f.Table, null), "mixed-source preview agrees with payment");
     }
 }

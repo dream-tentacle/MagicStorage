@@ -4,6 +4,19 @@ using Verse;
 
 namespace MagicStorage
 {
+    internal static class PrinterCraftingWorkerPolicy
+    {
+        internal static bool Allows(CraftingOrder order, int skillLevel)
+        {
+            if (order?.Recipe == null || order.Worker != null ||
+                (order.WorkerKind != CraftingWorkerKind.Anyone && order.WorkerKind != CraftingWorkerKind.Printers)) return false;
+            var recipe = order.Recipe;
+            if (ModsConfig.BiotechActive && recipe.mechanitorOnlyRecipe) return false;
+            if (recipe.workSkill != null && (skillLevel < order.SkillRange.min || skillLevel > order.SkillRange.max)) return false;
+            return recipe.skillRequirements == null || recipe.skillRequirements.All(r => skillLevel >= r.minLevel);
+        }
+    }
+
     internal interface ICraftingWorkerPolicy
     {
         bool Allows(CraftingOrder order, Pawn pawn, WorkTypeDef workType);
@@ -34,6 +47,7 @@ namespace MagicStorage
         private static bool RestrictionAllows(CraftingOrder order, Pawn pawn)
         {
             if (order.Worker != null) return order.Worker == pawn;
+            if (order.WorkerKind == CraftingWorkerKind.Printers) return false;
             if (order.WorkerKind == CraftingWorkerKind.Slaves && !pawn.IsSlave) return false;
             if (order.WorkerKind == CraftingWorkerKind.Mechs && !pawn.IsColonyMechPlayerControlled) return false;
             if (order.WorkerKind == CraftingWorkerKind.NonMechs && pawn.IsColonyMechPlayerControlled) return false;

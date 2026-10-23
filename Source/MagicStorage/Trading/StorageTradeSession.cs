@@ -16,6 +16,7 @@ namespace MagicStorage
         private static readonly Action<TradeDeal> limitCurrency = AccessTools.MethodDelegate<Action<TradeDeal>>(
             AccessTools.Method(typeof(TradeDeal), "LimitCurrencyCountToFunds"));
         private readonly Dictionary<Thing, StorageNetwork> sources = new Dictionary<Thing, StorageNetwork>();
+        private readonly Dictionary<Thing, Building_StorageSupplyShelf> shelfSources = new Dictionary<Thing, Building_StorageSupplyShelf>();
         private readonly Pawn negotiator;
         private readonly ITrader trader;
         private readonly Building_CommsConsole console;
@@ -89,11 +90,18 @@ namespace MagicStorage
 
         private bool CoreEligible(Building_StorageCore core, out string reason)
         {
+            return CoreEligible(core, negotiator.Map, trader is TradeShip, trader as Pawn, out reason);
+        }
+
+        internal static bool OrbitalCoreEligible(Building_StorageCore core, Map map) =>
+            CoreEligible(core, map, true, null, out _);
+
+        private static bool CoreEligible(Building_StorageCore core, Map map, bool orbital, Pawn pawnTrader, out string reason)
+        {
             reason = null;
-            Map map = negotiator.Map;
             if (core == null || !core.CanWork || core.Faction != Faction.OfPlayer || core.Map != map || core.Position.Fogged(map)) return false;
-            if (trader is TradeShip && !BeaconCovers(core)) return false;
-            if (trader is Pawn pawnTrader &&
+            if (orbital && !BeaconCovers(core)) return false;
+            if (pawnTrader != null &&
                 !map.reachability.CanReach(pawnTrader.Position, core, PathEndMode.Touch, TraverseMode.PassDoors, Danger.Some)) return false;
             Room room = core.GetRoom();
             if (room == null) return true;
@@ -111,13 +119,16 @@ namespace MagicStorage
         internal int Available(Thing item)
         {
             if (!sources.TryGetValue(item, out StorageNetwork network)) return 0;
-            return transaction?.Available(network, item) ?? network.AvailableToWithdraw(item);
+            shelfSources.TryGetValue(item, out var shelf);
+            return transaction?.Available(network, item, shelf) ?? (shelf == null
+                ? network.AvailableToWithdraw(item) : StorageTradeTransaction.ShelfAvailable(network, shelf, item));
         }
 
         internal void FillInventory()
         {
             transaction?.Dispose(); transaction = null;
             sources.Clear();
+            shelfSources.Clear();
             if (Usable())
             {
                 negotiator.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
@@ -133,13 +144,11 @@ namespace MagicStorage
                     if (!seen.Add(core.Network)) continue;
                     var stacks = new List<Thing>(); core.Network.GetAllStacks(stacks);
                     stacks.Sort((a, b) => a.thingIDNumber.CompareTo(b.thingIDNumber));
-                    foreach (Thing item in stacks)
-                    {
-                        if (item == null || item.Destroyed || item is Pawn || sources.ContainsKey(item) ||
-                            core.Network.AvailableToWithdraw(item) <= 0 || !TradeUtility.PlayerSellableNow(item, trader)) continue;
-                        sources.Add(item, core.Network);
-                        Add(item, Transactor.Colony);
-                    }
+                    foreach (Thing item in stacks) AddColony(item, core.Network);
+                    foreach (var shelf in negotiator.Map.GetComponent<MapComponent_StorageNetworks>().SupplyShelves)
+                        if (shelf.Spawned && shelf.Network == core.Network)
+                            foreach (Thing item in shelf.GetSlotGroup().HeldThings.OrderBy(item => item.thingIDNumber))
+                                AddColony(item, core.Network, shelf);
                 }
             }
             if (!TradeSession.giftMode)
@@ -152,6 +161,17 @@ namespace MagicStorage
                 }
             }
             if (TradeSession.TradeCurrency == TradeCurrency.Favor) deal.AllTradeables.Add(new Tradeable_RoyalFavor());
+        }
+
+        private void AddColony(Thing item, StorageNetwork network, Building_StorageSupplyShelf shelf = null)
+        {
+            if (item == null || item.Destroyed || item is Pawn || sources.ContainsKey(item) ||
+                (shelf == null ? network.AvailableToWithdraw(item) :
+                    StorageTradeTransaction.ShelfAvailable(network, shelf, item)) <= 0 ||
+                !TradeUtility.PlayerSellableNow(item, trader)) return;
+            sources.Add(item, network);
+            if (shelf != null) shelfSources.Add(item, shelf);
+            Add(item, Transactor.Colony);
         }
 
         private void Add(Thing item, Transactor trans)
@@ -186,14 +206,15 @@ namespace MagicStorage
                     return Reject();
                 if (line.ActionToDo != TradeAction.PlayerSells) continue;
                 int remaining = line.CountToTransferToDestination;
-                foreach (Thing item in line.thingsColony)
+                foreach (Thing item in line.thingsColony.OrderBy(item => shelfSources.ContainsKey(item)))
                 {
                     if (remaining == 0) break;
                     if (!sources.TryGetValue(item, out StorageNetwork network) || !CoreEligible(network.Core, out _) ||
                         !TradeUtility.PlayerSellableNow(item, trader)) continue;
-                    int count = Math.Min(remaining, network.AvailableToWithdraw(item));
+                    shelfSources.TryGetValue(item, out var shelf);
+                    int count = Math.Min(remaining, Available(item));
                     if (count <= 0) continue;
-                    requests.Add(new StorageTradeRequest { Line = line, Network = network, Item = item, Count = count,
+                    requests.Add(new StorageTradeRequest { Line = line, Network = network, Shelf = shelf, Item = item, Count = count,
                         Usable = () => Usable() && CoreEligible(network.Core, out _) && TradeUtility.PlayerSellableNow(item, trader) });
                     remaining -= count;
                 }
@@ -235,7 +256,7 @@ namespace MagicStorage
                 foreach (Thing item in items)
                 {
                     if (!batch.Contents.Contains(item)) continue;
-                    transaction.SourceFor(item)?.TryStore(batch.Contents, item, item.stackCount);
+                    transaction.Restore(batch.Contents, item);
                 }
                 manager.ReleaseRecovery(batch);
             }
@@ -253,6 +274,7 @@ namespace MagicStorage
             closed = true; transaction?.Dispose(); transaction = null;
             if (deal != null) sessions.Remove(deal);
             sources.Clear();
+            shelfSources.Clear();
         }
     }
 

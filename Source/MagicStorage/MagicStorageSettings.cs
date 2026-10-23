@@ -32,8 +32,10 @@ namespace MagicStorage
         public const int MaxRefreshSeconds = 60;
         public bool SimplifiedMode = true;
         public bool WorkbenchUnlockMode;
+        public bool AllowPrinterParameterChanges;
         public bool CaravanItemFilters;
         public bool TradeItemFilters;
+        public bool TidySupplyShelf = true;
         private int overallRefreshSeconds = DefaultRefreshSeconds;
         private List<int> refreshSeconds = CreateRefreshDefaults();
         public const int DefaultCraftingMaterialRecheckSeconds = 30;
@@ -68,8 +70,10 @@ namespace MagicStorage
             StorageUnitSlots = DefaultUnitSlots;
             CosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
             WorkbenchUnlockMode = false;
+            AllowPrinterParameterChanges = false;
             CaravanItemFilters = false;
             TradeItemFilters = false;
+            TidySupplyShelf = true;
             SimplifiedMode = true;
             OverallRefreshSeconds = DefaultRefreshSeconds;
             refreshSeconds = CreateRefreshDefaults();
@@ -97,8 +101,10 @@ namespace MagicStorage
             CosmicWorkbenchWorkSpeedPercent = cosmicWorkbenchWorkSpeedPercent;
             Scribe_Values.Look(ref SimplifiedMode, "simplifiedMode", true);
             Scribe_Values.Look(ref WorkbenchUnlockMode, "workbenchUnlockMode", false);
+            Scribe_Values.Look(ref AllowPrinterParameterChanges, "allowPrinterParameterChanges", false);
             Scribe_Values.Look(ref CaravanItemFilters, "caravanItemFilters", false);
             Scribe_Values.Look(ref TradeItemFilters, "tradeItemFilters", false);
+            Scribe_Values.Look(ref TidySupplyShelf, "tidySupplyShelf", true);
             Scribe_Values.Look(ref overallRefreshSeconds, "overallRefreshSeconds", DefaultRefreshSeconds);
             Scribe_Values.Look(ref craftingMaterialRecheckSeconds, "craftingMaterialRecheckSeconds", DefaultCraftingMaterialRecheckSeconds);
             CraftingMaterialRecheckSeconds = craftingMaterialRecheckSeconds;

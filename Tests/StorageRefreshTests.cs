@@ -26,6 +26,7 @@ internal static class StorageRefreshTests
         var settings = MagicStorageMod.Settings;
         settings.RestoreDefaults();
         Equal(true, settings.SimplifiedMode, "simple mode enabled by default");
+        Equal(false, settings.AllowPrinterParameterChanges, "printer parameter changes default off");
         Equal(100, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed defaults to one hundred percent");
         settings.CosmicWorkbenchWorkSpeedPercent = int.MinValue;
         Equal(50, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed lower bound");
@@ -35,7 +36,9 @@ internal static class StorageRefreshTests
         Equal(150, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed snaps down to ten percent steps");
         settings.CosmicWorkbenchWorkSpeedPercent = 155;
         Equal(160, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed snaps up to ten percent steps");
+        settings.AllowPrinterParameterChanges = true;
         settings.RestoreDefaults();
+        Equal(false, settings.AllowPrinterParameterChanges, "restore defaults disables printer parameter changes");
         Equal(100, settings.CosmicWorkbenchWorkSpeedPercent, "restore defaults resets workbench speed");
         Equal(1, settings.OverallRefreshSeconds, "overall default is one second");
         Equal(30, settings.CraftingMaterialRecheckSeconds, "material retry defaults to thirty seconds");
@@ -134,7 +137,10 @@ internal static class StorageRefreshTests
     private static void SettingsWindow()
     {
         var mod = new MagicStorageMod(new ModContentPack());
+        Listing_Standard.Events.Clear();
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsAllowPrinterParameterChanges"),
+            "general tab exposes a single printer editing checkbox without an extra description");
         Equal(1, Listing_Standard.NumericLabels.Count, "general tab only contains the unit slot numeric setting");
         Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "general tab shows slot capacity");
         Equal(false, Listing_Standard.NumericLabels.Contains("MS_SettingsOverallRefresh"), "general tab hides performance fields");
@@ -157,6 +163,7 @@ internal static class StorageRefreshTests
         Equal(false, MagicStorageMod.Settings.SimplifiedMode, "switching tabs preserves performance settings");
         Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "caravan item filters default off");
         Equal(false, MagicStorageMod.Settings.TradeItemFilters, "trade item filters default off");
+        Equal(true, MagicStorageMod.Settings.TidySupplyShelf, "tidy shelf display defaults on");
         TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabAccessibility").clickedAction();
         Listing_Standard.Events.Clear();
         Listing_Standard.NumericLabels.Clear();
@@ -164,12 +171,16 @@ internal static class StorageRefreshTests
         Equal("MS_SettingsAccessibilityNotice", Listing_Standard.Events[0], "conflict explanation is first on accessibility tab");
         Equal("MS_SettingsCaravanItemFilters", Listing_Standard.Events[1], "accessibility tab exposes caravan toggle");
         Equal("MS_SettingsTradeItemFilters", Listing_Standard.Events[2], "accessibility tab exposes independent trade toggle");
+        Equal("MS_SettingsTidySupplyShelf", Listing_Standard.Events[3], "accessibility tab exposes tidy shelf toggle");
+        Equal(false, Listing_Standard.Events.Contains("MS_SettingsTidySupplyShelfHelp"), "tidy shelf description is no longer a persistent label");
         Equal(0, Listing_Standard.NumericLabels.Count, "accessibility tab has no performance or storage numeric settings");
         MagicStorageMod.Settings.CaravanItemFilters = true;
         MagicStorageMod.Settings.TradeItemFilters = true;
+        MagicStorageMod.Settings.TidySupplyShelf = false;
         MagicStorageMod.Settings.RestoreDefaults();
         Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "restore defaults disables caravan filter hook");
         Equal(false, MagicStorageMod.Settings.TradeItemFilters, "restore defaults disables trade filter hook");
+        Equal(true, MagicStorageMod.Settings.TidySupplyShelf, "restore defaults enables tidy shelves");
     }
 
     private sealed class Fixture

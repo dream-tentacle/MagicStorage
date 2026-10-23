@@ -11,26 +11,30 @@ namespace MagicStorage
         private readonly List<Building_StorageCore> cores = new List<Building_StorageCore>();
         private readonly List<Building_CosmicWorkbench> benches = new List<Building_CosmicWorkbench>();
         private readonly Dictionary<WorkTypeDef, int> lastCoreIds = new Dictionary<WorkTypeDef, int>();
-        private readonly Dictionary<CraftingOrder, JobDriver_CosmicCrafting> assignments = new Dictionary<CraftingOrder, JobDriver_CosmicCrafting>();
+        private readonly Dictionary<CraftingOrder, ICraftingExecutor> assignments = new Dictionary<CraftingOrder, ICraftingExecutor>();
+        private readonly List<ICraftingExecutor> automaticWorkers = new List<ICraftingExecutor>();
         private StorageRefreshTimer maintenanceTimer;
         public MapComponent_CosmicCrafting(Map map) : base(map) { }
         internal IEnumerable<Thing> Workbenches => benches.Where(b => b.Spawned && b.Map == map);
         internal void Register(Building_StorageCore core) { if (!cores.Contains(core)) { cores.Add(core); cores.Sort((a,b) => a.thingIDNumber.CompareTo(b.thingIDNumber)); } }
         internal void Register(Building_CosmicWorkbench bench) { if (!benches.Contains(bench)) benches.Add(bench); }
         internal void Unregister(Building_StorageCore core) { cores.Remove(core); CancelWhere(d => d.Core == core); }
-        internal void Unregister(Building_CosmicWorkbench bench) { benches.Remove(bench); CancelWhere(d => d.Bench == bench); }
-        private void CancelWhere(System.Predicate<JobDriver_CosmicCrafting> predicate)
+        internal void Unregister(Building_CosmicWorkbench bench) { benches.Remove(bench); CancelWhere(d => d is JobDriver_CosmicCrafting driver && driver.Bench == bench); }
+        internal void RegisterAutomatic(ICraftingExecutor executor) { if (!automaticWorkers.Contains(executor)) automaticWorkers.Add(executor); }
+        internal void UnregisterAutomatic(ICraftingExecutor executor)
+        { automaticWorkers.Remove(executor); executor.CancelAssignment(); }
+        private void CancelWhere(System.Predicate<ICraftingExecutor> predicate)
         {
             foreach (var driver in assignments.Values.ToList())
                 if (predicate(driver)) map.GetComponent<MapComponent_StorageNetworks>().Defer(() =>
-                { if (!driver.ended) driver.EndJobWith(JobCondition.Incompletable); });
+                { driver.CancelAssignment(); });
         }
-        internal Pawn AssignedWorker(CraftingOrder order) => assignments.TryGetValue(order, out var driver) &&
-            !driver.ended && driver.pawn?.jobs?.curDriver == driver && driver.pawn.CurJob == driver.job
-                ? driver.pawn : null;
-        internal bool IsAssigned(CraftingOrder order, JobDriver_CosmicCrafting driver) =>
+        internal Thing AssignedThing(CraftingOrder order) => assignments.TryGetValue(order, out var executor) &&
+            executor.AssignmentActive ? executor.WorkerThing : null;
+        internal Pawn AssignedWorker(CraftingOrder order) => AssignedThing(order) as Pawn;
+        internal bool IsAssigned(CraftingOrder order, ICraftingExecutor driver) =>
             assignments.TryGetValue(order, out var owner) && owner == driver;
-        internal void Release(CraftingOrder order, JobDriver_CosmicCrafting driver)
+        internal void Release(CraftingOrder order, ICraftingExecutor driver)
         { if (order != null && assignments.TryGetValue(order, out var owner) && owner == driver) assignments.Remove(order); }
 
         internal bool CanRun(Building_StorageCore core, CraftingOrder order)
@@ -46,7 +50,7 @@ namespace MagicStorage
                 ? CraftingServices.Products.Count(core, order, order.ProductCountLimit) : 0);
         }
         internal bool CanClaimOrder(Building_StorageCore core, CraftingOrder order, Pawn pawn, WorkGiverDef giver) =>
-            core != null && order != null && giver != null && AssignedWorker(order) == null &&
+            core != null && order != null && giver != null && AssignedThing(order) == null &&
             CraftingServices.Workers.Allows(order, pawn, giver.workType) && CanRun(core, order);
 
         private bool MaterialsAvailable(Building_StorageCore core, CraftingOrder order, bool immediate = false)
@@ -66,10 +70,12 @@ namespace MagicStorage
                 (order.Batch != null || MaterialsAvailable(core, order, true));
         }
 
-        internal bool TryClaim(JobDriver_CosmicCrafting driver)
+        internal bool TryClaim(JobDriver_CosmicCrafting driver) => TryClaim((ICraftingExecutor)driver);
+
+        internal bool TryClaim(ICraftingExecutor driver)
         {
             var core = driver.Core; var order = driver.Order;
-            if (!CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef)) return false;
+            if (core == null || order == null || AssignedThing(order) != null || !driver.Allows(order) || !CanRun(core, order)) return false;
             if (order.Batch == null)
             {
                 if (!CraftingServices.Materials.TryPlan(core.Network, order, out var plan))
@@ -79,6 +85,19 @@ namespace MagicStorage
             }
             assignments[order] = driver;
             return true;
+        }
+
+        internal CraftingOrder FindAutomaticOrder(ICraftingExecutor executor)
+        {
+            var core = executor.Core;
+            if (core == null || !core.CanWork) return null;
+            foreach (var order in core.Crafting.Orders)
+            {
+                if (!executor.Allows(order) || AssignedThing(order) != null || !CanRun(core, order)) continue;
+                if (order.Batch == null && !MaterialsAvailable(core, order)) continue;
+                return order;
+            }
+            return null;
         }
         internal Job FindJob(Pawn pawn, WorkGiverDef giver)
         {
@@ -114,7 +133,7 @@ namespace MagicStorage
                 // This also avoids counting products or scanning materials for excluded orders.
                 if (!CraftingServices.Workers.Allows(order, pawn, giver.workType)) continue;
                 string failure = null;
-                var worker = AssignedWorker(order);
+                var worker = AssignedThing(order);
                 if (worker != null)
                 { if (!reportFailure) continue; failure = "MS_Craft_Assigned".Translate(worker.LabelShortCap); }
                 else if (!CanRun(core, order))
@@ -180,9 +199,10 @@ namespace MagicStorage
             if (order.Suspended) return "MS_Craft_Suspended".Translate();
             if (!order.Recipe.AvailableNow) return "MS_Craft_Locked".Translate();
             if (!(canRun ?? CanRun(core, order))) return "MS_Craft_Satisfied".Translate();
-            var worker = AssignedWorker(order);
+            var worker = AssignedThing(order);
             if (worker != null) return "MS_Craft_Assigned".Translate(worker.LabelShortCap);
             if (order.Batch == null && !MaterialsAvailable(core, order)) return "MS_Craft_MissingMaterials".Translate();
+            if (automaticWorkers.Any(e => e.Core == core && e.Allows(order))) return "MS_Craft_Ready".Translate();
             var eligible = map.mapPawns.AllPawnsSpawned.Where(p => p.Faction == core.Faction &&
                 CraftingRecipeCatalog.Routes(order.Recipe).Any(w => CraftingServices.Workers.Allows(order, p, w.workType))).ToList();
             if (eligible.Count == 0) return "MS_Craft_NoWorker".Translate();
@@ -200,12 +220,11 @@ namespace MagicStorage
                 bool release = false;
                 try
                 {
-                    if (driver.ended || driver.pawn?.jobs?.curDriver != driver ||
-                        driver.pawn.CurJob != driver.job || driver.pawn.Map != map) release = true;
+                    if (!driver.AssignmentActive || driver.WorkerThing?.Map != map) release = true;
                     else if (!driver.CanContinue())
                     {
                         release = true;
-                        driver.EndJobWith(JobCondition.Incompletable);
+                        driver.CancelAssignment();
                     }
                 }
                 catch (System.Exception exception)

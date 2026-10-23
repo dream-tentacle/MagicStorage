@@ -23,7 +23,7 @@ draw = ImageDraw.Draw(canvas)
 svg = []
 
 def font(size):
-    return ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc', size*SCALE)
+    return ImageFont.truetype('HarmonyOS_Sans_SC_Bold.ttf', size*SCALE)
 
 def line(points, color, width):
     draw.line([(round(x*SCALE), round(y*SCALE)) for x, y in points],
@@ -100,7 +100,7 @@ path = OUT / '存储控制核心_介绍_v1.png'
 result.save(path)
 svg_path = OUT / '存储控制核心_介绍_v1.svg'
 svg_path.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="2800" height="800" '
-                    'viewBox="0 0 1400 400"><g font-family="Microsoft YaHei,sans-serif" '
+                    'viewBox="0 0 1400 400"><g font-family="HarmonyOS Sans SC,HarmonyOS Sans,sans-serif" '
                     'font-weight="700">'+''.join(svg)+'</g></svg>', encoding='utf-8')
 with Image.open(path) as saved:
     assert saved.size == (2800,800) and saved.mode == 'RGBA'

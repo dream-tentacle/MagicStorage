@@ -1,6 +1,7 @@
 // Settings persistence and GUI remain native engine boundaries.
 namespace MagicStorage
 {
+    internal static class StorageShelfDrawing { internal static void RefreshAll() { } }
     public sealed class StorageInventoryRule : Verse.IExposable { public void ExposeData() { } }
 }
 #if !TRADING_STUB_RECT
@@ -56,7 +57,7 @@ namespace Verse
         public void TextFieldNumericLabeled<T>(string label, ref T value, ref string buffer, float min, float max) where T : struct
         { NumericLabels.Add(label); }
         public void Gap() { }
-        public void CheckboxLabeled(string label, ref bool value) { Events.Add(label); }
+        public void CheckboxLabeled(string label, ref bool value, string tooltip = null) { Events.Add(label); }
         public void Label(string label) { Events.Add(label); }
         public float Slider(float value, float min, float max) => value;
         public bool ButtonText(string label) => false;

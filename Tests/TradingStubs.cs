@@ -65,7 +65,9 @@ namespace Verse
         public TraderKindDef TraderKind = new TraderKindDef();
         public IEnumerable<Thing> Goods => inventory.innerContainer;
         public TradePermission CanTradeWith(Faction faction, TraderKindDef kind) => new TradePermission { Accepted = AllowedTrade };
-        public void GiveSoldThingToTrader(Thing item, int count, Pawn negotiator) => inventory.innerContainer.TryAdd(item.SplitOff(count), false);
+        public System.Action<Thing> BeforeReceivingTrade;
+        public void GiveSoldThingToTrader(Thing item, int count, Pawn negotiator)
+        { BeforeReceivingTrade?.Invoke(item); inventory.innerContainer.TryAdd(item.SplitOff(count), false); }
         bool ITrader.CanTradeNow => CanTradeNow;
         Faction ITrader.Faction => Faction;
         TraderKindDef ITrader.TraderKind => TraderKind;
@@ -120,7 +122,7 @@ namespace RimWorld
     }
     public static class PawnCapacityDefOf { public static object Talking = new object(); }
     public static class ThingDefOf { public static ThingDef Silver = new ThingDef(); }
-    public static class TradeUtility { public static bool PlayerSellableNow(Thing item, ITrader trader) => !item.stale; }
+    public static partial class TradeUtility { public static bool PlayerSellableNow(Thing item, ITrader trader) => !item.stale; }
     public static class TradeSession
     {
         public static ITrader trader;

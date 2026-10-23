@@ -79,6 +79,9 @@ namespace Verse
         }
         public Thing SplitOff(int count)
         {
+#if LAUNCH_PAYMENT_TESTS
+            BeforePaymentTestSplit?.Invoke(this);
+#endif
 #if MONOLYN_COMPATIBILITY_TESTS
             BeforeMonolynTestSplit?.Invoke(this);
 #endif

@@ -54,7 +54,10 @@
   <MS_SettingsAccessibilityNotice>以下选项修改了原版代码，如果开启后报错或者没有生效，说明和其他mod冲突，本mod和其他mod均修改了原版代码。</MS_SettingsAccessibilityNotice>
   <MS_SettingsCaravanItemFilters>远行队物品过滤器</MS_SettingsCaravanItemFilters>
   <MS_SettingsTradeItemFilters>交易页物品过滤器</MS_SettingsTradeItemFilters>
+  <MS_SettingsTidySupplyShelf>补货架整洁摆放</MS_SettingsTidySupplyShelf>
+  <MS_SettingsTidySupplyShelfHelp>让补货架上的物品更好地显示。</MS_SettingsTidySupplyShelfHelp>
   <MS_SettingsWorkbenchUnlockMode>工作台解锁模式</MS_SettingsWorkbenchUnlockMode>
+  <MS_SettingsAllowPrinterParameterChanges>允许修改打印机参数</MS_SettingsAllowPrinterParameterChanges>
   <MS_SettingsWorkbenchUnlockModeHelp>需消耗建造材料解锁工作台，才能添加其配方。无材料成本的工作台默认解锁，解锁状态在当前存档中共享。关闭后可直接使用所有满足研究条件的配方，已解锁的工作台仍会保留记录。</MS_SettingsWorkbenchUnlockModeHelp>
   <MS_SettingsTabPerformance>性能</MS_SettingsTabPerformance>
   <MS_SettingsPerformanceNotice>建议保留初始默认值，因为本mod性能已经足够优秀。</MS_SettingsPerformanceNotice>

@@ -46,6 +46,8 @@
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingBatch.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\ICraftingExecutor.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CosmicPrinterSettings.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\ICraftingProductionPolicy.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />

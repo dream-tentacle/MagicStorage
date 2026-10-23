@@ -25,7 +25,7 @@ namespace MagicStorage
                 var order = driver.Order;
                 if (order?.Batch == null || !order.Batch.Valid(order))
                 { driver.EndJobWith(JobCondition.Incompletable); return; }
-                order.Batch.Work(order, pawn, driver.Bench, delta);
+                order.Batch.WorkWith(order, driver, delta);
                 pawn.GainComfortFromCellIfPossible(delta, chairsOnly: true);
                 if (order.Batch.Finished) { driver.FinishBatch(); return; }
                 // Port of Toils_Recipe.DoRecipeWork's long-work override. Unlike normal
@@ -43,7 +43,7 @@ namespace MagicStorage
         }
     }
 
-    public sealed class JobDriver_CosmicCrafting : JobDriver, IStorageNetworkClient
+    public sealed class JobDriver_CosmicCrafting : JobDriver, IStorageNetworkClient, ICraftingExecutor
     {
         private CraftingOrder claimedOrder;
         private MapComponent_CosmicCrafting dispatcher;
@@ -55,6 +55,23 @@ namespace MagicStorage
         internal Building_CosmicWorkbench Bench => job.GetTarget(TargetIndex.A).Thing as Building_CosmicWorkbench;
         internal Building_StorageCore Core => job.GetTarget(TargetIndex.B).Thing as Building_StorageCore;
         internal CraftingOrder Order => Core?.Crafting.Find(job.count);
+
+        Thing ICraftingExecutor.WorkerThing => pawn;
+        Building_StorageCore ICraftingExecutor.Core => Core;
+        CraftingOrder ICraftingExecutor.Order => Order;
+        bool ICraftingExecutor.AssignmentActive => !ended && pawn?.jobs?.curDriver == this && pawn.CurJob == job;
+        bool ICraftingExecutor.Allows(CraftingOrder order) => job.workGiverDef != null &&
+            CraftingServices.Workers.Allows(order, pawn, job.workGiverDef.workType);
+        bool ICraftingExecutor.CanContinue() => CanContinue();
+        void ICraftingExecutor.CancelAssignment()
+        { if (!ended) EndJobWith(JobCondition.Incompletable); ReleaseAssignment(); }
+        void ICraftingExecutor.ReleaseAssignment() => ReleaseAssignment();
+        float ICraftingExecutor.WorkSpeed(RecipeDef recipe) =>
+            CraftingServices.Production.WorkSpeed(recipe, pawn, Bench) * MagicStorageMod.Settings.CosmicWorkbenchWorkSpeedFactor;
+        void ICraftingExecutor.Learn(RecipeDef recipe, int ticks) => CraftingServices.Production.Learn(recipe, pawn, ticks);
+        IEnumerable<Thing> ICraftingExecutor.MakeProducts(RecipeDef recipe, List<Thing> ingredients, Thing dominant) =>
+            CraftingServices.Production.MakeProducts(recipe, pawn, ingredients, dominant);
+        void ICraftingExecutor.NotifyCompleted(List<Thing> products) => CraftingServices.Production.NotifyCompleted(pawn, products);
 
         public override bool? IsSameJobAs(Job other) => other != null && job.def == other.def &&
             job.workGiverDef == other.workGiverDef && job.count == other.count &&
@@ -102,7 +119,7 @@ namespace MagicStorage
         internal void FinishBatch()
         {
             var order = Order;
-            if (order?.Batch == null || !order.Batch.Complete(order, pawn))
+            if (order?.Batch == null || !order.Batch.CompleteWith(order, this))
             { EndJobWith(JobCondition.Incompletable); return; }
             order.Batch = null;
             EndJobWith(JobCondition.Succeeded);

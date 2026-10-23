@@ -1,0 +1,20 @@
+{
+  "defName": "MS_CosmicPrinter",
+  "standalone": true,
+  "zh": {
+    "name": "宇宙打印机",
+    "body": "某种不合常理的打印机。直接使用存储网络中的材料，自动执行控制核心的制作任务。",
+    "effects": [
+      "每台打印机可独立调整速度、产出效率、技能等级和品质参数。",
+      "制作任务可设为“仅打印机”。"
+    ]
+  },
+  "en": {
+    "name": "Cosmic Printer",
+    "body": "A printer that defies common sense. Uses materials directly from the storage network to automatically carry out the control core's production orders.",
+    "effects": [
+      "Individually adjust each printer's speed, output efficiency, skill level and quality settings.",
+      "Production orders can be set to \"Printers only\"."
+    ]
+  }
+}

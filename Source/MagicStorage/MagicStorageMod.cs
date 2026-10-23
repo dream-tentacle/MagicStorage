@@ -34,6 +34,7 @@ namespace MagicStorage
 
         public override void DoSettingsWindowContents(Rect inRect)
         {
+            bool tidySupplyShelf = Settings.TidySupplyShelf;
             var body = new Rect(inRect.x, inRect.y + 32f, inRect.width, Mathf.Max(0f, inRect.height - 32f));
             Widgets.DrawMenuSection(body);
             TabDrawer.DrawTabs(body, new List<TabRecord>
@@ -60,6 +61,7 @@ namespace MagicStorage
             settingsHeight = listing.CurHeight;
             listing.End();
             Widgets.EndScrollView();
+            if (tidySupplyShelf != Settings.TidySupplyShelf) StorageShelfDrawing.RefreshAll();
         }
 
         private void SelectSettingsTab(SettingsTab tab)
@@ -72,8 +74,10 @@ namespace MagicStorage
 
         private void DrawGeneralSettings(Listing_Standard listing)
         {
-            listing.Label("MS_SettingsWorkbenchUnlockModeHelp".Translate());
-            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode);
+            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode,
+                "MS_SettingsWorkbenchUnlockModeHelp".Translate());
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsAllowPrinterParameterChanges".Translate(), ref Settings.AllowPrinterParameterChanges);
             listing.Gap();
             listing.Label("MS_SettingsUnitSlotsHelp".Translate());
             int slots = Settings.StorageUnitSlots;
@@ -96,6 +100,9 @@ namespace MagicStorage
             listing.Gap();
             listing.CheckboxLabeled("MS_SettingsCaravanItemFilters".Translate(), ref Settings.CaravanItemFilters);
             listing.CheckboxLabeled("MS_SettingsTradeItemFilters".Translate(), ref Settings.TradeItemFilters);
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsTidySupplyShelf".Translate(), ref Settings.TidySupplyShelf,
+                "MS_SettingsTidySupplyShelfHelp".Translate());
         }
 
         private void DrawPerformanceSettings(Listing_Standard listing)

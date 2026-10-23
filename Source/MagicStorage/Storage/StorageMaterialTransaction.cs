@@ -25,16 +25,18 @@ namespace MagicStorage
         private readonly Map map;
         private readonly IntVec3 recoveryCell;
         private readonly MapComponent_StorageNetworks manager;
+        private readonly bool respectGroundReservations;
         private readonly List<Request> requests = new List<Request>();
         private readonly Dictionary<Thing, Request> byItem = new Dictionary<Thing, Request>();
         private StorageRecoveryBatch staging;
         private bool attempted, staged, disposed;
         internal IReadOnlyList<Request> Requests => requests;
 
-        internal StorageMaterialTransaction(Map map, IntVec3 recoveryCell)
+        internal StorageMaterialTransaction(Map map, IntVec3 recoveryCell, bool respectGroundReservations = true)
         {
             this.map = map;
             this.recoveryCell = recoveryCell;
+            this.respectGroundReservations = respectGroundReservations;
             manager = map.GetComponent<MapComponent_StorageNetworks>();
         }
 
@@ -56,15 +58,16 @@ namespace MagicStorage
             return true;
         }
 
-        internal static bool GroundAvailable(Map map, Thing item) =>
+        internal static bool GroundAvailable(Map map, Thing item, bool respectReservations = true) =>
             item != null && !item.Destroyed && item.Spawned && item.Map == map && item.stackCount > 0 &&
-            item.holdingOwner == null && !map.reservationManager.IsReservedByAnyoneOf(item, Faction.OfPlayer) &&
-            !map.physicalInteractionReservationManager.IsReserved(item);
+            item.holdingOwner == null && (!respectReservations ||
+                (!map.reservationManager.IsReservedByAnyoneOf(item, Faction.OfPlayer) &&
+                 !map.physicalInteractionReservationManager.IsReserved(item)));
 
         private int Available(Request request)
         {
             if (request.Network == null)
-                return GroundAvailable(map, request.Item) && request.Item.Position == request.Cell ? request.Item.stackCount : 0;
+                return GroundAvailable(map, request.Item, respectGroundReservations) && request.Item.Position == request.Cell ? request.Item.stackCount : 0;
             var unit = request.Source?.Owner as Building_StorageUnit;
             if (unit == null || !unit.Spawned || unit.Destroyed || unit.Map != map || unit.Faction != Faction.OfPlayer ||
                 unit.Network != request.Network || request.Item.holdingOwner != request.Source) return 0;
@@ -178,7 +181,7 @@ namespace MagicStorage
             }
             else
             {
-                if (GroundAvailable(map, request.Item) && request.Item.Position == request.Cell)
+                if (GroundAvailable(map, request.Item, respectGroundReservations) && request.Item.Position == request.Cell)
                     request.Item.TryAbsorbStack(item, true);
                 if (!item.Destroyed && staging.Contents.Contains(item))
                     staging.Contents.TryDrop(item, request.Cell, map, ThingPlaceMode.Direct, out _, playDropSound: false);

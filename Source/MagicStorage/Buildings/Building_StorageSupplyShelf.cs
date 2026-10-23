@@ -120,7 +120,11 @@ namespace MagicStorage
         public StorageSettings GetParentStoreSettings() =>
             def.building.fixedStorageSettings ?? StorageSettings.EverStorableFixedSettings();
         public void Notify_SettingsChanged()
-        { if (Spawned) Map.listerHaulables.Notify_SlotGroupChanged(slotGroup); }
+        {
+            if (!Spawned) return;
+            Map.listerHaulables.Notify_SlotGroupChanged(slotGroup);
+            Map.mapDrawer.MapMeshDirty(Position, MapMeshFlagDefOf.Things, true, false);
+        }
         public void Notify_ReceivedThing(Thing item) { }
         public void Notify_LostThing(Thing item) { }
 

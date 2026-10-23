@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Craft_Worker_Printers>仅打印机</MS_Craft_Worker_Printers>
+  <MS_Printer_Settings>打印机设置</MS_Printer_Settings>
+  <MS_Printer_SettingsDesc>调整这台打印机的工作速度、产出效率和品质参数。</MS_Printer_SettingsDesc>
+  <MS_Printer_Title>宇宙打印机设置</MS_Printer_Title>
+  <MS_Printer_Hint>设置仅对当前打印机生效，生产进度保存在控制核心中。批次的产出和品质由最终完成它的工作者决定。</MS_Printer_Hint>
+  <MS_Printer_Speed>基础工作速度（%）</MS_Printer_Speed>
+  <MS_Printer_SpeedTip>100%即为和人类普通工作相同的速度</MS_Printer_SpeedTip>
+  <MS_Printer_Efficiency>基础产出效率（%）</MS_Printer_Efficiency>
+  <MS_Printer_EfficiencyTip>产出物品数量的倍率</MS_Printer_EfficiencyTip>
+  <MS_Printer_Skill>基础技能等级</MS_Printer_Skill>
+  <MS_Printer_SkillTip>影响制造门槛，通过原版公式生成基础品质。</MS_Printer_SkillTip>
+  <MS_Printer_Offset>基础品质偏移</MS_Printer_Offset>
+  <MS_Printer_OffsetTip>在原版基础品质上增加或减少的档数</MS_Printer_OffsetTip>
+  <MS_Printer_Inspiration>灵感率</MS_Printer_Inspiration>
+  <MS_Printer_InspirationTip>生产后品质增加1档的概率。与故障独立判定，同时触发时抵消。</MS_Printer_InspirationTip>
+  <MS_Printer_Failure>故障率</MS_Printer_Failure>
+  <MS_Printer_FailureTip>生产后品质降低1档的概率。与灵感独立判定，同时触发时抵消。</MS_Printer_FailureTip>
+  <MS_Printer_Reset>恢复默认设置</MS_Printer_Reset>
+  <MS_Printer_Confirm>确认</MS_Printer_Confirm>
+  <MS_Printer_Close>关闭</MS_Printer_Close>
+  <MS_Printer_EditingLocked>默认参数无法修改，需要在mod选项中开启设置</MS_Printer_EditingLocked>
+  <MS_Printer_ZeroPauses>速度或产出效率为0时，打印机无法工作。</MS_Printer_ZeroPauses>
+  <MS_Printer_Preview>最终品质产出概率</MS_Printer_Preview>
+  <MS_Printer_Working>正在打印：{0}（{1}）</MS_Printer_Working>
+  <MS_Printer_Idle>正在等待可执行的核心任务</MS_Printer_Idle>
+  <MS_Printer_Paused>打印机已停机或未连接</MS_Printer_Paused>
+</LanguageData>

@@ -27,7 +27,147 @@ internal static class CosmicCraftingTests
         IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
         RefreshDoesNotChangeWork();
         MaterialRetryCaching(); EarlyWorkerEligibility();
+        PrinterWorkerRules(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
         return checks;
+    }
+
+    private static void PrinterWorkerRules()
+    {
+        var f = new Fixture(); var core = f.Core(0).Item1; var order = f.Order(core);
+        order.Recipe.workSkill = new SkillDef();
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 12), "anyone includes printers");
+        order.WorkerKind = CraftingWorkerKind.Printers;
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer-only accepts printers");
+        Equal(false, CraftingServices.Workers.Allows(order, f.Pawn, f.Type), "printer-only excludes colonists");
+        foreach (var kind in new[] { CraftingWorkerKind.Slaves, CraftingWorkerKind.Mechs, CraftingWorkerKind.NonMechs })
+        { order.WorkerKind = kind; Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer has no pawn identity category"); }
+        order.WorkerKind = CraftingWorkerKind.Anyone; order.Worker = f.Pawn;
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "named pawn excludes printers");
+        order.Worker = null; order.SkillRange = new IntRange(13, 20);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer respects optional skill minimum");
+        order.SkillRange = new IntRange(0, 11);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer respects optional skill maximum");
+        order.SkillRange = new IntRange(0, 20);
+        order.Recipe.skillRequirements = new List<SkillRequirement> { new SkillRequirement { minLevel = 15 } };
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer respects hard recipe skill requirements");
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 15), "printer meeting hard skill requirement can work");
+    }
+
+    private sealed class AutomaticExecutor : ICraftingExecutor
+    {
+        private readonly MapComponent_CosmicCrafting dispatcher;
+        public Thing WorkerThing { get; }
+        public Building_StorageCore Core { get; }
+        public CraftingOrder Order { get; set; }
+        public bool AssignmentActive => Order != null && WorkerThing.Spawned;
+        internal float Speed = 2;
+        internal int Made, Notified;
+        internal readonly ThingDef Product = new ThingDef();
+        internal AutomaticExecutor(Fixture fixture, Building_StorageCore core)
+        {
+            Core = core; dispatcher = fixture.Dispatch;
+            WorkerThing = new Thing { Spawned = true, Map = fixture.Map, Position = new IntVec3(8, 0), Faction = Faction.OfPlayer };
+            dispatcher.RegisterAutomatic(this);
+        }
+        public bool Allows(CraftingOrder order) => PrinterCraftingWorkerPolicy.Allows(order, 12);
+        public bool CanContinue() => AssignmentActive && Core.CanWork && dispatcher.IsAssigned(Order, this) && dispatcher.CanRun(Core, Order);
+        public void CancelAssignment() => ReleaseAssignment();
+        public void ReleaseAssignment() { dispatcher.Release(Order, this); Order = null; }
+        public float WorkSpeed(RecipeDef recipe) => Speed;
+        public void Learn(RecipeDef recipe, int ticks) { }
+        public IEnumerable<Thing> MakeProducts(RecipeDef recipe, List<Thing> ingredients, Thing dominant)
+        { Made++; yield return new Thing { def = Product, stackCount = 9 }; }
+        public void NotifyCompleted(List<Thing> products) { Notified++; }
+    }
+
+    private static void AutomaticExecutorHandoff()
+    {
+        var f = new Fixture(); var tuple = f.Core(0); var core = tuple.Item1; var order = f.Order(core);
+        ((TestProductionPolicy)CraftingServices.Production).Required = 100;
+        var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        driver.TestToils.Last().tickIntervalAction(30);
+        var originalBatch = order.Batch;
+        Equal(.3f, order.Progress, "colonist advances the core batch");
+        driver.EndJobWith(JobCondition.InterruptForced);
+        var machine = new AutomaticExecutor(f, core);
+        machine.Order = f.Dispatch.FindAutomaticOrder(machine);
+        Equal(order, machine.Order, "automatic worker selects the unfinished core order");
+        Equal(true, f.Dispatch.TryClaim(machine), "automatic worker claims core order");
+        Equal(originalBatch, order.Batch, "handoff retains the same core batch");
+        Equal(machine.WorkerThing, f.Dispatch.AssignedThing(order), "machine occupies the shared assignment slot");
+        Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "colonist cannot claim machine-occupied task");
+        var competing = new AutomaticExecutor(f, core) { Order = order };
+        Equal(false, f.Dispatch.TryClaim(competing), "second printer cannot claim the same batch");
+        order.Batch.WorkWith(order, machine, 20);
+        Equal(.7f, order.Progress, "machine adds its speed to existing core progress");
+        Equal(4, core.Network.AvailableToWithdraw(tuple.Item3), "handoff never withdraws materials twice");
+        machine.ReleaseAssignment();
+        driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        driver.TestToils.Last().tickIntervalAction(30);
+        Equal(null, order.Batch, "colonist finishes the machine's partial batch");
+        Equal(1, ((TestProductionPolicy)CraftingServices.Production).MakeCalls, "final colonist uses normal production policy");
+        Equal(0, machine.Made, "previous machine parameters do not affect colonist completion");
+
+        var second = new Fixture(); var secondCore = second.Core(0).Item1; var secondOrder = second.Order(secondCore);
+        var normalProduction = (TestProductionPolicy)CraftingServices.Production;
+        normalProduction.Required = 100;
+        secondOrder.Mode = CraftingRepeatMode.RepeatCount; secondOrder.RepeatCount = 1;
+        var secondDriver = second.Start(second.Dispatch.FindJob(second.Pawn, second.Giver));
+        secondDriver.TestToils.Last().tickIntervalAction(20);
+        secondDriver.EndJobWith(JobCondition.InterruptForced);
+        var finisher = new AutomaticExecutor(second, secondCore);
+        finisher.Order = second.Dispatch.FindAutomaticOrder(finisher);
+        Equal(true, second.Dispatch.TryClaim(finisher), "printer takes over colonist's unfinished batch");
+        secondOrder.Batch.WorkWith(secondOrder, finisher, 40);
+        Equal(1f, secondOrder.Progress, "printer completes existing progress");
+        Equal(2f, second.Pawn.CraftingXp, "automatic work awards no extra pawn experience");
+        Equal(true, secondOrder.Batch.CompleteWith(secondOrder, finisher), "printer completes through core transaction");
+        Equal(true, secondOrder.Batch.CompleteWith(secondOrder, finisher), "completion retry is idempotent");
+        Equal(1, finisher.Made, "printer output generated once");
+        Equal(1, finisher.Notified, "printer completion credited once");
+        Equal(0, normalProduction.MakeCalls, "printer completion does not invoke pawn production");
+        Equal(0, secondOrder.RepeatCount, "printer completion decrements shared order count once");
+        Equal(1, normalProduction.ConsumeCalls, "printer completion consumes the reserved materials once");
+        secondOrder.Batch = null; finisher.ReleaseAssignment();
+        Equal(null, second.Dispatch.AssignedThing(secondOrder), "printer releases the shared assignment");
+    }
+
+    private static void PrinterQualityProbabilities()
+    {
+        var settings = new CosmicPrinterSettings();
+        Equal(.3f, settings.InspirationChance, "new printer defaults to 30 percent inspiration");
+        Equal(.2f, settings.FailureChance, "new printer defaults to 20 percent malfunction");
+        settings.InspirationChance = settings.FailureChance = 0;
+        int draws = Rand.Draws;
+        for (int skill = 0; skill <= 20; skill++)
+        {
+            settings.SkillLevel = skill;
+            double[] baseline = settings.QualityProbabilities();
+            Equal(true, Math.Abs(baseline.Sum() - 1) < .000001, "quality distribution sums to one");
+            Equal(0d, baseline[6], "uninspired unmodified production cannot be legendary");
+            settings.InspirationChance = settings.FailureChance = 1;
+            var cancelled = settings.QualityProbabilities();
+            Equal(true, baseline.Zip(cancelled, (a, b) => Math.Abs(a - b) < .000001).All(x => x), "simultaneous triggers cancel at all skill levels");
+            settings.InspirationChance = settings.FailureChance = 0;
+        }
+        Equal(draws, Rand.Draws, "quality preview does not alter game RNG");
+        settings.InspirationChance = .4f; settings.FailureChance = .7f;
+        Rand.Values.Clear(); Rand.Values.Enqueue(.3f); Rand.Values.Enqueue(.6f);
+        Equal(QualityCategory.Normal, settings.GenerateQuality(), "both independent rolls trigger and cancel");
+        Equal(2, Rand.Draws - draws, "runtime quality makes two independent machine rolls");
+        Equal(false, QualityUtility.LastInspired, "printer never invokes vanilla plus-two inspiration");
+        settings.QualityOffset = 6;
+        Equal(6, settings.ApplyQuality(5, true, true), "offset and rolls are combined before upper clamp");
+        settings.QualityOffset = -6;
+        Equal(0, settings.ApplyQuality(0, true, true), "simultaneous rolls cancel before lower clamp");
+        settings.WorkSpeed = float.NaN; settings.SkillLevel = 99; settings.Normalize();
+        Equal(1f, settings.WorkSpeed, "invalid saved speed normalizes safely");
+        Equal(20, settings.SkillLevel, "skill stays within vanilla formula range");
+        settings.Reset();
+        Equal(1f, settings.WorkSpeed, "reset work speed corresponds to 100 percent");
+        Equal(1f, settings.Efficiency, "reset output efficiency corresponds to 100 percent");
+        Equal(.3f, settings.InspirationChance, "reset restores 30 percent inspiration");
+        Equal(.2f, settings.FailureChance, "reset restores 20 percent malfunction");
     }
 
     private static void OrderReordering()

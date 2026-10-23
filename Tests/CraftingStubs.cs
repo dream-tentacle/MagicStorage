@@ -23,6 +23,13 @@ namespace Verse
     public struct IntRange { public int min, max; public IntRange(int a, int b) { min = a; max = b; } }
     public struct FloatRange { public float min, max; public FloatRange(float a, float b) { min = a; max = b; } public bool IncludesEpsilon(float v) => v >= min && v <= max; }
     public class SkillDef { }
+    public class SkillRequirement { public int minLevel; }
+    public static class Rand
+    {
+        internal static int Draws;
+        internal static Queue<float> Values = new Queue<float>();
+        public static float Value { get { Draws++; return Values.Count > 0 ? Values.Dequeue() : .5f; } }
+    }
     public class RecipeDef
     {
         public string label = "test recipe";
@@ -32,6 +39,7 @@ namespace Verse
         public IngredientValueGetter IngredientValueGetter = new IngredientValueGetter();
         public RecipeWorker Worker = new RecipeWorker();
         public SkillDef workSkill;
+        public List<SkillRequirement> skillRequirements;
         public int minimumSkill;
         public object effectWorking, soundWorking;
         public object specialProducts;
@@ -133,6 +141,13 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public static class QualityUtility
+    {
+        internal static int LastSkill;
+        internal static bool LastInspired;
+        public static QualityCategory GenerateQualityCreatedByPawn(int skill, bool inspired)
+        { LastSkill = skill; LastInspired = inspired; return QualityCategory.Normal; }
+    }
     // Vanilla helpers are engine boundaries; production calls these methods directly.
     public class Bill
     {

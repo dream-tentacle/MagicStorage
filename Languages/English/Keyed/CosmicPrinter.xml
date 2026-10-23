@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Craft_Worker_Printers>Printers only</MS_Craft_Worker_Printers>
+  <MS_Printer_Settings>Printer settings</MS_Printer_Settings>
+  <MS_Printer_SettingsDesc>Adjust this printer's work speed, output efficiency and quality settings.</MS_Printer_SettingsDesc>
+  <MS_Printer_Title>Cosmic printer settings</MS_Printer_Title>
+  <MS_Printer_Hint>Settings apply only to this printer. Production progress is stored in the control core. The worker that finishes a batch determines its output and quality.</MS_Printer_Hint>
+  <MS_Printer_Speed>Base work speed (%)</MS_Printer_Speed>
+  <MS_Printer_SpeedTip>100% matches a human colonist's normal work speed.</MS_Printer_SpeedTip>
+  <MS_Printer_Efficiency>Base output efficiency (%)</MS_Printer_Efficiency>
+  <MS_Printer_EfficiencyTip>Multiplier for the number of items produced.</MS_Printer_EfficiencyTip>
+  <MS_Printer_Skill>Base skill level</MS_Printer_Skill>
+  <MS_Printer_SkillTip>Determines which recipes can be crafted and generates base quality using the vanilla formula.</MS_Printer_SkillTip>
+  <MS_Printer_Offset>Base quality offset</MS_Printer_Offset>
+  <MS_Printer_OffsetTip>Quality levels added to or removed from vanilla base quality.</MS_Printer_OffsetTip>
+  <MS_Printer_Inspiration>Inspiration rate</MS_Printer_Inspiration>
+  <MS_Printer_InspirationTip>Chance for a finished product to gain one quality level. Independent of malfunction; simultaneous triggers cancel out.</MS_Printer_InspirationTip>
+  <MS_Printer_Failure>Malfunction rate</MS_Printer_Failure>
+  <MS_Printer_FailureTip>Chance for a finished product to lose one quality level. Independent of inspiration; simultaneous triggers cancel out.</MS_Printer_FailureTip>
+  <MS_Printer_Reset>Restore defaults</MS_Printer_Reset>
+  <MS_Printer_Confirm>Confirm</MS_Printer_Confirm>
+  <MS_Printer_Close>Close</MS_Printer_Close>
+  <MS_Printer_EditingLocked>Default parameters cannot be changed. Enable printer parameter changes in the mod options.</MS_Printer_EditingLocked>
+  <MS_Printer_ZeroPauses>The printer cannot work if work speed or output efficiency is zero.</MS_Printer_ZeroPauses>
+  <MS_Printer_Preview>Final quality probabilities</MS_Printer_Preview>
+  <MS_Printer_Working>Printing: {0} ({1})</MS_Printer_Working>
+  <MS_Printer_Idle>Waiting for an available core order</MS_Printer_Idle>
+  <MS_Printer_Paused>Printer stopped or disconnected</MS_Printer_Paused>
+</LanguageData>

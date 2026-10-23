@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_CosmicPrinter</defName>
+    <label>cosmic printer</label>
+    <description>Some sort of printer that defies common sense.\n\nThis building is entirely optional. If you consider it too powerful, you can simply leave its technology unresearched.</description>
+    <thingClass>MagicStorage.Building_CosmicPrinter</thingClass>
+    <researchPrerequisites><li>MS_CosmicPrinter</li></researchPrerequisites>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
+    <tickerType>Normal</tickerType>
+    <size>(2,2)</size>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/CosmicPrinter/CosmicPrinter</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(2.2325,2.2325)</drawSize>
+    </graphicData>
+    <comps>
+      <li Class="MagicStorage.CompProperties_StorageNode" />
+    </comps>
+    <costList><Steel>500</Steel><Plasteel>200</Plasteel><ComponentSpacer>10</ComponentSpacer></costList>
+    <uiOrder>3105.5</uiOrder>
+  </ThingDef>
+</Defs>

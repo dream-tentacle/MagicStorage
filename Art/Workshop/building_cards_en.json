@@ -35,7 +35,8 @@
     "body": "Combines multiple crafting jobs at one bench. Materials come directly from the network, so workers do not need to fetch them.",
     "effects": [
       "Supports all crafting recipes, including modded recipes.",
-      "Products go into the network by default, or can be set to drop on the ground."
+      "Products go into the network by default, or can be set to drop on the ground.",
+      "Optional \"Unlock workbenches\" mode in settings: spend bench materials to unlock recipes."
     ]
   },
   {
