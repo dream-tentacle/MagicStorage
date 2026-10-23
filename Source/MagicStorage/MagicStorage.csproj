@@ -92,6 +92,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MagicStorageMod.cs" />
+    <Compile Include="UpdateNotice\UpdateNoticeDef.cs" />
+    <Compile Include="UpdateNotice\UpdateNoticeSettings.cs" />
+    <Compile Include="UpdateNotice\UpdateNoticeUtility.cs" />
+    <Compile Include="UpdateNotice\GameComponent_UpdateNotice.cs" />
+    <Compile Include="UI\Dialog_UpdateNotice.cs" />
     <Compile Include="Compatibility\IStorageCompatibility.cs" />
     <Compile Include="Compatibility\CompatibilityManager.cs" />
     <Compile Include="Compatibility\MonolynCompatibility.cs" />

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_0</defName>
+    <label>Version log</label>
+    <version>1.0.0</version>
+    <sections>
+      <li>
+        <heading>Mod release</heading>
+        <entries>
+          <li>Initial release of Magic Storage.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+</Defs>

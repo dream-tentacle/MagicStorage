@@ -92,6 +92,18 @@ namespace MagicStorage
                 MagicStorageSettings.MinCosmicWorkbenchWorkSpeedPercent / (float)speedStep,
                 MagicStorageSettings.MaxCosmicWorkbenchWorkSpeedPercent / (float)speedStep),
                 System.MidpointRounding.AwayFromZero) * speedStep;
+            listing.GapLine();
+            UpdateNoticeSettings noticeSettings = UpdateNoticeSettings.Current;
+            bool showUpdateLog = !noticeSettings.neverShowUpdateLog;
+            listing.CheckboxLabeled("MS_SettingsShowUpdateLog".Translate(), ref showUpdateLog,
+                "MS_SettingsShowUpdateLogHelp".Translate());
+            if (showUpdateLog != !noticeSettings.neverShowUpdateLog)
+            {
+                noticeSettings.neverShowUpdateLog = !showUpdateLog;
+                noticeSettings.Save();
+            }
+            if (listing.ButtonText("MS_SettingsOpenUpdateLog".Translate()))
+                Dialog_UpdateNotice.Open(UpdateNoticeUtility.AllNotices());
         }
 
         private void DrawAccessibilitySettings(Listing_Standard listing)

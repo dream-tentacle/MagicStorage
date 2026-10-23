@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_UpdateNotice_Title>版本日志</MS_UpdateNotice_Title>
+  <MS_UpdateNotice_Version>版本 {0}</MS_UpdateNotice_Version>
+  <MS_UpdateNotice_Confirm>知道了</MS_UpdateNotice_Confirm>
+  <MS_SettingsShowUpdateLog>自动显示版本日志</MS_SettingsShowUpdateLog>
+  <MS_SettingsShowUpdateLogHelp>读档后自动弹出更新日志内容</MS_SettingsShowUpdateLogHelp>
+  <MS_SettingsOpenUpdateLog>查看版本日志</MS_SettingsOpenUpdateLog>
+</LanguageData>

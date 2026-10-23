@@ -1,0 +1,73 @@
+{
+  "title": "REAL PLAYER FEEDBACK",
+  "quotes": [
+    {
+      "text": "I can't live without Magic Storage anymore!",
+      "highlights": ["can't live without Magic Storage"]
+    },
+    {
+      "text": "Brilliant! This categorization feature is so good!",
+      "highlights": ["categorization feature is so good"]
+    },
+    {
+      "text": "For me, though, the cost of using it is really reasonable. I run the full Ayameduki race lineup, plus Ratkin, Milira, MoeLotl, Wolfein, Kiiro and The Dead Man's Switch. Without this cosmic workbench, I couldn't even manage a gravship 😂",
+      "highlights": ["the cost of using it is really reasonable"]
+    },
+    {
+      "text": "The logic behind this workbench mod is unbeatable. When I change a bill's crafting requirements, pawns seem to respond tens of thousands of times faster than in vanilla.",
+      "highlights": ["The logic behind this workbench mod is unbeatable."]
+    },
+    {
+      "text": "Yeah, it's mainly that this workbench costs so little to use. The concept and approach are excellent, and its UI and workflow are the best I've seen.",
+      "highlights": ["The concept and approach are excellent"]
+    },
+    {
+      "text": "It's such a huge quality-of-life improvement. It makes me feel like my micromanagement skills have improved.",
+      "highlights": ["such a huge quality-of-life improvement"]
+    }
+  ],
+  "workshop_names": [
+    {
+      "zh": "人工种族",
+      "en": "Ayameduki races",
+      "url": "https://steamcommunity.com/workshop/filedetails/?id=3153539856",
+      "note": "Aya series by Ayameduki; full lineup is a translation of the player's wording."
+    },
+    {
+      "zh": "鼠",
+      "en": "Ratkin",
+      "workshop_title": "NewRatkinPlus",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=1578693166"
+    },
+    {
+      "zh": "米",
+      "en": "Milira",
+      "workshop_title": "Milira Race",
+      "url": "https://steamcommunity.com/workshop/filedetails/?id=3256974620"
+    },
+    {
+      "zh": "螈",
+      "en": "MoeLotl",
+      "workshop_title": "MoeLotl Race",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3292351432"
+    },
+    {
+      "zh": "狗／沃芬",
+      "en": "Wolfein",
+      "workshop_title": "沃芬族 Wolfein Race v1.0",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3473140562&l=schinese"
+    },
+    {
+      "zh": "猫／绮罗",
+      "en": "Kiiro",
+      "workshop_title": "Kiiro Race",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2988200143"
+    },
+    {
+      "zh": "失能机关",
+      "en": "The Dead Man's Switch",
+      "workshop_title": "The Dead Man's Switch",
+      "url": "https://steamcommunity.com/workshop/filedetails/?id=3121742525"
+    }
+  ]
+}

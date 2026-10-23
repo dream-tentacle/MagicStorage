@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_UpdateNotice_Title>Version log</MS_UpdateNotice_Title>
+  <MS_UpdateNotice_Version>Version {0}</MS_UpdateNotice_Version>
+  <MS_UpdateNotice_Confirm>Got it</MS_UpdateNotice_Confirm>
+  <MS_SettingsShowUpdateLog>Automatically show version logs</MS_SettingsShowUpdateLog>
+  <MS_SettingsShowUpdateLogHelp>Automatically show the update log after loading a save.</MS_SettingsShowUpdateLogHelp>
+  <MS_SettingsOpenUpdateLog>View version logs</MS_SettingsOpenUpdateLog>
+</LanguageData>
