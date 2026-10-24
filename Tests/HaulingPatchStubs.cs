@@ -33,6 +33,19 @@ namespace Verse
 
 namespace RimWorld
 {
+    // Controlled merge job factory boundary; no native merge search is simulated.
+    public class WorkGiver_Merge
+    {
+        public static int OriginalCalls;
+        public static readonly Verse.AI.Job VanillaJob = new Verse.AI.Job();
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public virtual Verse.AI.Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
+        {
+            OriginalCalls++;
+            return VanillaJob;
+        }
+    }
+
     public sealed class DefOfAttribute : Attribute { }
     public static class DefOfHelper { public static void EnsureInitializedInCtor(Type type) { } }
     public enum StoragePriority { Unstored, Low, Normal, Important, Critical }

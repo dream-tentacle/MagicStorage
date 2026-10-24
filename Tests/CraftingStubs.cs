@@ -22,7 +22,7 @@ namespace Verse
     public static class Scribe_References { public static void Look<T>(ref T value, string key) { } }
     public struct IntRange { public int min, max; public IntRange(int a, int b) { min = a; max = b; } }
     public struct FloatRange { public float min, max; public FloatRange(float a, float b) { min = a; max = b; } public bool IncludesEpsilon(float v) => v >= min && v <= max; }
-    public class SkillDef { }
+    public class SkillDef { public string LabelCap => "Social"; }
     public class SkillRequirement { public int minLevel; }
     public static class Rand
     {
@@ -69,7 +69,7 @@ namespace Verse
     }
     public enum ThingRequestGroup { MinifiedThing, Blueprint, BuildingFrame, Refuelable }
     public partial struct IntVec3 { public bool Standable(Map map) => true; public bool Fogged(Map map) => map.Fog.Contains(this); }
-    public enum Danger { Some }
+    public enum Danger { Some, Deadly }
     public partial class Thing { public string LabelShortCap => "test pawn"; public RimWorld.RotStage GetRotStage() => stale ? RimWorld.RotStage.Rotting : RimWorld.RotStage.Fresh; }
     public partial class ThingDef
     {
@@ -134,7 +134,7 @@ namespace Verse
         public bool WorkIsActive(RimWorld.WorkTypeDef type) => !Disabled.Contains(type) && !Unassigned.Contains(type);
     }
     public class Skills { public SkillRecord record = new SkillRecord(); public SkillRecord GetSkill(SkillDef def) => record; }
-    public class SkillRecord { public int Level = 10; }
+    public class SkillRecord { public int Level = 10; public bool TotallyDisabled; }
     public class PawnEquipment { public List<Thing> AllEquipmentListForReading = new List<Thing>(); }
     public partial class PawnApparel { public List<RimWorld.Apparel> WornApparel = new List<RimWorld.Apparel>(); }
     public static class ModsConfig { public static bool BiotechActive = true; }

@@ -11,8 +11,54 @@ internal static class StorageShelfDrawingTests
     private static void Near(float a, float b, string label) => Check(Math.Abs(a-b)<0.00001f,label+": "+a+" / "+b);
     public static int Main()
     {
-        try { Layout(); Routing(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
+        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
         catch(Exception ex) { Console.Error.WriteLine(ex);return 1; }
+    }
+
+    private static void DynamicLayout()
+    {
+        foreach (int count in new[] { 1, 2, 4, 5, 6, 9, 12, 16, 25 })
+        {
+            float size = StorageShelfLayout.ItemSizeFor(count);
+            Check(size > 0 && size <= 0.4f, "dynamic item size is positive and bounded");
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 offset = StorageShelfLayout.Offset(i, count);
+                Check(Math.Abs(offset.x) + size / 2 <= 0.39001f, "all configured items fit shelf width");
+                Check(Math.Abs(offset.z - 0.08f) + size / 2 <= 0.39001f, "all configured items fit shelf depth");
+                for (int j = 0; j < i; j++)
+                {
+                    Vector3 other = StorageShelfLayout.Offset(j, count);
+                    Check(Math.Abs(offset.x - other.x) >= size || Math.Abs(offset.z - other.z) >= size,
+                        "dynamic positions do not overlap");
+                }
+                Vector2 fitted = StorageShelfLayout.FitSize(new Vector2(2, 1), 35, count);
+                double r = 35 * Math.PI / 180;
+                Check(fitted.x * Math.Cos(r) + fitted.y * Math.Sin(r) <= size + 0.00001,
+                    "rotated graphics fit dynamic position");
+            }
+        }
+    }
+
+    private static void DynamicRouting()
+    {
+        var map = new Map();
+        var shelf = new Building_StorageSupplyShelf { Map = map, Position = new IntVec3 { x = 10, z = 20 },
+            Selections = new ThingDef[9], Stocks = new Thing[9] };
+        map.haulDestinationManager.Parent = shelf;
+        var def = new ThingDef();
+        for (int i = 0; i < 9; i++)
+        {
+            shelf.Selections[i] = def;
+            var item = new Thing { Map = map, Position = shelf.Position, def = def };
+            shelf.GetSlotGroup().HeldThings.Add(item);
+            Check(StorageShelfDrawing.TryGetShelf(item, out _, out int slot) && slot == i,
+                "real stack uses its configured position beyond third");
+            Printer_Plane.Calls.Clear();
+            StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item);
+            Near(StorageShelfLayout.ItemSizeFor(9), Printer_Plane.Calls[0].Size.x,
+                "static graphics use dynamic item size");
+        }
     }
 
     private static void Layout()
@@ -42,6 +88,7 @@ internal static class StorageShelfDrawingTests
         shelf.def.Altitude=1f;
         map.haulDestinationManager.Parent=shelf;
         var item=new Thing { Map=map,Position=shelf.Position };
+        shelf.GetSlotGroup().HeldThings.Add(item);
         shelf.Selections[1]=item.def;
         var layer=new SectionLayer_ThingsGeneral();
         Check(StorageShelfDrawing.TryGetShelf(item,out var found,out int slot),"recognizes shelf item");
@@ -88,6 +135,12 @@ internal static class StorageShelfDrawingTests
         map.haulDestinationManager.Parent=new object();Check(StorageShelfDrawing.PrintItem(layer,item),"other storage stays native");
         map.haulDestinationManager.Parent=shelf;
         shelf.Selections[1]=null;Check(StorageShelfDrawing.TryGetShelf(item,out _,out slot) && slot>=0 && slot<3,"leftover stacks remain visible");
+        shelf.Selections[0]=item.def;shelf.Selections[2]=item.def;
+        var second=new Thing { def=item.def,Map=map,Position=shelf.Position };
+        var third=new Thing { def=item.def,Map=map,Position=shelf.Position };
+        shelf.GetSlotGroup().HeldThings.Add(second);shelf.GetSlotGroup().HeldThings.Add(third);
+        Check(StorageShelfDrawing.TryGetShelf(second,out _,out int secondSlot) && secondSlot==0,"same-def second stack uses separate first position");
+        Check(StorageShelfDrawing.TryGetShelf(third,out _,out int thirdSlot) && thirdSlot==2,"same-def third stack uses separate third position");
         map.listerThings.AllThings.Add(item);map.listerThings.AllThings.Add(shelf);Find.Maps.Add(map);
         StorageShelfDrawing.RefreshAll();
         Check(map.mapDrawer.Dirty.Count==1,"toggle invalidates shelf meshes without touching other cells");

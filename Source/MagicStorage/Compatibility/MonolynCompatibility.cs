@@ -25,6 +25,7 @@ namespace MagicStorage
             Type effects = AccessTools.TypeByName("ASEL.MNEffecterDefOf");
             lanternTransfer = effects == null ? null : AccessTools.Field(effects, "LanternTransfer");
             harmony.Patch(destroy, prefix: new HarmonyMethod(typeof(MonolynCompatibility), nameof(DestroyResourcesPrefix)));
+            MonolynProductionSupply.Apply(harmony);
         }
 
         private static bool DestroyResourcesPrefix(Map __0, BuildableDef __1, ref bool __result)

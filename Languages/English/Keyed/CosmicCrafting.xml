@@ -25,11 +25,24 @@
   <MS_Craft_Add>Add production order</MS_Craft_Add>
   <MS_Craft_Orders>Production orders</MS_Craft_Orders>
   <MS_Craft_DragToSort>Left/right-drag to reorder</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>Hold the left or right mouse button and drag the task block to change production priority.</MS_Craft_DragOrder>
+  <MS_Craft_GroupModeOff>Enable grouping mode. Work order is affected by groups.</MS_Craft_GroupModeOff>
+  <MS_Craft_GroupModeOn>Disable grouping mode and show the same production priority as a flat list. Existing groups are kept.</MS_Craft_GroupModeOn>
+  <MS_Craft_StartGroup>Start grouping</MS_Craft_StartGroup>
+  <MS_Craft_FinishGroup>Finish grouping</MS_Craft_FinishGroup>
+  <MS_Craft_NewGroup>New group {0}</MS_Craft_NewGroup>
+  <MS_Craft_Ungrouped>Ungrouped</MS_Craft_Ungrouped>
+  <MS_Craft_RenameGroup>Edit group name</MS_Craft_RenameGroup>
+  <MS_Craft_DeleteGroup>Delete this group and move its orders to Ungrouped.</MS_Craft_DeleteGroup>
+  <MS_Craft_GroupConfirm>Confirm</MS_Craft_GroupConfirm>
+  <MS_Craft_GroupCancel>Cancel</MS_Craft_GroupCancel>
+  <MS_Craft_DragOrder>Hold the left or right mouse button and drag a task to change production priority. Dragging across groups also changes its group.</MS_Craft_DragOrder>
+  <MS_Craft_DragGroup>Click to expand or collapse. Hold the left or right mouse button and drag the header to change the whole group's production priority.</MS_Craft_DragGroup>
   <MS_Craft_Details>Details</MS_Craft_Details>
   <MS_Craft_Workbenches>Workbenches</MS_Craft_Workbenches>
   <MS_Craft_FavoriteWorkbench>Favorite this workbench and move it to the top.</MS_Craft_FavoriteWorkbench>
   <MS_Craft_UnfavoriteWorkbench>Remove this workbench from favorites.</MS_Craft_UnfavoriteWorkbench>
+  <MS_Craft_BottomWorkbench>Move this workbench to the bottom and remove it from favorites.</MS_Craft_BottomWorkbench>
+  <MS_Craft_RestoreWorkbenchOrder>Remove the bottom marker and restore this workbench's normal order.</MS_Craft_RestoreWorkbenchOrder>
   <MS_Craft_CompactModeOff>Enable compact mode for the workbench list.</MS_Craft_CompactModeOff>
   <MS_Craft_CompactModeOn>Disable compact mode for the workbench list.</MS_Craft_CompactModeOn>
   <MS_Craft_RecipeCompactModeOff>Enable compact mode for the recipe list.</MS_Craft_RecipeCompactModeOff>
@@ -42,6 +55,7 @@
   <MS_Craft_NoOrders>No production orders yet. Select a workbench on the right to add a recipe.</MS_Craft_NoOrders>
   <MS_Craft_NoMatchingWorkbenches>No unlocked workbenches with available recipes match these filters.</MS_Craft_NoMatchingWorkbenches>
   <MS_Craft_All>All</MS_Craft_All>
+  <MS_Craft_HaulingTabHint>Vanilla crematorium bills are hauling work. Surprising, right?</MS_Craft_HaulingTabHint>
   <MS_Craft_AllRecipes>All recipes</MS_Craft_AllRecipes>
   <MS_Craft_ModFilter>Mod: {0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>Workbench: {0}</MS_Craft_WorkbenchFilter>
@@ -79,6 +93,7 @@
   <MS_Craft_Worker_NonMechs>Any non-mech</MS_Craft_Worker_NonMechs>
   <MS_Craft_AnyMechanitor>Any mechanitor</MS_Craft_AnyMechanitor>
   <MS_Craft_Skill>Skill range: {0}</MS_Craft_Skill>
+  <MS_Craft_UnlimitedSkill>Unlimited</MS_Craft_UnlimitedSkill>
   <MS_Craft_MinSkill>Minimum skill</MS_Craft_MinSkill>
   <MS_Craft_MaxSkill>Maximum skill</MS_Craft_MaxSkill>
   <MS_Craft_NamedWorkerHint>As in vanilla, a named worker ignores this range. The recipe's minimum skill requirements still apply.</MS_Craft_NamedWorkerHint>
@@ -92,4 +107,6 @@
   <MS_Craft_MaxQuality>Maximum quality: {0}</MS_Craft_MaxQuality>
   <MS_Craft_Incapable>Incapable of this work</MS_Craft_Incapable>
   <MS_Craft_WorkDisabled>Work not assigned</MS_Craft_WorkDisabled>
+  <MS_Gestation_MissingMaterials>Insufficient materials (available/required): {0}</MS_Gestation_MissingMaterials>
+  <MS_Gestation_MaterialCount>{0} {1}/{2}</MS_Gestation_MaterialCount>
 </LanguageData>

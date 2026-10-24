@@ -33,10 +33,21 @@ namespace MagicStorage
         {
             if (!(billGiver is Building_CosmicMechGestator table)) return true;
             chosen.Clear();
-            __result = CosmicGestationMaterials.TryPlan(table, bill, pawn, out var plan);
+            var missing = missingIngredients == null ? null : new List<string>();
+            __result = CosmicGestationMaterials.TryPlan(table, bill, pawn, out var plan, missing);
             if (__result)
                 foreach (var pair in plan) chosen.Add(new ThingCount(pair.Key, pair.Value));
-            else if (missingIngredients != null) missingIngredients.AddRange(bill.recipe.ingredients);
+            else if (missingIngredients != null)
+            {
+                missingIngredients.AddRange(bill.recipe.ingredients);
+                WorkGiver_CosmicGestation.MaterialFailure = missing.Count == 0 ? null :
+                    new WorkGiver_CosmicGestation.Failure
+                    {
+                        Bill = bill,
+                        VanillaReason = "MissingMaterials".Translate(missingIngredients.Select(i => i.Summary).ToCommaList()),
+                        Reason = "MS_Gestation_MissingMaterials".Translate(missing.ToCommaList())
+                    };
+            }
             return false;
         }
 
@@ -77,13 +88,25 @@ namespace MagicStorage
             // input candidates here as well, including a corpse already delivered.
             var items = new List<Thing>(table.innerContainer);
             if (table.NetworkReady)
+            {
                 table.Network.GetMatchingStacks(d => __instance.recipe.fixedIngredientFilter.Allows(d), items);
-            __result = items.OfType<Corpse>().Where(c => CosmicGestationMaterials.Allows(__instance, pawn, c));
+                StorageMaterialSources.GetShelfStacks(table.Network,
+                    d => __instance.recipe.fixedIngredientFilter.Allows(d), items);
+            }
+            __result = items.OfType<Corpse>().Where(c => CosmicGestationMaterials.Allows(__instance, pawn, c) &&
+                (table.innerContainer.Contains(c) || StorageMaterialSources.Available(table.Network, c) > 0));
         }
     }
 
     public sealed class WorkGiver_CosmicGestation : WorkGiver_DoBill
     {
+        internal sealed class Failure
+        {
+            internal Bill Bill;
+            internal string VanillaReason, Reason;
+        }
+        [System.ThreadStatic] internal static Failure MaterialFailure;
+
         public override Job JobOnThing(Pawn pawn, Thing thing, bool forced = false)
         {
             if (!(thing is Building_CosmicMechGestator table)) return null;
@@ -92,7 +115,20 @@ namespace MagicStorage
             { JobFailReason.Is(StorageNetwork.StatusLabel(table.Network)); return null; }
             if (!MechanitorUtility.IsMechanitor(pawn))
             { JobFailReason.Is("NotAMechanitor".Translate()); return null; }
-            return base.JobOnThing(pawn, thing, forced);
+            var previous = MaterialFailure;
+            MaterialFailure = null;
+            try
+            {
+                var job = base.JobOnThing(pawn, thing, forced);
+                var failure = MaterialFailure;
+                // Vanilla assigns its failure after the ingredient search. Replace
+                // only that exact reason; preserve bandwidth and other bill failures.
+                if (job == null && failure != null && JobFailReason.Reason == failure.VanillaReason &&
+                    JobFailReason.CustomJobString == failure.Bill.Label)
+                    JobFailReason.Is(failure.Reason, failure.Bill.Label);
+                return job;
+            }
+            finally { MaterialFailure = previous; }
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>[DR] 魔法存储</name>
+	<name>[DR] Magic Storage (魔法存储)</name>
 	<author>梦境触感</author>
-	<modVersion>1.0.0</modVersion>
+	<modVersion>1.0.14</modVersion>
 	<supportedVersions>
 		<li>1.6</li>
 		<li>1.7</li>
 	</supportedVersions>
 	<packageId>mjcg.magicstorage</packageId>
-	<description>通过控制核心和存储线管理多个存储单元。\n可以使用宇宙工作台制作配方。\n可以在自动补货架满足日常小量取货。\n可以通过新增选项进行贸易。\n组建远行队时，通过远行队传送器组建。\n\n不支持手术、机械族孕育的自动取货。</description>
+	<description>详细请见工坊简介。Please read the workshop description.</description>
 	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>

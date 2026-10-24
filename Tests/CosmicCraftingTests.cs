@@ -13,6 +13,10 @@ internal static class CosmicCraftingTests
     { checks++; if (!Equals(expected, actual)) throw new Exception("Cosmic crafting: " + message + "; expected " + expected + ", got " + actual); }
     internal static int Run()
     {
+        bool previousPlacement = MagicStorageMod.Settings.NewWorkbenchOrdersFirst;
+        MagicStorageMod.Settings.NewWorkbenchOrdersFirst = false;
+        try
+        {
         OrderReordering(); FilteredOrderReordering(); Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
         ProductionCompletion(); ConfigurableWorkSpeed(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
         PreparedMaterialsSurviveSourceLoss();
@@ -20,6 +24,7 @@ internal static class CosmicCraftingTests
         CoreContainerSelection();
         BenchSelectionAndPriority();
         OrderedJobPreflight();
+        GroupedProductionPriority();
         WorkerFailurePrecedesOccupation();
         DuplicateRecipeWorkerEligibility();
         FixedCostMaterials();
@@ -27,8 +32,10 @@ internal static class CosmicCraftingTests
         IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
         RefreshDoesNotChangeWork();
         MaterialRetryCaching(); EarlyWorkerEligibility();
-        PrinterWorkerRules(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
+        PrinterWorkerRules(); UnlimitedSkillRange(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
         return checks;
+        }
+        finally { MagicStorageMod.Settings.NewWorkbenchOrdersFirst = previousPlacement; }
     }
 
     private static void PrinterWorkerRules()
@@ -51,6 +58,41 @@ internal static class CosmicCraftingTests
         order.Recipe.skillRequirements = new List<SkillRequirement> { new SkillRequirement { minLevel = 15 } };
         Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 12), "printer respects hard recipe skill requirements");
         Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 15), "printer meeting hard skill requirement can work");
+    }
+
+    private static void UnlimitedSkillRange()
+    {
+        var type = new WorkTypeDef();
+        var recipe = new RecipeDef { route = new WorkGiverDef { workType = type }, workSkill = new SkillDef(), minimumSkill = 5 };
+        var order = new CraftingOrder(1, recipe);
+        var pawn = new Pawn { Spawned = true };
+        var policy = new VanillaCraftingWorkerPolicy();
+        foreach (int level in new[] { 20, 21, 100, int.MaxValue })
+        {
+            pawn.skills.record.Level = level;
+            Equal(true, policy.Allows(order, pawn, type), "default unlimited range accepts skill " + level);
+        }
+        order.SkillRange = new IntRange(0, 20);
+        pawn.skills.record.Level = 21;
+        Equal(false, policy.Allows(order, pawn, type), "finite maximum 20 still rejects skill 21");
+        pawn.skills.record.Level = 20;
+        Equal(true, policy.Allows(order, pawn, type), "finite maximum includes its boundary");
+        order.SkillRange = new IntRange(12, CraftingOrder.UnlimitedSkillLevel);
+        pawn.skills.record.Level = 11;
+        Equal(false, policy.Allows(order, pawn, type), "unlimited maximum preserves optional minimum");
+        pawn.skills.record.Level = 12;
+        Equal(true, policy.Allows(order, pawn, type), "unlimited range includes its minimum");
+        order.SkillRange = new IntRange(0, CraftingOrder.UnlimitedSkillLevel);
+        pawn.skills.record.Level = 4;
+        Equal(false, policy.Allows(order, pawn, type), "unlimited maximum preserves hard recipe minimum");
+        pawn.IsColonyMech = true; pawn.IsColonyMechPlayerControlled = true;
+        pawn.RaceProps.IsMechanoid = true; pawn.RaceProps.mechFixedSkillLevel = 100; pawn.skills = null;
+        Equal(true, policy.Allows(order, pawn, type), "unlimited range accepts high fixed mech skills");
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 100), "printer uses the same unlimited range");
+        order.SkillRange = new IntRange(12, CraftingOrder.UnlimitedSkillLevel);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 11), "printer retains minimum with unlimited maximum");
+        order.SkillRange = new IntRange(0, 20);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 100), "printer retains a finite maximum");
     }
 
     private sealed class AutomaticExecutor : ICraftingExecutor
@@ -677,6 +719,38 @@ internal static class CosmicCraftingTests
         actualDriver.EndJobWith(JobCondition.InterruptForced);
         Equal(null, f.Dispatch.AssignedWorker(order), "actual driver releases its own assignment");
     }
+    private static void GroupedProductionPriority()
+    {
+        var f = new Fixture(); var tuple = f.Core(0); var core = tuple.Item1;
+        var first = f.Order(core, 2); var second = f.Order(core, 2);
+        var firstGroup = core.Crafting.CreateGroup(new[] { first }, "First");
+        var secondGroup = core.Crafting.CreateGroup(new[] { second }, "Second");
+        var machine = new AutomaticExecutor(f, core);
+        core.Crafting.MoveGroup(secondGroup, firstGroup, false);
+        Equal(second.Id, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, tuple.Item2, true).count,
+            "colonist follows the group's new production priority");
+        Equal(second, f.Dispatch.FindAutomaticOrder(machine), "automatic worker follows the same group priority");
+        secondGroup.Collapsed = true; core.Crafting.GroupingMode = false;
+        Equal(second, f.Dispatch.FindAutomaticOrder(machine), "folding or disabling group display does not affect scheduling");
+        second.Suspended = true;
+        Equal(first.Id, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, tuple.Item2, true).count, "suspended higher group is skipped");
+        Equal(first, f.Dispatch.FindAutomaticOrder(machine), "automatic worker skips suspended higher group");
+        second.Suspended = false; second.Mode = CraftingRepeatMode.RepeatCount; second.RepeatCount = 0;
+        Equal(first.Id, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, tuple.Item2, true).count, "completed higher group does not block later groups");
+        second.Mode = CraftingRepeatMode.Forever; second.Recipe.ingredients[0].count = 20;
+        Equal(first.Id, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, tuple.Item2, true).count, "unaffordable higher group does not block later groups");
+        second.Recipe.ingredients[0].count = 2; second.LastMaterialFailureTick = null;
+        var running = f.Start(f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, tuple.Item2, true));
+        var batch = second.Batch; int revision = second.Revision;
+        core.Crafting.MoveGroup(firstGroup, secondGroup, false);
+        Equal(true, running.CanContinue(), "changing group priority never interrupts an active order");
+        Equal(batch, second.Batch, "group drag preserves prepared materials and progress");
+        Equal(revision, second.Revision, "priority drag does not invalidate the active batch");
+        Equal(f.Pawn.CurJob, f.Dispatch.FindJob(f.Pawn, f.Giver), "active job remains valid after priority changes");
+        Equal(first, f.Dispatch.FindAutomaticOrder(machine), "other worker can take an available later task while one is active");
+        running.EndJobWith(JobCondition.InterruptForced);
+    }
+
     private static void BenchSelectionAndPriority()
     {
         var f = new Fixture(); var a = f.Core(0); var b = f.Core(10);
@@ -994,6 +1068,28 @@ internal static class CosmicCraftingTests
         Equal(3, plan["wood1"], "whole-stack quantity");
         stocks[0].Value=0; stocks[1].Count=0;
         Equal(false, CraftingMaterialPlanner.TryPlan(stocks, needs, true, false, out _), "zero-value and unavailable ingredients");
+        var shortages = new List<CraftingMaterialShortage>();
+        stocks[0].Value = 1; stocks[1].Count = 4;
+        needs = new List<CraftingMaterialNeed<string>> {
+            new CraftingMaterialNeed<string> { Value = 7, Allows = s => s.StartsWith("wood") },
+            new CraftingMaterialNeed<string> { Value = 2, Allows = s => s.StartsWith("wood") },
+            new CraftingMaterialNeed<string> { Value = 6, Allows = s => s == "steel" } };
+        Equal(false, CraftingMaterialPlanner.TryPlan(stocks, needs, false, false, out plan, shortages), "diagnose beyond first missing ingredient");
+        Equal(1, shortages.Count, "sufficient ingredients omitted and previously allocated stock unavailable");
+        Equal(1, shortages[0].NeedIndex, "overlapping ingredient is missing");
+        Equal(0d, shortages[0].Available, "same stock cannot satisfy two displayed requirements");
+        Equal(2d, shortages[0].Required, "missing requirement retained");
+        Equal(0, plan.Count, "failure never publishes a partial plan");
+        shortages.Clear(); needs = new List<CraftingMaterialNeed<string>> {
+            new CraftingMaterialNeed<string> { Value = 10, Allows = _ => true } };
+        Equal(false, CraftingMaterialPlanner.TryPlan(stocks, needs, false, false, out plan, shortages), "no-mix shortage keeps best single kind");
+        Equal("steel", shortages[0].Kind, "choose kind closest to satisfying requirement");
+        Equal(4d, shortages[0].Available, "no-mix available quantity uses item units");
+        Equal(5d, shortages[0].Required, "no-mix requirement accounts for value per unit");
+        shortages.Clear(); needs[0].Value = 20;
+        Equal(false, CraftingMaterialPlanner.TryPlan(stocks, needs, true, false, out plan, shortages), "mixed shortage");
+        Equal(15d, shortages[0].Available, "mixed quantity uses ingredient values");
+        Equal(20d, shortages[0].Required, "mixed required value retained");
     }
     private static void WorkerRules()
     {
@@ -1039,6 +1135,8 @@ internal static class CosmicCraftingTests
         internal MapComponent_CosmicCrafting Dispatch => Map.GetComponent<MapComponent_CosmicCrafting>();
         internal Fixture()
         {
+            // Scheduling scenarios below explicitly construct their priority queue in append order.
+            MagicStorageMod.Settings.NewWorkbenchOrdersFirst = false;
             Map.component = new MapComponent_StorageNetworks(Map);
             Pawn = new Pawn { Spawned=true, Map=Map, Faction=Faction.OfPlayer };
             Giver = new WorkGiverDef { workType=Type };

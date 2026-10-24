@@ -6,6 +6,8 @@ using Verse;
 
 namespace RimWorld
 {
+    public static class ThingCategoryDefOf
+    { public static readonly ThingCategoryDef Foods = new ThingCategoryDef(); }
     public interface IStoreSettingsParent { }
     public interface ISlotGroupParent : IHaulDestination, IStoreSettingsParent
     {
@@ -28,8 +30,16 @@ namespace RimWorld
             (!thing.hasQuality || AllowedQualityLevels.Includes(thing.quality));
         public void SetDisallowAll() { Allowed.Clear(); }
         public void SetAllow(ThingDef def, bool allowed) { if (allowed) Allowed.Add(def); else Allowed.Remove(def); }
+        public void SetAllow(ThingCategoryDef category, bool allowed)
+        { foreach (ThingDef def in category.DescendantThingDefs) SetAllow(def, allowed); }
         public bool IsAlwaysDisallowedDueToSpecialFilters(ThingDef def) => def.specialDisallowed;
-        public void CopyAllowancesFrom(ThingFilter filter) { foreach (var def in filter.Allowed) Allowed.Add(def); }
+        public void CopyAllowancesFrom(ThingFilter filter)
+        {
+            Allowed.Clear();
+            foreach (var def in filter.Allowed) Allowed.Add(def);
+            AllowedQualityLevels = filter.AllowedQualityLevels;
+            AllowedHitPointsPercents = filter.AllowedHitPointsPercents;
+        }
     }
     public class StorageSettings
     {
@@ -136,6 +146,8 @@ namespace RimWorld
 }
 namespace Verse
 {
+    public class ThingCategoryDef
+    { public readonly List<ThingDef> DescendantThingDefs = new List<ThingDef>(); }
     public enum DestroyMode { Vanish, KillFinalize, Deconstruct }
     public partial class Thing
     {

@@ -4,7 +4,7 @@
     <defName>MS_FuelSupplier</defName>
     <researchPrerequisites><li>MS_MaterialSupplyTechnology</li></researchPrerequisites>
     <label>fuel supplier</label>
-    <description>Automatically supplies fuel from the connected storage network to friendly buildings within 20 cells. Follows each building's fuel filter and automatic refueling toggle.\n\nUses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.</description>
+    <description>Automatically supplies fuel from the connected storage network to friendly buildings within 20 cells. Follows each building's fuel filter and automatic refueling toggle.\n\nUses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.\n\nTurrets can also be refueled normally; their refueling threshold is usually fixed at 50% in the base game.</description>
     <thingClass>MagicStorage.Building_FuelSupplier</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

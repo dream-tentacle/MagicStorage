@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using RimWorld;
@@ -58,6 +59,21 @@ namespace MagicStorage
             return false;
         }
 
+        internal static bool HasWindow(StorageTradeSession session) => sessions.Any(entry =>
+            entry.Value == session && Find.WindowStack.Windows.Contains(entry.Key));
+
+        internal static bool CloseWindows(StorageTradeSession session)
+        {
+            bool clean = true;
+            foreach (var window in sessions.Where(entry => entry.Value == session).Select(entry => entry.Key).ToList())
+            {
+                try { Find.WindowStack.TryRemove(window, false); }
+                catch (Exception error) { clean = false; Log.Error("[MagicStorage] Failed dynamic trade window cleanup: " + error); }
+                finally { sessions.Remove(window); }
+            }
+            return clean;
+        }
+
         private static void BeginReplacement(Dialog_Trade __0, out Replacement __state)
         {
             __state = null;
@@ -93,7 +109,8 @@ namespace MagicStorage
                 !Find.WindowStack.Windows.Contains(__state.Target)))
             {
                 // A failed replacement must not leave a session or reservations behind.
-                if (__state.Target != null) sessions.Remove(__state.Target);
+                // Keep a partially inserted window associated until the opener can remove it.
+                if (__state.Target != null && !Find.WindowStack.Windows.Contains(__state.Target)) sessions.Remove(__state.Target);
                 __state.Session.Dispose();
             }
             return __exception;

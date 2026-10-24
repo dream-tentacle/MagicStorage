@@ -6,7 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath>bin\</OutputPath>
     <AssemblyName>StorageFoundationTests</AssemblyName>
-    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;WORKBENCH_UNLOCK_TESTS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;WORKBENCH_UNLOCK_TESTS;CONSTRUCTION_REPAIR_TESTS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" /><Reference Include="System.Core" />
@@ -28,6 +28,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\GameComponent_WorkbenchUnlocks.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\MonolynCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\MonolynProductionSupply.cs" />
     <Compile Include="ModSettingsStubs.cs" />
     <Compile Include="..\Source\MagicStorage\MagicStorageSettings.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageRefreshTimer.cs" />
@@ -40,8 +41,13 @@
     <Compile Include="..\Source\MagicStorage\Apparel\JobDriver_TakeStorageApparel.cs" />
     <Compile Include="ConstructionStubs.cs" />
     <Compile Include="ConstructionSupplyTests.cs" />
+    <Compile Include="LogicalFloorsCompatibilityTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\LogicalFloorsCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ConstructionSupplyUnit.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSupply.cs" />
+    <Compile Include="..\Source\MagicStorage\Construction\MapComponent_ConstructionRepair.cs" />
+    <Compile Include="..\Source\MagicStorage\Construction\ConstructionRepairPatches.cs" />
+    <Compile Include="ConstructionRepairTests.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSite.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
@@ -52,6 +58,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingProductFilters.cs" />
     <Compile Include="CosmicCraftingTests.cs" />
+    <Compile Include="CraftingOrderGroupTests.cs" />
     <Compile Include="StorageReservationTests.cs" />
     <Compile Include="StorageUnitTransferTests.cs" />
     <Compile Include="StorageTradeTests.cs" />
@@ -61,6 +68,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingWorkerPolicy.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterialPlanner.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterials.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialSources.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\MapComponent_CosmicCrafting.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\JobDriver_CosmicCrafting.cs" />
     <Compile Include="JobStubs.cs" />
@@ -81,6 +89,7 @@
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageReceiver.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReception.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageReceiverHaulingPatches.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfHaulingPatches.cs" />
     <Compile Include="GameplayStubs.cs" />
     <Compile Include="PlacementStubs.cs" />
     <Compile Include="WithdrawalStubs.cs" />

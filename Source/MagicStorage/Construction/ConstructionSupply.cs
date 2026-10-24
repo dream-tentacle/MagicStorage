@@ -25,6 +25,8 @@ namespace MagicStorage
                 if (!supplier.CanWork) break;
                 DeliverTo(supplier, target);
             }
+            if (supplier.RepairMode && supplier.CanWork)
+                supplier.Map.GetComponent<MapComponent_ConstructionRepair>().Scan(supplier);
         }
 
         private static void Collect(Building_ConstructionSupplyUnit supplier, ThingRequestGroup group, List<Thing> targets)

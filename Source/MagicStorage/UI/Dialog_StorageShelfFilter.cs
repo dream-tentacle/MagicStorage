@@ -7,6 +7,80 @@ using Verse;
 
 namespace MagicStorage
 {
+    public sealed class Dialog_StorageShelfSharedFilter : Window
+    {
+        private readonly Building_StorageSupplyShelf shelf;
+        private readonly ThingFilterUI.UIState filterState = new ThingFilterUI.UIState();
+        private readonly string[] limitBuffers;
+        private Vector2 limitsScroll;
+        public override Vector2 InitialSize => new Vector2(Math.Min(620, UI.screenWidth), Math.Min(760, UI.screenHeight));
+
+        public Dialog_StorageShelfSharedFilter(Building_StorageSupplyShelf shelf)
+        {
+            this.shelf = shelf;
+            limitBuffers = new string[shelf.SlotCount];
+            for (int i = 0; i < limitBuffers.Length; i++) limitBuffers[i] = shelf.FilterLimit(i).ToString();
+            doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true;
+        }
+
+        public override void DoWindowContents(Rect rect)
+        {
+            if (!shelf.Spawned || !shelf.FilterMode || shelf.SlotCount != limitBuffers.Length) { Close(); return; }
+            Text.Font = GameFont.Medium;
+            Widgets.Label(new Rect(0, 0, rect.width - 30, 36), "MS_Shelf_FilterMode".Translate());
+            Text.Font = GameFont.Small;
+            Widgets.Label(new Rect(0, 42, rect.width, 58), "MS_Shelf_SharedFilterHint".Translate());
+            StorageSettings settings = shelf.GetStoreSettings();
+            if (Widgets.ButtonText(new Rect(0, 106, rect.width, 30),
+                "Priority".Translate() + ": " + settings.Priority.Label().CapitalizeFirst()))
+            {
+                var options = new List<FloatMenuOption>();
+                foreach (StoragePriority priority in Enum.GetValues(typeof(StoragePriority)))
+                {
+                    if (priority == StoragePriority.Unstored) continue;
+                    StoragePriority selected = priority;
+                    options.Add(new FloatMenuOption(selected.Label().CapitalizeFirst(), () => settings.Priority = selected));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+            int columns = Math.Min(3, shelf.SlotCount);
+            int rows = (shelf.SlotCount - 1) / columns + 1;
+            float contentHeight = rows * 66f;
+            float limitsHeight = Math.Min(contentHeight, 132f);
+            Rect limitsRect = new Rect(0, 144, rect.width, limitsHeight);
+            Rect view = new Rect(0, 0, rect.width - (contentHeight > limitsHeight ? 20 : 0), contentHeight);
+            float width = view.width / columns;
+            Widgets.BeginScrollView(limitsRect, ref limitsScroll, view);
+            for (int i = 0; i < shelf.SlotCount; i++)
+            {
+                float x = (i % columns) * width, y = (i / columns) * 66f;
+                if (y + 66 < limitsScroll.y || y > limitsScroll.y + limitsHeight) continue;
+                Widgets.Label(new Rect(x, y, width - 8, 28), "MS_Shelf_SlotLimit".Translate(i + 1));
+                int limit = shelf.FilterLimit(i);
+                Rect input = new Rect(x, y + 30, width - 8, 28);
+                Widgets.TextFieldNumeric(input, ref limit, ref limitBuffers[i], 0, int.MaxValue);
+                shelf.SetFilterLimit(i, limit);
+                TooltipHandler.TipRegion(input, "MS_Shelf_SharedLimitTip".Translate());
+            }
+            Widgets.EndScrollView();
+            float filterY = limitsRect.yMax + 4;
+            ThingFilterUI.DoThingFilterConfigWindow(new Rect(0, filterY, rect.width, Math.Max(1, rect.height - filterY - 60)),
+                filterState, shelf.SharedFilter, shelf.GetParentStoreSettings().filter, 8,
+                forceHiddenFilters: HiddenSpecialFilters(), map: shelf.Map);
+        }
+
+        private static IEnumerable<SpecialThingFilterDef> HiddenSpecialFilters()
+        {
+            if (ModsConfig.IdeologyActive)
+            {
+                yield return SpecialThingFilterDefOf.AllowVegetarian;
+                yield return SpecialThingFilterDefOf.AllowCarnivore;
+                yield return SpecialThingFilterDefOf.AllowCannibal;
+                yield return SpecialThingFilterDefOf.AllowInsectMeat;
+            }
+        }
+    }
+
     public sealed class Dialog_StorageShelfFilter : Window
     {
         private readonly Building_StorageSupplyShelf shelf;
@@ -24,7 +98,7 @@ namespace MagicStorage
         }
         public override void DoWindowContents(Rect rect)
         {
-            if (!shelf.Spawned || shelf.SelectedDef(slot) != itemDef) { Close(); return; }
+            if (!shelf.Spawned || shelf.FilterMode || shelf.SelectedDef(slot) != itemDef) { Close(); return; }
             StorageShelfFilter filter = shelf.SlotFilter(slot);
             Text.Font = GameFont.Medium;
             Widgets.Label(new Rect(0, 0, rect.width - 30, 36), "MS_Shelf_FilterTitle".Translate(slot + 1));

@@ -1,5 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_0_14.label>版本日志</MS_UpdateNotice_1_0_14.label>
+  <MS_UpdateNotice_1_0_14.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_14.sections.0.heading>
+  <MS_UpdateNotice_1_0_14.sections.0.entries.0>允许技能范围无限制</MS_UpdateNotice_1_0_14.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_14.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_14.sections.1.heading>
+  <MS_UpdateNotice_1_0_14.sections.1.entries.0>优化交易失败时的提示</MS_UpdateNotice_1_0_14.sections.1.entries.0>
+  <MS_UpdateNotice_1_0_13.label>版本日志</MS_UpdateNotice_1_0_13.label>
+  <MS_UpdateNotice_1_0_13.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_13.sections.0.heading>
+  <MS_UpdateNotice_1_0_13.sections.0.entries.0>建筑供应单元可以自动维修设施，在建筑上可以关闭此功能</MS_UpdateNotice_1_0_13.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_12.label>版本日志</MS_UpdateNotice_1_0_12.label>
+  <MS_UpdateNotice_1_0_12.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_12.sections.0.heading>
+  <MS_UpdateNotice_1_0_12.sections.0.entries.0>优化配方分组模式的优先级设置，工作顺序受到组别影响</MS_UpdateNotice_1_0_12.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_12.sections.0.entries.1>允许在mod选项中调整新任务的默认顺序</MS_UpdateNotice_1_0_12.sections.0.entries.1>
+  <MS_UpdateNotice_1_0_11.label>版本日志</MS_UpdateNotice_1_0_11.label>
+  <MS_UpdateNotice_1_0_11.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_11.sections.0.heading>
+  <MS_UpdateNotice_1_0_11.sections.0.entries.0>工作台配方列表添加分组模式</MS_UpdateNotice_1_0_11.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_10.label>版本日志</MS_UpdateNotice_1_0_10.label>
+  <MS_UpdateNotice_1_0_10.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.0.heading>
+  <MS_UpdateNotice_1_0_10.sections.0.entries.0>修复交易的兼容性bug</MS_UpdateNotice_1_0_10.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_10.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.1.heading>
+  <MS_UpdateNotice_1_0_10.sections.1.entries.0>供货架新增一键食物功能</MS_UpdateNotice_1_0_10.sections.1.entries.0>
+  <MS_UpdateNotice_1_0_10.sections.2.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.2.heading>
+  <MS_UpdateNotice_1_0_10.sections.2.entries.0>建筑供给单元兼容dd.Logical Floors</MS_UpdateNotice_1_0_10.sections.2.entries.0>
+  <MS_UpdateNotice_1_0_9.label>版本日志</MS_UpdateNotice_1_0_9.label>
+  <MS_UpdateNotice_1_0_9.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_9.sections.0.heading>
+  <MS_UpdateNotice_1_0_9.sections.0.entries.0>现在两种供货架都可以承担营养膏机的料斗的功能</MS_UpdateNotice_1_0_9.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_8.label>版本日志</MS_UpdateNotice_1_0_8.label>
+  <MS_UpdateNotice_1_0_8.sections.0.heading>&lt;color=#FF6B6B&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.0.heading>
+  <MS_UpdateNotice_1_0_8.sections.0.entries.0>新增高堆叠供货架，容量10格</MS_UpdateNotice_1_0_8.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_8.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.1.heading>
+  <MS_UpdateNotice_1_0_8.sections.1.entries.0>兼容渡鸦赠礼系统</MS_UpdateNotice_1_0_8.sections.1.entries.0>
+  <MS_UpdateNotice_1_0_8.sections.1.entries.1>兼容墨诺灵的生产设施</MS_UpdateNotice_1_0_8.sections.1.entries.1>
+  <MS_UpdateNotice_1_0_7.label>版本日志</MS_UpdateNotice_1_0_7.label>
+  <MS_UpdateNotice_1_0_7.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性优化&lt;/color&gt;</MS_UpdateNotice_1_0_7.sections.0.heading>
+  <MS_UpdateNotice_1_0_7.sections.0.entries.0>新增交易页面的公开入口，方便第三方调用</MS_UpdateNotice_1_0_7.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_7.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_7.sections.1.heading>
+  <MS_UpdateNotice_1_0_7.sections.1.entries.0>宇宙工作台允许删除工作台，会将其排在最后。</MS_UpdateNotice_1_0_7.sections.1.entries.0>
+  <MS_UpdateNotice_1_0_6.label>版本日志</MS_UpdateNotice_1_0_6.label>
+  <MS_UpdateNotice_1_0_6.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_6.sections.0.heading>
+  <MS_UpdateNotice_1_0_6.sections.0.entries.0>与天工铸造的贸易穿梭机兼容</MS_UpdateNotice_1_0_6.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_5.label>版本日志</MS_UpdateNotice_1_0_5.label>
+  <MS_UpdateNotice_1_0_5.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_5.sections.0.heading>
+  <MS_UpdateNotice_1_0_5.sections.0.entries.0>自动补货架添加筛选模式，可以选择多种物品，补货架会自动选择可放置的物品</MS_UpdateNotice_1_0_5.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_4.label>版本日志</MS_UpdateNotice_1_0_4.label>
+  <MS_UpdateNotice_1_0_4.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性优化&lt;/color&gt;</MS_UpdateNotice_1_0_4.sections.0.heading>
+  <MS_UpdateNotice_1_0_4.sections.0.entries.0>兼容[FSF] Complex Jobs</MS_UpdateNotice_1_0_4.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_3.label>版本日志</MS_UpdateNotice_1_0_3.label>
+  <MS_UpdateNotice_1_0_3.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_3.sections.0.heading>
+  <MS_UpdateNotice_1_0_3.sections.0.entries.0>优化机械培育器在材料不足时的反馈</MS_UpdateNotice_1_0_3.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_3.sections.0.entries.1>优化机械培育器取货逻辑</MS_UpdateNotice_1_0_3.sections.0.entries.1>
+  <MS_UpdateNotice_1_0_2.label>版本日志</MS_UpdateNotice_1_0_2.label>
+  <MS_UpdateNotice_1_0_2.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_2.sections.0.heading>
+  <MS_UpdateNotice_1_0_2.sections.0.entries.0>允许设置建筑供应单元的供应半径</MS_UpdateNotice_1_0_2.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_1.label>版本日志</MS_UpdateNotice_1_0_1.label>
+  <MS_UpdateNotice_1_0_1.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_0_1.sections.0.heading>
+  <MS_UpdateNotice_1_0_1.sections.0.entries.0>修复了存储线和隐藏存储线可以搬运的bug</MS_UpdateNotice_1_0_1.sections.0.entries.0>
   <MS_UpdateNotice_1_0_0.label>版本日志</MS_UpdateNotice_1_0_0.label>
   <MS_UpdateNotice_1_0_0.sections.0.heading>模组发布</MS_UpdateNotice_1_0_0.sections.0.heading>
   <MS_UpdateNotice_1_0_0.sections.0.entries.0>魔法存储模组首次发布。</MS_UpdateNotice_1_0_0.sections.0.entries.0>

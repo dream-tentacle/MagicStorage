@@ -27,6 +27,7 @@ internal static class StorageRefreshTests
         settings.RestoreDefaults();
         Equal(true, settings.SimplifiedMode, "simple mode enabled by default");
         Equal(false, settings.AllowPrinterParameterChanges, "printer parameter changes default off");
+        Equal(true, settings.NewWorkbenchOrdersFirst, "new workbench orders default to first in Ungrouped");
         Equal(100, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed defaults to one hundred percent");
         settings.CosmicWorkbenchWorkSpeedPercent = int.MinValue;
         Equal(50, settings.CosmicWorkbenchWorkSpeedPercent, "workbench speed lower bound");
@@ -141,6 +142,8 @@ internal static class StorageRefreshTests
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
         Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsAllowPrinterParameterChanges"),
             "general tab exposes a single printer editing checkbox without an extra description");
+        Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsNewWorkbenchOrdersFirst"),
+            "general settings exposes the new-order priority checkbox");
         Equal(1, Listing_Standard.NumericLabels.Count, "general tab only contains the unit slot numeric setting");
         Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "general tab shows slot capacity");
         Equal(false, Listing_Standard.NumericLabels.Contains("MS_SettingsOverallRefresh"), "general tab hides performance fields");

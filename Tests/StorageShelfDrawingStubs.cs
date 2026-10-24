@@ -120,8 +120,21 @@ namespace MagicStorage
     public static class MagicStorageMod { public static MagicStorageSettings Settings=new MagicStorageSettings(); }
     public class Building_StorageSupplyShelf : Verse.Thing
     {
-        public const int SlotCount=3;
+        public int SlotCount => Selections.Length;
         public Verse.ThingDef[] Selections=new Verse.ThingDef[3];
         public Verse.ThingDef SelectedDef(int i) => Selections[i];
+        public Verse.Thing[] Stocks=new Verse.Thing[3];
+        private readonly ShelfSlotGroup group = new ShelfSlotGroup();
+        public class ShelfSlotGroup { public readonly List<Verse.Thing> HeldThings = new List<Verse.Thing>(); }
+        public ShelfSlotGroup GetSlotGroup() => group;
+        public Verse.Thing StockAt(int slot) => Stocks[slot];
+        public int StockSlot(Verse.Thing item) => System.Array.IndexOf(Stocks, item);
+        public void ResolveStockSlots(List<Verse.Thing> items)
+        {
+            foreach (var item in items)
+                if (StockSlot(item) < 0)
+                    for (int i = 0; i < SlotCount; i++)
+                        if (Stocks[i] == null && Selections[i] == item.def) { Stocks[i] = item; break; }
+        }
     }
 }

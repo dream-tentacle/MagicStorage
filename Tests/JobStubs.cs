@@ -9,8 +9,10 @@ namespace Verse
     public static class GenTicks { public const int TicksPerRealSecond = 60; }
     public static class Scribe_Values
     {
-        public static void Look<T>(ref T value, string key, T fallback = default(T)) { }
-        public static void Look(ref bool value, string key, bool fallback) { }
+        public static Func<string, object, object, object> Boundary;
+        public static void Look<T>(ref T value, string key, T fallback = default(T))
+        { if (Boundary != null) value = (T)Boundary(key, value, fallback); }
+        public static void Look(ref bool value, string key, bool fallback) => Look<bool>(ref value, key, fallback);
         public static void Look(ref IntVec3 value, string key) { }
     }
     public class MinifiedThing : Thing { public Thing InnerThing; }
@@ -95,6 +97,7 @@ namespace Verse.AI
     {
         public Pawn pawn;
         public Job job;
+        public Thing TargetThingA => job.targetA;
         public bool ended;
         public JobCondition? EndCondition;
         public readonly List<Toil> TestToils = new List<Toil>();

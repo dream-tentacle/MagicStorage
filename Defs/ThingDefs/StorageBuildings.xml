@@ -140,7 +140,7 @@
     <defName>MS_ConstructionSupplyUnit</defName>
     <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>construction supply unit</label>
-    <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within 40 cells. No hauling is required; colonists still perform the construction work.</description>
+    <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within the configured supply radius. No hauling is required; colonists still perform the construction work.\n\nThe supply range can be adjusted in the mod settings.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
@@ -197,8 +197,6 @@
     <label>storage conduit</label>
     <description>Connects storage control cores and storage units. Storage conduits form a separate network and do not transmit electricity.</description>
     <thingClass>MagicStorage.Building_StorageConduit</thingClass>
-    <minifiedDef>MinifiedThing</minifiedDef>
-    <thingCategories><li>BuildingsMisc</li></thingCategories>
     <category>Building</category>
     <altitudeLayer>Conduits</altitudeLayer>
     <selectable>true</selectable>

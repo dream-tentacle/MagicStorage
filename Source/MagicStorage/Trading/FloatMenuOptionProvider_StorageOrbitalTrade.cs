@@ -59,9 +59,10 @@ namespace MagicStorage
             {
                 if (Console.CanUseCommsNow && Ship?.CanTradeNow == true && StorageTradeSession.HasOrbitalCore(pawn.Map))
                 {
-                    StorageTradeSession.Open(pawn, Ship, Console);
-                    PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter_Send(System.Linq.Enumerable.OfType<Pawn>(Ship.Goods),
-                        "LetterRelatedPawnsTradeShip".Translate(Faction.OfPlayer.def.pawnsPlural), LetterDefOf.NeutralEvent);
+                    var result = StorageTradeSession.Open(pawn, Ship, Console);
+                    if (result.Opened)
+                        PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter_Send(System.Linq.Enumerable.OfType<Pawn>(Ship.Goods),
+                            "LetterRelatedPawnsTradeShip".Translate(Faction.OfPlayer.def.pawnsPlural), LetterDefOf.NeutralEvent);
                 }
             };
             yield return open;

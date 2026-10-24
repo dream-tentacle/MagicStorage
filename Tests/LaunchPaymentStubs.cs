@@ -1,5 +1,5 @@
 // Native enumeration/launch boundaries and a forwarding mod call. Production
-// Harmony hooks, staging, reservations, rollback and inventory indexes are real.
+// Harmony hooks, per-source extraction, reservations and inventory indexes are real.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,21 +24,36 @@ namespace RimWorld
             var seen = new HashSet<Thing>();
             foreach (var beacon in Building_OrbitalTradeBeacon.AllPowered(map))
                 foreach (var cell in beacon.TradeableCells)
-                    foreach (var item in cell.GetThingList(map))
-                        if (item.Spawned && !item.Destroyed && item.def.category == ThingCategory.Item &&
+                    foreach (var item in LaunchThingsAt(map, cell))
+                        if (item.def.category == ThingCategory.Item &&
                             PlayerSellableNow(item, trader) && seen.Add(item)) yield return item;
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static IEnumerable<Thing> LaunchThingsAt(Map map, IntVec3 cell) => cell.GetThingList(map);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static void LaunchThingsOfType(ThingDef resDef, int debt, Map map, TradeShip trader)
         {
             NativeLaunches++;
-            foreach (var item in AllLaunchableThingsForTrade(map, trader).Where(t => t.Spawned && t.def == resDef).ToArray())
+            // Match the native loop, including the selected-stack null test patched
+            // by the production transpiler and the remaining-debt argument mutation.
+            while (debt > 0)
             {
-                if (debt <= 0) break;
-                int count = Math.Min(debt, item.stackCount);
-                if (trader == null) item.SplitOff(count).Destroy();
-                else trader.GiveSoldThingToTrader(item, count, TradeSession.playerNegotiator);
+                Thing thing = null;
+                foreach (var beacon in Building_OrbitalTradeBeacon.AllPowered(map))
+                    foreach (var cell in beacon.TradeableCells)
+                        foreach (var item in LaunchThingsAt(map, cell))
+                            if (item.def == resDef) { thing = item; goto Found; }
+                Found:
+                if (thing == null)
+                {
+                    Log.Error("Could not find any " + resDef + " to transfer to trader.");
+                    break;
+                }
+                int count = Math.Min(debt, thing.stackCount);
+                if (trader != null) trader.GiveSoldThingToTrader(thing, count, TradeSession.playerNegotiator);
+                else thing.SplitOff(count).Destroy();
                 debt -= count;
             }
         }

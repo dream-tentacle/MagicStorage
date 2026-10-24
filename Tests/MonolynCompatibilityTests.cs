@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using MagicStorage;
 using RimWorld;
@@ -54,6 +55,15 @@ internal static class MonolynCompatibilityTests
                 new ThingDefCountClass { thingDef = Component, count = components } } };
             return Worker.DestroyResources(Map, def);
         }
+        internal ASEL.Building_MonolynProducer Producer(int steel, int components = 0, bool crucible = false)
+        {
+            var producer = crucible ? new ASEL.Building_Crucible() : new ASEL.Building_MonolynProducer();
+            producer.Map = Map; producer.Spawned = true; producer.Faction = Faction.OfPlayer;
+            producer.Position = new IntVec3(8, 0);
+            if (steel > 0) producer.requiredCost.Add(new ThingDefCountClass(Steel, steel));
+            if (components > 0) producer.requiredCost.Add(new ThingDefCountClass(Component, components));
+            return producer;
+        }
     }
 
     internal static int Run()
@@ -62,9 +72,147 @@ internal static class MonolynCompatibilityTests
         ContainerOnly(); MixedAndMultipleCosts(); MultipleUnits(); IneligibleUnits(); DisconnectedAndReserved();
         WholeReservedStack(); PreservedReservation(); CraftingGroupInvalidated(); IncomingMergeReservation(); Insufficient();
         LaterMaterialMissing(); DuplicateCosts(); GroundReservations(); ExtractionRollback(); StoredExtractionRollback(); EffectFailure();
+        ProductionSupply(); ProductionReservations(); ProductionGuards(); ProductionReceiverFailures(); ProductionRollback();
         Equal(0, ASEL.PlaceWorker_LightBuilder.OriginalCalls, "prefix replaces original deduction without double charging");
         Equal(Effecter.Triggers, Effecter.Cleanups, "transfer effects cleaned up");
         return assertions;
+    }
+
+    private static void ProductionTick(ASEL.Building_MonolynProducer producer)
+    {
+        int tick = Find.TickManager.TicksGame;
+        Find.TickManager.TicksGame += (300 - (tick + producer.thingIDNumber) % 300) % 300;
+        producer.RunTick();
+    }
+
+    private static void ProductionSupply()
+    {
+        var f = new Fixture(); f.Store(f.First, f.Steel, 6); f.Store(f.Second, f.Steel, 9);
+        f.Store(f.Second, f.Component, 4);
+        var producer = f.Producer(10, 2, crucible: true);
+        producer.innerContainer.TryAdd(new Thing { def = f.Steel, stackCount = 3 }, false);
+        producer.requiredCost.Add(new ThingDefCountClass(f.Steel, 2));
+        ProductionTick(producer);
+        Equal(15, producer.innerContainer.Where(x => x.def == f.Steel).Sum(x => x.stackCount),
+            "production receives only remaining costs, including duplicate material entries");
+        Equal(2, producer.innerContainer.Where(x => x.def == f.Component).Sum(x => x.stackCount), "second material supplied");
+        Equal(3L, f.Core.Network.GetTotalCount(f.Steel), "multi-unit source indexes updated exactly");
+        Equal(2L, f.Core.Network.GetTotalCount(f.Component), "component remainder exact");
+        Equal(0, producer.requiredCost.Count, "only fully supplied demands removed");
+        Equal(0, f.Map.Ground.Count, "direct supply creates no ground material");
+        Equal(1, producer.OriginalTicks, "Harmony prefix preserves original producer tick");
+        ProductionTick(producer);
+        Equal(3L, f.Core.Network.GetTotalCount(f.Steel), "repeated check does not charge twice");
+        producer.requiredCost.Add(new ThingDefCountClass(f.Steel, 2));
+        ProductionTick(producer);
+        Equal(1L, f.Core.Network.GetTotalCount(f.Steel), "next production batch is replenished");
+    }
+
+    private static void ProductionReservations()
+    {
+        var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 20);
+        object claim = new object();
+        f.Core.Network.ReserveOutgoing(claim, steel, 15);
+        var producer = f.Producer(10);
+        ProductionTick(producer);
+        Equal(5, producer.requiredCost[0].count, "partial stock leaves exact missing quantity");
+        Equal(5, producer.innerContainer.Sum(x => x.stackCount), "only unreserved stock supplied");
+        Equal(true, f.Core.Network.HasOutgoingReservation(claim, steel, 15), "another consumer keeps reservation");
+        f.Core.Network.ReleaseOutgoing(claim);
+        ProductionTick(producer);
+        Equal(0, producer.requiredCost.Count, "released stock satisfies remaining demand");
+        Equal(10L, f.Core.Network.GetTotalCount(f.Steel), "no double deduction after partial delivery");
+
+        f = new Fixture(); steel = f.Store(f.First, f.Steel, 20);
+        var incoming = new Thing { def = f.Steel, stackCount = 5 };
+        claim = new object(); f.Core.Network.ReserveIncoming(claim, incoming, 5);
+        producer = f.Producer(10); ProductionTick(producer);
+        Equal(0, producer.innerContainer.Count, "incoming merge reservation protects source stack");
+        f.Core.Network.ReleaseIncoming(claim);
+        ProductionTick(producer);
+        Equal(10, producer.innerContainer.Sum(x => x.stackCount), "released incoming merge allows supply");
+    }
+
+    private static void ProductionGuards()
+    {
+        var f = new Fixture(); f.Store(f.First, f.Steel, 20);
+        var producer = f.Producer(10);
+        Find.TickManager.TicksGame += (300 - (Find.TickManager.TicksGame + producer.thingIDNumber) % 300) % 300 + 1;
+        producer.RunTick();
+        Equal(0, producer.innerContainer.Count, "production supply runs only at its interval");
+        producer.working = false; ProductionTick(producer);
+        producer.working = true; producer.pause = true; ProductionTick(producer);
+        producer.pause = false; producer.forbidden = true; ProductionTick(producer);
+        producer.forbidden = false; producer.Faction = new Faction(); ProductionTick(producer);
+        producer.Faction = Faction.OfPlayer; producer.Spawned = false; ProductionTick(producer);
+        producer.Spawned = true;
+        f.Map.reservationManager.Reserved.Add(producer); ProductionTick(producer);
+        f.Map.reservationManager.Reserved.Clear();
+        f.Map.physicalInteractionReservationManager.Reserved.Add(producer); ProductionTick(producer);
+        f.Map.physicalInteractionReservationManager.Reserved.Clear();
+        Equal(20L, f.Core.Network.GetTotalCount(f.Steel), "inactive, forbidden, foreign, unspawned and pawn delivery guards preserve stock");
+        f.Map.Fog.Add(f.First.Position); ProductionTick(producer);
+        f.Map.Fog.Clear(); f.First.Faction = new Faction(); ProductionTick(producer);
+        f.First.Faction = Faction.OfPlayer;
+        f.Manager.Unregister(f.Core.node); f.Manager.EnsureCurrent(); ProductionTick(producer);
+        Equal(0, producer.innerContainer.Count, "fogged, foreign and disconnected storage excluded");
+        f.Manager.Register(f.Core.node); f.Manager.EnsureCurrent();
+        ProductionTick(producer);
+        Equal(10, producer.innerContainer.Sum(x => x.stackCount), "restored network resumes supply");
+    }
+
+    private sealed class ProductionContainer : ThingOwner
+    {
+        internal int Limit = int.MaxValue;
+        internal bool Reject, ThrowBefore, ThrowAfter;
+        internal ProductionContainer(IThingHolder owner) : base(owner) { }
+        public override int GetCountCanAccept(Thing item, bool merge = true) => Math.Min(Limit, base.GetCountCanAccept(item, merge));
+        public override bool TryAdd(Thing item, bool merge = true)
+        {
+            if (ThrowBefore) throw new InvalidOperationException("Injected production rejection");
+            if (Reject) return false;
+            bool accepted = base.TryAdd(item, merge);
+            if (ThrowAfter) throw new InvalidOperationException("Injected failure after production acceptance");
+            return accepted;
+        }
+    }
+
+    private static void ProductionReceiverFailures()
+    {
+        foreach (int mode in new[] { 0, 1, 2, 3 })
+        {
+            var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 20);
+            var producer = f.Producer(10);
+            var destination = new ProductionContainer(producer) {
+                Reject = mode == 0, ThrowBefore = mode == 1, ThrowAfter = mode == 2, Limit = mode == 3 ? 4 : int.MaxValue };
+            producer.innerContainer = destination;
+            ProductionTick(producer);
+            int accepted = mode == 2 ? 10 : mode == 3 ? 4 : 0;
+            Equal(accepted, destination.Sum(x => x.stackCount), "actual acceptance tracked for receiver failure mode " + mode);
+            Equal(20L - accepted, f.Core.Network.GetTotalCount(f.Steel), "undelivered stock restored for mode " + mode);
+            Equal(10 - accepted, producer.requiredCost.Sum(x => x.count), "missing cost follows receipt even after exception " + mode);
+            Equal(20, f.Core.Network.AvailableToWithdraw(steel) + destination.Sum(x => x.stackCount), "temporary reservation released " + mode);
+            Equal(0, f.Map.Ground.Count, "rollback creates no loose duplicates " + mode);
+        }
+    }
+
+    private static void ProductionRollback()
+    {
+        var f = new Fixture(); Thing steel = f.Store(f.First, f.Steel, 6); f.Store(f.Second, f.Steel, 6);
+        var producer = f.Producer(10);
+        Thing.BeforeMonolynTestSplit = item =>
+        {
+            if (item != steel) return;
+            Thing.BeforeMonolynTestSplit = null;
+            f.Manager.Unregister(f.Core.node); f.Manager.EnsureCurrent();
+        };
+        try { ProductionTick(producer); }
+        finally { Thing.BeforeMonolynTestSplit = null; }
+        Equal(0, producer.innerContainer.Count, "network loss during staging delivers no partial batch");
+        Equal(10, producer.requiredCost[0].count, "failed staging leaves full missing cost");
+        Equal(12L, f.First.Inventory.GetTotalCount(f.Steel) + f.Second.Inventory.GetTotalCount(f.Steel), "staged stock restored on network loss");
+        f.Manager.Register(f.Core.node); f.Manager.EnsureCurrent(); ProductionTick(producer);
+        Equal(10, producer.innerContainer.Sum(x => x.stackCount), "supply resumes after staging rollback");
     }
 
     private static void ContainerOnly()

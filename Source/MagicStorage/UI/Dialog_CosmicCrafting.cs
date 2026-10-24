@@ -11,9 +11,13 @@ namespace MagicStorage
     public sealed class Dialog_CosmicCrafting : Window
     {
         private static readonly Texture2D CompactModeIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/CompactMode");
+        private static readonly Texture2D GroupModeIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/CategoryMode");
         private static readonly Texture2D FavoriteEmptyIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteEmpty");
         private static readonly Texture2D FavoriteFilledIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteFilled");
         private static readonly Texture2D FavoriteHoverIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/FavoriteHover");
+        private static readonly Texture2D BottomEmptyIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/BottomEmpty");
+        private static readonly Texture2D BottomFilledIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/BottomFilled");
+        private static readonly Texture2D BottomHoverIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/BottomHover");
         private static Vector2? lastClosedPosition;
         private readonly Building_StorageCore core;
         private readonly CosmicCraftingListFilter listFilter = new CosmicCraftingListFilter();
@@ -28,6 +32,10 @@ namespace MagicStorage
         private float refreshAt;
         private int orderReorderGroup = -1;
         private int orderDragButton = -1;
+        private bool selectingGroup;
+        private readonly HashSet<CraftingOrder> groupSelection = new HashSet<CraftingOrder>();
+        private GroupedDrag groupedDrag;
+        private bool IsDragging => ReorderableWidget.Dragging || groupedDrag?.Started == true;
         private readonly Dictionary<CraftingOrder, long> productCounts = new Dictionary<CraftingOrder, long>();
         public override Vector2 InitialSize => new Vector2(Math.Min(1100, UI.screenWidth), Math.Min(800, UI.screenHeight));
         public Dialog_CosmicCrafting(Building_StorageCore core)
@@ -74,12 +82,23 @@ namespace MagicStorage
             float listY = headingY + 32;
             float listHeight = Math.Max(0, rect.height - listY - 60);
             string ordersHeading = "MS_Craft_Orders".Translate();
-            Widgets.Label(new Rect(0, headingY, leftWidth, 28), ordersHeading);
-            float hintX = Text.CalcSize(ordersHeading).x + 8f;
+            float titleWidth = Math.Min(Text.CalcSize(ordersHeading).x, leftWidth * 0.52f);
+            Widgets.Label(new Rect(0, headingY, titleWidth, 28), ordersHeading.Truncate(titleWidth));
+            float hintX = titleWidth + 8f;
+            string dragHint = "MS_Craft_DragToSort".Translate();
+            float groupX = Math.Min(hintX + Text.CalcSize(dragHint).x + 6f, leftWidth - 28f);
             Color headingColor = GUI.color;
             GUI.color = ColoredText.SubtleGrayColor;
-            Widgets.Label(new Rect(hintX, headingY, Math.Max(0, leftWidth - hintX), 28), "MS_Craft_DragToSort".Translate());
+            var hintRect = new Rect(hintX, headingY, Math.Max(0, groupX - hintX - 4f), 28);
+            Widgets.Label(hintRect, dragHint.Truncate(hintRect.width));
+            TooltipHandler.TipRegion(hintRect, dragHint);
             GUI.color = headingColor;
+            if (DrawListModeButton(new Rect(groupX, headingY, 28, 28), GroupModeIcon, core.Crafting.GroupingMode,
+                (core.Crafting.GroupingMode ? "MS_Craft_GroupModeOn" : "MS_Craft_GroupModeOff").Translate()))
+            {
+                core.Crafting.GroupingMode = !core.Crafting.GroupingMode;
+                selectingGroup = false; groupSelection.Clear(); groupedDrag = null; orderDragButton = -1; scroll = Vector2.zero;
+            }
             string workbenchesHeading = "MS_Craft_Workbenches".Translate();
             float headingX = leftWidth + 16;
             float compactX = Math.Min(headingX + Text.CalcSize(workbenchesHeading).x + 8f, rect.xMax - 28f);
@@ -87,10 +106,45 @@ namespace MagicStorage
             if (DrawCompactModeButton(new Rect(compactX, headingY, 28, 28), CompactMode,
                 (CompactMode ? "MS_Craft_CompactModeOn" : "MS_Craft_CompactModeOff").Translate()))
             { CompactMode = !CompactMode; workbenchScroll = Vector2.zero; }
-            DrawOrders(new Rect(0, listY, leftWidth, listHeight),
+            float ordersHeight = Math.Max(0, listHeight - (core.Crafting.GroupingMode ? 40f : 0f));
+            DrawOrders(new Rect(0, listY, leftWidth, ordersHeight),
                 core.Crafting.Orders.Where(order => listFilter.Matches(order.Recipe)).ToList());
+            if (core.Crafting.GroupingMode)
+            {
+                groupSelection.RemoveWhere(order => !core.Crafting.Orders.Contains(order));
+                if (Widgets.ButtonText(new Rect(0, listY + ordersHeight + 6f, leftWidth, 32f),
+                    (selectingGroup ? "MS_Craft_FinishGroup" : "MS_Craft_StartGroup").Translate(),
+                    active: selectingGroup ? groupSelection.Count > 0 : core.Crafting.Orders.Count > 0))
+                {
+                    if (selectingGroup)
+                    {
+                        core.Crafting.CreateGroup(groupSelection,
+                            "MS_Craft_NewGroup".Translate(core.Crafting.GroupsInUse().Count() + 1));
+                        selectingGroup = false; groupSelection.Clear(); scroll = Vector2.zero;
+                    }
+                    else { selectingGroup = true; groupSelection.Clear(); groupedDrag = null; orderDragButton = -1; }
+                }
+            }
             DrawWorkbenches(new Rect(leftWidth + 16, listY, rect.width - leftWidth - 16, listHeight));
             Event current = Event.current;
+            if (groupedDrag != null && current.button == groupedDrag.Button)
+            {
+                if (current.rawType == EventType.MouseUp)
+                {
+                    if (groupedDrag.Started && groupedDrag.HasTarget)
+                    {
+                        if (groupedDrag.IsGroup)
+                            core.Crafting.MoveGroup(groupedDrag.Group, groupedDrag.TargetGroup, groupedDrag.After);
+                        else core.Crafting.MoveToGroup(groupedDrag.Order, groupedDrag.TargetGroup, groupedDrag.TargetOrder, groupedDrag.After);
+                        refreshAt = 0;
+                    }
+                    else if (!groupedDrag.Started && groupedDrag.IsGroup && groupedDrag.HasTarget && groupedDrag.Button == 0)
+                        ToggleOrderGroup(groupedDrag.Group);
+                    groupedDrag = null;
+                    if (current.type == EventType.MouseUp) current.Use();
+                }
+                else if (current.type == EventType.MouseDrag) current.Use();
+            }
             if (orderDragButton >= 0 && current.button == orderDragButton)
             {
                 // The native reorder widget observes raw MouseUp even after the event is consumed.
@@ -104,6 +158,7 @@ namespace MagicStorage
         }
         private void SharedFilterChanged()
         {
+            groupedDrag = null;
             scroll = Vector2.zero;
             workbenchScroll = Vector2.zero;
         }
@@ -124,16 +179,17 @@ namespace MagicStorage
         {
             Widgets.DrawMenuSection(outer);
             var tables = CraftingRecipeCatalog.AvailableWorkbenches(listFilter.WorkType)
-                .Where(listFilter.MatchesWorkbench).OrderBy(uiState.WorkbenchFavoriteOrder).ToList();
+                .Where(listFilter.MatchesWorkbench).OrderBy(uiState.WorkbenchSortGroup)
+                .ThenBy(uiState.WorkbenchFavoriteOrder).ToList();
             if (tables.Count == 0)
             { Widgets.Label(outer.ContractedBy(8), "MS_Craft_NoMatchingWorkbenches".Translate()); return; }
             float viewWidth = outer.width - 18;
             var heights = tables.Select(table => CompactMode
-                ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 108f) + 8f) : 64f).ToList();
+                ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 136f) + 8f) : 64f).ToList();
             var view = new Rect(0, 0, viewWidth, heights.Sum());
             Widgets.BeginScrollView(outer, ref workbenchScroll, view);
             float y = 0;
-            bool favoritesChanged = false;
+            bool orderingChanged = false;
             for (int index = 0; index < tables.Count; index++)
             {
                 var table = tables[index];
@@ -149,18 +205,18 @@ namespace MagicStorage
                 {
                     Widgets.DefIcon(new Rect(row.x + 4, row.y + (row.height - 24f) / 2f, 24, 24), table);
                     Text.Anchor = TextAnchor.MiddleLeft;
-                    Widgets.Label(new Rect(row.x + 36, row.y + 4, row.width - 100, row.height - 8), table.LabelCap);
+                    Widgets.Label(new Rect(row.x + 36, row.y + 4, row.width - 128, row.height - 8), table.LabelCap);
                     Text.Anchor = TextAnchor.UpperLeft;
                     Widgets.DrawLineHorizontal(row.x, row.yMax - 1f, row.width, Widgets.SeparatorLineColor);
                 }
                 else
                 {
                     Widgets.DefIcon(new Rect(row.x + 4, row.y + 8, 44, 44), table);
-                    Widgets.Label(new Rect(row.x + 56, row.y + 3, row.width - 120, 28), table.LabelCap);
-                    Widgets.Label(new Rect(row.x + 56, row.y + 31, row.width - 120, 26), source);
+                    Widgets.Label(new Rect(row.x + 56, row.y + 3, row.width - 148, 28), table.LabelCap);
+                    Widgets.Label(new Rect(row.x + 56, row.y + 31, row.width - 148, 26), source);
                 }
                 bool favorite = uiState.IsWorkbenchFavorite(table);
-                var favoriteRect = new Rect(row.xMax - 58, row.y + (row.height - 24f) / 2f, 24, 24);
+                var favoriteRect = new Rect(row.xMax - 86, row.y + (row.height - 24f) / 2f, 24, 24);
                 TooltipHandler.TipRegion(favoriteRect,
                     (favorite ? "MS_Craft_UnfavoriteWorkbench" : "MS_Craft_FavoriteWorkbench").Translate());
                 Texture2D favoriteIcon = Mouse.IsOver(favoriteRect) ? FavoriteHoverIcon :
@@ -168,16 +224,27 @@ namespace MagicStorage
                 if (Widgets.ButtonImage(favoriteRect, favoriteIcon, Color.white, Color.white))
                 {
                     uiState.ToggleWorkbenchFavorite(table);
-                    favoritesChanged = true;
+                    orderingChanged = true;
+                }
+                bool atBottom = uiState.IsWorkbenchAtBottom(table);
+                var bottomRect = new Rect(row.xMax - 58, row.y + (row.height - 24f) / 2f, 24, 24);
+                TooltipHandler.TipRegion(bottomRect,
+                    (atBottom ? "MS_Craft_RestoreWorkbenchOrder" : "MS_Craft_BottomWorkbench").Translate());
+                Texture2D bottomIcon = Mouse.IsOver(bottomRect) ? BottomHoverIcon :
+                    (atBottom ? BottomFilledIcon : BottomEmptyIcon);
+                if (Widgets.ButtonImage(bottomRect, bottomIcon, Color.white, Color.white))
+                {
+                    uiState.ToggleWorkbenchBottom(table);
+                    orderingChanged = true;
                 }
                 Widgets.InfoCardButton(row.xMax - 30, row.y + (row.height - 24f) / 2f, table);
-                TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 64, row.height),
+                TooltipHandler.TipRegion(new Rect(row.x, row.y, row.width - 92, row.height),
                     table.LabelCap + "\n" + source + (locked ? "\n" + "MS_Craft_WorkbenchLockedHint".Translate().ToString() : ""));
-                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 64, row.height)))
+                if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 92, row.height)))
                     OpenRecipePicker(table);
             }
             Widgets.EndScrollView();
-            if (favoritesChanged) workbenchScroll = Vector2.zero;
+            if (orderingChanged) workbenchScroll = Vector2.zero;
         }
         private void OpenRecipePicker(ThingDef table = null)
         {
@@ -203,56 +270,192 @@ namespace MagicStorage
                 return;
             }
             const float step = 76f;
+            const float headerHeight = 32f;
+            var sections = new List<OrderSection>();
+            if (core.Crafting.GroupingMode)
+            {
+                var membersByGroup = visible.ToLookup(order => order.GroupId);
+                foreach (var group in core.Crafting.DisplayGroups())
+                {
+                    var members = membersByGroup[group?.Id].ToList();
+                    // The empty Ungrouped header remains a destination for dragging tasks out of a group.
+                    if (members.Count > 0 || group == null) sections.Add(new OrderSection
+                    { Group = group, Orders = members, Header = true, Collapsed = group?.Collapsed ?? core.Crafting.UngroupedCollapsed });
+                }
+            }
+            else sections.Add(new OrderSection { Orders = visible });
             Widgets.BeginGroup(rect);
             try
             {
                 var viewport = rect.AtZero();
-                if (Event.current.type == EventType.Repaint)
+                bool pointerInList = Mouse.IsOver(viewport);
+                if (groupedDrag != null)
+                {
+                    groupedDrag.HasTarget = false;
+                    if (Vector2.Distance(UI.GUIToScreenPoint(Event.current.mousePosition), groupedDrag.Start) > 5f)
+                        groupedDrag.Started = true;
+                }
+                if (!core.Crafting.GroupingMode && Event.current.type == EventType.Repaint)
                     orderReorderGroup = ReorderableWidget.NewGroup((from, to) =>
                     { core.Crafting.Reorder(visible, from, to); refreshAt = 0; }, ReorderableDirection.Vertical, viewport, 0f);
-                float contentHeight = visible.Count * step + 1f;
+                float contentHeight = sections.Sum(section => (section.Header ? headerHeight : 0f) +
+                    (section.Collapsed ? 0f : section.Orders.Count * step)) + 1f;
                 float contentWidth = contentHeight > viewport.height ? rect.width - 18f : rect.width;
                 var view = new Rect(0, 0, contentWidth, contentHeight);
+                scroll.y = Mathf.Clamp(scroll.y, 0f, Math.Max(0f, contentHeight - viewport.height));
                 Widgets.BeginScrollView(viewport, ref scroll, view);
                 try
                 {
-                    for (int i = 0; i < visible.Count; i++)
+                    float y = 0f;
+                    foreach (var section in sections)
                     {
-                        var order = visible[i];
-                        var row = new Rect(0, i * step, view.width, step);
-                        var icon = new Rect(row.x + 4, row.y + 6, 46, 46);
-                        var title = new Rect(row.x + 58, row.y + 2, row.width - 120, 26);
-                        if (row.yMax >= scroll.y && row.y <= scroll.y + viewport.height)
+                        if (section.Header)
                         {
-                            Color borderColor = GUI.color;
-                            GUI.color = Widgets.SeparatorLineColor;
-                            // Adjacent tasks share a single border pixel, closing every rectangle without gaps.
-                            Widgets.DrawBox(new Rect(row.x, row.y, row.width, row.height + 1f));
-                            GUI.color = borderColor;
-                            DrawOrderRow(row, icon, title, order);
+                            var header = new Rect(0, y, view.width, headerHeight);
+                            y += headerHeight;
+                            if (header.yMax >= scroll.y && header.y <= scroll.y + viewport.height)
+                                DrawOrderGroupHeader(header, section, pointerInList);
                         }
-                        // Register offscreen rows too so native drag indexes remain stable while scrolling.
-                        Event current = Event.current;
-                        bool startReorder = current.type == EventType.MouseDown &&
-                            (current.button == 0 || current.button == 1) && Mouse.IsOver(row);
-                        if (ReorderableWidget.Reorderable(orderReorderGroup, row, useRightButton: current.button == 1))
+                        if (section.Collapsed) continue;
+                        foreach (var order in section.Orders)
                         {
-                            Color previousColor = GUI.color;
-                            GUI.color = new Color(1f, 1f, 1f, 0.5f);
-                            Widgets.DrawBox(row, 2);
-                            GUI.color = previousColor;
-                        }
-                        if (startReorder)
-                        {
-                            // Let row buttons handle their clicks first, then prevent window dragging.
-                            orderDragButton = current.button;
-                            current.Use();
+                            var row = new Rect(0, y, view.width, step);
+                            y += step;
+                            if (row.yMax >= scroll.y && row.y <= scroll.y + viewport.height)
+                            {
+                                Color borderColor = GUI.color;
+                                GUI.color = Widgets.SeparatorLineColor;
+                                Widgets.DrawBox(new Rect(row.x, row.y, row.width, row.height + 1f));
+                                GUI.color = borderColor;
+                                var content = row;
+                                if (selectingGroup)
+                                {
+                                    bool chosen = groupSelection.Contains(order);
+                                    Widgets.Checkbox(row.x + 5f, row.y + 12f, ref chosen, 20f);
+                                    if (chosen) groupSelection.Add(order); else groupSelection.Remove(order);
+                                    content.xMin += 30f;
+                                }
+                                var icon = new Rect(content.x + 4, content.y + 6, 46, 46);
+                                var title = new Rect(content.x + 58, content.y + 2, content.width - 120, 26);
+                                DrawOrderRow(content, icon, title, order);
+                            }
+                            // Register hidden rows too; headers never participate in task dragging.
+                            if (selectingGroup) continue;
+                            if (core.Crafting.GroupingMode)
+                            {
+                                if (row.yMax >= scroll.y && row.y <= scroll.y + viewport.height)
+                                    GroupedDragRow(row, section.Group, order, pointerInList);
+                                continue;
+                            }
+                            Event current = Event.current;
+                            bool startReorder = current.type == EventType.MouseDown &&
+                                (current.button == 0 || current.button == 1) && Mouse.IsOver(row);
+                            if (ReorderableWidget.Reorderable(orderReorderGroup, row, useRightButton: current.button == 1))
+                            {
+                                Color previousColor = GUI.color;
+                                GUI.color = new Color(1f, 1f, 1f, 0.5f);
+                                Widgets.DrawBox(row, 2);
+                                GUI.color = previousColor;
+                            }
+                            if (startReorder) { orderDragButton = current.button; current.Use(); }
                         }
                     }
                 }
                 finally { Widgets.EndScrollView(); }
             }
             finally { Widgets.EndGroup(); }
+        }
+
+        private sealed class OrderSection
+        {
+            internal CraftingOrderGroup Group;
+            internal List<CraftingOrder> Orders;
+            internal bool Header, Collapsed;
+        }
+
+        private sealed class GroupedDrag
+        {
+            internal bool IsGroup, Started, HasTarget, After;
+            internal int Button;
+            internal Vector2 Start;
+            internal CraftingOrder Order, TargetOrder;
+            internal CraftingOrderGroup Group, TargetGroup;
+        }
+
+        private void GroupedDragRow(Rect row, CraftingOrderGroup group, CraftingOrder order, bool pointerInList)
+        {
+            if (selectingGroup) return;
+            Event current = Event.current;
+            bool over = pointerInList && Mouse.IsOver(row);
+            if (groupedDrag != null && !groupedDrag.Started && groupedDrag.IsGroup && order == null && groupedDrag.Group == group && over)
+                groupedDrag.HasTarget = true;
+            if (groupedDrag?.Started == true)
+            {
+                if (groupedDrag.IsGroup ? order == null && groupedDrag.Group == group : groupedDrag.Order == order)
+                    Widgets.DrawBox(row, 2);
+                if (!over) return;
+                groupedDrag.HasTarget = true;
+                groupedDrag.TargetGroup = group;
+                groupedDrag.TargetOrder = groupedDrag.IsGroup ? null : order;
+                groupedDrag.After = current.mousePosition.y >= row.center.y;
+                if (groupedDrag.IsGroup && order != null) groupedDrag.After = true;
+                if (!groupedDrag.IsGroup && order == null)
+                {
+                    groupedDrag.After = true;
+                    Widgets.DrawBox(row, 2);
+                }
+                else Widgets.DrawLineHorizontal(row.x, groupedDrag.After ? row.yMax : row.y, row.width, Color.white);
+                return;
+            }
+            if (!over || current.type != EventType.MouseDown || current.button != 0 && current.button != 1) return;
+            groupedDrag = new GroupedDrag
+            {
+                IsGroup = order == null, Order = order, Group = group, Button = current.button,
+                Start = UI.GUIToScreenPoint(current.mousePosition)
+            };
+            current.Use();
+        }
+
+        private void DrawOrderGroupHeader(Rect row, OrderSection section, bool pointerInList)
+        {
+            Widgets.DrawHighlightIfMouseover(row);
+            GUI.DrawTexture(new Rect(row.x + 6f, row.y + 8f, 16f, 16f), section.Collapsed ? TexButton.Reveal : TexButton.Collapse);
+            string label = section.Group?.Name ?? "MS_Craft_Ungrouped".Translate().ToString();
+            float labelWidth = Math.Max(0f, row.width - (section.Group == null ? 34f : 92f));
+            var labelRect = new Rect(row.x + 28f, row.y, labelWidth, row.height);
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(labelRect, label.Truncate(labelRect.width));
+            Text.Anchor = TextAnchor.UpperLeft;
+            TooltipHandler.TipRegion(labelRect, label + "\n" + "MS_Craft_DragGroup".Translate());
+            bool overControls = false;
+            if (section.Group != null)
+            {
+                float editX = labelRect.x + Math.Min(labelWidth, Text.CalcSize(label).x) + 6f;
+                var edit = new Rect(editX, row.y + 5f, 22f, 22f);
+                var delete = new Rect(edit.xMax + 6f, edit.y, 22f, 22f);
+                overControls = Mouse.IsOver(edit) || Mouse.IsOver(delete);
+                TooltipHandler.TipRegion(edit, "MS_Craft_RenameGroup".Translate());
+                TooltipHandler.TipRegion(delete, "MS_Craft_DeleteGroup".Translate());
+                if (Widgets.ButtonImage(edit, TexButton.Rename) && !IsDragging)
+                    Find.WindowStack.Add(new Dialog_CraftingGroupName(section.Group.Name,
+                        name => core.Crafting.RenameGroup(section.Group, name)));
+                if (Widgets.ButtonImage(delete, TexButton.Delete) && !IsDragging) core.Crafting.DeleteGroup(section.Group);
+            }
+            Widgets.DrawLineHorizontal(row.x, row.yMax - 1f, row.width, Widgets.SeparatorLineColor);
+            bool headerAvailable = pointerInList && (!overControls || groupedDrag?.Started == true);
+            // A click anywhere on the header toggles it; moving past the drag threshold
+            // reorders instead. Edit/delete retain their own hit areas.
+            if (selectingGroup)
+            {
+                if (headerAvailable && Widgets.ButtonInvisible(row)) ToggleOrderGroup(section.Group);
+            }
+            else GroupedDragRow(row, section.Group, null, headerAvailable);
+        }
+
+        private void ToggleOrderGroup(CraftingOrderGroup group)
+        {
+            if (group == null) core.Crafting.UngroupedCollapsed = !core.Crafting.UngroupedCollapsed;
+            else group.Collapsed = !group.Collapsed;
         }
         private void DrawOrderRow(Rect row, Rect icon, Rect title, CraftingOrder order)
         {
@@ -265,9 +468,9 @@ namespace MagicStorage
             var suspend = new Rect(delete.x - 28, delete.y, 22, 22);
             TooltipHandler.TipRegion(delete, "MS_Craft_Delete".Translate());
             TooltipHandler.TipRegion(suspend, (order.Suspended ? "MS_Craft_Resume" : "MS_Craft_Pause").Translate());
-            if (Widgets.ButtonImage(delete, TexButton.Delete) && !ReorderableWidget.Dragging)
+            if (Widgets.ButtonImage(delete, TexButton.Delete) && !IsDragging)
             { core.Crafting.Remove(order); refreshAt = 0; return; }
-            if (Widgets.ButtonImage(suspend, order.Suspended ? TexButton.SpeedButtonTextures[1] : TexButton.Suspend) && !ReorderableWidget.Dragging)
+            if (Widgets.ButtonImage(suspend, order.Suspended ? TexButton.SpeedButtonTextures[1] : TexButton.Suspend) && !IsDragging)
             { order.Suspended = !order.Suspended; OrderChanged(order); }
             float controlsY = row.y + 32;
             var details = new Rect(row.xMax - 72, controlsY, 68, 25);
@@ -301,14 +504,14 @@ namespace MagicStorage
             GUI.color = previousColor;
             if (!order.Suspended)
             {
-                if (Widgets.ButtonText(mode, modeLabel) && !ReorderableWidget.Dragging) ChooseOrderMode(order);
-                if (Widgets.ButtonText(details, "MS_Craft_Details".Translate()) && !ReorderableWidget.Dragging)
+                if (Widgets.ButtonText(mode, modeLabel) && !IsDragging) ChooseOrderMode(order);
+                if (Widgets.ButtonText(details, "MS_Craft_Details".Translate()) && !IsDragging)
                     Find.WindowStack.Add(new Dialog_CosmicCraftingDetails(core, order, () => refreshAt = 0));
             }
             if (order.Mode != CraftingRepeatMode.Forever)
             {
-                if (Widgets.ButtonImage(minus, TexButton.Minus) && !ReorderableWidget.Dragging) AdjustOrderQuantity(order, -1);
-                if (Widgets.ButtonImage(plus, TexButton.Plus) && !ReorderableWidget.Dragging) AdjustOrderQuantity(order, 1);
+                if (Widgets.ButtonImage(minus, TexButton.Minus) && !IsDragging) AdjustOrderQuantity(order, -1);
+                if (Widgets.ButtonImage(plus, TexButton.Plus) && !IsDragging) AdjustOrderQuantity(order, 1);
             }
             var statusBar = new Rect(row.x + 4, row.yMax - 11, row.width - 8, 6);
             Widgets.FillableBar(statusBar, order.Progress);
@@ -540,10 +743,36 @@ namespace MagicStorage
             {
                 Widgets.Label(new Rect(inner.x, inner.y + 34, inner.width, 28), "MS_Craft_Skill".Translate(selected.Recipe.workSkill.LabelCap));
                 IntRange before = selected.SkillRange;
-                Widgets.IntRange(new Rect(inner.x, inner.y + 64, inner.width, 32), 184563, ref selected.SkillRange, 0, 20);
+                DrawSkillRange(new Rect(inner.x, inner.y + 64, inner.width, 32));
                 if (before.min != selected.SkillRange.min || before.max != selected.SkillRange.max) Changed();
                 TooltipHandler.TipRegion(new Rect(inner.x, inner.y + 34, inner.width, 62), "MS_Craft_NamedWorkerHint".Translate());
             }
+        }
+        private void DrawSkillRange(Rect rect)
+        {
+            // Clip the native numeric label while retaining the native range slider and dragging.
+            Widgets.BeginGroup(rect);
+            try
+            {
+                Widgets.IntRange(new Rect(0, -28, rect.width, rect.height + 28), 184563,
+                    ref selected.SkillRange, 0, CraftingOrder.UnlimitedSkillLevel);
+            }
+            finally { Widgets.EndGroup(); }
+            // The extra stop represents an unlimited maximum, never a minimum of 21.
+            selected.SkillRange.min = Math.Min(selected.SkillRange.min, CraftingOrder.UnlimitedSkillLevel - 1);
+            string maximum = selected.SkillRange.max == CraftingOrder.UnlimitedSkillLevel
+                ? "MS_Craft_UnlimitedSkill".Translate().ToString() : selected.SkillRange.max.ToString();
+            GameFont font = Text.Font;
+            TextAnchor anchor = Text.Anchor;
+            Color color = GUI.color;
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperCenter;
+            GUI.color = new Color(.6f, .6f, .6f);
+            Widgets.Label(new Rect(rect.x + 8, rect.y - 2, rect.width - 16, 28),
+                selected.SkillRange.min + " - " + maximum);
+            GUI.color = color;
+            Text.Anchor = anchor;
+            Text.Font = font;
         }
         private void ChooseMode()
         {
@@ -663,6 +892,14 @@ namespace MagicStorage
 
     internal sealed class CosmicCraftingListFilter
     {
+        private sealed class HaulingTabRecord : TabRecord
+        {
+            internal HaulingTabRecord(string label, Action clicked, bool selected)
+                : base(label + "<color=#A0A0A0>(?)</color>", clicked, selected) { }
+
+            public override string GetTip() => "MS_Craft_HaulingTabHint".Translate();
+        }
+
         private WorkTypeDef workType;
         internal WorkTypeDef WorkType => workType;
         private ModContentPack source;
@@ -682,8 +919,11 @@ namespace MagicStorage
             foreach (var type in CraftingRecipeCatalog.WorkTypes)
             {
                 var chosen = type;
-                tabs.Add(new TabRecord(type.labelShort.CapitalizeFirst(), () =>
-                { workType = chosen; changed(); }, workType == type));
+                Action clicked = () => { workType = chosen; changed(); };
+                string label = type.labelShort.CapitalizeFirst();
+                tabs.Add(type == WorkTypeDefOf.Hauling
+                    ? new HaulingTabRecord(label, clicked, workType == type)
+                    : new TabRecord(label, clicked, workType == type));
             }
             float minWidth = Mathf.Min(rect.width, Mathf.Max(90f, tabs.Max(t => Text.CalcSize(t.label).x + 32f)));
             float maxWidth = Mathf.Max(minWidth, 200f);

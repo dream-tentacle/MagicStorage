@@ -19,13 +19,13 @@ internal static class StorageSupplyShelfTests
         internal readonly Building_StorageSupplyShelf Shelf = new Building_StorageSupplyShelf();
         internal readonly ThingDef X = new ThingDef(), Y = new ThingDef { stackLimit = 10 }, Z = new ThingDef { stackLimit = 1 };
         internal MapComponent_StorageNetworks Manager => Map.GetComponent<MapComponent_StorageNetworks>();
-        internal Fixture(int slots = 64)
+        internal Fixture(int slots = 64, int shelfSlots = 3)
         {
             Map.component = new MapComponent_StorageNetworks(Map);
             Unit.SlotCapacity = slots;
             var parent = new StorageSettings();
             foreach (ThingDef def in new[] { X, Y, Z }) parent.filter.SetAllow(def, true);
-            Shelf.def.building = new BuildingProperties { fixedStorageSettings = parent };
+            Shelf.def.building = new BuildingProperties { fixedStorageSettings = parent, maxItemsInCell = shelfSlots };
             Thing[] buildings = { Core, Unit, Shelf };
             for (int i = 0; i < buildings.Length; i++)
             {
@@ -38,6 +38,7 @@ internal static class StorageSupplyShelfTests
                 Manager.Register(node);
             }
             Manager.FinalizeInit();
+            Map.haulDestinationManager.SlotParents[Shelf.Position] = Shelf;
         }
         internal Thing Store(ThingDef def, int count, string variant = null)
         {
@@ -54,11 +55,268 @@ internal static class StorageSupplyShelfTests
     }
     internal static int Run()
     {
+        NativeMergeBoundary();
         PresetClipboard();
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
         StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
         StockSelectionCommands();
+        DuplicateSlots(); SharedFilterRestocking(); ModeSwitchReturns(); SharedFilterPresets();
+        ConfigurableSlotCounts(); DifferentSizePresets();
         return assertions;
+    }
+
+    private static void NativeMergeBoundary()
+    {
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(StorageShelfHaulingPatches).TypeHandle);
+        var giver = new WorkGiver_Merge();
+        var pawn = new Pawn();
+        WorkGiver_Merge.OriginalCalls = 0;
+        foreach (int slots in new[] { 3, 10 })
+        foreach (bool filterMode in new[] { false, true })
+        {
+            var f = new Fixture(shelfSlots: slots);
+            if (filterMode)
+            {
+                f.Shelf.TrySetFilterMode(true);
+                f.Shelf.SharedFilter.SetAllow(f.Y, true);
+                for (int i = 0; i < slots; i++) f.Shelf.SetFilterLimit(i, 0);
+            }
+            int[] counts = { 2, 5, 7 };
+            for (int i = 0; i < counts.Length; i++)
+            {
+                if (filterMode) f.Shelf.SetFilterLimit(i, counts[i]);
+                else { f.Shelf.SetSelection(i, f.Y); f.Shelf.SetRestockLimit(i, counts[i]); }
+            }
+            f.Store(f.Y, 10); f.Store(f.Y, 10); f.Tick();
+            for (int i = 0; i < counts.Length; i++)
+            {
+                Thing stock = f.Shelf.StockAt(i);
+                Equal(true, stock != null, "partial stack stocked before merge check");
+                foreach (bool forced in new[] { false, true })
+                    Equal<Verse.AI.Job>(null, giver.JobOnThing(pawn, stock, forced), "supply shelf never creates native merge job");
+                Equal(counts[i], stock.stackCount, "merge check preserves independent slot quantity");
+            }
+            Equal(0, WorkGiver_Merge.OriginalCalls, "both shelf sizes and modes skip merge factory");
+
+            Thing moved = f.Shelf.StockAt(0);
+            moved.Position = new IntVec3(20, 20);
+            Equal(WorkGiver_Merge.VanillaJob, giver.JobOnThing(pawn, moved), "stock moved off shelf uses native merge factory");
+            moved.Position = f.Shelf.Position;
+            moved.Spawned = false;
+            Equal(WorkGiver_Merge.VanillaJob, giver.JobOnThing(pawn, moved), "carried stock is not treated as shelf stock");
+            WorkGiver_Merge.OriginalCalls = 0;
+        }
+        var receiver = new Building_StorageReceiver();
+        var map = new Map();
+        map.haulDestinationManager.SlotParents[receiver.Position] = receiver;
+        var ordinary = new Thing { Map = map, Spawned = true, Position = receiver.Position };
+        Equal(WorkGiver_Merge.VanillaJob, giver.JobOnThing(pawn, ordinary), "receiver stock still uses native merge factory");
+        map.haulDestinationManager.SlotParents.Clear();
+        Equal(WorkGiver_Merge.VanillaJob, giver.JobOnThing(pawn, ordinary), "other cells still use native merge factory");
+        Equal(WorkGiver_Merge.VanillaJob, giver.JobOnThing(pawn, null), "null input remains owned by native factory");
+        Equal(3, WorkGiver_Merge.OriginalCalls, "unrelated merge calls pass through");
+    }
+
+    private static void ConfigurableSlotCounts()
+    {
+        foreach (int count in new[] { 1, 2, 4, 6, 9, 16 })
+        {
+            var f = new Fixture(shelfSlots: count);
+            Equal(count, f.Shelf.SlotCount, "slot count follows only native building parameter");
+            for (int i = 0; i < count; i++)
+            {
+                Equal(true, f.Shelf.SetSelection(i, f.X), "all configured slots accept selections");
+                f.Shelf.SetRestockLimit(i, i + 1);
+            }
+            Equal(false, f.Shelf.SetSelection(count, f.X), "selection cannot exceed configured slot count");
+            int total = count * (count + 1) / 2;
+            int stored = 0;
+            while (stored < total + 30) { f.Store(f.X, 75); stored += 75; }
+            f.Tick();
+            Equal(count, f.Shelf.GetSlotGroup().HeldThingsCount, "normal mode fills all configured positions");
+            for (int i = 0; i < count; i++) Equal(i + 1, f.Shelf.StockAt(i).stackCount, "each position has its own normal cap");
+            f.Shelf.StockAt(count - 1).SplitOff(1); f.Tick();
+            Equal(count, f.Shelf.StockAt(count - 1).stackCount, "last configured position replenishes");
+            Equal((long)stored - total - 1, f.Core.Network.GetTotalCount(f.X), "dynamic slot refill conserves inventory");
+            Equal(true, f.Shelf.TrySetFilterMode(true), "mode change returns every configured position");
+            Equal((long)stored - 1, f.Core.Network.GetTotalCount(f.X), "return includes positions after third");
+            f.Shelf.SharedFilter.SetAllow(f.X, true);
+            for (int i = 0; i < count; i++) f.Shelf.SetFilterLimit(i, 2);
+            f.Tick();
+            Equal(count, f.Shelf.GetSlotGroup().HeldThingsCount, "filter mode fills all positions");
+            for (int i = 0; i < count; i++) Equal(2, f.Shelf.StockAt(i).stackCount, "filter caps exist for every position");
+            Scribe.mode = LoadSaveMode.PostLoadInit;
+            try { f.Shelf.ExposeData(); } finally { Scribe.mode = LoadSaveMode.Inactive; }
+            Equal(2, f.Shelf.FilterLimit(count - 1), "load normalization preserves last slot settings");
+            Equal(true, f.Shelf.TrySetFilterMode(false), "switch off returns all filter positions");
+            f.Shelf.SlotFilter(count - 1).WarnWhenRestockFails = true;
+            f.Manager.Unregister(f.Core.node); f.Tick();
+            Equal(StorageShelfFailureReason.NetworkUnavailable, f.Shelf.RestockFailure(count - 1).Reason,
+                "warning data covers final configured position");
+            Equal(0L, f.Pending(), "dynamic shelf operations leave no hidden recovery stock");
+        }
+
+        // Six different types exercise native placement capacity without any merge shortcut.
+        var many = new Fixture(shelfSlots: 6);
+        for (int i = 0; i < 6; i++)
+        {
+            var itemDef = new ThingDef();
+            many.Shelf.GetParentStoreSettings().filter.SetAllow(itemDef, true);
+            many.Shelf.SetSelection(i, itemDef); many.Shelf.SetRestockLimit(i, 3); many.Store(itemDef, 3);
+        }
+        many.Tick();
+        Equal(6, many.Shelf.GetSlotGroup().HeldThingsCount, "six different types use native configured storage capacity");
+        Equal(6, many.Shelf.GetSlotGroup().HeldThings.Select(t => t.def).Distinct().Count(), "six distinct types remain independently stocked");
+    }
+
+    private static void DifferentSizePresets()
+    {
+        var large = new Fixture(shelfSlots: 6);
+        for (int i = 0; i < 6; i++) { large.Shelf.SetSelection(i, large.X); large.Shelf.SetRestockLimit(i, i + 2); }
+        PresetCommand(large.Shelf, "MS_Shelf_CopyPreset").action();
+        var small = new Fixture(shelfSlots: 2);
+        PresetCommand(small.Shelf, "MS_Shelf_PastePreset").action();
+        Equal(2, small.Shelf.SlotCount, "large preset does not change receiver's native capacity");
+        Equal(3, small.Shelf.RestockLimit(1), "large preset truncated to receiver's positions");
+        PresetCommand(small.Shelf, "MS_Shelf_CopyPreset").action();
+        var larger = new Fixture(shelfSlots: 9);
+        PresetCommand(larger.Shelf, "MS_Shelf_PastePreset").action();
+        Equal(9, larger.Shelf.SlotCount, "small preset retains larger receiver capacity");
+        Equal(large.X, larger.Shelf.SelectedDef(1), "shared prefix of preset retained");
+        Equal<ThingDef>(null, larger.Shelf.SelectedDef(8), "additional normal positions start unconfigured");
+        Equal(75, larger.Shelf.FilterLimit(8), "additional filter positions receive default cap");
+        Equal(true, larger.Shelf.SetSelection(8, larger.Y), "new last position remains configurable after paste");
+        larger.Shelf.TrySetFilterMode(true); larger.Shelf.SetFilterLimit(8, 4);
+        PresetCommand(larger.Shelf, "MS_Shelf_CopyPreset").action();
+        PresetCommand(large.Shelf, "MS_Shelf_PastePreset").action();
+        Equal(true, large.Shelf.FilterMode, "filter-mode presets also support a different receiver count");
+        Equal(6, large.Shelf.SlotCount, "filter paste keeps receiver's own count");
+    }
+
+    private static void DuplicateSlots()
+    {
+        var f = new Fixture();
+        for (int i = 0; i < 3; i++)
+        { f.Shelf.SetSelection(i, f.X); f.Shelf.SetRestockLimit(i, (i + 1) * 5); }
+        f.Store(f.X, 75); f.Tick();
+        Equal(3, f.Shelf.GetSlotGroup().HeldThingsCount, "same item occupies three distinct stacks");
+        for (int i = 0; i < 3; i++) Equal((i + 1) * 5, f.Shelf.StockAt(i).stackCount, "each duplicate has its own limit");
+        Thing first = f.Shelf.StockAt(0), second = f.Shelf.StockAt(1), third = f.Shelf.StockAt(2);
+        second.SplitOff(3); f.Tick();
+        Equal(5, first.stackCount, "refilling second slot does not merge into first");
+        Equal(10, second.stackCount, "second duplicate replenished exactly");
+        Equal(15, third.stackCount, "third duplicate stays independent");
+        Equal(0, f.Shelf.StockSlot(first), "first real stack bound to first display position");
+        Equal(1, f.Shelf.StockSlot(second), "second real stack bound to second display position");
+        first.SplitOff(first.stackCount); f.Tick();
+        Equal(5, f.Shelf.StockAt(0).stackCount, "fully consumed duplicate is replaced in its own slot");
+        Equal(second, f.Shelf.StockAt(1), "other slot reference survives replacement");
+        Scribe.mode = LoadSaveMode.PostLoadInit;
+        try { f.Shelf.ExposeData(); } finally { Scribe.mode = LoadSaveMode.Inactive; }
+        Equal(f.X, f.Shelf.SelectedDef(1), "load normalization keeps duplicate configuration");
+        Equal(f.X, f.Shelf.SelectedDef(2), "all three repeated selections survive normalization");
+    }
+
+    private static void SharedFilterRestocking()
+    {
+        var f = new Fixture();
+        Equal(false, f.Shelf.FilterMode, "filter mode defaults off");
+        Command_Toggle toggle = f.Shelf.GetGizmos().OfType<Command_Toggle>().Single();
+        Equal(false, toggle.isActive(), "native toggle starts unchecked");
+        toggle.toggleAction();
+        Equal(true, toggle.isActive(), "native toggle reflects enabled filter mode");
+        Equal(true, f.Shelf.TrySetFilterMode(true), "empty shelf enables filter mode");
+        PresetCommand(f.Shelf, "MS_Shelf_Configure").action();
+        Equal(true, Find.WindowStack.Windows.Last() is Dialog_StorageShelfSharedFilter, "configure opens shared filter directly");
+        f.Shelf.SharedFilter.SetAllow(f.X, true); f.Shelf.SharedFilter.SetAllow(f.Y, true);
+        f.Shelf.SetFilterLimit(0, 4); f.Shelf.SetFilterLimit(1, 7); f.Shelf.SetFilterLimit(2, 6);
+        f.Store(f.Z, 1); f.Store(f.X, 15); f.Store(f.Y, 10); f.Tick();
+        Equal(f.X, f.Shelf.StockAt(0).def, "first matching inventory type selected, excluding disallowed types");
+        Equal(4, f.Shelf.StockAt(0).stackCount, "first filter slot uses its own cap");
+        Equal(7, f.Shelf.StockAt(1).stackCount, "second filter slot independently capped");
+        Equal(4, f.Shelf.StockAt(2).stackCount, "third slot accepts available partial stock");
+        f.Tick();
+        Equal(f.X, f.Shelf.StockAt(2).def, "partial existing stack does not switch to another allowed type");
+        Equal(10L, f.Core.Network.GetTotalCount(f.Y), "other allowed item not mixed into existing stack");
+        Thing emptied = f.Shelf.StockAt(1); emptied.SplitOff(emptied.stackCount); f.Tick();
+        Equal(f.Y, f.Shelf.StockAt(1).def, "empty slot selects next matching available inventory item");
+        Equal(7, f.Shelf.StockAt(1).stackCount, "replacement type retains slot quantity setting");
+        f.Shelf.SetFilterLimit(1, 100); f.Tick();
+        Equal(10, f.Shelf.StockAt(1).stackCount, "item's native stack limit caps filter mode");
+        f.Shelf.SetFilterLimit(0, 0); f.Shelf.StockAt(0).SplitOff(2); f.Store(f.X, 20); f.Tick();
+        Equal(2, f.Shelf.StockAt(0).stackCount, "zero filter limit pauses only that slot");
+        Equal(6, f.Shelf.StockAt(2).stackCount, "another filter slot still tops up");
+        f.Shelf.SharedFilter.SetAllow(f.X, false); f.Tick();
+        Equal(false, f.Shelf.GetSlotGroup().HeldThings.Any(t => t.def == f.X), "changing shared filter removes rejected stock");
+
+        f = new Fixture(); f.Shelf.TrySetFilterMode(true); f.Shelf.SharedFilter.SetAllow(f.X, true);
+        f.X.hasQualityComp = true;
+        f.Shelf.SharedFilter.AllowedQualityLevels = new QualityRange { min = QualityCategory.Good, max = QualityCategory.Legendary };
+        Thing poor = f.Store(f.X, 15, "poor"); poor.hasQuality = true; poor.quality = QualityCategory.Poor;
+        Thing good = f.Store(f.X, 5, "good"); good.hasQuality = true; good.quality = QualityCategory.Good;
+        f.Tick();
+        Equal("good", f.Shelf.StockAt(0).variant, "native shared quality filter applies to actual source stacks");
+        Equal(15L, f.Core.Network.GetTotalCount(f.X), "nonmatching variant remains stored");
+    }
+
+    private static void ModeSwitchReturns()
+    {
+        var f = new Fixture(1);
+        for (int i = 0; i < 3; i++) { f.Shelf.SetSelection(i, f.X); f.Shelf.SetRestockLimit(i, 10); }
+        f.Store(f.X, 60); f.Tick();
+        f.Core.Settings.allow = false;
+        int windows = Find.WindowStack.Windows.Count;
+        Equal(false, f.Shelf.TrySetFilterMode(true), "rejected return blocks switch");
+        Equal(false, f.Shelf.FilterMode, "failed switch retains normal mode");
+        Equal(3, f.Shelf.GetSlotGroup().HeldThingsCount, "filter rejection keeps stock on shelf");
+        Equal(windows + 1, Find.WindowStack.Windows.Count, "failed mode switch opens a message box");
+        Equal(true, Find.WindowStack.Windows.Last() is Dialog_MessageBox, "failure is a modal message");
+        f.Core.Settings.allow = true;
+        Thing reserved = f.Shelf.StockAt(1); f.Map.reservationManager.Reserved.Add(reserved);
+        Equal(false, f.Shelf.TrySetFilterMode(true), "reserved shelf item blocks switch");
+        f.Map.reservationManager.Reserved.Clear();
+        Equal(true, f.Shelf.TrySetFilterMode(true), "all duplicate stacks return into one partial network stack");
+        Equal(0, f.Shelf.GetSlotGroup().HeldThingsCount, "successful switch clears shelf first");
+        Equal(60L, f.Core.Network.GetTotalCount(f.X), "mode switch conserves all materials");
+        Equal(10, f.Shelf.RestockLimit(1), "normal mode limits retained");
+        f.Shelf.SharedFilter.SetAllow(f.X, true);
+        for (int i = 0; i < 3; i++) f.Shelf.SetFilterLimit(i, 5);
+        f.Tick();
+        f.Core.Settings.allow = false;
+        Equal(false, f.Shelf.TrySetFilterMode(false), "failed returns also block switching off");
+        Equal(true, f.Shelf.FilterMode, "failed switch off preserves filter mode");
+        f.Core.Settings.allow = true;
+        Equal(true, f.Shelf.TrySetFilterMode(false), "switching off also returns contents");
+        Equal(60L, f.Core.Network.GetTotalCount(f.X), "switching off returns exact filtered quantity");
+        Equal(0, f.Shelf.GetSlotGroup().HeldThingsCount, "switching off leaves shelf empty until next restock");
+        Equal(5, f.Shelf.FilterLimit(1), "filter mode limits retained");
+        f.Tick(); Equal(10, f.Shelf.StockAt(1).stackCount, "normal mode configuration restored");
+
+        f = new Fixture(1); f.Shelf.SetSelection(0, f.X); f.Shelf.SetRestockLimit(0, 20);
+        f.Store(f.X, 20); f.Tick(); f.Store(f.Y, 10);
+        Equal(false, f.Shelf.TrySetFilterMode(true), "full incompatible network blocks mode switch");
+        Equal(20, f.Shelf.StockAt(0).stackCount, "capacity failure preserves shelf contents");
+        f.Manager.Unregister(f.Core.node);
+        Equal(false, f.Shelf.TrySetFilterMode(true), "disconnected shelf with contents cannot switch");
+        Equal(false, f.Shelf.FilterMode, "network failure retains original mode");
+        Equal(0L, f.Pending(), "failed mode switches create no hidden recovery stock");
+    }
+
+    private static void SharedFilterPresets()
+    {
+        var f = new Fixture(); f.Shelf.TrySetFilterMode(true);
+        f.Shelf.SharedFilter.SetAllow(f.X, true); f.Shelf.SetFilterLimit(0, 3); f.Shelf.SetFilterLimit(1, 8);
+        PresetCommand(f.Shelf, "MS_Shelf_CopyPreset").action();
+        f.Shelf.SharedFilter.SetAllow(f.X, false); f.Shelf.SetFilterLimit(0, 9);
+        var other = new Fixture();
+        PresetCommand(other.Shelf, "MS_Shelf_PastePreset").action();
+        Equal(true, other.Shelf.FilterMode, "preset includes mode");
+        Equal(true, other.Shelf.SharedFilter.Allows(f.X), "preset filter snapshot survives later edits");
+        Equal(3, other.Shelf.FilterLimit(0), "preset first slot cap retained");
+        Equal(8, other.Shelf.FilterLimit(1), "preset second slot cap retained");
+        other.Shelf.SharedFilter.SetAllow(f.X, false);
+        PresetCommand(other.Shelf, "MS_Shelf_PastePreset").action();
+        Equal(true, other.Shelf.SharedFilter.Allows(f.X), "pasted filter is independent of reusable clipboard");
     }
 
     private static void StockSelectionCommands()
@@ -233,8 +491,9 @@ internal static class StorageSupplyShelfTests
         Equal(false, f.Shelf.HaulDestinationEnabled, "native incoming hauling disabled");
         Equal(StoragePriority.Critical, f.Shelf.GetStoreSettings().Priority, "new shelf defaults to critical priority");
         Equal(true, f.Shelf.SetSelection(0, f.X), "first selection");
-        Equal(false, f.Shelf.SetSelection(1, f.X), "duplicate selection rejected");
-        Equal<ThingDef>(null, f.Shelf.SelectedDef(1), "duplicate does not mutate configuration");
+        Equal(true, f.Shelf.SetSelection(1, f.X), "duplicate selections allowed");
+        Equal(f.X, f.Shelf.SelectedDef(1), "duplicate selection retained");
+        f.Shelf.SetSelection(1, null);
         Equal(false, f.Shelf.SetSelection(-1, f.X), "negative slot rejected");
         Equal(false, f.Shelf.SetSelection(3, f.X), "fourth slot rejected");
         Equal(false, f.Shelf.SetSelection(1, new ThingDef()), "parent shelf filter enforced");

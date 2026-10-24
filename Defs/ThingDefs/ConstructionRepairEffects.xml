@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MoteBase" MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>MS_Mote_ConstructionRepairBeam</defName>
+    <thingClass>MoteDualAttached</thingClass>
+    <altitudeLayer>MoteOverhead</altitudeLayer>
+    <drawOffscreen>true</drawOffscreen>
+    <mote>
+      <fadeInTime>0.02</fadeInTime>
+      <solidTime>2.93</solidTime>
+      <fadeOutTime>0.05</fadeOutTime>
+      <needsMaintenance>false</needsMaintenance>
+      <fadeOutUnmaintained>false</fadeOutUnmaintained>
+      <rotateTowardsTarget>true</rotateTowardsTarget>
+      <scaleToConnectTargets>true</scaleToConnectTargets>
+    </mote>
+    <graphicData>
+      <texPath>Things/Mote/GraserBeam</texPath>
+      <graphicClass>Graphic_MoteWithAgeSecs</graphicClass>
+      <shaderType>MoteBeam</shaderType>
+      <color>(0.55, 0.85, 1)</color>
+      <shaderParameters>
+        <_ExtraTexA>/Things/Mote/BeamSecondaryNoise_A</_ExtraTexA>
+        <_ExtraTexB>/Things/Mote/BeamSecondaryNoise_B</_ExtraTexB>
+        <_ScrollSpeedA>-4</_ScrollSpeedA>
+        <_ScrollSpeedB>3</_ScrollSpeedB>
+        <_Intensity>2</_Intensity>
+      </shaderParameters>
+    </graphicData>
+  </ThingDef>
+
+  <!-- Core-only fallback when the graser beam's Biotech assets are unavailable. -->
+  <ThingDef ParentName="MoteBase">
+    <defName>MS_Mote_ConstructionRepairBeamFallback</defName>
+    <thingClass>MoteDualAttached</thingClass>
+    <altitudeLayer>MoteOverhead</altitudeLayer>
+    <drawOffscreen>true</drawOffscreen>
+    <mote>
+      <fadeInTime>0.02</fadeInTime>
+      <solidTime>2.93</solidTime>
+      <fadeOutTime>0.05</fadeOutTime>
+      <needsMaintenance>false</needsMaintenance>
+      <rotateTowardsTarget>true</rotateTowardsTarget>
+      <scaleToConnectTargets>true</scaleToConnectTargets>
+    </mote>
+    <graphicData>
+      <texPath>Things/Mote/PowerBeam</texPath>
+      <graphicClass>Graphic_Mote</graphicClass>
+      <shaderType>MoteGlow</shaderType>
+      <color>(0.55, 0.85, 1)</color>
+    </graphicData>
+  </ThingDef>
+</Defs>

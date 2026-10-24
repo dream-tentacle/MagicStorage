@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_ConstructionRepairMode>Repair mode</MS_ConstructionRepairMode>
+  <MS_ConstructionRepairModeDesc>Automatically repairs broken-down buildings within the supply range. Each repair takes 3 seconds and consumes 1 component from the connected storage network. Buildings already reserved by colonists are skipped.</MS_ConstructionRepairModeDesc>
   <MS_ConstructionSupplyUse>Automatically supplies construction materials within {0} cells. Colonists perform construction.</MS_ConstructionSupplyUse>
   <MS_NetworkStatus>Storage network: {0}</MS_NetworkStatus>
   <MS_Status_Rebuilding>rebuilding connections</MS_Status_Rebuilding>
@@ -48,7 +50,7 @@
   <MS_UI_QuantityTip>Right arrows increase withdrawal; left arrows decrease it. Hold the left mouse button and drag across arrow buttons to adjust multiple rows. Each row is adjusted once per drag.</MS_UI_QuantityTip>
   <MS_ReceiverCapacity>Receiving buffer: {0} / {1} stacks</MS_ReceiverCapacity>
   <MS_ReceiverUse>Uses the connected core's filter and priority. Eligible items on its surface are automatically sent to storage units.</MS_ReceiverUse>
-  <MS_SettingsCategory>Magic storage</MS_SettingsCategory>
+  <MS_SettingsCategory>[DR] Magic Storage</MS_SettingsCategory>
   <MS_SettingsTabGeneral>General</MS_SettingsTabGeneral>
   <MS_SettingsTabAccessibility>Accessibility</MS_SettingsTabAccessibility>
   <MS_SettingsAccessibilityNotice>The following options modify vanilla code. If enabling them causes errors or has no effect, this indicates a conflict with another mod: both this mod and the other mod modify vanilla code.</MS_SettingsAccessibilityNotice>
@@ -57,6 +59,8 @@
   <MS_SettingsTidySupplyShelf>Tidy restocking shelves</MS_SettingsTidySupplyShelf>
   <MS_SettingsTidySupplyShelfHelp>Improve how items are displayed on restocking shelves.</MS_SettingsTidySupplyShelfHelp>
   <MS_SettingsWorkbenchUnlockMode>Workbench unlock mode</MS_SettingsWorkbenchUnlockMode>
+  <MS_SettingsNewWorkbenchOrdersFirst>Add new workbench orders first</MS_SettingsNewWorkbenchOrdersFirst>
+  <MS_SettingsNewWorkbenchOrdersFirstHelp>Affects the default priority of new orders, which remain in Ungrouped. When disabled, new orders are added last.</MS_SettingsNewWorkbenchOrdersFirstHelp>
   <MS_SettingsAllowPrinterParameterChanges>Allow printer parameter changes</MS_SettingsAllowPrinterParameterChanges>
   <MS_SettingsWorkbenchUnlockModeHelp>Spend construction materials to unlock workbenches before adding their recipes. Workbenches with no material cost are unlocked automatically. Unlocks are shared throughout the current save. Disabling this mode makes all researched recipes available and preserves recorded unlocks.</MS_SettingsWorkbenchUnlockModeHelp>
   <MS_SettingsTabPerformance>Performance</MS_SettingsTabPerformance>
@@ -65,6 +69,7 @@
   <MS_SettingsUnitSlotsHelp>Range: 1–10000. Default: 64. Applies immediately to existing and new storage units. Lowering the limit preserves stored items. Units above capacity cannot accept new stacks, but compatible partial stacks can still be filled.</MS_SettingsUnitSlotsHelp>
   <MS_SettingsRestoreDefaults>Restore defaults</MS_SettingsRestoreDefaults>
   <MS_SettingsCosmicWorkbenchWorkSpeed>Cosmic workbench work speed: {0}%</MS_SettingsCosmicWorkbenchWorkSpeed>
+  <MS_SettingsConstructionSupplyRadius>Construction supply unit supply radius: {0}</MS_SettingsConstructionSupplyRadius>
   <MS_SettingsSimplifiedMode>Simple mode</MS_SettingsSimplifiedMode>
   <MS_SettingsRefreshHelp>Refresh times: 1–60 seconds at normal game speed, default 1. Longer intervals reduce periodic checks but delay responses. Switching modes preserves both sets of values. Immediate supply commands still run immediately.</MS_SettingsRefreshHelp>
   <MS_SettingsOverallRefresh>Overall refresh time (seconds)</MS_SettingsOverallRefresh>

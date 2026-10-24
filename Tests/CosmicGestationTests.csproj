@@ -19,10 +19,13 @@
     <Compile Include="CosmicGestationPowerTests.cs" />
     <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationCatalog.cs" />
     <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationMaterials.cs" />
+    <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationPatches.cs" />
     <Compile Include="..\Source\MagicStorage\Gestation\CosmicGestationPower.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_CosmicMechGestator.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterialPlanner.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialSources.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialTransaction.cs" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

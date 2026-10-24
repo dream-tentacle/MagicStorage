@@ -23,7 +23,7 @@ namespace MagicStorage
                 foreach (Building_StorageSupplyShelf shelf in manager.SupplyShelves)
                 {
                     bool added = false;
-                    for (int slot = 0; slot < Building_StorageSupplyShelf.SlotCount; slot++)
+                    for (int slot = 0; slot < shelf.SlotCount; slot++)
                     {
                         StorageShelfRestockFailure failure = shelf.RestockFailure(slot);
                         if (failure == null) continue;

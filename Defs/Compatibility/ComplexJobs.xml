@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- Complex Jobs splits production into additional work types. Each entry
+       enables both recipe discovery and dispatch through the shared work giver. -->
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFButcher</defName>
+    <label>宇宙工作台屠宰</label>
+    <workType>FSFButcher</workType>
+    <verb>屠宰</verb>
+    <gerund>屠宰</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFDrugs</defName>
+    <label>宇宙工作台制药</label>
+    <workType>FSFDrugs</workType>
+    <verb>制药</verb>
+    <gerund>制药</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFMachining</defName>
+    <label>宇宙工作台加工</label>
+    <workType>FSFMachining</workType>
+    <verb>加工</verb>
+    <gerund>加工</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFFabrication</defName>
+    <label>宇宙工作台装配</label>
+    <workType>FSFFabrication</workType>
+    <verb>装配</verb>
+    <gerund>装配</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFRefining</defName>
+    <label>宇宙工作台精炼</label>
+    <workType>FSFRefining</workType>
+    <verb>精炼</verb>
+    <gerund>精炼</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFProduction</defName>
+    <label>宇宙工作台生产</label>
+    <workType>FSFProduction</workType>
+    <verb>生产</verb>
+    <gerund>生产</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFSmelt</defName>
+    <label>宇宙工作台熔炼</label>
+    <workType>FSFSmelt</workType>
+    <verb>熔炼</verb>
+    <gerund>熔炼</gerund>
+  </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase" MayRequire="FrozenSnowFox.ComplexJobs">
+    <defName>MS_CosmicFSFStoneCut</defName>
+    <label>宇宙工作台切石</label>
+    <workType>FSFStoneCut</workType>
+    <verb>切石</verb>
+    <gerund>切石</gerund>
+  </WorkGiverDef>
+</Defs>

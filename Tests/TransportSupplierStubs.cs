@@ -15,13 +15,6 @@ namespace Verse
         public float iconAngle;
         public virtual void DrawIcon(UnityEngine.Rect rect, UnityEngine.Material material, GizmoRenderParms parms) { }
     }
-    public sealed class Command_Toggle : Gizmo
-    {
-        public string defaultLabel, defaultDesc;
-        public object icon;
-        public System.Func<bool> isActive;
-        public System.Action toggleAction;
-    }
     public sealed class FloatMenuOption
     {
         public string Label;

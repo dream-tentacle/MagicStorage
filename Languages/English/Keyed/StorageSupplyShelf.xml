@@ -2,12 +2,12 @@
 <LanguageData>
   <MS_Shelf_Configure>Configure restocking</MS_Shelf_Configure>
   <MS_Shelf_CopyPreset>Copy preset</MS_Shelf_CopyPreset>
-  <MS_Shelf_CopyPresetDesc>Copy this shelf's items, restocking limits, filters, restocking warnings and priority.</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_CopyPresetDesc>Copy this shelf's mode, items, per-slot restocking limits, filters, restocking warnings and priority.</MS_Shelf_CopyPresetDesc>
   <MS_Shelf_PastePreset>Paste preset</MS_Shelf_PastePreset>
   <MS_Shelf_PastePresetDesc>Apply the copied preset to the selected restocking shelves, replacing their current settings. Supports multiple selected shelves.</MS_Shelf_PastePresetDesc>
   <MS_Shelf_NeedCopiedPreset>Copy a preset first</MS_Shelf_NeedCopiedPreset>
   <MS_Shelf_Title>Auto-restocking shelf</MS_Shelf_Title>
-  <MS_Shelf_ConfigureDesc>Choose three item types and their restocking limits, with at most one stack of each.</MS_Shelf_ConfigureDesc>
+  <MS_Shelf_ConfigureDesc>Choose an item and restocking limit for each of the {0} slots. Slots may hold the same item type.</MS_Shelf_ConfigureDesc>
   <MS_Shelf_PriorityHint>Colonists will not haul items into this shelf; only the connected storage network provides restocking.</MS_Shelf_PriorityHint>
   <MS_Shelf_Limit>Restock limit</MS_Shelf_Limit>
   <MS_Shelf_LimitTip>Restock quantity limit: 0–{0}. Lowering the limit keeps existing stock.</MS_Shelf_LimitTip>
@@ -19,7 +19,7 @@
   <MS_Shelf_Contents>Shelf contents: {0} / {1} stacks</MS_Shelf_Contents>
   <MS_Shelf_Use>Colonists can take items directly. Restocks automatically; does not accept normal hauling.</MS_Shelf_Use>
   <MS_Shelf_PickTitle>Select an item for slot {0}</MS_Shelf_PickTitle>
-  <MS_Shelf_PickHint>Expand categories or search, then click an item to select it. Each slot holds one item type. The three selections must be different.</MS_Shelf_PickHint>
+  <MS_Shelf_PickHint>Expand categories or search, then click an item to select it. Each slot holds one item type. Multiple slots may select the same item.</MS_Shelf_PickHint>
   <MS_Shelf_AlreadySelected>This item is already assigned to another slot.</MS_Shelf_AlreadySelected>
   <MS_Shelf_Filter>Filters</MS_Shelf_Filter>
   <MS_Shelf_FilterTitle>Filters for slot {0}</MS_Shelf_FilterTitle>
@@ -42,4 +42,13 @@
   <MS_Shelf_Failure_PlacementFailed>Items could not be placed on the shelf</MS_Shelf_Failure_PlacementFailed>
   <MS_Shelf_Failure_TransferFailed>Item transfer failed</MS_Shelf_Failure_TransferFailed>
   <MS_Shelf_Failure_Burning>The shelf cell is on fire and cannot be restocked</MS_Shelf_Failure_Burning>
+  <MS_Shelf_FilterMode>Filter mode</MS_Shelf_FilterMode>
+  <MS_Shelf_FilterModeDesc>Use a shared storage filter with separate stack limits for each slot. Switching modes returns shelf contents to the core first; switching is blocked if any item cannot be returned.</MS_Shelf_FilterModeDesc>
+  <MS_Shelf_QuickFood>Quick food setup</MS_Shelf_QuickFood>
+  <MS_Shelf_QuickFoodDesc>Switch to filter mode and set the shared filter to allow all foods. If the mode cannot be changed, keep the existing filter.</MS_Shelf_QuickFoodDesc>
+  <MS_Shelf_SharedFilterHint>All slots share this filter and restock to their own limits. Empty slots take the first matching available item in the network inventory list.</MS_Shelf_SharedFilterHint>
+  <MS_Shelf_SlotLimit>Slot {0} stack limit</MS_Shelf_SlotLimit>
+  <MS_Shelf_SharedLimitTip>Controls only this slot. The item's own stack limit also applies. Set to 0 to pause restocking. Lowering the limit keeps existing stock.</MS_Shelf_SharedLimitTip>
+  <MS_Shelf_ModeBlockedTitle>Cannot switch shelf mode</MS_Shelf_ModeBlockedTitle>
+  <MS_Shelf_ModeBlocked>Some shelf contents could not be returned to the core. The current mode is unchanged. Check the network connection, core storage filter and remaining capacity, and ensure the items are not forbidden or reserved.</MS_Shelf_ModeBlocked>
 </LanguageData>

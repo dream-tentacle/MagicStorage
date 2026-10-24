@@ -30,4 +30,9 @@
     <defName>MS_CosmicCrafting</defName><label>宇宙工作台手工</label><workType>Crafting</workType>
     <verb>手工制作</verb><gerund>手工制作</gerund>
   </WorkGiverDef>
+  <WorkGiverDef ParentName="MS_CosmicCraftingBase">
+    <defName>MS_CosmicHauling</defName><label>宇宙工作台焚烧</label><workType>Hauling</workType>
+    <priorityInType>41</priorityInType>
+    <verb>焚烧</verb><gerund>焚烧</gerund>
+  </WorkGiverDef>
 </Defs>

@@ -42,6 +42,7 @@
     <Compile Include="ConstructionSupplyTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ConstructionSupplyUnit.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSupply.cs" />
+    <Compile Include="..\Source\MagicStorage\Construction\MapComponent_ConstructionRepair.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSite.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingWorkerPolicy.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterialPlanner.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingMaterials.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialSources.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\MapComponent_CosmicCrafting.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\JobDriver_CosmicCrafting.cs" />
     <Compile Include="JobStubs.cs" />

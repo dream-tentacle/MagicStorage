@@ -99,8 +99,12 @@
     <Compile Include="UI\Dialog_UpdateNotice.cs" />
     <Compile Include="Compatibility\IStorageCompatibility.cs" />
     <Compile Include="Compatibility\CompatibilityManager.cs" />
+    <Compile Include="Compatibility\LogicalFloorsCompatibility.cs" />
     <Compile Include="Compatibility\MonolynCompatibility.cs" />
+    <Compile Include="Compatibility\MonolynProductionSupply.cs" />
     <Compile Include="Compatibility\DynamicTradeInterfaceCompatibility.cs" />
+    <Compile Include="Compatibility\CeleTechTradeCompatibility.cs" />
+    <Compile Include="Compatibility\RavenGiftCompatibility.cs" />
     <Compile Include="Compatibility\NivarianCannonApi.cs" />
     <Compile Include="Compatibility\NivarianCannonCompatibility.cs" />
     <Compile Include="Buildings\Building_NivarianCannonExtractor.cs" />
@@ -131,6 +135,7 @@
     <Compile Include="Apparel\JobDriver_TakeStorageApparel.cs" />
     <Compile Include="Trading\StorageTradeTransaction.cs" />
     <Compile Include="Trading\StorageTradeSession.cs" />
+    <Compile Include="Trading\StorageTradeApi.cs" />
     <Compile Include="Trading\Tradeable_Storage.cs" />
     <Compile Include="Trading\StorageTradePatches.cs" />
     <Compile Include="Trading\StorageLaunchPaymentPatches.cs" />
@@ -146,6 +151,8 @@
     <Compile Include="UI\Dialog_StorageShelfFilter.cs" />
     <Compile Include="Buildings\Building_ConstructionSupplyUnit.cs" />
     <Compile Include="Construction\ConstructionSupply.cs" />
+    <Compile Include="Construction\MapComponent_ConstructionRepair.cs" />
+    <Compile Include="Construction\ConstructionRepairPatches.cs" />
     <Compile Include="Construction\ConstructionSite.cs" />
     <Compile Include="Crafting\CraftingOrder.cs" />
     <Compile Include="Crafting\CraftingBatch.cs" />
@@ -176,6 +183,7 @@
     <Compile Include="Gestation\CosmicGestationPatches.cs" />
     <Compile Include="Gestation\CosmicGestationPower.cs" />
     <Compile Include="UI\Dialog_CosmicCrafting.cs" />
+    <Compile Include="UI\Dialog_CraftingGroupName.cs" />
     <Compile Include="UI\GameComponent_CosmicCraftingUI.cs" />
     <Compile Include="Storage\StorageInventory.cs" />
     <Compile Include="Storage\StorageDebugActions.cs" />
@@ -191,12 +199,14 @@
     <Compile Include="UI\StorageInventoryEntry.cs" />
     <Compile Include="Storage\StorageTransfer.cs" />
     <Compile Include="Storage\StorageMaterialTransaction.cs" />
+    <Compile Include="Storage\StorageMaterialSources.cs" />
     <Compile Include="Storage\StorageIncomingReservations.cs" />
     <Compile Include="Storage\StorageOutgoingReservations.cs" />
     <Compile Include="Storage\StorageReservation.cs" />
     <Compile Include="Buildings\Building_StorageReceiver.cs" />
     <Compile Include="Storage\StorageReception.cs" />
     <Compile Include="Storage\StorageReceiverHaulingPatches.cs" />
+    <Compile Include="Storage\StorageShelfHaulingPatches.cs" />
     <Compile Include="Networks\StorageNetwork.cs" />
     <Compile Include="Networks\CompStorageNode.cs" />
     <Compile Include="Networks\StorageConnectionQuery.cs" />

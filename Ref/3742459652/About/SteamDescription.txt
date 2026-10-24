@@ -1,0 +1,101 @@
+Colonists use their inventories smartly when moving items, so they finish tasks with fewer round-trips and less walking back and forth — more time actually working. Plus planning tools and quality-of-life touches that build on it.
+
+
+[hr][/hr]
+
+[b]Compatible with[/b]
+[i]Multiplayer, Combat Extended, Vehicle Framework, Adaptive Storage Framework, LWM's Deep Storage, Storage Network, Common Sense, Cook Carefully, Allow Tool / Keyz' Allow Utilities ("Haul Urgently"), Simple Sidearms, Item Policy, Smart Medicine, Everybody Gets One, Perfect Pathfinding, Better Autocasting for VPE, While You Are Nearby[/i] — amongst other mods
+
+[b]Replaces[/b]
+[i]Pick Up And Haul, Harvest and Haul, Auto Strip on Haul, Haul After Stripping, Everyone Hauls, Allow Dumb Labor, Haul to Stack, Bulk Load For Transport, While You're Up, Meals on Wheels, Haul After Slaughter[/i]
+
+
+[hr][/hr]
+
+[h2]Smart inventories[/h2]
+Inventories carry resources, loot etc., and efficiently unloads the contents.
+This results in fewer trips to do work and hauling items.
+[list]
+[*] Harvested items goes into inventory without interrupting dedicated miners/farmers etc.
+[*] Pick up in bulk instead of one at a time
+[*] Strip corpses when hauling (configurable policies)
+[*] Gather resources into inventory when constructing, cooking etc.
+[*] Shared inventories — others draw from a carrier like a walking stockpile
+[*] Nomad-ready — eat, build, and tend from a colonist, a pack animal, or (with Vehicle Framework) a parked vehicle's cargo when away from home
+[/list]
+
+[h2]Smarter hauling[/h2]
+What happens between picking things up and putting them away.
+[list]
+[*] Top up existing stacks, and let several pawns fill the same tile at once
+[*] Drop a full load at storage that's already on the way
+[*] Grab loose items lying along a job you're already doing
+[*] Relocate supplies to storage closer to where they're used
+[/list]
+
+[h2]Bulk loading[/h2]
+Anything with a manifest, loaded in bulk instead of one stack per walk.
+[list]
+[*] Transport pods and shuttles
+[*] Map portals — loaded down [i]and[/i] hauled back up
+[*] Pack animals, refuelables, and Vehicle Framework cargo
+[*] Several haulers split one manifest without double-hauling
+[/list]
+
+[h2]Carrying capacity[/h2]
+Pawns overload past 100% only when the slowdown beats another round-trip.
+[list]
+[*] A gentle curve — the heavier the load, the slower the pawn
+[*] One slider from "carry freely" to "never overload*
+[*] Combat Extended's weight & bulk rules take over when it's installed
+[/list]
+
+[h2]Planning tools[/h2]
+Right-click → "Plan prioritized [task]…" to set up a whole job at once.
+[list]
+[*] Batched crafting — gather a whole batch's ingredients, then craft it all
+[*] Travel-optimal routes over a patch, vein, room or growing zone, with a live preview
+[*] Smart routing ends the run right next to your storage
+[*] One-job construction — haul the materials and build, in a single order
+[*] Pre-stock a build site, or plan a fence line for several builders at once
+[/list]
+
+[h2]Quality of life[/h2]
+[list]
+[*] Per-pawn control — leave a skilled miner mining while others clear the output
+[*] Optional dumb-labor overrides — any pawn can haul, clean or cut plants
+[*] Extensive in-game settings with per-option help, plus savable, shareable profiles
+[/list]
+
+[b]…and that's just the highlights — more than 25 improvements, each with their own toggles.[/b]
+
+
+[hr][/hr]
+
+[b]Languages[/b]
+[list]
+[*] 🇬🇧 English
+[*] 🇨🇳 简体中文 (Chinese Simplified)
+[*] 🇩🇰 Dansk (Danish)
+[*] 🇩🇪 Deutsch (German)
+[*] 🇪🇸 Español (Spanish)
+[*] 🇫🇷 Français (French)
+[*] 🇮🇹 Italiano (Italian)
+[*] 🇳🇱 Nederlands (Dutch)
+[*] 🇵🇱 Polski (Polish)
+[*] 🇧🇷 Português brasileiro (Portuguese-Brazilian)
+[*] 🇷🇺 Русский (Russian)
+[*] 🇺🇦 Українська (Ukrainian)
+[*] 🇰🇷 한국어 (Korean)
+[*] 🇯🇵 日本語 (Japanese)
+[*] 🇹🇭 ไทย (Thai)
+[/list]
+[i]Spot a typo or awkward wording in your language? These are a first-pass translation, so fixes (and whole new languages) are genuinely welcome. [url=https://github.com/Refzlund/haulers-dream/blob/main/CONTRIBUTING.md]Here's how to open a quick PR[/url].[/i]
+
+
+[hr][/hr]
+
+Development accelerated via Opus 4.8 and Fable 5. Read more [url=https://github.com/Refzlund/haulers-dream/blob/main/About/Disclaimer.md]here[/url].
+Full feature list, compatibility notes etc. can be seen on [url=https://github.com/Refzlund/haulers-dream]Github[/url].
+
+Thanks to the authors of every mod mentioned above for the inspiration. Leave your suggestions in the comments!

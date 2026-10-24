@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+<HaulersDream.SettingsCategory>Hauler's Dream</HaulersDream.SettingsCategory>
+<HaulersDream.SettingsHeaderFallback>Hauler's Dream</HaulersDream.SettingsHeaderFallback>
+<HaulersDream.Settings.MultiplayerLocked>在多人游戏期间，Hauler's Dream的设置由主机控制。你加入时它们会被同步——接受Multiplayer的“应用配置”（Apply configs）提示以与主机保持一致。退出多人游戏方可更改这些设置。</HaulersDream.Settings.MultiplayerLocked>
+<HaulersDream.Tab.General>常规</HaulersDream.Tab.General>
+<HaulersDream.Tab.Sharing>共享与运送</HaulersDream.Tab.Sharing>
+<HaulersDream.Tab.Bulk>批量与运载者</HaulersDream.Tab.Bulk>
+<HaulersDream.Tab.Routing>途中与路径</HaulersDream.Tab.Routing>
+<HaulersDream.Tab.Sources>来源与对象</HaulersDream.Tab.Sources>
+<HaulersDream.Tab.Planners>规划器与高级</HaulersDream.Tab.Planners>
+<HaulersDream.Setting.MasterEnabled>启用 Hauler's Dream</HaulersDream.Setting.MasterEnabled>
+<HaulersDream.Setting.MasterEnabledDesc>总开关。关闭后，Hauler's Dream将停止启动其自动搬运行为——收取工作产出、清扫附近的战利品、批量搬运、途中拾取以及储存路径规划——这便于在不重启的情况下排查某个问题是否与本模组有关。已经收取了物资的小人仍会正常卸载它们（绝不会有物资被遗弃），且每个小人的“卸载货物栏”按钮依然可用。（无工作能力的覆盖项与右键命令菜单各有自己的开关，不受此开关影响。）默认开启。</HaulersDream.Setting.MasterEnabledDesc>
+<HaulersDream.Setting.DrawDetourLines>绘制调试绕行线（开发）</HaulersDream.Setting.DrawDetourLines>
+<HaulersDream.Setting.DrawDetourLinesDesc>仅供开发的诊断功能：为途中拾取和储存路径绕行绘制彩色线条，以便你看清小人为何绕路。不会保存——每次启动游戏时都会重置为关闭。</HaulersDream.Setting.DrawDetourLinesDesc>
+<HaulersDream.Setting.CarryLimit>携带上限：每个小人最大携带容量的 {0}</HaulersDream.Setting.CarryLimit>
+<HaulersDream.Setting.CarryLimitDesc>该上限是小人最大携带容量的一个比例——即它在服装、装备和货物栏中能承载的质量（与商队和驮兽装载所用的容量相同）。搬运过程中拿在手上的物品（正在手动搬运的那一堆）不计入此上限；只有收纳在服装/装备/货物栏中的才算。下方的智能超载仍可让小人超过此上限的100%以减少往返次数。</HaulersDream.Setting.CarryLimitDesc>
+<HaulersDream.Setting.DropThenHaul>先丢到地上，再拾取（真实）</HaulersDream.Setting.DropThenHaul>
+<HaulersDream.Setting.DropThenHaulDesc>开启时，收获/采掘的物资会落到地上，小人在完成工作后再将它们收进货物栏。关闭时，物资直接进入货物栏（不经过地面）。</HaulersDream.Setting.DropThenHaulDesc>
+<HaulersDream.Setting.MarkForUnload>自动卸载收取的物资（在工作结束时、用餐和娱乐前后、超重时，以及按下方的间隔）。关闭：小人会一直携带，直到你按下其“卸载货物栏”按钮。</HaulersDream.Setting.MarkForUnload>
+<HaulersDream.Setting.UnloadAllSurplus>同时收起小人携带的、并非 Hauler's Dream 自己拾取的多余货物栏物品（默认关闭）</HaulersDream.Setting.UnloadAllSurplus>
+<HaulersDream.Setting.UnloadAllSurplusDesc>默认关闭：Hauler's Dream 只卸载它自己收取的物资，因此绝不会动到殖民者的副武器、随身携带的药物或水，或交易得来的货物。开启此项可顺手收起小人无故携带的多余物品（来自交易、其他模组或手动移动）。“多余”不包括小人保留的食物、成瘾品、货物栏库存以及任何武器装备清单物品（含弹药）、原版的成瘾/依赖性药物、副武器/药物/卫生类模组保留在货物栏中的物品（均自动识别），以及你在下方“单项物品卸载设置”中保留的任何物品——并且只针对有处可存放的物品堆；正在为商队装载的货物栏物品不会被动。</HaulersDream.Setting.UnloadAllSurplusDesc>
+<HaulersDream.Setting.ItemUnloadButton>单项物品卸载设置…</HaulersDream.Setting.ItemUnloadButton>
+<HaulersDream.Setting.ItemUnloadButtonN>单项物品卸载设置（{0}）…</HaulersDream.Setting.ItemUnloadButtonN>
+<HaulersDream.ItemUnload.Title>单项物品卸载设置</HaulersDream.ItemUnload.Title>
+<HaulersDream.ItemUnload.Desc>设置 Hauler's Dream 如何处理小人货物栏中的特定物品。对每种物品可选择：从不卸载（保留整堆）、最多保留 N（携带至多 N 个，其余卸载），或始终卸载（即便其他模组本会保留它也照样收起）。没有规则的物品按正常行为处理。此处的规则会覆盖针对武器装备清单、副武器、药物、卫生及成瘾品物品的自动保留检测。对来自你已移除的模组的物品所做的选择会被记住，并在你重装该模组时恢复，且绝不会影响存档读取。（提示：若你使用装备清单/弹药模组，请在其装备清单中设置弹药数量——它会按该数量补充弹药。）</HaulersDream.ItemUnload.Desc>
+<HaulersDream.ItemUnload.ClearAll>全部清除</HaulersDream.ItemUnload.ClearAll>
+<HaulersDream.ItemUnload.ModeDefault>默认</HaulersDream.ItemUnload.ModeDefault>
+<HaulersDream.ItemUnload.ModeKeepAll>从不卸载</HaulersDream.ItemUnload.ModeKeepAll>
+<HaulersDream.ItemUnload.ModeKeepAtMost>最多保留</HaulersDream.ItemUnload.ModeKeepAtMost>
+<HaulersDream.ItemUnload.ModeUnloadAlways>始终卸载</HaulersDream.ItemUnload.ModeUnloadAlways>
+  <HaulersDream.ItemUnload.ModeMixed>混合</HaulersDream.ItemUnload.ModeMixed>
+<HaulersDream.Setting.UnloadBeforeSleep>睡觉前先收起货物</HaulersDream.Setting.UnloadBeforeSleep>
+<HaulersDream.Setting.UnloadBeforeSleepDesc>当小人结束工作且疲惫（即将睡觉）时，会先去卸载，然后空手就寝——而不是把收取的货物带上床。它在实际工作时仍正常积攒货物。</HaulersDream.Setting.UnloadBeforeSleepDesc>
+<HaulersDream.Setting.UnloadBeforeLeisure>娱乐前先收起货物</HaulersDream.Setting.UnloadBeforeLeisure>
+<HaulersDream.Setting.UnloadBeforeLeisureDesc>当小人停止工作前往娱乐（其日程中的娱乐时段，或任何娱乐活动）时，会先卸载，而不是在放松时还带着一身货物。</HaulersDream.Setting.UnloadBeforeLeisureDesc>
+<HaulersDream.Setting.UnloadBeforeEating>进食前先收起货物</HaulersDream.Setting.UnloadBeforeEating>
+<HaulersDream.Setting.UnloadBeforeEatingDesc>当小人结束工作且饥饿（即将进食）时，会先卸载——这样它就不会把刚采掘的矿石带到餐桌上。</HaulersDream.Setting.UnloadBeforeEatingDesc>
+<HaulersDream.Setting.ShareHeader>在殖民者之间共享所携带的材料：</HaulersDream.Setting.ShareHeader>
+<HaulersDream.Setting.ShareForBuilding>使用所携带的材料进行建造</HaulersDream.Setting.ShareForBuilding>
+<HaulersDream.Setting.BuildFromInventory>使用小人、殖民者或驮兽携带的材料进行建造</HaulersDream.Setting.BuildFromInventory>
+<HaulersDream.Setting.BuildFromInventoryDesc>建造中的小人可从某个小人或动物已携带的货物栏中取用建造材料——先是它自己的，然后是其他殖民者的，再然后是驮兽/商队货物的——而不仅是地上的散堆。因此，如果你用商队携带钢铁，在突袭或外出地图上下令造沙袋或墙，它就会用所携带的钢铁来造，而无需你先从驮兽身上把钢铁卸下。直接从货物栏运送到工地（无需先丢在运载者脚边）。这与上方的“使用所携带的材料进行建造”不同，后者只计入本模组自己收取的材料。绝不会从被征召、倒地或暴走的运载者处取用，也不会从已划归正在组建的商队的货物中取用；会预定该物品堆，以免两名建造者争抢。默认开启。</HaulersDream.Setting.BuildFromInventoryDesc>
+<HaulersDream.Setting.BuildFromInventoryPartial>允许用货物栏材料进行部分建造</HaulersDream.Setting.BuildFromInventoryPartial>
+<HaulersDream.Setting.BuildFromInventoryPartialDesc>通常，除非整件物品所需的材料都齐备，否则不会开始建造。开启此项后，即便货物栏中的材料少于所需总量，也会用现有的材料开始并推进框架的搭建——其余部分在材料逐渐到位时送达。这改变了游戏本体“要么全有要么全无”的规则，故默认关闭。需要“从货物栏建造”。</HaulersDream.Setting.BuildFromInventoryPartialDesc>
+<HaulersDream.Setting.ShareForCrafting>使用所携带的材料完成制作工单</HaulersDream.Setting.ShareForCrafting>
+<HaulersDream.Setting.ShareForCraftingDesc>制作中的小人可从某个小人已携带的货物栏中取用工单原料，而不仅是地上的散堆。如果有其他模组在管理制作原料的搬运，Hauler's Dream 会自动让位，由它去收集原料——这样任何制作循环都会自行解决，无需你介入。</HaulersDream.Setting.ShareForCraftingDesc>
+<HaulersDream.Setting.ShareMeetInMiddle>空闲的运载者会走向工人以交付货物</HaulersDream.Setting.ShareMeetInMiddle>
+<HaulersDream.Setting.BatchWorkDeliveries>一趟为多个排队的建造任务携带材料</HaulersDream.Setting.BatchWorkDeliveries>
+<HaulersDream.Setting.BatchWorkDeliveriesDesc>在建造大量廉价物件时（例如一道长围栏），小人会一次性拿满足够多个排队建造任务的材料，并在一趟中分别交付到每处，而不是一次只运送几个来回穿梭。材料拿在手上，因此不会减速。</HaulersDream.Setting.BatchWorkDeliveriesDesc>
+<HaulersDream.Setting.InventoryConstructDeliver>用货物栏为单个大型建造携带材料</HaulersDream.Setting.InventoryConstructDeliver>
+<HaulersDream.Setting.InventoryConstructDeliverDesc>当单件物品所需的某种材料超过一手能拿的量（例如地热发电机需要340钢铁）时，小人会把材料装进货物栏——其上限取决于质量而非堆叠大小——并以远少得多的往返次数送达，而不是手上一次只运约75个来回穿梭。它会按上方的智能超载设置决定超过100%装多少；关闭超载时则装到100%（不减速）。</HaulersDream.Setting.InventoryConstructDeliverDesc>
+<HaulersDream.Setting.MultiSiteConstructDeliver>一趟装载附近多个工地的材料</HaulersDream.Setting.MultiSiteConstructDeliver>
+<HaulersDream.Setting.MultiSiteConstructDeliverDesc>当自动或Shift点选的建造要向一簇需要相同材料的邻近工地交付时，小人会把整簇工地的合计需求一次性装进货物栏，并分别送达每处工地，而不是一趟只服务一个工地（此前只有路径规划器能这样做）。小人会先完成它正在干的工地，再去装载。需要上方的“用货物栏为单个大型建造携带材料”。</HaulersDream.Setting.MultiSiteConstructDeliverDesc>
+<HaulersDream.Setting.ShareHandHauled>向正把材料搬往储存区的殖民者索取材料（默认关闭）</HaulersDream.Setting.ShareHandHauled>
+<HaulersDream.Setting.ShareHandHauledDesc>当建造者需要某种材料，而唯一的存货正在一名将其搬往储存区的殖民者手中时，建造者会在途中拦下那名殖民者并取走那一堆，而不是等它到达储存区再去那里取。绝不会动正在向特定建造、工单或添加燃料任务交付的殖民者，并且只在确实能省下一趟时才这么做。（目前仅限建造。）</HaulersDream.Setting.ShareHandHauledDesc>
+<HaulersDream.Setting.MealsOnWheels>找不到食物时，从其他殖民者或驮兽携带的食物中取食</HaulersDream.Setting.MealsOnWheels>
+<HaulersDream.Setting.MealsOnWheelsDesc>当饥饿的殖民者在地图上或自己（或驮兽）的行囊中都找不到食物时，会走向另一名携带可接受食物的殖民者或驮兽，从其货物栏中取食——既减少往返，又能在所携带的餐食腐烂前抢救它们——而不是挨饿或长途跋涉去远处的储存区。只有在正常的食物搜索一无所获时才会启动，因此绝不会越过更近的餐食。会遵守进食者的食物方案、意识形态和禁酒状态；绝不取走家长正喂给婴儿的食物；绝不从被征召、倒地或暴走的运载者处取用；会预定该餐食，以免两名殖民者争抢；并优先取最临近腐烂的食物。默认开启。</HaulersDream.Setting.MealsOnWheelsDesc>
+  <HaulersDream.Setting.EatFromVehiclesAway>离家在外时也能从载具货舱取食</HaulersDream.Setting.EatFromVehiclesAway>
+  <HaulersDream.Setting.EatFromVehiclesAwayDesc>扩展"移动餐车"：在非家园地图上，饥饿的殖民者也可以像从驮兽身上那样，从停放的载具货舱中取用食物。仅在离家的地图上生效，家中载具的装载清单不受影响。默认关闭；需要开启"移动餐车"并安装载具框架。</HaulersDream.Setting.EatFromVehiclesAwayDesc>
+  <HaulersDream.Setting.DrugsForWithdrawal>让处于戒断中的殖民者从其他殖民者那里取走被保管的药物</HaulersDream.Setting.DrugsForWithdrawal>
+  <HaulersDream.Setting.DrugsForWithdrawalDesc>当一名殖民者渴求或正在戒断其成瘾的药物，而地图上又找不到任何一份时，他会走向随身携带该药物的另一名殖民者，并取走一剂。只有被拾荒者之梦本身固定住的药物才能通过这种方式取得——也就是"保管在背包中"的固定量，或正被搬运往仓库的货物。殖民者按自己用药方案携带的药物依然不可触碰，与原版完全一致。若没有这项功能，让一名殖民者保管某种药物就会把它对成瘾者永久藏起来，而原版从不允许这种情况：原版会让殖民者放下任何没有理由携带的药物。绝不会从被征召、倒地、死亡或精神失常的殖民者身上取走，也不会从正在组建的商队或载具货舱中取走。若要彻底阻止成瘾者用药，请在其用药方案中把该药物设为"成瘾时"不允许——那依然能完全阻止他。默认开启。</HaulersDream.Setting.DrugsForWithdrawalDesc>
+  <HaulersDream.Setting.MedicineFromVehiclesAway>离家在外时用载具或驮兽上的药品治疗</HaulersDream.Setting.MedicineFromVehiclesAway>
+  <HaulersDream.Setting.MedicineFromVehiclesAwayDesc>当地图上没有可用药品时，医生可以使用载具货舱、驮兽或其他殖民者身上携带的药品进行治疗。仅在离家的地图上生效，遵循病人的医疗策略。默认关闭；需要安装载具框架。</HaulersDream.Setting.MedicineFromVehiclesAwayDesc>
+  <HaulersDream.Setting.BuildFromVehiclesAway>离家在外时也能从载具货舱取建材</HaulersDream.Setting.BuildFromVehiclesAway>
+  <HaulersDream.Setting.BuildFromVehiclesAwayDesc>扩展"从库存建造"：在非家园地图上，建造者也可以像从驮兽身上那样，从停放的载具货舱中取用建材。仅在离家的地图上生效，家中载具的装载清单不受影响。默认关闭；需要开启"从库存建造"并安装载具框架。</HaulersDream.Setting.BuildFromVehiclesAwayDesc>
+<HaulersDream.Setting.BulkHaul>批量搬运——一趟搬运中拾取周围的一切</HaulersDream.Setting.BulkHaul>
+<HaulersDream.Setting.BulkHaulDesc>被派去搬运某一件物品的小人，会规划把周围一切可搬运的物品都拾进货物栏，并在一趟储存行程中送出全部。关闭＝原版每趟一件的搬运。</HaulersDream.Setting.BulkHaulDesc>
+<HaulersDream.Setting.BulkHaulSecond>仅当附近也下达了第二个搬运命令时，被命令的搬运才会清扫</HaulersDream.Setting.BulkHaulSecond>
+<HaulersDream.Setting.BulkHaulSecondDesc>自动搬运总会把周围清扫进货物栏（多件物品一趟储存）。而由你对某个小人下达的搬运则保持精准——它只搬那一件东西——除非你在附近又下达了第二个搬运命令，此时小人会把它们一并清扫。这是更精细控制的默认值。</HaulersDream.Setting.BulkHaulSecondDesc>
+<HaulersDream.Setting.BulkHaulAlways>始终清扫——每次搬运都拾取周围的一切</HaulersDream.Setting.BulkHaulAlways>
+<HaulersDream.Setting.BulkHaulAlwaysDesc>每次搬运——无论自动还是被命令——都会把附近可搬运的物品也装进小人的货物栏，一趟储存运完全部。携带多少会遵循下方的智能超载滑块：只多承载相比再跑一个来回而言确实值得那点减速的额外质量。</HaulersDream.Setting.BulkHaulAlwaysDesc>
+<HaulersDream.Setting.HaulNearbyOption>添加“搬运附近的一切”右键命令</HaulersDream.Setting.HaulNearbyOption>
+<HaulersDream.Setting.HaulNearbyOptionDesc>在可搬运物品的右键菜单上（对能搬运的小人）添加“搬运附近的一切”选项，它会立即开始一次批量清扫——这样你就不必为了触发批量搬运而去优先处理两个搬运。原版的“优先搬运”仍会与它并列出现，用于单件搬运。</HaulersDream.Setting.HaulNearbyOptionDesc>
+<HaulersDream.Setting.ManualPickup>添加“拾取 X”右键命令</HaulersDream.Setting.ManualPickup>
+<HaulersDream.Setting.ManualPickupDesc>在地上可搬运物品的右键菜单上添加“拾取 X”选项。小人会把所点选的那一堆直接拾进货物栏，作为一次受追踪的 Hauler's Dream 搬运，随后由正常的卸载流程收起——因此即便自动卸载关闭也绝不会丢失。是对原版右键搬运选项的补充。</HaulersDream.Setting.ManualPickupDesc>
+<HaulersDream.Setting.KeepInInventory>添加“将 X 留在货物栏”右键命令</HaulersDream.Setting.KeepInInventory>
+<HaulersDream.Setting.KeepInInventoryDesc>在地上可搬运物品的右键菜单上，在“拾取 X”旁边添加“将 X 留在货物栏”选项。小人会把所点选的那一堆收进自己的货物栏并一直带着：Hauler's Dream 绝不会把它搬去储存，游戏日常的“丢弃未使用货物”清理也不会把它扔掉。当你想让某个小人有意携带某件物品时使用它。要日后放下它，就让小人把它用掉，或从其装备栏中丢弃。是对原版右键选项的补充。</HaulersDream.Setting.KeepInInventoryDesc>
+  <HaulersDream.Setting.KeepGearButton>在装备标签页显示"保留数量"控件</HaulersDream.Setting.KeepGearButton>
+  <HaulersDream.Setting.KeepGearButtonDesc>在殖民者装备标签页中每件物品右侧添加一个小控件。将鼠标悬停在任意携带物品上即可设置该小人应在背包中保留多少；被保留的物品会始终显示保留数量。Hauler's Dream 会保留该数量，其余视为多余并搬运走。将数量设为 0 即停止保留。纯界面元素；关闭后只是隐藏该控件。</HaulersDream.Setting.KeepGearButtonDesc>
+<HaulersDream.Setting.PickupDelay.Lab>每堆拾取延迟</HaulersDream.Setting.PickupDelay.Lab>
+<HaulersDream.Setting.PickupDelay.Help>殖民者在每个物品堆前工作、显示原版拾取进度条、然后将其收入背包所需的时间。默认仅对“捡起X”和“将X留在背包中”这类主动指令生效，与原版自身的拾取延迟完全一致；自动搬运和装载保持即时，因此清扫拆除地板产生的碎料绝不会比原版更慢。使用下方两个选项也可为其加上延迟。120刻（约2秒）为原版数值。0＝处处即时。</HaulersDream.Setting.PickupDelay.Help>
+<HaulersDream.Setting.PickupDelay.Instant>立即</HaulersDream.Setting.PickupDelay.Instant>
+<HaulersDream.Setting.PickupDelay.Vanilla>原版</HaulersDream.Setting.PickupDelay.Vanilla>
+  <HaulersDream.Setting.PickupDelayOnHauling>自动搬运与清扫也加延迟</HaulersDream.Setting.PickupDelayOnHauling>
+  <HaulersDream.Setting.PickupDelayOnHaulingDesc>当殖民者自动把散落物品收入背包搬走、拾取自己的劳作产出（拆地板、采矿、收割），或为批量加注燃料收集燃料时，也显示拾取延迟。默认关闭，使清扫与原版一样快；若希望殖民者在每堆物品前明显地工作，可开启。</HaulersDream.Setting.PickupDelayOnHaulingDesc>
+  <HaulersDream.Setting.PickupDelayOnLoading>装载运输舱与驮兽也加延迟</HaulersDream.Setting.PickupDelayOnLoading>
+  <HaulersDream.Setting.PickupDelayOnLoadingDesc>当殖民者把物品堆收入背包以装载运输舱、传送门或驮兽时，也显示拾取延迟。默认关闭，使装载与原版一样快；开启后每堆物品都会像手动拾取那样计时。</HaulersDream.Setting.PickupDelayOnLoadingDesc>
+  <HaulersDream.Setting.PickupDelayOnDirectHarvest>直接就地收取的收获物加延迟</HaulersDream.Setting.PickupDelayOnDirectHarvest>
+  <HaulersDream.Setting.PickupDelayOnDirectHarvestDesc>当殖民者就地收取单个收获物时（一处被下令收割、旁边没有其他收获物的作物，因而会被立即拾取，而不是并入附近的一堆），显示拾取延迟。需要将（搬运标签页中的）拾取延迟设为大于零；"自动搬运与清扫也加延迟"设置不影响本项。默认关闭，使一次性的下令收割无需停顿即可收取。成片田地的分区清扫不受影响——它改为遵循"自动搬运与清扫也加延迟"。</HaulersDream.Setting.PickupDelayOnDirectHarvestDesc>
+<HaulersDream.Setting.HaulOversized>用货物栏携带超大物品堆</HaulersDream.Setting.HaulOversized>
+<HaulersDream.Setting.HaulOversizedDesc>当单堆物品太大、一抱拿不下时（例如一堆75的钢铁而小人只能拿72），小人会把它装进货物栏，一趟运完整堆——而不是手提一部分、把其余留下。对被命令和自动的搬运均适用；只承载储存区实际能接收的量，因此不会有物资被遗弃。</HaulersDream.Setting.HaulOversizedDesc>
+<HaulersDream.Setting.BulkHaulCorpses>尸体搬运也像其他搬运一样顺手清扫、成批带走</HaulersDream.Setting.BulkHaulCorpses>
+<HaulersDream.Setting.BulkHaulCorpsesDesc>RimWorld 用一个单独的工作来处理尸体搬运，而 Hauler's Dream 从未接管过它——所以对尸体下达搬运命令只会搬走尸体本身，而且尸体总是一趟只取一具。开启后，尸体搬运的行为与其他搬运完全一致：尸体周围散落的物品会在同一趟里被扫进搬运者的货物栏，躺在另一次搬运旁边的尸体也能顺路带走。真正能带上多少仍由承重决定：类人尸体（约 60 公斤，而上限通常约 96 公斤）通常仍会独占一趟——受益的是小型动物，现在可以几只一起带回。自动扒取不受影响：小人取走的每具尸体，仍与用手搬运的尸体完全一样被扒取。</HaulersDream.Setting.BulkHaulCorpsesDesc>
+<HaulersDream.Setting.CorpseCarryAllowance.Lab>尸体承重折算</HaulersDream.Setting.CorpseCarryAllowance.Lab>
+<HaulersDream.Setting.CorpseCarryAllowance.Off>关闭（真实重量）</HaulersDream.Setting.CorpseCarryAllowance.Off>
+<HaulersDream.Setting.CorpseCarryAllowance.Value>×{0}</HaulersDream.Setting.CorpseCarryAllowance.Value>
+<HaulersDream.Setting.CorpseCarryAllowanceDesc>在计算一趟能带走几具尸体时，把尸体当作比实际更轻。类人尸体重 60 千克，而普通殖民者的搬运上限约为 96 千克，所以两具永远装不下，死者总是一具一具地取回——这正是“我的殖民者一次只搬一具尸体”的答案。×2.0 会把一具尸体在这个上限里占用的分量减半，于是原本只能搬一具的殖民者现在能带回三具；×3.0 减到三分之一，就是四具。本就能搬两具的搬运机械体还能走得更远。调高之前请先看清这笔交易：改变的只是账面，负重丝毫未减。殖民者扛起的是每一千克真实重量——三具尸体就是实打实的 180 千克，压在一个自身只有 35 千克的身躯上——所以他会被拖慢到本模组设定的最低速度，远远超出智能超载认为划算的界限。你选择的是一趟慢的，而不是好几趟快的，这也是本项默认关闭的原因。×1.0 不改变任何东西。</HaulersDream.Setting.CorpseCarryAllowanceDesc>
+<HaulersDream.Setting.CorpseMaxHaulMass.Lab>可成批搬运的最重尸体</HaulersDream.Setting.CorpseMaxHaulMass.Lab>
+<HaulersDream.Setting.CorpseMaxHaulMass.Off>无限制</HaulersDream.Setting.CorpseMaxHaulMass.Off>
+<HaulersDream.Setting.CorpseMaxHaulMass.Value>{0} 千克</HaulersDream.Setting.CorpseMaxHaulMass.Value>
+<HaulersDream.Setting.CorpseMaxHaulMassDesc>只有重量不超过此值的尸体才会被并入批量搬运；更重的仍旧单独搬运，与以前完全一样。用它把几具轻小的动物尸体一起带回家，而沉重的仍旧一趟一具——类人尸体为 60 千克，雪牛或敲击兽则远不止于此。设为 0 表示无限制（默认值）。</HaulersDream.Setting.CorpseMaxHaulMassDesc>
+<HaulersDream.Setting.CorpseHaulHumanlike>将人的尸体纳入批量搬运</HaulersDream.Setting.CorpseHaulHumanlike>
+<HaulersDream.Setting.CorpseHaulHumanlikeDesc>默认开启。人的尸体——你的死者、访客、袭击者——会像其他尸体一样被并入批量搬运。关闭它可让人彻底不参与成批搬运：无论上面的折算与重量上限如何设置，人都始终单独搬运，而动物与机械体的尸体仍会一起带回。适合希望自己的死者一具一具地安置、却想把当天的猎获一趟带回的殖民地。</HaulersDream.Setting.CorpseHaulHumanlikeDesc>
+<HaulersDream.Setting.CorpseHaulByColonists>允许殖民者批量搬运尸体</HaulersDream.Setting.CorpseHaulByColonists>
+<HaulersDream.Setting.CorpseHaulByColonistsDesc>默认开启。关闭它可把墓地这趟活交给你的机械体或动物：殖民者仍会搬运尸体，但像原版一样一趟一具，也绝不会顺路把别的尸体一并扫走。改变的只是成批与否——没有人被禁止搬运。</HaulersDream.Setting.CorpseHaulByColonistsDesc>
+<HaulersDream.Setting.CorpseHaulByMechs>允许工作机械体批量搬运尸体</HaulersDream.Setting.CorpseHaulByMechs>
+<HaulersDream.Setting.CorpseHaulByMechsDesc>默认开启。尸体搬运属于普通的搬运工作，所以专职的搬运机械体本来就会做；它更大的承载能力意味着它能一趟带回两具人的尸体，而殖民者做不到。关闭此项后，机械体仍会搬运尸体，但像原版一样一趟一具，也绝不会顺路把别的尸体一并扫走。改变的只是成批与否——没有人被禁止搬运。它只能收窄：若“允许机械体收取和搬运”处于关闭状态，机械体无论如何都不参与。</HaulersDream.Setting.CorpseHaulByMechsDesc>
+<HaulersDream.Setting.CorpseHaulByAnimals>允许受过搬运训练的动物批量搬运尸体</HaulersDream.Setting.CorpseHaulByAnimals>
+<HaulersDream.Setting.CorpseHaulByAnimalsDesc>默认开启。训练了搬运的殖民地动物会像收集普通战利品一样，把尸体并入批量搬运。如果你更愿意让哈士奇们别去碰死者，就关闭它。它只能收窄：若“允许殖民地动物收取和搬运”处于关闭状态，动物就绝不会批量搬运任何东西，尸体也不例外。</HaulersDream.Setting.CorpseHaulByAnimalsDesc>
+<HaulersDream.Setting.SweepNearbyWhileWorking>边工作边整理——把附近的散落物品也一并收取</HaulersDream.Setting.SweepNearbyWhileWorking>
+<HaulersDream.Setting.SweepNearbyWhileWorkingDesc>当小人在拆除、采掘或收获并收取自己的产出时，也会把工作地点周围散落的其他可搬运物品拾进货物栏，从而在这一趟整合行程中清空整片区域，而不是留给单独的搬运。只取需要搬运且有处可去的物品（绝不取另一名搬运者的目标或已入库的存货），并且只取到智能超载的上限为止。</HaulersDream.Setting.SweepNearbyWhileWorkingDesc>
+<HaulersDream.Setting.HaulToStack>堆叠搬运（补充已有物品堆，共享目标格）</HaulersDream.Setting.HaulToStack>
+<HaulersDream.Setting.ConstructTether>被命令的建造作为一项任务同时搬运并建造</HaulersDream.Setting.ConstructTether>
+<HaulersDream.Setting.ConstructTetherDesc>当你右键并优先处理一项建造时，小人会搬运材料并立即建造，作为一项连续的工作。关闭＝该命令只交付材料（类似原版）；建造通过正常工作完成。用“同时建造”规划的路径无论如何都保留各自的行为。</HaulersDream.Setting.ConstructTetherDesc>
+<HaulersDream.Setting.HaulToSiteOption>显示“优先搬运材料至…”命令</HaulersDream.Setting.HaulToSiteOption>
+<HaulersDream.Setting.HaulToSiteOptionDesc>为工地备料的右键命令，甚至在工地可建造之前就可用。关闭＝隐藏该选项。</HaulersDream.Setting.HaulToSiteOptionDesc>
+<HaulersDream.Setting.PlanRoutes>启用路径规划器（“规划优先[任务]…”）</HaulersDream.Setting.PlanRoutes>
+<HaulersDream.Setting.PlanRoutesDesc>用于收获、采掘、清洁、拆除和建造路径的右键规划工具。关闭＝该菜单选项在各处都隐藏。</HaulersDream.Setting.PlanRoutesDesc>
+<HaulersDream.Setting.PlanCrafting>启用制作规划器（“规划优先制作…”）</HaulersDream.Setting.PlanCrafting>
+<HaulersDream.Setting.PlanCraftingDesc>工作台上的右键规划工具，用一趟原料行程把一个工单批量制作多次。关闭＝隐藏该菜单选项。</HaulersDream.Setting.PlanCraftingDesc>
+<HaulersDream.Setting.PlanForUnassignedWork>为未分配的小人规划工作</HaulersDream.Setting.PlanForUnassignedWork>
+<HaulersDream.Setting.PlanForUnassignedWorkDesc>开启时（默认），即使小人有能力从事该工作、但在其工作选项卡中未勾选该工作类型，仍会为其显示规划器。关闭时，对这类小人隐藏规划器，因此只为实际分配了该工作的小人显示。没有能力从事该工作的小人始终隐藏。</HaulersDream.Setting.PlanForUnassignedWorkDesc>
+<HaulersDream.Setting.BatchByDefault>新工单默认批量</HaulersDream.Setting.BatchByDefault>
+<HaulersDream.Setting.BatchByDefaultDesc>从现在起你添加的制作和烹饪工单以“批量”模式开始：殖民者一趟取来整批原料，在工作台前一次全部制作（工作期间食物不会腐烂），然后把一切搬到储存区。仅影响新添加的工单——已有的工单保持当前设置。</HaulersDream.Setting.BatchByDefaultDesc>
+  <HaulersDream.Setting.AllowBatchUnderCommonSense>即使启用了常识（Common Sense）也进行批量制作</HaulersDream.Setting.AllowBatchUnderCommonSense>
+  <HaulersDream.Setting.AllowBatchUnderCommonSenseDesc>默认开启。让你标记为批量制作的工单在常识（Common Sense）启用时仍能批量制作，而不是一次只做一件。批量制作使用其自己独立的工作，因此不会与常识的“先清扫”和“搬运全部原料”功能相冲突。关闭此项可将所有烹饪和制作全部交给常识处理，届时工单菜单中的批量选项将会消失。</HaulersDream.Setting.AllowBatchUnderCommonSenseDesc>
+<HaulersDream.Setting.DefaultBatchSize>默认批量大小：{0}</HaulersDream.Setting.DefaultBatchSize>
+<HaulersDream.Batch.MenuPrefix>批量</HaulersDream.Batch.MenuPrefix>
+<HaulersDream.Batch.SetSize>批量大小：{0}…</HaulersDream.Batch.SetSize>
+<HaulersDream.Batch.RowMarker>×{0} </HaulersDream.Batch.RowMarker>
+<HaulersDream.Batch.SizeDialogTitle>批量大小——{0}</HaulersDream.Batch.SizeDialogTitle>
+<HaulersDream.Batch.SizeLabel>每批最多制作 {0} 个</HaulersDream.Batch.SizeLabel>
+<HaulersDream.Batch.SizeDesc>殖民者一趟取来整批原料，在工作台前一次全部制作（工作期间原料不会腐烂），然后把一切搬到储存区。受可用材料和工单自身数量的限制。</HaulersDream.Batch.SizeDesc>
+<HaulersDream.Setting.HaulToStackDesc>搬运者更倾向于把物品加进已有的部分物品堆，而不是新起一堆——这是在游戏已选定的储存房间之内进行的（哪个储存区胜出仍由优先级和距离决定）。对地面、货架和模组储存单元均有效。室外储存则改为扫描短半径内的附近储存区。目标格也不再被预定，因此多名搬运者可同时向同一格交付，而不是把一种物品分散到十个格子里。</HaulersDream.Setting.HaulToStackDesc>
+<HaulersDream.Setting.AutoStripHeader>搬运尸体的同时自动扒取——当殖民者搬运一具尸体时，会在途中扒下尸体上的衣物，战利品随搬运者的货物栏一起运走（无需单独的扒取任务，无需第二趟）：</HaulersDream.Setting.AutoStripHeader>
+<HaulersDream.Setting.AutoStripMode>搬运时自动扒取：{0}</HaulersDream.Setting.AutoStripMode>
+<HaulersDream.Setting.AutoStripAll>每次尸体搬运都扒取（储存区、坟墓、火化、屠宰）</HaulersDream.Setting.AutoStripAll>
+<HaulersDream.Setting.AutoStripDisposal>仅在处置类搬运时扒取（坟墓、石棺、火化、屠宰——不含普通的储存区搬运）</HaulersDream.Setting.AutoStripDisposal>
+<HaulersDream.Setting.AutoStripOff>从不——搬运时不扒取（原版行为）</HaulersDream.Setting.AutoStripOff>
+<HaulersDream.Setting.AutoStripCrossRef>“从不”只关闭这个搬运时顺手扒取的捷径。它并不会停止搬运扒下的装备：你手动下达的扒取命令仍正常执行，其掉落的武器和衣物仍会被收取并搬回家——这由下方另一个独立的“扒取——移除的装备”工作开关控制（在更下方的“从这些种类的工作中收取产出”之下）。</HaulersDream.Setting.AutoStripCrossRef>
+<HaulersDream.Setting.StripColonists>同时扒取玩家派系的尸体</HaulersDream.Setting.StripColonists>
+<HaulersDream.Setting.StripColonistsDesc>此项关闭时（默认），你自己的死者——殖民者和殖民地动物——会保留其装备与尊严；只有陌生人和敌人才会被搜刮。</HaulersDream.Setting.StripColonistsDesc>
+<HaulersDream.Setting.TaintedSmeltable>污损的服装（可熔炼）：{0}</HaulersDream.Setting.TaintedSmeltable>
+<HaulersDream.Setting.TaintedNonSmeltable>污损的服装（不可熔炼）：{0}</HaulersDream.Setting.TaintedNonSmeltable>
+<HaulersDream.Setting.TaintedTake>取走它（出售、穿着或熔炼）</HaulersDream.Setting.TaintedTake>
+<HaulersDream.Setting.TaintedLeave>留在尸体上，任何剥取都不会把它脱下，手动下达的剥取命令也一样（火化会随尸体一同烧掉；屠宰则像原版那样把它丢在工作台旁）</HaulersDream.Setting.TaintedLeave>
+<HaulersDream.Setting.TaintedForbid>丢下并禁用它</HaulersDream.Setting.TaintedForbid>
+<HaulersDream.Setting.TaintedDestroy>当场销毁它（任务物品和圣物会被取走，绝不销毁）</HaulersDream.Setting.TaintedDestroy>
+<HaulersDream.Setting.HaulTamedSlaughter>把屠宰的尸体搬到储存区</HaulersDream.Setting.HaulTamedSlaughter>
+<HaulersDream.Setting.HaulTamedSlaughterDesc>当殖民者屠宰完一只殖民地动物后，新鲜的尸体会被直接搬到储存区（冷库或尸体储存区），免得它倒在原地腐烂——前提是有可到达的储存点能接收它，否则就完全保持原版状态。（原版从不自己搬运被屠宰的动物；这弥补了那个缺口。）</HaulersDream.Setting.HaulTamedSlaughterDesc>
+<HaulersDream.Setting.HaulWildKills>把猎杀的尸体搬到储存区</HaulersDream.Setting.HaulWildKills>
+<HaulersDream.Setting.HaulWildKillsDesc>当一次狩猎在击杀后随即被打断——猎人因某项需求、征召、精神崩溃被拉走，或狩猎超时——猎人会在离开途中迅速把新鲜的尸体搬到储存区，而不是把它留给缓慢的通用搬运队列。在一次干净利落的狩猎中，猎人本就会把猎物带回家（原版），因此这不会碍事——不会重复搬运。仅在有可到达的储存点能接收尸体时才搬运；否则尸体就完全保持原版状态（绝不会被禁用，因此一旦出现能接收它的冷库或尸体储存区，正常的尸体搬运仍会去收）。</HaulersDream.Setting.HaulWildKillsDesc>
+<HaulersDream.Setting.ButcherSpoilingFirst>优先屠宰最临近腐烂的尸体</HaulersDream.Setting.ButcherSpoilingFirst>
+<HaulersDream.Setting.ButcherSpoilingFirstDesc>当殖民者为一项屠宰工单挑选尸体时，会从工单本就允许的尸体中（在其原料搜索范围内）选择最临近腐烂的那具，而不只是最近的那具——这样肉就能在腐烂前回收。只重新排序使用哪具本就合格的尸体；绝不改变配方、搜索范围或工单接受哪些尸体。冷冻的尸体留到最后（它们不会腐烂）。对普通屠宰工单和 Hauler's Dream 批量均适用。默认开启。</HaulersDream.Setting.ButcherSpoilingFirstDesc>
+<HaulersDream.Setting.CookSpoilingFirst>优先用最临近腐烂的食物烹饪</HaulersDream.Setting.CookSpoilingFirst>
+<HaulersDream.Setting.CookSpoilingFirstDesc>当殖民者为一项烹饪工单挑选易腐原料（肉、蔬菜及其他会腐烂的食物——不含尸体）时，会从工单本就允许的原料中（在其原料搜索范围内）选择最临近腐烂的那一堆，而不只是最近的那一堆——这样食物就能在腐烂前被吃掉。只重新排序使用哪份本就合格的原料；绝不改变配方、搜索范围，也不影响非易腐的制作（钢铁、布料等不受影响）。冷冻的食物留到最后。对普通烹饪工单和 Hauler's Dream 批量均适用。默认开启。</HaulersDream.Setting.CookSpoilingFirstDesc>
+  <HaulersDream.Setting.CookMostStockFirst>优先使用库存最多的食材烹饪</HaulersDream.Setting.CookMostStockFirst>
+  <HaulersDream.Setting.CookMostStockFirstDesc>当殖民者为烹饪配方挑选食材时，会优先选择殖民地库存最多的食物，从而消耗过剩物资并保留稀缺食材（无需再手动禁止）。仅调整已符合条件的食材的使用顺序；不会改变配方、搜索半径或配方接受的食材，且仅影响烹饪（布料、皮革、钢铁等制作不受影响）。当同时启用“优先使用最易腐烂的食物”时，本选项优先，因此会先用充足的冷冻农产品而非稀缺的新鲜食物；若你更希望按新鲜度烹饪，请关闭此项。默认关闭。</HaulersDream.Setting.CookMostStockFirstDesc>
+<HaulersDream.Setting.Overload>智能超载：{0}</HaulersDream.Setting.Overload>
+<HaulersDream.Setting.OverloadDesc>小人会超过其最大质量的100%来携带材料以减少往返，但越超载移动越慢——并且只在更少的往返确实值得那点减速时才这么做（对排队的建造/制作工作也是如此）。向左滑＝更轻的减速＋更大的载量，向右＝更重的减速＋更小的载量。</HaulersDream.Setting.OverloadDesc>
+<HaulersDream.Overload.Free>不减速——自由携带</HaulersDream.Overload.Free>
+<HaulersDream.Overload.Fair>适中（平衡）</HaulersDream.Overload.Fair>
+<HaulersDream.Overload.Off>关闭——绝不超载</HaulersDream.Overload.Off>
+<HaulersDream.Overload.Eager>积极超载</HaulersDream.Overload.Eager>
+<HaulersDream.Overload.Cautious>谨慎</HaulersDream.Overload.Cautious>
+<HaulersDream.Setting.StrictCarryWeight>严格携带质量（不超载）</HaulersDream.Setting.StrictCarryWeight>
+<HaulersDream.Setting.StrictCarryWeightDesc>开启时，小人绝不携带超过其最大质量的100%，也绝不在装满时中断工作去卸载——它会继续收获，把多余的留在地上交给正常搬运（路过时顺手拾取）。关闭时（默认），小人按上方滑块超载，装满后即前去卸载。</HaulersDream.Setting.StrictCarryWeightDesc>
+<HaulersDream.Setting.KeepWorkingWhenFull>装满时继续工作（不中断去卸载）</HaulersDream.Setting.KeepWorkingWhenFull>
+<HaulersDream.Setting.KeepWorkingWhenFullDesc>默认关闭。开启时，在采掘、收获或拆除时装满的小人不会中断工作去卸载——它会继续工作，再也装不下的产出留在地上交给正常搬运。它仍会在工作结束时、用餐/睡眠/娱乐前后、按间隔卸载，并且（与严格携带质量不同）它仍会超过100%超载，直到智能超载上限。它只在划算时才中途卸下货物——即在走向一个较远的下一个工作目标之前（当储存区比下一个任务更近，且差距达到下方的余量时）。专门的搬运/装载任务在装满时仍会交付其载量。独立于严格携带质量：此项保留超载并积攒的行为，只是停止“装满→立刻去倾倒”的中断。</HaulersDream.Setting.KeepWorkingWhenFullDesc>
+<HaulersDream.Setting.KeepWorkingMargin>仅当转移至少远这么多时才在转移前卸载：{0} 格</HaulersDream.Setting.KeepWorkingMargin>
+<HaulersDream.Setting.KeepWorkingMarginDesc>“装满时继续工作”规则的滞后量：一个装满且超载的小人，只在其下一个工作目标比储存区卸货点至少远这么多格时，才在前往途中绕道去卸载。值越高＝小人在距离大致相等的更宽区间内会继续带着货物（绕道更少）；0＝只要下一个目标哪怕比储存区稍远一点，它就先去卸载。</HaulersDream.Setting.KeepWorkingMarginDesc>
+<HaulersDream.Setting.RouteMaxAmount>规划路径——“数量”滑块的顶端：{0} 站</HaulersDream.Setting.RouteMaxAmount>
+<HaulersDream.Setting.RouteCalcHeader>路径计算（默认值——可在路径对话框中按目标类型分别覆盖）</HaulersDream.Setting.RouteCalcHeader>
+<HaulersDream.Setting.RouteSelection>选择方式：{0}</HaulersDream.Setting.RouteSelection>
+<HaulersDream.Setting.RouteDistance>距离基准：{0}</HaulersDream.Setting.RouteDistance>
+<HaulersDream.Setting.RouteOrderEffort>精确求解访问顺序的上限：{0} 站</HaulersDream.Setting.RouteOrderEffort>
+<HaulersDream.Setting.OpportunisticUnload>路过储存区时顺手卸货</HaulersDream.Setting.OpportunisticUnload>
+<HaulersDream.Setting.OpportunisticUnloadDesc>当一个带着收取货物的小人为其下一个任务出发踏上长途，而某个储存区大致在途中时，它会路过时把货物卸下，而不是带着它横跨整张地图、之后再单独跑一趟。</HaulersDream.Setting.OpportunisticUnloadDesc>
+<HaulersDream.Stat.Overload>Hauler's Dream——超载</HaulersDream.Stat.Overload>
+<HaulersDream.Stat.MechCarryCapacity>Hauler's Dream——携带量</HaulersDream.Stat.MechCarryCapacity>
+<HaulersDream.Setting.WorkOverrideHeader>无工作能力覆盖（关闭＝原版）：</HaulersDream.Setting.WorkOverrideHeader>
+<HaulersDream.Setting.AllCanHaul>所有小人都能搬运</HaulersDream.Setting.AllCanHaul>
+<HaulersDream.Setting.AllCanHaulDesc>没有任何背景故事、特性、基因、皇室头衔、意识形态角色、健康状况或任务限制能让小人无法搬运。适用于工作选项卡、右键优先处理、自动工作以及本模组的规划器。（启用后请分配一个工作优先级——新获得能力的小人初始未分配，和任何其他工作一样。）</HaulersDream.Setting.AllCanHaulDesc>
+<HaulersDream.Setting.AllCanClean>所有小人都能清洁</HaulersDream.Setting.AllCanClean>
+<HaulersDream.Setting.AllCanCleanDesc>没有任何无能力能让小人无法清洁。适用于工作选项卡、右键优先处理、自动工作以及本模组的规划器（包括“规划优先清洁”）。（启用后请分配一个工作优先级——新获得能力的小人初始未分配。）</HaulersDream.Setting.AllCanCleanDesc>
+<HaulersDream.Setting.AllCanCutPlants>所有小人都能砍伐植物</HaulersDream.Setting.AllCanCutPlants>
+<HaulersDream.Setting.AllCanCutPlantsDesc>没有任何无能力能让小人无法砍伐植物。只启用砍伐植物工作——播种（种植）仍由小人的真实能力管辖。</HaulersDream.Setting.AllCanCutPlantsDesc>
+<HaulersDream.Setting.PauseWhileDrafted>被征召时暂停</HaulersDream.Setting.PauseWhileDrafted>
+<HaulersDream.Setting.AllowMechanoids>允许机械体收取和搬运</HaulersDream.Setting.AllowMechanoids>
+<HaulersDream.AllowMechanoidsDesc>管辖你的工作机械体是否使用 Hauler's Dream 的收取和批量搬运——像殖民者一样把产出和战利品装进它们的货物栏。这涵盖收取机械体自身工作产出的物资：收获/砍伐的植物、采掘的矿石和碎块，以及拆除残料（机械体拆掉一处结构时释放的材料）。这并不会改变原版机械体的工作本身：一个工作机械体仍自行采掘、收获和拆除——此开关只决定它是否还把成果收进货物栏以进行整合搬运。机械体如何向工地交付材料是另一回事，由上方的“用货物栏为单个大型建造携带材料”设置管辖（该设置适用于任何建造者，机械体或殖民者）；此开关本身不改变建造交付。开启时，玩家的工作机械体也可在智能超载设置下超过100%容量携带，并像殖民者一样因此减速。</HaulersDream.AllowMechanoidsDesc>
+<HaulersDream.AllowAnimals>允许殖民地动物收取和搬运</HaulersDream.AllowAnimals>
+<HaulersDream.AllowAnimalsDesc>默认关闭。开启时，训练了搬运的殖民地动物会一次携带多堆物品——把附近的战利品拾进货物栏并执行 Hauler's Dream 的批量搬运，而不是一趟一堆。这只会影响能被训练搬运的动物：具有高级可训练度且体型足够大的（哈士奇、拉布拉多、大象、熊、敲击兽等）。无法被训练搬运的动物——家政猫之类——根本不会执行搬运任务（无论此设置如何均是如此），因此不受此开关影响。只动你自己的殖民地动物；野生和敌方动物绝不受影响。</HaulersDream.AllowAnimalsDesc>
+<HaulersDream.Setting.AllowIncapable>让无法搬运的小人也能拾取和搬运</HaulersDream.Setting.AllowIncapable>
+<HaulersDream.Setting.EnableOnNonHomeMaps>也在商队/非主基地地图上工作</HaulersDream.Setting.EnableOnNonHomeMaps>
+<HaulersDream.Setting.HideGizmo>显示每个小人的“卸载货物栏”按钮</HaulersDream.Setting.HideGizmo>
+<HaulersDream.Setting.UnloadGrace>积攒窗口：在最后一次拾取后，继续拾取 {0} tick（约60/秒）再去卸载。值越高＝小人超载越多、往返更少更大；它们一旦装满仍会立即卸载（超载上限）。</HaulersDream.Setting.UnloadGrace>
+<HaulersDream.Setting.IntervalUnload>间隔卸载：每 {0} 游戏小时</HaulersDream.Setting.IntervalUnload>
+<HaulersDream.Setting.IntervalUnloadOff>间隔卸载：关闭（仅在工作结束/用餐和娱乐/超重/手动时）</HaulersDream.Setting.IntervalUnloadOff>
+<HaulersDream.Setting.AlertCannotUnload>当小人无法卸载其货物栏时发出警告（红色警报）</HaulersDream.Setting.AlertCannotUnload>
+<HaulersDream.Setting.AlertCannotUnloadDesc>当一名或多名小人携带着无法收起的收取物品时，在右下角显示一个类似“着火！”的关键警报——要么地图上没有任何地方能储存它们（没有储存区/倾倒区/可到达的格子），要么它们携带物品太久仍未卸载（储存区无法到达，或另一个模组不断取消搬运/卸载任务）。一个警报涵盖所有受影响的小人；悬停可用箭头指出它们，点击可在它们之间循环。这是你的保证，让货物栏绝不会悄悄变成“黑洞”。</HaulersDream.Setting.AlertCannotUnloadDesc>
+<HaulersDream.Setting.AlertStuckHours>…在小人携带未卸载物品达 {0} 游戏小时后标记它</HaulersDream.Setting.AlertStuckHours>
+<HaulersDream.Setting.VerboseLogging>详细调试日志</HaulersDream.Setting.VerboseLogging>
+<HaulersDream.Gizmo.UnloadNow>卸载货物栏</HaulersDream.Gizmo.UnloadNow>
+<HaulersDream.Gizmo.UnloadNowDesc>让这个小人把它收取的一切搬到最近的有效储存区。</HaulersDream.Gizmo.UnloadNowDesc>
+<HaulersDream.Gizmo.UnloadNowDrafted>已征召：取消征召该小人以卸载。</HaulersDream.Gizmo.UnloadNowDrafted>
+<HaulersDream.Gizmo.AutoHaul>自动搬运产出</HaulersDream.Gizmo.AutoHaul>
+<HaulersDream.Gizmo.AutoHaulDesc>开启时，这个小人会在工作时自动收取自己的工作产出，并把附近的战利品清扫进货物栏。关闭它即可阻止这个小人自动搬运——它仍会收起任何已经携带的东西。</HaulersDream.Gizmo.AutoHaulDesc>
+<HaulersDream.Gizmo.BenchGather>收集原料</HaulersDream.Gizmo.BenchGather>
+<HaulersDream.Gizmo.BenchGatherDescActive>当由 Hauler's Dream 负责收集时，小人在制作前会一次性把这个工作台工单所需的原料收进货物栏。\n\n为这个工作台关闭它，改用 RimWorld 自己的行为：小人一次只搬一堆直接送到工作台，并立刻开始工单。当原料本来就在工作台旁边时这样更快，因为那次收集是一个独立的工作——小人走回工作台把它做完，要等到下一次找活时才会重新接手这个工单。\n\n只影响这个工作台，并且同样涵盖批量制作：在这个工作台上设为“批量”的工单会改成一次做一个。其他工作台不受影响。</HaulersDream.Gizmo.BenchGatherDescActive>
+<HaulersDream.Gizmo.BenchGatherDescInactive>小人不会把这个工作台工单所需的原料收进货物栏。这个工作台使用 RimWorld 自己的行为：小人一次只搬一堆直接送到工作台并立刻开始工单，当原料本来就在附近时这样更快。\n\n这个工作台的批量制作同样关闭，所以在这里设为“批量”的工单会一次做一个。\n\n重新打开它即可让小人再次一次性收集所有原料。只影响这个工作台。</HaulersDream.Gizmo.BenchGatherDescInactive>
+<HaulersDream.Notice.ForeignModGathers>目前是 {0} 在收集工单原料，而不是 Hauler's Dream。在那个模组负责期间，Hauler's Dream 会完全让位，它的任何收集选项——包括这一项——都无法改变你看到的行为。要停止收集，请关闭那个模组自己的选项：“{1}”。</HaulersDream.Notice.ForeignModGathers>
+<HaulersDream.Notice.GatherOffGlobally>Hauler's Dream 自己的一次性收集已在模组选项中关闭（“{0}”），因此它不会在任何工作台为普通制作工单收集原料。此按钮仍然控制这里的批量制作，以及把原料搬到更近处的绕行。</HaulersDream.Notice.GatherOffGlobally>
+<HaulersDream.Alert.CannotUnload>无法卸载货物栏（{0}）</HaulersDream.Alert.CannotUnload>
+<HaulersDream.Alert.CannotUnloadDesc.NoStorage>这些小人携带着无处存放的收取物品——地图上没有储存区或倾倒区接收它们，也找不到可到达的地点。请添加一个储存区（倾倒储存区可接收岩石碎块和大多数废料），或在已有储存区上允许它们的物品类型：\n\n{0}\n\n在此之前，小人会把这些物品放在它们工作的地方——只要有空位就放在住宅区内——而不是一直随身携带。点击此警报可循环切换到这些小人；悬停可指出它们。</HaulersDream.Alert.CannotUnloadDesc.NoStorage>
+<HaulersDream.Alert.CannotUnloadDesc.Stuck>这些小人已经携带收集到的物品很久却没有卸下。通常的原因是，从他们所在的位置没有可到达且允许存放的仓库能接收这些物品，所以请先检查这一点：\n\n{0}\n\n如果仓库看起来没问题，可能是某个会打断工作的模组（例如不断发出新命令的自动施法或自动工作模组）在他们卸货完成前取消了卸货。注意：Hauler's Dream 官方支持的模组，例如 Simple Sidearms、Smart Medicine、Combat Extended、Grab Your Tool、Item Policy 和 Compositable Loadouts，都不是原因，不应将其禁用；它们要保留的物品已被排除在卸货之外。点击此警报可在这些小人之间切换；悬停可标示他们。</HaulersDream.Alert.CannotUnloadDesc.Stuck>
+<HaulersDream.Alert.WorkGiverQuarantined>因反复出错而停用了某类工作（{0}）</HaulersDream.Alert.WorkGiverQuarantined>
+<HaulersDream.Alert.WorkGiverQuarantinedDesc>在 RimWorld 挑选工作时，有东西反复出错，而且出错的位置是 RimWorld 并未加以保护的地方。若置之不理，你的殖民者将完全不做任何工作——他们照常吃饭睡觉，所以看起来像是偷懒，而不像是出了错。\n\nHauler's Dream 只停用了受影响的那类工作，其余一切照常运行：\n\n{0}\n\n在起因被修复或移除之前，这类工作不会再自动进行。你仍然可以手动指派：右键点击优先安排它依旧能派出一次工作，因为 RimWorld 会直接生成那条命令，不经过 Hauler's Dream 使用的那道检查——只是殖民者做完之后不会自己继续做下去。\n\n如果上面某一行指出了某个模组，请附上你的日志向该模组反馈。如果某一行写着无法确定来源，那么完整的错误信息就在日志里——把日志附在报告中，才有可能查明来源。重启游戏后该列表会清空。</HaulersDream.Alert.WorkGiverQuarantinedDesc>
+<HaulersDream.Alert.QuarantineLine.KnownSource>{0} — 最可能的来源：{1}</HaulersDream.Alert.QuarantineLine.KnownSource>
+<HaulersDream.Alert.QuarantineLine.UnknownSource>{0} — 无法从错误信息中确定来源，请查看日志</HaulersDream.Alert.QuarantineLine.UnknownSource>
+<HaulersDream.PlanRoute.Option>规划优先{0}…</HaulersDream.PlanRoute.Option>
+<HaulersDream.PlanRoute.ConstructGerund>建造</HaulersDream.PlanRoute.ConstructGerund>
+<HaulersDream.PlanRoute.MiningGerundFallback>采掘</HaulersDream.PlanRoute.MiningGerundFallback>
+<HaulersDream.PlanRoute.Title>规划路径：{0}</HaulersDream.PlanRoute.Title>
+<HaulersDream.PlanRoute.ModeChained>链式——最近的若干个</HaulersDream.PlanRoute.ModeChained>
+<HaulersDream.PlanRoute.ModeChainedDesc>从你点选的那个开始，规划所选数量的最近的同类目标。</HaulersDream.PlanRoute.ModeChainedDesc>
+<HaulersDream.PlanRoute.ModeVein>相连——整条矿脉</HaulersDream.PlanRoute.ModeVein>
+<HaulersDream.PlanRoute.ModeVeinDesc>从你点选的那个向外，规划相连成片的同类目标簇（一条矿脉、一片植物），直到所选数量。</HaulersDream.PlanRoute.ModeVeinDesc>
+<HaulersDream.PlanRoute.ModeRadius>半径内</HaulersDream.PlanRoute.ModeRadius>
+<HaulersDream.PlanRoute.ModeRadiusDesc>规划你点选的那个所选半径内的每一个同类目标。</HaulersDream.PlanRoute.ModeRadiusDesc>
+<HaulersDream.PlanRoute.ModeRooms>房间内</HaulersDream.PlanRoute.ModeRooms>
+<HaulersDream.PlanRoute.ModeRoomsDesc>规划所选房间内的每一个同类目标。包含你点选的目标所在的房间始终被纳入；在下方挑选更多房间。注意：开阔的户外算作一个大区域，受数量上限约束。</HaulersDream.PlanRoute.ModeRoomsDesc>
+<HaulersDream.PlanRoute.ModeZone>整个种植区</HaulersDream.PlanRoute.ModeZone>
+<HaulersDream.PlanRoute.ModeZoneDesc>规划所点选植物所在种植区内的每一个同类目标——一键打理整片田地。对于收获，成熟度门槛和生长阈值仍适用。</HaulersDream.PlanRoute.ModeZoneDesc>
+<HaulersDream.PlanRoute.PickRooms>挑选房间…</HaulersDream.PlanRoute.PickRooms>
+<HaulersDream.PlanRoute.PickRoomsStop>挑选完成（点击房间内部以添加）</HaulersDream.PlanRoute.PickRoomsStop>
+<HaulersDream.PlanRoute.RoomsHeader>房间：{0}</HaulersDream.PlanRoute.RoomsHeader>
+<HaulersDream.PlanRoute.RoomGone>（房间已不存在）</HaulersDream.PlanRoute.RoomGone>
+<HaulersDream.PlanRoute.RadiusLabel>半径：{0} 格</HaulersDream.PlanRoute.RadiusLabel>
+<HaulersDream.PlanRoute.Amount>数量：{0}</HaulersDream.PlanRoute.Amount>
+<HaulersDream.PlanRoute.VeinAll>全部</HaulersDream.PlanRoute.VeinAll>
+<HaulersDream.PlanRoute.MaxTravel>最大行程：{0}</HaulersDream.PlanRoute.MaxTravel>
+<HaulersDream.PlanRoute.MaxTravelNoLimit>无限制</HaulersDream.PlanRoute.MaxTravelNoLimit>
+<HaulersDream.PlanRoute.Smart>智能路径（绕回储存区）</HaulersDream.PlanRoute.Smart>
+<HaulersDream.PlanRoute.SmartDesc>排列各站顺序，使整趟行程——采集目标并返回货物应归属的储存区——尽可能短，并在该储存区旁结束路径。关闭此项时，各站仅按最短采集路径排序。</HaulersDream.PlanRoute.SmartDesc>
+<HaulersDream.PlanRoute.AllowHarvest>允许收获未标记的植物</HaulersDream.PlanRoute.AllowHarvest>
+<HaulersDream.PlanRoute.AllowHarvestDesc>即便你尚未将附近的同类植物标记为收获，也把它们一并纳入路径——只要它们至少达到下方的生长阈值。让你一键收获一整片足够成熟的作物。关闭此项时，路径只涵盖已标记为收获的植物。</HaulersDream.PlanRoute.AllowHarvestDesc>
+<HaulersDream.PlanRoute.GrowthThreshold>生长阈值：{0}%</HaulersDream.PlanRoute.GrowthThreshold>
+<HaulersDream.PlanRoute.PickStart>挑选必含目标…</HaulersDream.PlanRoute.PickStart>
+<HaulersDream.PlanRoute.PickStop>挑选完成（点击地图以添加）</HaulersDream.PlanRoute.PickStop>
+<HaulersDream.PlanRoute.PickHeader>必含：{0}</HaulersDream.PlanRoute.PickHeader>
+<HaulersDream.PlanRoute.PickRoleHint>把某个目标标为 S（起点）或 E（终点），以固定路径的起止位置——否则每个目标都会被放在最短的位置。</HaulersDream.PlanRoute.PickRoleHint>
+<HaulersDream.PlanRoute.PickStartBtn>始</HaulersDream.PlanRoute.PickStartBtn>
+<HaulersDream.PlanRoute.PickEndBtn>终</HaulersDream.PlanRoute.PickEndBtn>
+<HaulersDream.PlanRoute.PickStartBadge>（起点）</HaulersDream.PlanRoute.PickStartBadge>
+<HaulersDream.PlanRoute.PickEndBadge>（终点）</HaulersDream.PlanRoute.PickEndBadge>
+<HaulersDream.PlanRoute.PickStartTip>把这里设为路径的起点——小人造访的第一站。再次点击可清除。</HaulersDream.PlanRoute.PickStartTip>
+<HaulersDream.PlanRoute.PickEndTip>把这里设为路径的终点——最后一站，就在返回储存区之前。再次点击可清除。</HaulersDream.PlanRoute.PickEndTip>
+<HaulersDream.PlanRoute.Selection>选择：{0}</HaulersDream.PlanRoute.Selection>
+<HaulersDream.PlanRoute.DistanceBasis>距离：{0}</HaulersDream.PlanRoute.DistanceBasis>
+<HaulersDream.PlanRoute.SelMostStops>每段行程内站点最多</HaulersDream.PlanRoute.SelMostStops>
+<HaulersDream.PlanRoute.SelNearest>离所点选目标最近</HaulersDream.PlanRoute.SelNearest>
+<HaulersDream.PlanRoute.DistStraight>直线</HaulersDream.PlanRoute.DistStraight>
+<HaulersDream.PlanRoute.DistWalking>真实步行路径</HaulersDream.PlanRoute.DistWalking>
+<HaulersDream.PlanRoute.FogCaution>注意：并非所有矿脉物品都可见。随着你采掘并揭开更多，路径会延伸以一并涵盖它们。</HaulersDream.PlanRoute.FogCaution>
+<HaulersDream.PlanRoute.Estimate>预计时间：约 {0} 小时（{1} 站，约 {2} 格采集）</HaulersDream.PlanRoute.Estimate>
+<HaulersDream.PlanRoute.Cells>{0} 格</HaulersDream.PlanRoute.Cells>
+<HaulersDream.PlanRoute.EstimateLimited>——已削减至行程上限</HaulersDream.PlanRoute.EstimateLimited>
+<HaulersDream.PlanRoute.EstimateUnreachable>——部分目标无法到达</HaulersDream.PlanRoute.EstimateUnreachable>
+<HaulersDream.PlanRoute.EstimateNone>此路径没有可到达的站点。</HaulersDream.PlanRoute.EstimateNone>
+<HaulersDream.PlanRoute.Append>追加</HaulersDream.PlanRoute.Append>
+<HaulersDream.PlanRoute.Replace>替换</HaulersDream.PlanRoute.Replace>
+<HaulersDream.PlanRoute.Cancel>取消</HaulersDream.PlanRoute.Cancel>
+<HaulersDream.PlanRoute.NoTargets>附近没有可规划的目标。</HaulersDream.PlanRoute.NoTargets>
+<HaulersDream.PlanRoute.WaitingForMaterials>路径已设定——蓝图将在材料到位时建造。</HaulersDream.PlanRoute.WaitingForMaterials>
+<HaulersDream.PlanRoute.NoMaterials>（材料不可用）</HaulersDream.PlanRoute.NoMaterials>
+<HaulersDream.PlanRoute.Planned>已规划一条 {0} 站的路径。</HaulersDream.PlanRoute.Planned>
+<HaulersDream.PlanRoute.Capped>已规划一条 {0} 站的路径（已封顶以保持高效）。</HaulersDream.PlanRoute.Capped>
+<HaulersDream.PlanRoute.DistanceLimited>已规划一条 {0} 站的路径（已削减至行程上限）。</HaulersDream.PlanRoute.DistanceLimited>
+<HaulersDream.PlanRoute.Partial>已规划一条 {0} 站的路径（附近有 {1} 个无法到达）。</HaulersDream.PlanRoute.Partial>
+<HaulersDream.PlanCraft.Option>规划优先制作…</HaulersDream.PlanCraft.Option>
+<HaulersDream.PlanCraft.Title>规划制作：{0}</HaulersDream.PlanCraft.Title>
+<HaulersDream.PlanCraft.NoBills>这里没有可批量的工单。添加一个生产工单（烹饪、药物、简单零件——不含需要未完成物品的工单）即可规划一个批量。</HaulersDream.PlanCraft.NoBills>
+<HaulersDream.PlanCraft.Repeat>重复：{0} 次</HaulersDream.PlanCraft.Repeat>
+<HaulersDream.PlanCraft.Timeout>超时：{0}小时</HaulersDream.PlanCraft.Timeout>
+<HaulersDream.PlanCraft.TimeoutOff>超时：无</HaulersDream.PlanCraft.TimeoutOff>
+<HaulersDream.PlanCraft.RepeatBoxTip>直接输入精确的重复次数。可以填写超过当前材料所能支持的数量（目前为 {0} 次）——批量会自动缩减到实际可行的次数，原因显示在下方。</HaulersDream.PlanCraft.RepeatBoxTip>
+<HaulersDream.PlanCraft.TimeoutBoxTip>直接输入精确的超时时长（小时，{0}–{1}）。输入完成后会取整到最近的半小时；0 表示不限时。</HaulersDream.PlanCraft.TimeoutBoxTip>
+<HaulersDream.PlanCraft.Resolved>将一次制作 {0} 个。</HaulersDream.PlanCraft.Resolved>
+<HaulersDream.PlanCraft.ResolvedTrimmed>将一次制作 {0} 个——{1}。</HaulersDream.PlanCraft.ResolvedTrimmed>
+<HaulersDream.PlanCraft.LimitResources>受可用原料限制</HaulersDream.PlanCraft.LimitResources>
+<HaulersDream.PlanCraft.LimitMass>受小人可携带量限制</HaulersDream.PlanCraft.LimitMass>
+<HaulersDream.PlanCraft.LimitTimeout>受超时限制</HaulersDream.PlanCraft.LimitTimeout>
+<HaulersDream.PlanCraft.LimitBillRepeat>受工单的剩余数量限制</HaulersDream.PlanCraft.LimitBillRepeat>
+<HaulersDream.PlanCraft.Ingredients>携带：{0}</HaulersDream.PlanCraft.Ingredients>
+<HaulersDream.PlanCraft.IngredientsMixed>携带多种原料的混合（每次制作时选定，启用时优先最易腐的）。</HaulersDream.PlanCraft.IngredientsMixed>
+<HaulersDream.PlanCraft.EstTime>制作时间：约 {0}小时（外加取料行程；产品随后会被搬到最佳储存区）</HaulersDream.PlanCraft.EstTime>
+<HaulersDream.PlanCraft.Infeasible>无法批量此项：{0}</HaulersDream.PlanCraft.Infeasible>
+<HaulersDream.PlanCraft.Confirm>优先处理</HaulersDream.PlanCraft.Confirm>
+<HaulersDream.PlanCraft.Cancel>取消</HaulersDream.PlanCraft.Cancel>
+<HaulersDream.PlanCraft.Started>正在批量制作 {0}× {1}。</HaulersDream.PlanCraft.Started>
+<HaulersDream.PlanCraft.CouldNotStart>无法开始批量（工作台可能正在使用）。</HaulersDream.PlanCraft.CouldNotStart>
+<HaulersDream.PlanCraft.JobReport>正在制作 {0}（批次 {1}/{2}）。</HaulersDream.PlanCraft.JobReport>
+<HaulersDream.PlanCraft.BlockUnsupported>此配方无法批量</HaulersDream.PlanCraft.BlockUnsupported>
+<HaulersDream.PlanCraft.BlockNoIngredient>没有可用于 {0} 的原料</HaulersDream.PlanCraft.BlockNoIngredient>
+<HaulersDream.PlanCraft.BlockNoReps>资源不足，连一轮都不够</HaulersDream.PlanCraft.BlockNoReps>
+<HaulersDream.PlanCraft.BlockBillNotActive>该工单已暂停或已满足</HaulersDream.PlanCraft.BlockBillNotActive>
+<HaulersDream.HaulToSite.Option>优先搬运材料至 {0}</HaulersDream.HaulToSite.Option>
+<HaulersDream.HaulToSite.CouldNotStart>当前没有可到达的材料可供搬运。</HaulersDream.HaulToSite.CouldNotStart>
+<HaulersDream.HaulNearby.Option>搬运附近的一切</HaulersDream.HaulNearby.Option>
+<HaulersDream.HaulNearby.CouldNotStart>当前附近没有可搬运的东西。</HaulersDream.HaulNearby.CouldNotStart>
+<HaulersDream.PickUp.Option>拾取 {0}</HaulersDream.PickUp.Option>
+<HaulersDream.PickUp.CouldNotStart>{0} 无法拾取 {1}——已尽可能多地携带，且无处可搬运它。</HaulersDream.PickUp.CouldNotStart>
+<HaulersDream.Keep.Option>将 {0} 留在货物栏</HaulersDream.Keep.Option>
+<HaulersDream.Keep.CouldNotStart>{0} 现在无法再多带 {1}——已尽可能多地携带了。</HaulersDream.Keep.CouldNotStart>
+<HaulersDream.Keep.Report>正在留存一件物品。</HaulersDream.Keep.Report>
+  <HaulersDream.Keep.SliderLabel>保留 {0} 个{1}</HaulersDream.Keep.SliderLabel>
+  <HaulersDream.Keep.GearChip>保留</HaulersDream.Keep.GearChip>
+  <HaulersDream.Keep.GearSliderLabel>保留 {0} 个{1}</HaulersDream.Keep.GearSliderLabel>
+  <HaulersDream.Keep.GearTooltipKept>在此小人的背包中保留 {0} 个{1}。点击可修改数量；设为 0 即停止保留。</HaulersDream.Keep.GearTooltipKept>
+  <HaulersDream.Keep.GearTooltipOff>在此小人的背包中保留一些{0}。Hauler's Dream 会保留这么多，其余绝不搬走。点击选择数量。</HaulersDream.Keep.GearTooltipOff>
+<HaulersDream.PlanRoute.AlsoBuild>同时建造（每站搬运＋建造）</HaulersDream.PlanRoute.AlsoBuild>
+<HaulersDream.PlanRoute.AlsoBuildDesc>开启此项时，小人会先向一处工地交付材料并将其建造完成，再前往下一处——预先采集整条路径的材料并保存在货物栏中。关闭它时，小人只为各工地备料（他人可来建造）。无论哪种方式，工地都对其他小人开放，因此多人可并行供应同一趟；后到者只需为下一站保留多余材料，或在最后卸下它。</HaulersDream.PlanRoute.AlsoBuildDesc>
+<HaulersDream.Setting.CraftBatchTimeout>默认制作批量超时：{0}小时</HaulersDream.Setting.CraftBatchTimeout>
+<HaulersDream.Setting.CraftBatchTimeoutOff>默认制作批量超时：无</HaulersDream.Setting.CraftBatchTimeoutOff>
+<HaulersDream.Setting.InventoryCraftDeliver>用货物栏携带制作原料（更少往返）</HaulersDream.Setting.InventoryCraftDeliver>
+<HaulersDream.Setting.InventoryCraftDeliverDesc>当小人开始一个需要来自两堆或更多分散物品堆的原料的制作工单时，它会先一次性把它们全部收集进货物栏——必要时超重，接受减速（除非启用了严格携带质量）——只走一趟去工作台，并用所携带的存货来制作。对每个配方都有效，包括那些先制作一件未完成物品的（服装、武器、雕塑）。制作本身100%是原版的，因此不会有任何东西被复制或丢失。如果有其他模组在管理制作原料的搬运，Hauler's Dream 会完全让位，把收集原料交给那个模组——这样任何制作循环都会自行解决，而在此期间本设置对收集行为不起作用。需要上方的“所携带的原料计入制作”。</HaulersDream.Setting.InventoryCraftDeliverDesc>
+<HaulersDream.Setting.ShowBenchGatherGizmo>显示每个工作台的“收集原料”按钮</HaulersDream.Setting.ShowBenchGatherGizmo>
+<HaulersDream.Setting.ShowBenchGatherGizmoDesc>在每个工作台的命令栏上添加一个“收集原料”开关，这样你就可以只关闭某一个工作台的原料收集，让 RimWorld 自己的一次一堆行为在那里运行。适合那些你就在旁边补货的炉灶或工作台——在那里收集花的时间比省下的还多。默认开启。这只控制按钮是否显示——你已经关掉的工作台无论如何都保持关闭。关闭某个工作台始终优先于上面的设置，而且即使“用货物栏携带制作原料（更少往返）”已关闭它依然有效，因为批量制作无论该设置如何都会收集原料。</HaulersDream.Setting.ShowBenchGatherGizmoDesc>
+<HaulersDream.PrepGather.Report>正在收集制作原料。</HaulersDream.PrepGather.Report>
+<HaulersDream.BulkHaul.Report>正在搬运附近的一切。</HaulersDream.BulkHaul.Report>
+<HaulersDream.JobReport.DefaultDestination>储存区</HaulersDream.JobReport.DefaultDestination>
+<HaulersDream.JobReport.EnRoute.Load>{ORIGINAL}（前往 {DESTINATION} 的途中）</HaulersDream.JobReport.EnRoute.Load>
+<HaulersDream.JobReport.EnRoute.Unload>{ORIGINAL}（前往 {DESTINATION} 的途中）</HaulersDream.JobReport.EnRoute.Unload>
+<HaulersDream.JobReport.CloserTo.Load>{ORIGINAL}（更靠近 {DESTINATION}）</HaulersDream.JobReport.CloserTo.Load>
+<HaulersDream.JobReport.CloserTo.Unload>{ORIGINAL}（更靠近 {DESTINATION}）</HaulersDream.JobReport.CloserTo.Unload>
+<HaulersDream.JobReport.Efficient.Load>正在高效搬运 {ORIGINAL}</HaulersDream.JobReport.Efficient.Load>
+<HaulersDream.JobReport.Efficient.Unload>正在高效搬运 {ORIGINAL}</HaulersDream.JobReport.Efficient.Unload>
+<HaulersDream.LoadPackAnimal.Report>正在将物品装载到驮兽上。</HaulersDream.LoadPackAnimal.Report>
+<HaulersDream.LoadPackAnimal.BulkOption>将附近的物品装载到驮兽上（批量）</HaulersDream.LoadPackAnimal.BulkOption>
+<HaulersDream.LoadPackAnimal.CouldNotStart>当前附近没有可装载到驮兽上的东西。</HaulersDream.LoadPackAnimal.CouldNotStart>
+<HaulersDream.LoadPackAnimal.NoCarrier>附近没有可用且有空间的驮兽。</HaulersDream.LoadPackAnimal.NoCarrier>
+<HaulersDream.UnloadCarrier.Report>正在卸载 {0}。</HaulersDream.UnloadCarrier.Report>
+<HaulersDream.UnloadCarrier.Option>优先批量卸载 {0}</HaulersDream.UnloadCarrier.Option>
+<HaulersDream.UnloadCarrier.CouldNotStart>当前无法开始批量卸载那只驮兽。</HaulersDream.UnloadCarrier.CouldNotStart>
+<HaulersDream.Setting.LoadPackAnimalBulk>批量“装载到驮兽上”命令</HaulersDream.Setting.LoadPackAnimalBulk>
+<HaulersDream.Setting.LoadPackAnimalBulkDesc>在商队/外出地图上，添加一个右键“将附近的物品装载到驮兽上（批量）”命令：一名殖民者把附近的若干堆清扫进货物栏，并一趟装载到一只驮兽上，而不是一次一堆地搬运。原版的单件“装载到驮兽上”仍与它并存。</HaulersDream.Setting.LoadPackAnimalBulkDesc>
+<HaulersDream.Setting.AutoDivertToPackAnimal>卸载到驮兽上（商队）</HaulersDream.Setting.AutoDivertToPackAnimal>
+<HaulersDream.Setting.AutoDivertToPackAnimalDesc>在商队/外出地图上，小人会把它们收取的战利品卸载到最近的自有驮兽身上，就像在家时卸到储存区一样——在它们的工作结束时、休息/进食/放松之前、按周期性兜底，以及在过度负重时立即（以保持机动）。关闭此项时，战利品就只随小人自己的货物栏运回家（或使用手动批量装载命令／重组商队）。所有这些也都需要开启自动卸载（并且在严格携带质量模式下，过度负重的卸载会被禁用）。</HaulersDream.Setting.AutoDivertToPackAnimalDesc>
+<HaulersDream.Setting.EnableBulkUnloadCarriers>一次造访批量卸载驮兽</HaulersDream.Setting.EnableBulkUnloadCarriers>
+<HaulersDream.Setting.EnableBulkUnloadCarriersDesc>当一只驮兽被设为“卸载”时，搬运者会走到它身边一次，把多堆物品从它身上取进自己的背包（然后照常搬到储存区），而不是原版那样一趟一堆。最后/溢出的那堆拿在搬运者手上直接搬运。关闭此项时，沿用原版的单堆卸载，不作改变。</HaulersDream.Setting.EnableBulkUnloadCarriersDesc>
+<HaulersDream.Setting.MinFreeSpaceToUnloadCarrier>开始所需的最小背包空闲空间：{0}</HaulersDream.Setting.MinFreeSpaceToUnloadCarrier>
+<HaulersDream.Setting.ReserveCarrierOnUnload>卸载时预定该驮兽</HaulersDream.Setting.ReserveCarrierOnUnload>
+<HaulersDream.Setting.ReserveCarrierOnUnloadDesc>在卸载期间独占地占用该驮兽。关闭（默认）则允许拴绳、组建商队或第二名搬运者打断它——当另一个小人占用该动物时，卸载会干净利落地让位。</HaulersDream.Setting.ReserveCarrierOnUnloadDesc>
+<HaulersDream.Setting.VisualUnloadDelay>每堆卸载延迟：{0} tick</HaulersDream.Setting.VisualUnloadDelay>
+<HaulersDream.LoadTransporter.Report>正在批量装载运输舱。</HaulersDream.LoadTransporter.Report>
+<HaulersDream.LoadTransporter.Option>优先批量装载 {0}</HaulersDream.LoadTransporter.Option>
+<HaulersDream.LoadTransporter.CouldNotStart>当前附近没有可批量装载进那个运输舱的东西。</HaulersDream.LoadTransporter.CouldNotStart>
+<HaulersDream.Setting.EnableBulkLoadTransporters>一趟批量装载运输舱和穿梭机</HaulersDream.Setting.EnableBulkLoadTransporters>
+<HaulersDream.Setting.EnableBulkLoadTransportersDesc>当一个运输舱或穿梭机被设为装载时，搬运者会认领其装载清单的一部分，把附近的若干堆清扫进货物栏，走到运输舱一次，并把它们全部存入——而不是原版那样一趟手提一堆。多名搬运者分担一个大清单且不会重复搬运，并且在所认领的货物到位前，舱体不会登舱或发射。关闭此项时，沿用原版的单堆运输舱装载，不作改变。</HaulersDream.Setting.EnableBulkLoadTransportersDesc>
+<HaulersDream.Setting.BulkLoadAiUpdateFrequency>装载重新检查间隔：{0} tick</HaulersDream.Setting.BulkLoadAiUpdateFrequency>
+<HaulersDream.LoadPortal.Report>正在批量装载传送门。</HaulersDream.LoadPortal.Report>
+<HaulersDream.LoadPortal.Option>优先批量装载 {0}</HaulersDream.LoadPortal.Option>
+<HaulersDream.LoadPortal.CouldNotStart>当前附近没有可批量装载进那个传送门的东西。</HaulersDream.LoadPortal.CouldNotStart>
+<HaulersDream.Setting.EnableBulkLoadPortal>一趟批量装载地图传送门</HaulersDream.Setting.EnableBulkLoadPortal>
+<HaulersDream.Setting.EnableBulkLoadPortalDesc>当一个地图传送门（坑道门、洞穴或地窖出口、“进入地图”传送门）被设为装载时，搬运者会认领其装载清单的一部分，把附近的若干堆清扫进货物栏，走到传送门一次，并把它们全部存入——而不是原版那样一趟手提一堆。存入的物品会传送到另一张地图。多名搬运者分担一个大清单且不会重复搬运。关闭此项时，沿用原版的单堆传送门装载，不作改变。</HaulersDream.Setting.EnableBulkLoadPortalDesc>
+<HaulersDream.LoadVehicle.Report>正在批量装载载具。</HaulersDream.LoadVehicle.Report>
+<HaulersDream.LoadVehicle.Option>优先批量装载 {0}</HaulersDream.LoadVehicle.Option>
+<HaulersDream.LoadVehicle.CouldNotStart>当前附近没有可批量装载进那辆载具的东西。</HaulersDream.LoadVehicle.CouldNotStart>
+<HaulersDream.Setting.EnableVehicleFramework>载具集成</HaulersDream.Setting.EnableVehicleFramework>
+<HaulersDream.Setting.EnableVehicleFrameworkDesc>Hauler's Dream 载具功能的总开关：一趟批量装载载具货物（下方），以及以符合事件机制的正确方式把物品装载到载具上（而非驮兽），使载具的装载清单保持同步。关闭此项只会禁用那些功能——它不会关闭那些防止 Hauler's Dream 批量卸载干扰载具自身货物界面的安全修复，也不会关闭从停放载具货物中进食或建造（那些遵循上方的“车轮上的餐食”和“从货物栏建造”开关）。未安装载具模组时，此项完全无效。默认开启。</HaulersDream.Setting.EnableVehicleFrameworkDesc>
+<HaulersDream.Setting.EnableBulkLoadVehicles>一趟批量装载载具</HaulersDream.Setting.EnableBulkLoadVehicles>
+<HaulersDream.Setting.EnableBulkLoadVehiclesDesc>当一辆载具（地面或空中）被设为装载货物时，搬运者会认领其装载清单的一部分，把附近的若干堆清扫进货物栏，走到载具一次，并把它们全部存入——而不是通常那样一趟手提一堆。多名搬运者分担一个大清单且不会重复搬运，同时遵守载具的货物容量。关闭此项时，沿用载具的单堆装载，不作改变。需要上方的“载具集成”。</HaulersDream.Setting.EnableBulkLoadVehiclesDesc>
+<HaulersDream.BulkRefuel.Report>正在批量添加燃料。</HaulersDream.BulkRefuel.Report>
+<HaulersDream.BulkRefuel.Option>优先为 {0} 批量添加燃料</HaulersDream.BulkRefuel.Option>
+<HaulersDream.BulkRefuel.CouldNotStart>当前附近没有可用于批量添加燃料的东西。</HaulersDream.BulkRefuel.CouldNotStart>
+<HaulersDream.Setting.EnableBulkRefuel>一趟批量添加燃料</HaulersDream.Setting.EnableBulkRefuel>
+<HaulersDream.Setting.EnableBulkRefuelDesc>当某物需要燃料时（穿梭机的化学燃料、深岩钻机、发电机——任何可添加燃料的），搬运者会把附近足够的燃料清扫进货物栏，走到它身边一次，并一趟填满它——而不是原版那样一趟手提一堆。仅在需要不止一堆燃料（不止一趟原版行程）时才启动；单堆的添加燃料留给原版。右键一个可添加燃料的物体选择“优先批量添加燃料”，或让它作为普通的添加燃料工作运行。关闭此项时，沿用原版的单堆添加燃料，不作改变。默认开启。</HaulersDream.Setting.EnableBulkRefuelDesc>
+<HaulersDream.Setting.SkipHaulWhileBleeding>严重流血时不开始搬运</HaulersDream.Setting.SkipHaulWhileBleeding>
+<HaulersDream.Setting.SkipHaulWhileBleedingDesc>当小人在流血（高于一个极小阈值）时，它不会开始一次新的收取或批量搬运清扫——它应该去接受治疗，而不是绕道去整理。这只阻止开始搬运：已经携带收取货物的小人仍会正常卸载它们，因此绝不会有物资被遗弃。默认开启。</HaulersDream.Setting.SkipHaulWhileBleedingDesc>
+<HaulersDream.Setting.ClosestDestUnloadOrder>先卸到最近的目的地</HaulersDream.Setting.ClosestDestUnloadOrder>
+<HaulersDream.Setting.ClosestDestUnloadOrderDesc>当小人携带多种不同物品进行卸载行程时，它会先造访最近的储存目的地，把所有去往那里的东西清空，再前往下一处——减少在基地里来回穿梭。关闭则使用此前的（按物品类别）顺序。默认开启。</HaulersDream.Setting.ClosestDestUnloadOrderDesc>
+<HaulersDream.Setting.EnRoutePickup>抓取前往任务途中的散落物品</HaulersDream.Setting.EnRoutePickup>
+<HaulersDream.Setting.EnRoutePickupDesc>当小人即将出发去做一项任务，而一件散落的可搬运物品大致在途中时，它会先把它抓进货物栏——这样这件零散物品就在小人本就要跑的一趟中被带到储存区，无需额外的来回。该物品作为一次受追踪的 Hauler's Dream 搬运被拾取，并由正常的卸载收起，因此即便自动卸载关闭也绝不会丢失。仅在由此产生的行程仍贴近直线路径时才触发，绝不越过原版的顺手搬运，遵守每个小人的“自动搬运产出”开关，并在小人本会改去卸下货物时让位。默认开启；它改变小人的移动方式，因此切换它会在小人下次选取任务时生效。</HaulersDream.Setting.EnRoutePickupDesc>
+<HaulersDream.Setting.EnRoutePathChecker>途中检查：{0}</HaulersDream.Setting.EnRoutePathChecker>
+<HaulersDream.Setting.EnRoutePathCheckerDesc>在廉价的距离测试之后，多严格地确认一个候选物品确实“在途中”。廉价（默认）只数地图区域，因此速度快但绕道距离可能有出入。寻路（提前停止）和寻路（彻底）会走真实路径以求准确——“提前停止”一旦某候选超出范围就放弃扫描（更快），“彻底”会检查每个剩余候选（最慢，只要存在搬运就能找到，例如在蜿蜒的山地基地中）。如果安装了寻路精度模组，这两种寻路模式会自动继承其精度。</HaulersDream.Setting.EnRoutePathCheckerDesc>
+<HaulersDream.Setting.EnRoutePathVanilla>廉价（区域计数）</HaulersDream.Setting.EnRoutePathVanilla>
+<HaulersDream.Setting.EnRoutePathDefault>寻路（提前停止）</HaulersDream.Setting.EnRoutePathDefault>
+<HaulersDream.Setting.EnRoutePathPathfinding>寻路（彻底）</HaulersDream.Setting.EnRoutePathPathfinding>
+<HaulersDream.Setting.StorageRouting>在把物资搬到任务处之前，先把它们移到更近处</HaulersDream.Setting.StorageRouting>
+<HaulersDream.Setting.StorageRoutingDesc>“先搬运再携带”功能。在小人把一种资源搬到工地或工作台之前，它会先把附近最大的那堆该材料移到更靠近其使用地点的储存区——这样这一次以及之后每一次取料都是更短的行程。它仅在更近的储存区确实比那堆当前位置更靠近任务时才触发，绝不移动另一名小人已在搬运的物品堆，并遵守每个小人的“自动搬运产出”开关。这次移动是一次正常搬运，因此材料绝不会丢失。默认开启；它改变小人的移动方式，因此切换它会在小人下次接取此类任务时生效。</HaulersDream.Setting.StorageRoutingDesc>
+<HaulersDream.Setting.RouteSupplies>把建造物资移到更靠近工地处</HaulersDream.Setting.RouteSupplies>
+<HaulersDream.Setting.RouteSuppliesDesc>对建造材料交付应用“先搬运再携带”移动。（在“用货物栏携带建造材料”开启时无效——那个功能已用自己的方式减少了往返。）</HaulersDream.Setting.RouteSuppliesDesc>
+<HaulersDream.Setting.RouteIngredients>把制作原料移到更靠近工作台处</HaulersDream.Setting.RouteIngredients>
+<HaulersDream.Setting.RouteIngredientsDesc>对制作工单原料应用“先搬运再携带”移动。（在“一趟收集工单原料”开启时无效——那个功能已用自己的方式减少了往返。）</HaulersDream.Setting.RouteIngredientsDesc>
+<HaulersDream.Setting.RouteToEqualPriority>允许移入同等优先级的储存区</HaulersDream.Setting.RouteToEqualPriority>
+<HaulersDream.Setting.RouteToEqualPriorityDesc>当某堆物品更靠近任务时，也把它移入同等优先级的储存区（而不仅是更高优先级的）。默认开启——关闭它会把移动限制为严格更高优先级的目的地。</HaulersDream.Setting.RouteToEqualPriorityDesc>
+<HaulersDream.Setting.RouteToStockpiles>允许移入普通的储存区</HaulersDream.Setting.RouteToStockpiles>
+<HaulersDream.Setting.RouteToStockpilesDesc>让普通储存区（而不仅是货架等储存建筑）也成为移动目的地。默认开启——关闭它只会移入储存建筑。</HaulersDream.Setting.RouteToStockpilesDesc>
+<HaulersDream.Setting.StorageFilters>筛选搬运可使用哪些储存建筑</HaulersDream.Setting.StorageFilters>
+<HaulersDream.Setting.StorageFiltersDesc>开启时，你可以限制搬运者在顺手搬运和路径搬运时被允许使用哪些储存建筑（货架和模组储存单元——绝不含普通储存区），可按建筑或按模组设置。已经携带货物的小人始终仍能卸载，因此绝不会有物资被遗弃。默认开启，使用下方精选的默认值——可按建筑或按模组设置你自己的规则。</HaulersDream.Setting.StorageFiltersDesc>
+<HaulersDream.Setting.StorageFilterUseDefaults>使用精选的默认规则</HaulersDream.Setting.StorageFilterUseDefaults>
+<HaulersDream.Setting.StorageFilterUseDefaultsDesc>应用合理的分情景默认值：顺手收取可使用任何储存（下方的慢速集合除外）；为携带前转至更优储存而绕道的搬运只针对已知的容器模组。你明确的按建筑/按模组选择始终覆盖这些。关闭＝只有你明确的选择才会限制任何东西。</HaulersDream.Setting.StorageFilterUseDefaultsDesc>
+<HaulersDream.Setting.StorageFilterDenyLwm>顺手搬运时跳过慢速储存</HaulersDream.Setting.StorageFilterDenyLwm>
+<HaulersDream.Setting.StorageFilterDenyLwmDesc>有些密集/深层储存有存入延迟，因此中途在那里停靠并不真的算“在途中”。开启时，顺手搬运和携带前搬运会避开此类储存（专门的卸载行程仍可使用它——你的货物绝不会被遗弃）。</HaulersDream.Setting.StorageFilterDenyLwmDesc>
+<HaulersDream.Setting.StorageFilterButton>编辑储存建筑规则…</HaulersDream.Setting.StorageFilterButton>
+<HaulersDream.StorageFilter.Title>储存建筑规则</HaulersDream.StorageFilter.Title>
+<HaulersDream.StorageFilter.Desc>设置搬运者是否可使用每个储存建筑，可按建筑或按模组。允许强制开启，拒绝强制关闭，默认则交由精选规则决定。按建筑的选择覆盖其所属模组的选择；明确的拒绝覆盖允许。普通储存区始终被允许。</HaulersDream.StorageFilter.Desc>
+<HaulersDream.StorageFilter.ResetAll>重置为默认</HaulersDream.StorageFilter.ResetAll>
+<HaulersDream.StorageFilter.StateDefault>默认</HaulersDream.StorageFilter.StateDefault>
+<HaulersDream.StorageFilter.StateAllow>允许</HaulersDream.StorageFilter.StateAllow>
+<HaulersDream.StorageFilter.StateDeny>拒绝</HaulersDream.StorageFilter.StateDeny>
+<HaulersDream.Setting.CleanupOnSave>保存时清理批量装载任务</HaulersDream.Setting.CleanupOnSave>
+<HaulersDream.Setting.CleanupOnSaveDesc>当游戏在某个小人正进行批量装载途中保存时，Hauler's Dream 会为这次保存把该小人收回到空闲状态，使存档文件不引用 Hauler's Dream 自己的任务类型——这意味着你日后可以卸载本模组而不会让存档报错。该小人会保留任何已清扫的货物，之后正常卸载它们。默认开启；若你绝不打算移除本模组，可关闭。</HaulersDream.Setting.CleanupOnSaveDesc>
+<HaulersDream.Setting.SoftlockDrop>从卡住的小人处释放被困货物</HaulersDream.Setting.SoftlockDrop>
+<HaulersDream.Setting.SoftlockDropDesc>如果一个小人在携带 Hauler's Dream 拾取的货物时再也无法搬运——它的搬运工作被禁用，或某个机械体处于休眠/自我关闭状态——所携带的货物会被丢在附近交给正常搬运，而不是永远被困在那个小人身上。一个即将充能的机械体会先把它携带的货物送到储存区（或在无处存放时丢在附近），免得它们在机械体停坐于充能器上时腐烂或占用携带空间。只动 Hauler's Dream 自己拾取的物品。默认开启（一道安全网）。</HaulersDream.Setting.SoftlockDropDesc>
+  <HaulersDream.Setting.QuestPawnDrop>任务客人离开时丢下捡到的物品</HaulersDream.Setting.QuestPawnDrop>
+  <HaulersDream.Setting.QuestPawnDropDesc>任务期间借给你的临时小人（来自其他派系的寄宿者、难民、援助者）可能会在物品栏里装着餐食、药品或其他殖民地物资。通常他们回归自己的派系时会带走身上的一切。开启此选项后，这样的小人在脱离你的控制的那一刻，会把在你这里捡到的所有东西丢在原地，只保留来时携带的物品，以及装备的武器和穿着的衣物。无论以何种方式结束都适用：任务结束、背叛或被逮捕。默认开启。</HaulersDream.Setting.QuestPawnDropDesc>
+<HaulersDream.Setting.OpportunisticLoad>途中把所携带的货物存入运输工具</HaulersDream.Setting.OpportunisticLoad>
+<HaulersDream.Setting.OpportunisticLoadDesc>一个已经携带着附近某个运输舱、穿梭机、地图传送门或载具正等待的物品的小人，会绕道把它们卸下，而不是另起一趟全新的取货行程。减少无谓的奔走。默认关闭（它改变小人接下来选取哪项任务）。</HaulersDream.Setting.OpportunisticLoadDesc>
+<HaulersDream.Setting.LoadOpportunityRadius>途中存货搜索半径：{0} 格</HaulersDream.Setting.LoadOpportunityRadius>
+<HaulersDream.Setting.ContinuousLoading>“装载至完成”右键命令</HaulersDream.Setting.ContinuousLoading>
+<HaulersDream.Setting.ContinuousLoadingDesc>添加一个右键命令，派出一名信使（即便被征召）穿行附近每个仍需装载的运输组，把这些任务连成一串直到它们全部装满——便于一条命令装满一支大商队。默认关闭（可选的便利功能）。</HaulersDream.Setting.ContinuousLoadingDesc>
+<HaulersDream.ContinuousLoad.Option>装载至完成（连续）——{0}</HaulersDream.ContinuousLoad.Option>
+<HaulersDream.ContinuousLoad.CouldNotStart>当前附近没有可批量装载进去的东西。</HaulersDream.ContinuousLoad.CouldNotStart>
+<HaulersDream.Setting.LoadHybridPathing>用真实寻路排列批量装载站点的顺序</HaulersDream.Setting.LoadHybridPathing>
+<HaulersDream.Setting.LoadHybridPathingDesc>当朝一个运输工具清扫若干堆物品时，对最近的几个候选用真实寻路而非直线距离来选取步行顺序——在杂乱地图上路径略好，代价是一些额外的寻路开销。默认关闭；直线顺序已能产出正确、往返少的装载。</HaulersDream.Setting.LoadHybridPathingDesc>
+<HaulersDream.Setting.LoadPathfindingCandidates>每站的寻路候选数：{0}</HaulersDream.Setting.LoadPathfindingCandidates>
+<HaulersDream.Setting.AutoOpenTransporterContents>为选中的运输舱自动打开“内容物”选项卡</HaulersDream.Setting.AutoOpenTransporterContents>
+<HaulersDream.Setting.AutoOpenTransporterContentsDesc>当你选中单个运输舱或穿梭机时，自动打开它的“内容物”选项卡，以便你看清它正在装载什么。它只在选择实际发生变化时才触发，所以如果你关闭该选项卡后再次点击同一个运输舱，它会保持关闭。默认关闭（它改变你点选东西时打开的是哪个选项卡）。</HaulersDream.Setting.AutoOpenTransporterContentsDesc>
+<HaulersDream.Setting.AutoOpenCarrierGear>为选中的驮兽和运载者自动打开“装备”选项卡</HaulersDream.Setting.AutoOpenCarrierGear>
+<HaulersDream.Setting.AutoOpenCarrierGearDesc>当你选中自己的驮兽、载具或其他非人形运载者，且其物品栏中有东西时，自动打开显示其载荷的那个选项卡：“装备”选项卡，载具则是“货物”选项卡。它绝不会对殖民者这样做：当你在殖民者之间点选时，游戏本来就会保持你上次打开的选项卡。它也只在选择实际发生变化时才触发，所以如果你关闭该选项卡后再次点击同一个运载者，它会保持关闭。默认关闭（它改变你点选东西时打开的是哪个选项卡）。</HaulersDream.Setting.AutoOpenCarrierGearDesc>
+<HaulersDream.Setting.EnableStorageNetworkBulkLoad>从储存网络批量装载（实验性）</HaulersDream.Setting.EnableStorageNetworkBulkLoad>
+<HaulersDream.Setting.EnableStorageNetworkBulkLoadDesc>当安装了储存网络（Storage Network）模组时，让批量装载清扫其网络服务器中储存的物品，从而一趟填满一个运输舱、舱体、传送门或载具，而不是一次一堆。物品通过一个可用、可到达的终端被取出，并由储存网络按需具现。默认关闭：这是实验性的，并依赖于储存网络的行为。不开启它，网络中的物品仍以正常的（一趟一堆）方式装载。</HaulersDream.Setting.EnableStorageNetworkBulkLoadDesc>
+<HaulersDream.Setting.ResetToDefaults>重置为默认</HaulersDream.Setting.ResetToDefaults>
+<HaulersDream.Setting.ResetToDefaultsConfirm>将所有 Hauler's Dream 设置重置为默认？你的单项物品卸载规则、路径偏好和储存筛选也将被清除。此操作无法撤销。</HaulersDream.Setting.ResetToDefaultsConfirm>
+<HaulersDream.Cat.Features>功能</HaulersDream.Cat.Features>
+<HaulersDream.Cat.Features.Help>整组功能的开与关。Hauler's Dream 承担了许多独立模组的工作——关掉任何你不想用的。每组的详细选项在其他页面上。</HaulersDream.Cat.Features.Help>
+<HaulersDream.Cat.Features.Intro>下方每张卡片启用或禁用一整组功能。每组的精细调节在左侧列表中它自己的页面上。</HaulersDream.Cat.Features.Intro>
+<HaulersDream.Cat.Hauling>搬运</HaulersDream.Cat.Hauling>
+<HaulersDream.Cat.Hauling.Help>殖民者如何拾取东西：携带上限、智能超载、一趟批量清扫整片区域，以及工作时顺手整理散落物品。</HaulersDream.Cat.Hauling.Help>
+<HaulersDream.Cat.Unloading>卸载</HaulersDream.Cat.Unloading>
+<HaulersDream.Cat.Unloading.Help>携带的货物何时、如何收起：自动卸载行程、闲暇前卸载、多余物品处理、卸货排序，以及单项物品规则。</HaulersDream.Cat.Unloading.Help>
+<HaulersDream.Cat.BuildCraft>建造与制作</HaulersDream.Cat.BuildCraft>
+<HaulersDream.Cat.BuildCraft.Help>为建造和制作工单从货物栏取用材料，外加小人之间的食物运送和优先用临近腐烂原料的选择。</HaulersDream.Cat.BuildCraft.Help>
+<HaulersDream.Cat.BulkLoading>批量装载</HaulersDream.Cat.BulkLoading>
+<HaulersDream.Cat.BulkLoading.Help>对驮兽、运输舱、穿梭机、地图传送门、可添加燃料物和载具的一趟装载与卸载。</HaulersDream.Cat.BulkLoading.Help>
+<HaulersDream.Cat.Routing>路径与储存</HaulersDream.Cat.Routing>
+<HaulersDream.Cat.Routing.Help>抓取大致在途中的物品、把物资移到更靠近使用处，以及筛选搬运可使用哪些储存。</HaulersDream.Cat.Routing.Help>
+<HaulersDream.Cat.Yields>工作与产出</HaulersDream.Cat.Yields>
+<HaulersDream.Cat.Yields.Help>哪些工作产出会被收取、击杀后把尸体搬到储存区，以及搬运时从尸体扒取装备。</HaulersDream.Cat.Yields.Help>
+<HaulersDream.Cat.Who>工作对象</HaulersDream.Cat.Who>
+<HaulersDream.Cat.Who.Help>Hauler's Dream 适用于哪些小人——机械体、动物、被征召者、地图外的殖民者——外加让任何小人都能搬运、清洁或砍伐植物的覆盖项。</HaulersDream.Cat.Who.Help>
+<HaulersDream.Cat.Planners>规划器</HaulersDream.Cat.Planners>
+<HaulersDream.Cat.Planners.Help>右键路径规划器和工作站制作规划器，及其默认值。</HaulersDream.Cat.Planners.Help>
+<HaulersDream.Cat.Advanced>高级</HaulersDream.Cat.Advanced>
+<HaulersDream.Cat.Advanced.Help>卸载时机、被困货物安全警报、保存清理，以及开发者诊断。</HaulersDream.Cat.Advanced.Help>
+<HaulersDream.Cat.Migration>迁移</HaulersDream.Cat.Migration>
+<HaulersDream.Cat.Migration.Help>之所以显示此项，是因为你仍启用着一个或多个 Hauler's Dream 所替代的模组（包括其翻译版或“Continued”续作版）。让它们与 Hauler's Dream 同时运行会使它们争抢同样的搬运任务——这可能看起来像是拾取出了故障。请按步骤把它们干净地移除。</HaulersDream.Cat.Migration.Help>
+<HaulersDream.Migration.DetectedHead>被替代的模组仍启用</HaulersDream.Migration.DetectedHead>
+<HaulersDream.Migration.Intro>Hauler's Dream 是下列模组的单一替代品，而你仍启用着它们。让它们与 Hauler's Dream 一同运行会使它们争夺同样的搬运任务，因此拾取可能看起来出故障或不稳定。请按下方干净的步骤移除它们。</HaulersDream.Migration.Intro>
+<HaulersDream.Migration.DisableButton>替我禁用它们</HaulersDream.Migration.DisableButton>
+<HaulersDream.Migration.DisableButton.Help>禁用上方列出的每个被替代的模组并重启 RimWorld。模组列表的更改只在重启后生效，因此这与“模组”菜单所做的是同一件事。使用前请先保存游戏（最好也征召你的殖民者——见步骤）。</HaulersDream.Migration.DisableButton.Help>
+<HaulersDream.Migration.DisableTitle>禁用被替代的模组？</HaulersDream.Migration.DisableTitle>
+<HaulersDream.Migration.DisableConfirm>这将禁用 {0} 并立即重启 RimWorld。\n\n请先确保你已保存游戏——最好也已征召你的殖民者（见本选项卡上的步骤），这样在旧模组于任务中途被移除时不会出问题。\n\n现在重启吗？</HaulersDream.Migration.DisableConfirm>
+<HaulersDream.Migration.StepsHead>为了干净地过渡</HaulersDream.Migration.StepsHead>
+<HaulersDream.Migration.Step1>1.  打开你的存档并征召你所有的殖民者，然后保存游戏。征召会取消他们当前的任务，从而避免那些模组在任务中途被移除时可能抛出的错误。</HaulersDream.Migration.Step1>
+<HaulersDream.Migration.Step2>2.  禁用上方列出的所有模组——使用“替我禁用它们”按钮，或退到主菜单在“模组”菜单中自行关闭它们。</HaulersDream.Migration.Step2>
+<HaulersDream.Migration.Step3>3.  游戏重启后，再次读取你的存档，然后再保存一次——被移除的模组现已彻底退出。</HaulersDream.Migration.Step3>
+<HaulersDream.Migration.Step4>4.  确保 Hauler's Dream 已启用，取消征召你的殖民者，然后继续游戏。</HaulersDream.Migration.Step4>
+<HaulersDream.Advanced.DevHint>启用开发者模式时，开发者诊断会显示在这里。</HaulersDream.Advanced.DevHint>
+<HaulersDream.Report.NavLabel>报告问题</HaulersDream.Report.NavLabel>
+<HaulersDream.Report.NavLabel.Help>向开发者发送漏洞报告、功能请求或模组兼容性请求。会附带你已启用的模组列表和游戏版本，以帮助诊断问题。</HaulersDream.Report.NavLabel.Help>
+<HaulersDream.Report.DialogTitle>报告问题</HaulersDream.Report.DialogTitle>
+<HaulersDream.Report.DialogIntro>这是哪一类报告，发生了什么？此内容会直接发送给开发者。</HaulersDream.Report.DialogIntro>
+<HaulersDream.Report.TypeLabel>类型</HaulersDream.Report.TypeLabel>
+<HaulersDream.Report.Type.Bug>漏洞</HaulersDream.Report.Type.Bug>
+<HaulersDream.Report.Type.Feature>功能请求</HaulersDream.Report.Type.Feature>
+<HaulersDream.Report.Type.Compatibility>模组兼容性</HaulersDream.Report.Type.Compatibility>
+<HaulersDream.Report.Type.Other>其他</HaulersDream.Report.Type.Other>
+<HaulersDream.Report.DescribeLabel>请描述（发生了什么、重现步骤，以及你预期的结果）：</HaulersDream.Report.DescribeLabel>
+<HaulersDream.Report.Placeholder.Bug>发生了什么：[哪里出了问题]\n你原本预期的结果：[本应发生什么]\n何时或如何发生：[涉及哪些殖民者、工作、存储区或其他模组]</HaulersDream.Report.Placeholder.Bug>
+<HaulersDream.Report.Placeholder.Feature>你希望有什么：[想要的改动或新选项]\n它有什么帮助：[能解决的问题，或什么时候有用]</HaulersDream.Report.Placeholder.Feature>
+<HaulersDream.Report.Placeholder.Compatibility>哪个模组与 Hauler's Dream 冲突：[另一个模组的名称]\n两者同时启用时出了什么问题：[你看到发生了什么]\n你原本预期的结果：[它本应如何表现]</HaulersDream.Report.Placeholder.Compatibility>
+<HaulersDream.Report.Placeholder.Other>你想告诉我们什么？[任何有助于我们理解并处理的信息]</HaulersDream.Report.Placeholder.Other>
+<HaulersDream.Report.IncludeLog>同时附带完整的游戏日志（Player.log）</HaulersDream.Report.IncludeLog>
+<HaulersDream.Report.IncludeLog.Help>Hauler's Dream 自己的日志始终会被附带。勾选此项可同时附带你完整 Player.log 的末尾部分；它体积更大，可能包含其他模组的信息，但它是诊断漏洞时最有用的附件。</HaulersDream.Report.IncludeLog.Help>
+<HaulersDream.Report.AutoMeta>你已启用的模组列表、游戏版本、操作系统，以及 Hauler's Dream 自己的日志都会自动附带。</HaulersDream.Report.AutoMeta>
+<HaulersDream.Report.Submit>发送报告</HaulersDream.Report.Submit>
+<HaulersDream.Report.Retry>重试</HaulersDream.Report.Retry>
+<HaulersDream.Report.Sending>正在发送…</HaulersDream.Report.Sending>
+<HaulersDream.Report.SentBody>谢谢！你的报告已发送。\n\n如果这是个漏洞，所附的日志将有助于追查它。</HaulersDream.Report.SentBody>
+<HaulersDream.Report.RateLimited>你发送报告太频繁了。请等待一分钟后再试。</HaulersDream.Report.RateLimited>
+<HaulersDream.Report.NetworkError>无法连接到报告服务器：{0}\n请检查你的网络连接，以及可能拦截 RimWorld 的防火墙或杀毒软件，然后再试一次。</HaulersDream.Report.NetworkError>
+<HaulersDream.Report.ServerError>报告服务器返回了一个错误（HTTP {0}）。请稍后再试。</HaulersDream.Report.ServerError>
+  <!-- My reports: the list/detail view that opens from the nav button -->
+  <HaulersDream.Report.MyReports.Title>你的报告</HaulersDream.Report.MyReports.Title>
+  <HaulersDream.Report.MyReports.Loading>正在加载你的报告…</HaulersDream.Report.MyReports.Loading>
+  <HaulersDream.Report.MyReports.Empty>你还没有发送过任何报告。</HaulersDream.Report.MyReports.Empty>
+  <HaulersDream.Report.MyReports.CreateNew>创建新报告</HaulersDream.Report.MyReports.CreateNew>
+  <HaulersDream.Report.MyReports.Refresh>刷新</HaulersDream.Report.MyReports.Refresh>
+  <HaulersDream.Report.MyReports.LoadError>无法加载你的报告（HTTP {0}）。</HaulersDream.Report.MyReports.LoadError>
+  <HaulersDream.Report.MyReports.NetworkError>无法连接到报告服务器：{0}</HaulersDream.Report.MyReports.NetworkError>
+  <HaulersDream.Report.Status.Open>待处理</HaulersDream.Report.Status.Open>
+  <HaulersDream.Report.Status.Solved>已解决</HaulersDream.Report.Status.Solved>
+  <HaulersDream.Report.Status.Closed>已关闭</HaulersDream.Report.Status.Closed>
+  <HaulersDream.Report.Status.Submitted>已提交</HaulersDream.Report.Status.Submitted>
+  <HaulersDream.Report.Detail.Status>状态：{0}</HaulersDream.Report.Detail.Status>
+  <HaulersDream.Report.Detail.Loading>正在加载…</HaulersDream.Report.Detail.Loading>
+  <HaulersDream.Report.Detail.Back>返回</HaulersDream.Report.Detail.Back>
+  <HaulersDream.Report.Detail.CommentsHeader>回复（{0}）</HaulersDream.Report.Detail.CommentsHeader>
+  <HaulersDream.Report.Detail.NoComments>暂无回复。开发者的回应会显示在这里。</HaulersDream.Report.Detail.NoComments>
+  <HaulersDream.Report.Detail.Unavailable>暂时无法加载回复，请稍后再试。</HaulersDream.Report.Detail.Unavailable>
+  <HaulersDream.Report.Detail.OpenOnGitHub>在 GitHub 上查看</HaulersDream.Report.Detail.OpenOnGitHub>
+  <HaulersDream.Report.Detail.Send>发送</HaulersDream.Report.Detail.Send>
+  <HaulersDream.Report.Detail.Sending>正在发送…</HaulersDream.Report.Detail.Sending>
+  <HaulersDream.Report.Detail.CommentPosted>回复已发送。</HaulersDream.Report.Detail.CommentPosted>
+  <HaulersDream.Report.Detail.CommentFailed>发送失败（HTTP {0}）。</HaulersDream.Report.Detail.CommentFailed>
+  <HaulersDream.Report.Detail.CommentEmpty>请先写一条回复。</HaulersDream.Report.Detail.CommentEmpty>
+  <HaulersDream.Report.Detail.NoIssue>此报告被加入跟踪列表后即可回复。</HaulersDream.Report.Detail.NoIssue>
+  <HaulersDream.Report.Role.You>你</HaulersDream.Report.Role.You>
+  <HaulersDream.Report.Role.Developer>开发者</HaulersDream.Report.Role.Developer>
+<HaulersDream.Report.AddScreenshots>添加截图…</HaulersDream.Report.AddScreenshots>
+<HaulersDream.Report.ScreenshotsSelected>已选择 {0} 张</HaulersDream.Report.ScreenshotsSelected>
+<HaulersDream.Report.ClearScreenshots>清除</HaulersDream.Report.ClearScreenshots>
+<HaulersDream.Report.Uploading>正在上传截图 {0}/{1}…</HaulersDream.Report.Uploading>
+<HaulersDream.Report.SentPartial>有些截图未能上传（{0}）。</HaulersDream.Report.SentPartial>
+<HaulersDream.Report.PickTitle>添加截图</HaulersDream.Report.PickTitle>
+<HaulersDream.Report.PickSubtitle>已选择 {0} / {1} 张</HaulersDream.Report.PickSubtitle>
+<HaulersDream.Report.PickEmpty>尚未找到截图。在游戏中用 RimWorld 的截图按键（默认 F10，除非你已重新绑定）或 Steam 覆盖层截一张，然后点击“刷新”。你也可以把自己的 PNG 或 JPG 图片放进截图文件夹。</HaulersDream.Report.PickEmpty>
+<HaulersDream.Report.PickOpenFolder>打开截图文件夹</HaulersDream.Report.PickOpenFolder>
+<HaulersDream.Report.PickOpenFolder.Help>在文件管理器中打开 RimWorld 自己的截图文件夹：\n{0}\n\n放进该文件夹的 PNG 和 JPG 图片，点击“刷新”后就会出现在此列表中——包括在游戏之外制作的图片。</HaulersDream.Report.PickOpenFolder.Help>
+<HaulersDream.Report.PickRefresh>刷新</HaulersDream.Report.PickRefresh>
+<HaulersDream.Report.PickOpenFolderFailed>无法打开截图文件夹。你可以自行前往：\n{0}</HaulersDream.Report.PickOpenFolderFailed>
+<HaulersDream.Report.PickConfirm>添加（{0}）</HaulersDream.Report.PickConfirm>
+<HaulersDream.Report.PickMax>你最多可附带 {0} 张截图。</HaulersDream.Report.PickMax>
+<HaulersDream.FeatGroup.Core>核心</HaulersDream.FeatGroup.Core>
+<HaulersDream.FeatGroup.Loading>装载与运载者</HaulersDream.FeatGroup.Loading>
+<HaulersDream.FeatGroup.BuildCraft>建造与制作</HaulersDream.FeatGroup.BuildCraft>
+<HaulersDream.FeatGroup.Planning>规划工具</HaulersDream.FeatGroup.Planning>
+<HaulersDream.FeatGroup.Wyu>顺手搬运</HaulersDream.FeatGroup.Wyu>
+<HaulersDream.Feat.Master.Name>启用 Hauler's Dream</HaulersDream.Feat.Master.Name>
+<HaulersDream.Feat.Master.Blurb>所有自动行为的总开关</HaulersDream.Feat.Master.Blurb>
+<HaulersDream.Feat.AutoUnload.Name>自动卸载</HaulersDream.Feat.AutoUnload.Name>
+<HaulersDream.Feat.AutoUnload.Blurb>小人自行进行卸载行程。关闭＝只通过每个小人的按钮卸载。</HaulersDream.Feat.AutoUnload.Blurb>
+<HaulersDream.Feat.BulkHaul.Name>批量搬运</HaulersDream.Feat.BulkHaul.Name>
+<HaulersDream.Feat.BulkHaul.Blurb>一趟把附近许多物品清扫进货物栏</HaulersDream.Feat.BulkHaul.Blurb>
+<HaulersDream.Feat.Sweep.Name>边工作边整理</HaulersDream.Feat.Sweep.Name>
+<HaulersDream.Feat.Sweep.Blurb>也抓取工作地点附近的散落物品</HaulersDream.Feat.Sweep.Blurb>
+<HaulersDream.Feat.UnloadCarriers.Name>批量卸载驮兽</HaulersDream.Feat.UnloadCarriers.Name>
+<HaulersDream.Feat.UnloadCarriers.Blurb>一次造访把运载者清空进背包</HaulersDream.Feat.UnloadCarriers.Blurb>
+<HaulersDream.Feat.LoadTransporters.Name>装载运输舱与穿梭机</HaulersDream.Feat.LoadTransporters.Name>
+<HaulersDream.Feat.LoadTransporters.Blurb>一趟填满舱体和穿梭机</HaulersDream.Feat.LoadTransporters.Blurb>
+<HaulersDream.Feat.LoadPortal.Name>装载地图传送门</HaulersDream.Feat.LoadPortal.Name>
+<HaulersDream.Feat.LoadPortal.Blurb>批量装载坑道门和洞穴出口</HaulersDream.Feat.LoadPortal.Blurb>
+<HaulersDream.Feat.Refuel.Name>批量添加燃料</HaulersDream.Feat.Refuel.Name>
+<HaulersDream.Feat.Refuel.Blurb>一趟把一个可添加燃料物加满</HaulersDream.Feat.Refuel.Blurb>
+<HaulersDream.Feat.Vehicles.Name>载具货物</HaulersDream.Feat.Vehicles.Name>
+<HaulersDream.Feat.Vehicles.Blurb>批量装载载具货物（需要一个载具模组）</HaulersDream.Feat.Vehicles.Blurb>
+<HaulersDream.Feat.BuildFromInv.Name>从货物栏建造</HaulersDream.Feat.BuildFromInv.Name>
+<HaulersDream.Feat.BuildFromInv.Blurb>使用所携带的和商队的材料建造</HaulersDream.Feat.BuildFromInv.Blurb>
+<HaulersDream.Feat.CraftFromInv.Name>用所携带的材料制作</HaulersDream.Feat.CraftFromInv.Name>
+<HaulersDream.Feat.CraftFromInv.Blurb>工单可使用小人已携带的原料</HaulersDream.Feat.CraftFromInv.Blurb>
+<HaulersDream.Feat.ConstructDeliver.Name>为大型建造携带材料</HaulersDream.Feat.ConstructDeliver.Name>
+<HaulersDream.Feat.ConstructDeliver.Blurb>更少往返于大型或成簇的建造任务</HaulersDream.Feat.ConstructDeliver.Blurb>
+<HaulersDream.Feat.Meals.Name>车轮上的餐食</HaulersDream.Feat.Meals.Name>
+<HaulersDream.Feat.Meals.Blurb>饥饿的小人食用另一个小人携带的食物</HaulersDream.Feat.Meals.Blurb>
+<HaulersDream.Feat.PlanRoutes.Name>路径规划器</HaulersDream.Feat.PlanRoutes.Name>
+<HaulersDream.Feat.PlanRoutes.Blurb>规划一条搬运/工作路径的右键工具</HaulersDream.Feat.PlanRoutes.Blurb>
+<HaulersDream.Feat.PlanCrafting.Name>制作规划器</HaulersDream.Feat.PlanCrafting.Name>
+<HaulersDream.Feat.PlanCrafting.Blurb>一次把一个工作台工单批量制作多次</HaulersDream.Feat.PlanCrafting.Blurb>
+<HaulersDream.Feat.EnRoute.Name>途中拾取</HaulersDream.Feat.EnRoute.Name>
+<HaulersDream.Feat.EnRoute.Blurb>抓取躺在前往任务途中的散落物品</HaulersDream.Feat.EnRoute.Blurb>
+<HaulersDream.Feat.StorageRouting.Name>面向使用者的路径规划</HaulersDream.Feat.StorageRouting.Name>
+<HaulersDream.Feat.StorageRouting.Blurb>把物资移到更靠近使用处的储存</HaulersDream.Feat.StorageRouting.Blurb>
+<HaulersDream.Feat.StorageFilters.Name>储存筛选</HaulersDream.Feat.StorageFilters.Name>
+<HaulersDream.Feat.StorageFilters.Blurb>限制搬运可使用哪些储存建筑</HaulersDream.Feat.StorageFilters.Blurb>
+<HaulersDream.Head.BulkHaul>批量搬运</HaulersDream.Head.BulkHaul>
+<HaulersDream.Head.WhileWorking>工作时</HaulersDream.Head.WhileWorking>
+<HaulersDream.Head.Construction>建造</HaulersDream.Head.Construction>
+<HaulersDream.Head.Crafting>制作</HaulersDream.Head.Crafting>
+<HaulersDream.Head.Food>食物</HaulersDream.Head.Food>
+<HaulersDream.Head.PackAnimals>驮兽</HaulersDream.Head.PackAnimals>
+<HaulersDream.Head.Transporters>运输舱、传送门与添加燃料</HaulersDream.Head.Transporters>
+<HaulersDream.Head.Vehicles>载具</HaulersDream.Head.Vehicles>
+<HaulersDream.Head.AutoOpenTabs>自动打开选项卡</HaulersDream.Head.AutoOpenTabs>
+<HaulersDream.Head.AdvancedLoading>高级装载</HaulersDream.Head.AdvancedLoading>
+<HaulersDream.Head.StorageRouting>面向使用者的储存路径规划</HaulersDream.Head.StorageRouting>
+<HaulersDream.Head.StorageFilters>储存建筑筛选</HaulersDream.Head.StorageFilters>
+<HaulersDream.Head.AfterKill>击杀后</HaulersDream.Head.AfterKill>
+<HaulersDream.Head.Stripping>扒取</HaulersDream.Head.Stripping>
+<HaulersDream.Head.Batches>制作批量</HaulersDream.Head.Batches>
+<HaulersDream.Head.RoutePlanning>路径规划</HaulersDream.Head.RoutePlanning>
+<HaulersDream.Head.UnloadTiming>卸载时机</HaulersDream.Head.UnloadTiming>
+<HaulersDream.Head.SafetyNet>安全网</HaulersDream.Head.SafetyNet>
+<HaulersDream.Head.Developer>开发者</HaulersDream.Head.Developer>
+<HaulersDream.Profile.Default>默认（配置档，内置）</HaulersDream.Profile.Default>
+<HaulersDream.Profile.Custom>自定义（未保存）</HaulersDream.Profile.Custom>
+<HaulersDream.Profile.Named>{0}（配置档）</HaulersDream.Profile.Named>
+<HaulersDream.Profile.NamedDirty>{0}（配置档，有未保存的更改）</HaulersDream.Profile.NamedDirty>
+<HaulersDream.Profile.SaveChanges>保存更改到“{0}”</HaulersDream.Profile.SaveChanges>
+<HaulersDream.Profile.CreateNew>创建新配置档…</HaulersDream.Profile.CreateNew>
+<HaulersDream.Profile.SaveAsNew>另存为新配置档…</HaulersDream.Profile.SaveAsNew>
+<HaulersDream.Profile.Delete>删除配置档“{0}”</HaulersDream.Profile.Delete>
+<HaulersDream.Profile.DeleteConfirm>删除配置档“{0}”？你当前的设置保持不变。</HaulersDream.Profile.DeleteConfirm>
+<HaulersDream.Profile.NameDialogTitle>配置档名称：</HaulersDream.Profile.NameDialogTitle>
+<HaulersDream.Profile.SelectorTip>设置配置档。选取一个已保存的配置档，重置为内置的默认，或把你当前的设置存为一个新配置档。“自定义（未保存）”表示你更改了尚未保存到任何配置档的设置。</HaulersDream.Profile.SelectorTip>
+<HaulersDream.Profile.Copy>复制配置档…</HaulersDream.Profile.Copy>
+<HaulersDream.Profile.Paste>粘贴配置档…</HaulersDream.Profile.Paste>
+<HaulersDream.Profile.CopyTitle>复制配置档</HaulersDream.Profile.CopyTitle>
+<HaulersDream.Profile.CopyInfo>把这串代码分享给另一名玩家。它包含模组版本以及仅你相对此版本默认值所更改的设置，因此它很短。</HaulersDream.Profile.CopyInfo>
+<HaulersDream.Profile.CopyToClipboard>复制到剪贴板</HaulersDream.Profile.CopyToClipboard>
+<HaulersDream.Profile.CopiedMsg>配置档代码已复制到剪贴板。</HaulersDream.Profile.CopiedMsg>
+<HaulersDream.Profile.PasteTitle>粘贴配置档</HaulersDream.Profile.PasteTitle>
+<HaulersDream.Profile.PasteTokenLabel>配置档代码：</HaulersDream.Profile.PasteTokenLabel>
+<HaulersDream.Profile.PasteFromClipboard>从剪贴板粘贴</HaulersDream.Profile.PasteFromClipboard>
+<HaulersDream.Profile.PasteInvalid>这看起来不像一个有效的 Hauler's Dream 配置档代码。</HaulersDream.Profile.PasteInvalid>
+<HaulersDream.Profile.PasteCreate>创建配置档</HaulersDream.Profile.PasteCreate>
+<HaulersDream.Common.Off>关闭</HaulersDream.Common.Off>
+<HaulersDream.Common.On>开启</HaulersDream.Common.On>
+<HaulersDream.Common.NumberBoxTip>直接输入精确数值（{0}–{1}），无需拖动滑块。</HaulersDream.Common.NumberBoxTip>
+<HaulersDream.Unit.Tiles>{0} 格</HaulersDream.Unit.Tiles>
+<HaulersDream.Unit.Hours>{0} 小时</HaulersDream.Unit.Hours>
+<HaulersDream.Setting.CarryLimit.Lab>携带上限</HaulersDream.Setting.CarryLimit.Lab>
+<HaulersDream.Setting.Overload.Lab>智能超载</HaulersDream.Setting.Overload.Lab>
+<HaulersDream.Setting.BulkHaulTrigger.Lab>批量搬运触发</HaulersDream.Setting.BulkHaulTrigger.Lab>
+<HaulersDream.Setting.KeepWorkingMargin.Lab>较长转移前先卸载</HaulersDream.Setting.KeepWorkingMargin.Lab>
+<HaulersDream.Setting.MinFreeSpaceToUnloadCarrier.Lab>开始所需的最小背包空闲空间</HaulersDream.Setting.MinFreeSpaceToUnloadCarrier.Lab>
+<HaulersDream.Setting.MinFreeSpaceToUnloadCarrier.Help>搬运者在开始清空一只驮兽之前，需要至少有这么多的携带容量空闲，以免它自己的背包立刻溢出。</HaulersDream.Setting.MinFreeSpaceToUnloadCarrier.Help>
+<HaulersDream.Setting.VisualUnloadDelay.Lab>每堆卸载延迟</HaulersDream.Setting.VisualUnloadDelay.Lab>
+<HaulersDream.Setting.VisualUnloadDelay.Help>批量卸载时每堆之间的一个小小装饰性停顿，让它看起来像一个有意的动作。0＝瞬间。</HaulersDream.Setting.VisualUnloadDelay.Help>
+<HaulersDream.Setting.BulkLoadAiUpdateFrequency.Lab>装载重新检查间隔</HaulersDream.Setting.BulkLoadAiUpdateFrequency.Lab>
+<HaulersDream.Setting.BulkLoadAiUpdateFrequency.Help>一个运行中的批量装载任务多久重新检查一次它所携带的货物是否仍被该组所需。越低＝重新路由越灵敏，越高＝越省。</HaulersDream.Setting.BulkLoadAiUpdateFrequency.Help>
+<HaulersDream.Setting.LoadOpportunityRadius.Lab>途中存货搜索半径</HaulersDream.Setting.LoadOpportunityRadius.Lab>
+<HaulersDream.Setting.LoadOpportunityRadius.Help>一个携带货物的小人在路过时，向多远处寻找一个需要货物的运输工具以存入货物。</HaulersDream.Setting.LoadOpportunityRadius.Help>
+<HaulersDream.Setting.LoadPathfindingCandidates.Lab>每站的寻路候选数</HaulersDream.Setting.LoadPathfindingCandidates.Lab>
+<HaulersDream.Setting.LoadPathfindingCandidates.Help>最近的拾取站点中有多少个用真实寻路（而非直线距离）重新排序。越高＝排序越准确，越耗CPU。</HaulersDream.Setting.LoadPathfindingCandidates.Help>
+<HaulersDream.Setting.DefaultBatchSize.Lab>默认批量大小</HaulersDream.Setting.DefaultBatchSize.Lab>
+<HaulersDream.Setting.DefaultBatchSize.Help>新批量工单的起始数量。</HaulersDream.Setting.DefaultBatchSize.Help>
+<HaulersDream.Setting.RouteMaxAmount.Lab>路径“数量”滑块最大值</HaulersDream.Setting.RouteMaxAmount.Lab>
+<HaulersDream.Setting.RouteMaxAmount.Help>路径规划器中“数量”滑块的顶端（在“全部”这一档之前）。</HaulersDream.Setting.RouteMaxAmount.Help>
+<HaulersDream.Setting.RouteOrderEffort.Lab>精确求解访问顺序的上限</HaulersDream.Setting.RouteOrderEffort.Lab>
+<HaulersDream.Setting.RouteOrderEffort.Help>站点数不超过此值的路径会得到精确最优的访问顺序；更大的路径使用快速近似。越高求解越精确，但越耗CPU。</HaulersDream.Setting.RouteOrderEffort.Help>
+<HaulersDream.Setting.CraftBatchTimeout.Lab>默认制作批量超时</HaulersDream.Setting.CraftBatchTimeout.Lab>
+<HaulersDream.Setting.CraftBatchTimeout.Help>一个制作批量自行结束前的实际时长上限。0＝无限制。可按批量分别覆盖。</HaulersDream.Setting.CraftBatchTimeout.Help>
+<HaulersDream.Setting.UnloadGrace.Lab>积攒窗口</HaulersDream.Setting.UnloadGrace.Lab>
+<HaulersDream.Setting.UnloadGrace.Help>小人在最后一次拾取后，会继续积攒多久才进行一次自动卸载行程。越高＝工作中的小人会在整项工作中持续收取；它一旦装满仍会更早卸载。</HaulersDream.Setting.UnloadGrace.Help>
+<HaulersDream.Setting.IntervalUnload.Lab>间隔卸载兜底</HaulersDream.Setting.IntervalUnload.Lab>
+<HaulersDream.Setting.IntervalUnload.Help>一个周期性的强制卸载，以防其他每一个卸载触发都被吞掉（征召、领主职责、模组任务）。0＝关闭。</HaulersDream.Setting.IntervalUnload.Help>
+<HaulersDream.Setting.AlertStuckHours.Lab>标记卡住的小人于</HaulersDream.Setting.AlertStuckHours.Lab>
+<HaulersDream.Setting.AlertStuckHours.Help>小人可以持有它无法收起的搬运货物（且存在一个目的地）多久之后，警报才标记它。</HaulersDream.Setting.AlertStuckHours.Help>
+<HaulersDream.Setting.EnRoutePathChecker.Lab>途中检查</HaulersDream.Setting.EnRoutePathChecker.Lab>
+  <HaulersDream.Head.OpportunisticDetour>顺路抓取绕行</HaulersDream.Head.OpportunisticDetour>
+  <HaulersDream.Setting.OpportunisticDetour.Lab>绕行距离</HaulersDream.Setting.OpportunisticDetour.Lab>
+  <HaulersDream.Setting.OpportunisticDetour.Desc>一个已经在前往储存途中的小人，会偏离原路多远去抓取它路过的一件散落物品。距离以在直行基础上多走的格数计：关闭从不抓取路过的物品；短只取几乎正好在必经路径上的物品（约 4 格）；标准（默认值）允许短距离绕行（约 10 格）；长会走值得的绕行（约 20 格）。以直线距离衡量，因此在长途搬运中一点点就能走得更远。仅在开启“抓取前往任务途中的散落物品”时生效。</HaulersDream.Setting.OpportunisticDetour.Desc>
+  <HaulersDream.Setting.Detour.Off.S>关闭</HaulersDream.Setting.Detour.Off.S>
+  <HaulersDream.Setting.Detour.Short.S>短</HaulersDream.Setting.Detour.Short.S>
+  <HaulersDream.Setting.Detour.Standard.S>标准</HaulersDream.Setting.Detour.Standard.S>
+  <HaulersDream.Setting.Detour.Long.S>长</HaulersDream.Setting.Detour.Long.S>
+  <HaulersDream.Setting.Detour.Off.H>从不绕行：小人不会去抓取路过的物品，并会把已收取的一批货物带着做完整项工作。恢复严格的“绝不延误工作”行为。（额外 0 格）</HaulersDream.Setting.Detour.Off.H>
+  <HaulersDream.Setting.Detour.Short.H>仅当几乎毫无代价时，大致相当于正好在必经路径上的一件物品。约额外多走 4 格。</HaulersDream.Setting.Detour.Short.H>
+  <HaulersDream.Setting.Detour.Standard.H>允许短距离绕行以省去第二趟。约额外多走 10 格。</HaulersDream.Setting.Detour.Standard.H>
+  <HaulersDream.Setting.Detour.Long.H>走值得的绕行，用重要工作上一点有意的小延迟换取更少的往返。约额外多走 20 格。</HaulersDream.Setting.Detour.Long.H>
+  <HaulersDream.Head.UnloadDetour>重要工作期间卸货</HaulersDream.Head.UnloadDetour>
+  <HaulersDream.Setting.UnloadDetour.Lab>重要工作中的卸货绕行</HaulersDream.Setting.UnloadDetour.Lab>
+  <HaulersDream.Setting.UnloadDetour.Desc>一个正在从事非紧急重要工作（择期手术、救援、看守任务）的小人，会偏离原路多远去在储存处卸下已收取的一批货物，通常是在外出取该手术所需药品的路上。距离以在直行基础上多走的格数计：关闭会把货物带着做完整项工作（旧的严格零绕行行为）；短（默认值）允许约 4 格的绕行，于是在几乎免费的顺路时卸下货物；标准允许约 10 格；长允许约 20 格，用一点有意的手术小延迟换取更少的往返。需要开启自动卸载（默认即为开启）；这是与“路过储存区时顺手卸货”开关相互独立的功能。</HaulersDream.Setting.UnloadDetour.Desc>
+<HaulersDream.Setting.AutoStripMode.Lab>搬运时自动扒取</HaulersDream.Setting.AutoStripMode.Lab>
+<HaulersDream.Setting.AutoStrip.Help>搬运尸体时，先扒下它的装备并随身带走战利品。“仅处置”只扒取前往倾倒区的尸体。“关闭”让尸体保持着装（手动扒取命令仍会收取其装备）。</HaulersDream.Setting.AutoStrip.Help>
+<HaulersDream.Setting.TaintedSmeltable.Lab>污损的服装——可熔炼</HaulersDream.Setting.TaintedSmeltable.Lab>
+<HaulersDream.Setting.TaintedNonSmeltable.Lab>污损的服装——不可熔炼</HaulersDream.Setting.TaintedNonSmeltable.Lab>
+<HaulersDream.Setting.Tainted.Help>对扒取过程中移除的污损（被死者穿过的）服装如何处理：取走、留在尸体上、丢下并禁用，或销毁。</HaulersDream.Setting.Tainted.Help>
+<HaulersDream.Setting.RouteSelection.Lab>路径选择</HaulersDream.Setting.RouteSelection.Lab>
+<HaulersDream.Setting.RouteSelection.Help>规划器如何选择哪些目标纳入一条路径。</HaulersDream.Setting.RouteSelection.Help>
+<HaulersDream.Setting.RouteDistance.Lab>距离基准</HaulersDream.Setting.RouteDistance.Lab>
+<HaulersDream.Setting.RouteDistance.Help>规划器如何测量各站之间的距离。</HaulersDream.Setting.RouteDistance.Help>
+<HaulersDream.Setting.ShareForBuilding.Help>小人已收进货物栏的材料会计入附近的建造，因此它无需单独跑一趟取料即可建造。</HaulersDream.Setting.ShareForBuilding.Help>
+<HaulersDream.Setting.ShareMeetInMiddle.Help>当一项建造或工单将从某个运载者的货物栏取用材料时，一个空闲的运载者会走向工人，以便更早相遇。</HaulersDream.Setting.ShareMeetInMiddle.Help>
+<HaulersDream.Setting.ItemUnload.Help>为单个物品设置规则：保留整堆、最多保留一个设定的数量，或始终卸载它——对该物品覆盖多余物品设置。</HaulersDream.Setting.ItemUnload.Help>
+<HaulersDream.Setting.HideGizmo.Help>显示当殖民者携带收取货物时出现的、每个小人的“卸载货物栏”按钮。默认开启；关闭后将隐藏该按钮。</HaulersDream.Setting.HideGizmo.Help>
+<HaulersDream.Setting.StorageFilterButton.Help>编辑按建筑和按模组的允许/拒绝规则，决定搬运可使用哪些储存。</HaulersDream.Setting.StorageFilterButton.Help>
+<HaulersDream.Setting.PauseWhileDrafted.Help>当一个小人被征召时，Hauler's Dream 停止为它启动新的收取和清扫。</HaulersDream.Setting.PauseWhileDrafted.Help>
+<HaulersDream.Setting.AllowIncapable.Help>默认关闭，与原版一致：一个搬运工作被禁用的小人（"无法从事粗活"的背景故事、特性、基因、自负的头衔、意识形态角色……）会被完全排除在拾荒者之梦之外——它不会拾取自己的工作产出，右键指令"搬运附近的一切""拾取""优先搬运材料至……""优先批量装载""优先为……批量添加燃料"和"优先批量卸载"也不会对它显示，正如原版会为该小人把"优先搬运"变灰一样。打开此项即可照样把这些搬运工作交给它们。有两项刻意永不受此设置限制：在商队地图上命令小人装载驮兽（原版允许任何小人这样做），以及清空小人自己的背包，那始终可用，以免有东西被滞留。如果你想让殖民地里的每个人都能搬运，请改用下方的"无工作能力覆盖"。</HaulersDream.Setting.AllowIncapable.Help>
+<HaulersDream.Setting.EnableOnNonHomeMaps.Help>也在商队和其他非主基地地图上运行 Hauler's Dream，而不仅是你的主殖民地。</HaulersDream.Setting.EnableOnNonHomeMaps.Help>
+<HaulersDream.Setting.VerboseLogging.Help>额外的开发者日志。仅在开发者模式下可用——且仅在该模式下记录。</HaulersDream.Setting.VerboseLogging.Help>
+<HaulersDream.Setting.BulkHaulSecond.S>第2个命令时</HaulersDream.Setting.BulkHaulSecond.S>
+<HaulersDream.Setting.BulkHaulAlways.S>始终</HaulersDream.Setting.BulkHaulAlways.S>
+<HaulersDream.Setting.EnRoutePathVanilla.S>廉价</HaulersDream.Setting.EnRoutePathVanilla.S>
+<HaulersDream.Setting.EnRoutePathDefault.S>准确</HaulersDream.Setting.EnRoutePathDefault.S>
+<HaulersDream.Setting.EnRoutePathPathfinding.S>彻底</HaulersDream.Setting.EnRoutePathPathfinding.S>
+<HaulersDream.Setting.AutoStripAll.S>所有搬运</HaulersDream.Setting.AutoStripAll.S>
+<HaulersDream.Setting.AutoStripDisposal.S>仅处置</HaulersDream.Setting.AutoStripDisposal.S>
+<HaulersDream.Setting.AutoStripOff.S>关闭</HaulersDream.Setting.AutoStripOff.S>
+<HaulersDream.Setting.TaintedTake.S>取走</HaulersDream.Setting.TaintedTake.S>
+<HaulersDream.Setting.TaintedLeave.S>留下</HaulersDream.Setting.TaintedLeave.S>
+<HaulersDream.Setting.TaintedForbid.S>丢下并禁用</HaulersDream.Setting.TaintedForbid.S>
+<HaulersDream.Setting.TaintedDestroy.S>销毁</HaulersDream.Setting.TaintedDestroy.S>
+<HaulersDream.PlanRoute.SelMostStops.S>站点最多</HaulersDream.PlanRoute.SelMostStops.S>
+<HaulersDream.PlanRoute.SelNearest.S>最近</HaulersDream.PlanRoute.SelNearest.S>
+<HaulersDream.PlanRoute.DistStraight.S>直线</HaulersDream.PlanRoute.DistStraight.S>
+<HaulersDream.PlanRoute.DistWalking.S>步行路径</HaulersDream.PlanRoute.DistWalking.S>
+<HaulersDream.Setting.EnRoutePathVanilla.H>快速的有界区域计数泛洪——最廉价的检查，最不准确。</HaulersDream.Setting.EnRoutePathVanilla.H>
+<HaulersDream.Setting.EnRoutePathDefault.H>真实的 A* 路径代价；遇到范围失败即停止扫描。更准确，更耗CPU。</HaulersDream.Setting.EnRoutePathDefault.H>
+<HaulersDream.Setting.EnRoutePathPathfinding.H>真实的 A* 路径代价；持续扫描以求最佳匹配。最准确，最耗CPU。</HaulersDream.Setting.EnRoutePathPathfinding.H>
+<HaulersDream.PlanRoute.SelMostStops.H>偏好能把最多站点压进同一段行程距离的目标。</HaulersDream.PlanRoute.SelMostStops.H>
+<HaulersDream.PlanRoute.SelNearest.H>偏好离你点选的那个最近的目标。</HaulersDream.PlanRoute.SelNearest.H>
+<HaulersDream.PlanRoute.DistStraight.H>以直线测量距离——快。</HaulersDream.PlanRoute.DistStraight.H>
+<HaulersDream.PlanRoute.DistWalking.H>沿真实步行路径测量距离——较慢，更准确。</HaulersDream.PlanRoute.DistWalking.H>
+<HaulersDream.Cat.Hauling.Intro>殖民者如何拾取东西——它们携带多少、何时超载，以及它们清扫什么。</HaulersDream.Cat.Hauling.Intro>
+<HaulersDream.Cat.Unloading.Intro>殖民者何时、如何收起所携带的货物。</HaulersDream.Cat.Unloading.Intro>
+<HaulersDream.Cat.BuildCraft.Intro>从货物栏取用建造和制作材料、食物运送，以及原料选择。</HaulersDream.Cat.BuildCraft.Intro>
+<HaulersDream.Cat.BulkLoading.Intro>对运载者、运输工具、传送门、可添加燃料物和载具的一趟装载与卸载。</HaulersDream.Cat.BulkLoading.Intro>
+<HaulersDream.Cat.Routing.Intro>抓取途中的物品、把物资移到更靠近使用处，以及筛选储存。</HaulersDream.Cat.Routing.Intro>
+<HaulersDream.Cat.Yields.Intro>哪些工作产出会被收取、击杀后搬运尸体，以及扒取装备。</HaulersDream.Cat.Yields.Intro>
+<HaulersDream.Cat.Who.Intro>Hauler's Dream 适用于哪些小人，以及让任何小人都能从事某些工作的覆盖项。</HaulersDream.Cat.Who.Intro>
+<HaulersDream.Cat.Planners.Intro>右键路径和制作规划器，及其默认值。</HaulersDream.Cat.Planners.Intro>
+<HaulersDream.Cat.Advanced.Intro>卸载时机、被困货物安全警报、保存清理，以及开发者工具。</HaulersDream.Cat.Advanced.Intro>
+<HaulersDream.Head.CarryWeight>携带质量</HaulersDream.Head.CarryWeight>
+<HaulersDream.Head.AutoUnloadTrips>自动卸载行程</HaulersDream.Head.AutoUnloadTrips>
+<HaulersDream.Head.DropOff>卸货行为</HaulersDream.Head.DropOff>
+<HaulersDream.Head.ItemRulesDisplay>单项物品规则与显示</HaulersDream.Head.ItemRulesDisplay>
+<HaulersDream.Head.EnRoute>途中拾取</HaulersDream.Head.EnRoute>
+<HaulersDream.Head.WhoCanHaul>谁能收取与搬运</HaulersDream.Head.WhoCanHaul>
+<HaulersDream.Head.PlanningTools>规划工具</HaulersDream.Head.PlanningTools>
+<HaulersDream.Setting.Overload.Ceiling>上限</HaulersDream.Setting.Overload.Ceiling>
+  <HaulersDream.Setting.MechHaulMultiplier.Lab>机械体搬运能力</HaulersDream.Setting.MechHaulMultiplier.Lab>
+  <HaulersDream.Setting.MechHaulMultiplierDesc>在你的工作机械体真实承载能力的基础上，再倍增它们每趟搬运的运量。在×1.0（默认值）时，机械体每趟搬运量恰好等于其承载能力所允许的量；调高此值可让专职的搬运机械体减少趟数、每趟搬得更多。机械体会像殖民者一样因额外负重而减速，因此智能超载的得失权衡依然保持平衡。仅影响你自己的机械体。安装了战斗扩展（Combat Extended）时：在×1.0（默认值）下本项不生效，由战斗扩展自行管理机械体的承重；仅当你将其调高到×1.0以上时，Hauler's Dream 才会接管，将机械体的战斗扩展承重设为其携带量（承载能力）乘以该倍数。</HaulersDream.Setting.MechHaulMultiplierDesc>
+  <HaulersDream.Setting.ShowAutoHaulGizmo>显示每个殖民者的自动搬运开关</HaulersDream.Setting.ShowAutoHaulGizmo>
+  <HaulersDream.Setting.ShowAutoHaulGizmo.Help>Adds an "Auto-haul yields" toggle to each eligible pawn's command bar so you can stop individual pawns from automatically scooping and hauling. Off by default to keep the command bar uncluttered; pawns still auto-haul either way, this only controls whether the toggle is shown. A pawn's saved preference is still honoured even while the toggle is hidden.</HaulersDream.Setting.ShowAutoHaulGizmo.Help>
+<HaulersDream.Batch.SetOvershoot>批量超额制作：+{0}…</HaulersDream.Batch.SetOvershoot>
+<HaulersDream.Batch.OvershootDialogTitle>批量超额制作 — {0}</HaulersDream.Batch.OvershootDialogTitle>
+<HaulersDream.Batch.OvershootLabel>在目标数量之外超额制作 {0} 个</HaulersDream.Batch.OvershootLabel>
+<HaulersDream.Batch.OvershootLabelOff>超额制作：关闭（达到目标数量即停止）</HaulersDream.Batch.OvershootLabelOff>
+<HaulersDream.Batch.OvershootDesc>用于“制作直到拥有X个”的批量作业：当殖民者开始作业时（数量仍低于X），允许其额外多制作这么多个，以便在他们已经待在工作台前时凑成一个实用的整数，而不是数量一达到X就立刻停手。仍受可用材料数量的限制。</HaulersDream.Batch.OvershootDesc>
+<HaulersDream.Batch.TipDoX>每次制作固定数量，一趟取齐整批所需的材料。</HaulersDream.Batch.TipDoX>
+<HaulersDream.Batch.TipUntilX>将库存补足到目标数量，每当库存不足时便制作一批。</HaulersDream.Batch.TipUntilX>
+<HaulersDream.Batch.TipForever>持续分批制作此物品。殖民者会做完当前这一件，如果急需，便会先把所有物品放好，然后停下来去吃饭、睡觉或娱乐。</HaulersDream.Batch.TipForever>
+<HaulersDream.Batch.TipSize>每批制作的数量。殖民者会一趟取齐所有原料。</HaulersDream.Batch.TipSize>
+<HaulersDream.Batch.TipOvershoot>用于“制作直到拥有X个”：一旦开始，便在达到目标后再多做一点，让殖民者在还待在工作台前时凑成一个整数。</HaulersDream.Batch.TipOvershoot>
+<HaulersDream.PlanRoute.SowingGerundFallback>播种</HaulersDream.PlanRoute.SowingGerundFallback>
+<HaulersDream.PlanRoute.ModeSowZone>整个种植区</HaulersDream.PlanRoute.ModeSowZone>
+<HaulersDream.PlanRoute.ModeSowZoneDesc>播种此种植区内所有空着的可种植格子——一键种满整片田地。</HaulersDream.PlanRoute.ModeSowZoneDesc>
+<HaulersDream.Setting.Yield.Header>收取工作成果</HaulersDream.Setting.Yield.Header>
+<HaulersDream.Setting.Yield.Intro>当殖民者完成一项工作时，选择成果的去向。两个“收取”选项都会将成果装入作业者自己的物品栏并在下一趟卸货时放好；它们的区别仅在于是否先掉落到地上。大多数配置都可将这些保持为“先掉落，再收取”。</HaulersDream.Setting.Yield.Intro>
+<HaulersDream.Setting.Yield.Off>Off</HaulersDream.Setting.Yield.Off>
+<HaulersDream.Setting.Yield.OffDesc>作业者把成果留在掉落处，由普通搬运者稍后收取，与原版完全一致。最适合那些你不想装进物品栏的笨重或低价值物品，例如石块。</HaulersDream.Setting.Yield.OffDesc>
+<HaulersDream.Setting.Yield.Drop>先掉落，再收取</HaulersDream.Setting.Yield.Drop>
+<HaulersDream.Setting.Yield.DropDesc>成果先掉落在地上，然后工作殖民者将其拾入自己的物品栏，并在下一趟卸货时带出。由于先落了地，其他搬运者或更近的仓储区仍可取走它，因此这是最接近原版的选择。在你有富余搬运人手时很合适。</HaulersDream.Setting.Yield.DropDesc>
+<HaulersDream.Setting.Yield.Direct>直接收取</HaulersDream.Setting.Yield.Direct>
+<HaulersDream.Setting.Yield.DirectDesc>成果完全不落地，直接进入工作殖民者的物品栏，随后在下一趟卸货时被带出。其他人无法取走，因此作业者总是自己把成果带走。能保持工作区整洁，适合商队和外出地图。负重过大会使该殖民者减速。</HaulersDream.Setting.Yield.DirectDesc>
+<HaulersDream.Setting.Yield.Harvest>收获（作物 &amp; 浆果）</HaulersDream.Setting.Yield.Harvest>
+<HaulersDream.Setting.Yield.HarvestHelp>作物、浆果及其他食物／植物的收获产物。</HaulersDream.Setting.Yield.HarvestHelp>
+<HaulersDream.Setting.Yield.Logging>伐木（树木 &amp; 仙人掌）</HaulersDream.Setting.Yield.Logging>
+<HaulersDream.Setting.Yield.LoggingHelp>砍伐树木和仙人掌所得的木材及其他产物。</HaulersDream.Setting.Yield.LoggingHelp>
+<HaulersDream.Setting.Yield.Mining>采矿（矿石 &amp; 资源）</HaulersDream.Setting.Yield.Mining>
+<HaulersDream.Setting.Yield.MiningHelp>采矿所得的矿石、零部件及其他资源——不含石块。</HaulersDream.Setting.Yield.MiningHelp>
+<HaulersDream.Setting.Yield.Chunks>采矿（碎块）</HaulersDream.Setting.Yield.Chunks>
+<HaulersDream.Setting.Yield.ChunksHelp>采矿产生的石块和矿渣碎块。将此项设为关闭，可把笨重的碎块留在地上，而不是装进物品栏。</HaulersDream.Setting.Yield.ChunksHelp>
+<HaulersDream.Setting.Yield.DeepDrill>深钻</HaulersDream.Setting.Yield.DeepDrill>
+<HaulersDream.Setting.Yield.DeepDrillHelp>深钻机产出的资源。</HaulersDream.Setting.Yield.DeepDrillHelp>
+<HaulersDream.Setting.Yield.Deconstruct>拆除回收物</HaulersDream.Setting.Yield.Deconstruct>
+<HaulersDream.Setting.Yield.DeconstructHelp>从拆除的建筑中回收的材料。</HaulersDream.Setting.Yield.DeconstructHelp>
+<HaulersDream.Setting.Yield.Animals>动物产物（奶 &amp; 羊毛）</HaulersDream.Setting.Yield.Animals>
+<HaulersDream.Setting.Yield.AnimalsHelp>从动物身上采集的奶、羊毛及其他产物。</HaulersDream.Setting.Yield.AnimalsHelp>
+<HaulersDream.Setting.Yield.Strip>扒取（取下的装备）</HaulersDream.Setting.Yield.Strip>
+<HaulersDream.Setting.Yield.StripHelp>通过扒取命令取下的装备。它总是先掉落到地上再被收取，因此无法直接进入物品栏。</HaulersDream.Setting.Yield.StripHelp>
+<HaulersDream.Setting.Yield.Uninstall>拆卸（小型化的建筑）</HaulersDream.Setting.Yield.Uninstall>
+<HaulersDream.Setting.Yield.UninstallHelp>Minified buildings from an Uninstall order (on caravan / away maps, so they batch onto pack animals).</HaulersDream.Setting.Yield.UninstallHelp>
+<HaulersDream.Setting.PerPawnButtonsNote>这些会给每个殖民者添加指令按钮；它们不会改变自动搬运行为。</HaulersDream.Setting.PerPawnButtonsNote>
+<HaulersDream.Search.Placeholder>搜索设置…</HaulersDream.Search.Placeholder>
+<HaulersDream.Search.NoResults>没有设置项与你的搜索匹配。</HaulersDream.Search.NoResults>
+<HaulersDream.Search.More>正在显示前 {0} 个匹配项。优化搜索以查看其余项目。</HaulersDream.Search.More>
+<HaulersDream.Search.Clear>清除搜索</HaulersDream.Search.Clear>
+  <HaulersDream.ItemUnload.SetCategoryTip>一次性把同一条规则应用到此类别中的每个物品，而不必逐个设置。对弹药之类的大类很方便。</HaulersDream.ItemUnload.SetCategoryTip>
+  <HaulersDream.Setting.Yield.Fishing>捕鱼（渔获）</HaulersDream.Setting.Yield.Fishing>
+  <HaulersDream.Setting.Yield.FishingHelp>从钓鱼点捕获的鱼和其他渔获。需要 Odyssey 扩展；没有它则此行隐藏。</HaulersDream.Setting.Yield.FishingHelp>
+  <!-- Main-menu report notifications -->
+  <HaulersDream.Report.Notify.Source>Hauler's Dream</HaulersDream.Report.Notify.Source>
+  <HaulersDream.Report.Notify.Word.Open>待处理</HaulersDream.Report.Notify.Word.Open>
+  <HaulersDream.Report.Notify.Word.Comment>新评论</HaulersDream.Report.Notify.Word.Comment>
+  <HaulersDream.Report.Notify.Word.Resolved>已解决</HaulersDream.Report.Notify.Word.Resolved>
+  <HaulersDream.Report.Notify.Word.Closed>已关闭</HaulersDream.Report.Notify.Word.Closed>
+  <HaulersDream.Report.Notify.OutOfDate>有可用更新（你当前为 {0}）</HaulersDream.Report.Notify.OutOfDate>
+  <HaulersDream.Report.Notify.MoreCount>还有 {0} 条</HaulersDream.Report.Notify.MoreCount>
+
+  <HaulersDream.Head.Notifications>主菜单通知</HaulersDream.Head.Notifications>
+  <HaulersDream.Setting.Notify.Intro>在主菜单角落显示你提交的报告的最新动态：报告被打开时、开发者回复时、你的某个问题被修复时，以及该修复在更新中可用时。点击卡片可在游戏内阅读或回复；点击 x 可将其关闭。</HaulersDream.Setting.Notify.Intro>
+  <HaulersDream.Setting.NotifyThreshold.Lab>显示以下通知</HaulersDream.Setting.NotifyThreshold.Lab>
+  <HaulersDream.Setting.NotifyThreshold.Help>主菜单上显示的数量。越往右显示越少。对于不是你提交的报告，永远不会显示任何内容。</HaulersDream.Setting.NotifyThreshold.Help>
+  <HaulersDream.Setting.NotifyThreshold.All>任何事件</HaulersDream.Setting.NotifyThreshold.All>
+  <HaulersDream.Setting.NotifyThreshold.All.Desc>当报告被打开、收到回复、状态变更或被修复时。</HaulersDream.Setting.NotifyThreshold.All.Desc>
+  <HaulersDream.Setting.NotifyThreshold.Comments>回复</HaulersDream.Setting.NotifyThreshold.Comments>
+  <HaulersDream.Setting.NotifyThreshold.Comments.Desc>新的回复和修复，但不包括打开或轻微状态变更的卡片。</HaulersDream.Setting.NotifyThreshold.Comments.Desc>
+  <HaulersDream.Setting.NotifyThreshold.Fixed>修复</HaulersDream.Setting.NotifyThreshold.Fixed>
+  <HaulersDream.Setting.NotifyThreshold.Fixed.Desc>仅当你的某个报告被修复时，如有更新版本会有提示。</HaulersDream.Setting.NotifyThreshold.Fixed.Desc>
+  <HaulersDream.Setting.NotifyThreshold.Never>从不</HaulersDream.Setting.NotifyThreshold.Never>
+  <HaulersDream.Setting.NotifyThreshold.Never.Desc>完全关闭主菜单通知。</HaulersDream.Setting.NotifyThreshold.Never.Desc>
+
+  <!-- PR #91: multi-target planner + remember-plan toggle + remove-floor route -->
+  <HaulersDream.PlanRoute.OptionRemembered>规划优先{0}（已记住）</HaulersDream.PlanRoute.OptionRemembered>
+  <HaulersDream.PlanRoute.RememberToggleTip>记住方案：一键沿用已记住路线的总开关。开启后，对于你已保存方案的目标（用规划器中的“记住”按钮保存），会显示“规划优先…（已记住）”并一键执行；关闭后，每次都会打开规划器。没有已保存方案的目标始终会打开规划器，即使此项已开启。</HaulersDream.PlanRoute.RememberToggleTip>
+  <HaulersDream.PlanRoute.AddTarget>添加目标类型…</HaulersDream.PlanRoute.AddTarget>
+  <HaulersDream.PlanRoute.AddTargetStop>完成添加类型</HaulersDream.PlanRoute.AddTargetStop>
+  <HaulersDream.PlanRoute.TargetTypesHeader>目标类型：{0}</HaulersDream.PlanRoute.TargetTypesHeader>
+  <HaulersDream.PlanRoute.AddTargetHint>在地图上点击另一种目标，将其也纳入此路线。</HaulersDream.PlanRoute.AddTargetHint>
+  <HaulersDream.PlanRoute.PrimaryBadge>（主要）</HaulersDream.PlanRoute.PrimaryBadge>
+  <HaulersDream.PlanRoute.RemoveFloorGerund>拆除地板</HaulersDream.PlanRoute.RemoveFloorGerund>
+  <HaulersDream.PlanRoute.ModeFloorArea>区域 — 相连的地板</HaulersDream.PlanRoute.ModeFloorArea>
+  <HaulersDream.PlanRoute.ModeFloorAreaDesc>拆除点击处周围整片相连的可拆除地板（整片废墟地板），直到达到路线上限。</HaulersDream.PlanRoute.ModeFloorAreaDesc>
+  <HaulersDream.PlanRoute.RememberButton>记住这些设置</HaulersDream.PlanRoute.RememberButton>
+  <HaulersDream.PlanRoute.RememberButtonDesc>将这些设置保存为该类目标的已记住方案，使其右键菜单提供“规划优先…（已记住）”以一键执行（需在“记住方案”界面开关开启时）。这会覆盖你之前为该类型记住的任何方案。</HaulersDream.PlanRoute.RememberButtonDesc>
+  <HaulersDream.PlanRoute.RememberedConfirm>已为{0}记住此方案。</HaulersDream.PlanRoute.RememberedConfirm>
+  <HaulersDream.PlanRoute.RememberButtonSaved>已记住</HaulersDream.PlanRoute.RememberButtonSaved>
+  <HaulersDream.PlanRoute.RememberButtonSavedDesc>这些设置已保存为该类目标的已记住方案。更改任意设置即可保存为不同的方案。</HaulersDream.PlanRoute.RememberButtonSavedDesc>
+  <!-- Added: #222 strip-before-cremation, Steam urgent-haul bulk, Steam allow-outside-home scope -->
+  <HaulersDream.Setting.NonHomeMapsPlayerControlledOnly>仅在你控制的地图上</HaulersDream.Setting.NonHomeMapsPlayerControlledOnly>
+  <HaulersDream.Setting.NonHomeMapsPlayerControlledOnly.Help>当 Hauler's Dream 在你的主基地之外工作时，将其限制在你真正控制的地图上：你的主基地、临时营地或已定居的据点，以及任何你已建有储存区的地图。在你只是路过或正在攻打的地图上（如伏击点、敌方基地和敌对口袋地图），它会停手。除非开启“也在商队/非主基地地图上工作”，否则无效。</HaulersDream.Setting.NonHomeMapsPlayerControlledOnly.Help>
+  <HaulersDream.Setting.BulkHaulUrgent>批量搬运紧急物品</HaulersDream.Setting.BulkHaulUrgent>
+  <HaulersDream.Setting.BulkHaulUrgentDesc>当一个小人被派去“紧急搬运”某个物品时，它还会把附近短半径内其他被标记为紧急的堆一并收入货物栏，一趟背走整簇，而不是一次搬一个。关闭则恢复原版每趟紧急搬运只搬一个物品的行为。可与 Allow Tool 和 Keyz' Allow Utilities 配合。</HaulersDream.Setting.BulkHaulUrgentDesc>
+  <HaulersDream.Setting.BulkHaulUrgentRadius.Lab>紧急拾取半径</HaulersDream.Setting.BulkHaulUrgentRadius.Lab>
+  <HaulersDream.Setting.BulkHaulUrgentRadius.Help>另一个“紧急搬运”的堆必须离小人正在取的那个多近，才会在同一趟顺手收走。值小则范围紧凑；值大则扫过更大的紧急物品簇。</HaulersDream.Setting.BulkHaulUrgentRadius.Help>
+  <HaulersDream.Setting.BulkHaulUrgentIncludeNonUrgent>同时抓取附近的非紧急物品</HaulersDream.Setting.BulkHaulUrgentIncludeNonUrgent>
+  <HaulersDream.Setting.BulkHaulUrgentIncludeNonUrgentDesc>在紧急搬运途中，也把附近的普通可搬运物收入货物栏，并允许在紧急搬运途中顺手拾取。关闭则表示紧急搬运只携带被标记为紧急的物品。</HaulersDream.Setting.BulkHaulUrgentIncludeNonUrgentDesc>
+  <HaulersDream.Feat.BulkHaulUrgent.Name>批量搬运紧急物品</HaulersDream.Feat.BulkHaulUrgent.Name>
+  <HaulersDream.Feat.BulkHaulUrgent.Blurb>一趟收走附近被标记为紧急的物品</HaulersDream.Feat.BulkHaulUrgent.Blurb>
+  <HaulersDream.Setting.StripBeforeCremation>火化前扒取装备</HaulersDream.Setting.StripBeforeCremation>
+  <HaulersDream.Setting.StripBeforeCremationDesc>当一具尸体即将被火化（或在焚化炉中焚烧）时，先把它的武器、衣物和随身物品扒到火化设施的格子上，这样它们就能被搬到储存区，而不是随尸体一同销毁。染污衣物遵循下方的策略，而“同时扒取玩家派系的尸体”仍决定是否扒取你自己的死者。默认关闭；如果你是故意火化装备来销毁它们，请保持关闭。</HaulersDream.Setting.StripBeforeCremationDesc>
+  <HaulersDream.Setting.CarryMassCap.Lab>最大携带质量</HaulersDream.Setting.CarryMassCap.Lab>
+  <HaulersDream.Setting.CarryMassCap.Off>无限制</HaulersDream.Setting.CarryMassCap.Off>
+  <HaulersDream.Setting.CarryMassCap.Value>{0} 千克</HaulersDream.Setting.CarryMassCap.Value>
+  <HaulersDream.Setting.CarryMassCapDesc>以千克为单位的硬性上限，限制小人在一趟搬运或收集中往货物栏里装多少。这是“我的小人携带太多”的直接答案：把它设低（比如 20 千克），小人就会收一小批、卸载、再回来，而不是装满到其全部携带质量。它与上方的“携带上限”百分比和智能超载协同工作，且始终以较低的限制为准，因此即使开启超载也绝不会超过此上限。与携带上限一样，它只计入装在背包里的东西，不算手上携带的那一堆，并且不改变小人为某个特定建造或工单取用多少材料。设为 0 表示无限制（默认）。</HaulersDream.Setting.CarryMassCapDesc>
+</LanguageData>

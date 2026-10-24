@@ -1,0 +1,30 @@
+[
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Networks\\StorageNetwork.cs",
+    "Hash": "3429CEF72CEF84A4F6E36D0A51D662AB57FCE7AD10B55BA259746DE17A604ECF"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Storage\\StorageOutgoingReservations.cs",
+    "Hash": "A85C28939224FE7A588B6646601A86255975D38796F4E754EFC909E99B68A5C1"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Storage\\StorageMaterialTransaction.cs",
+    "Hash": "3F41A4C474C077FA8B4F89826611B71EEFC3E2B56E5A978EA8D4DAFF967ACBF1"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Trading\\StorageTradeSession.cs",
+    "Hash": "41896BE3E7ACE1B621CF5D4FF649E285AA5275E4AB4B51138BDA2E548DEFA414"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Trading\\StorageTradeApi.cs",
+    "Hash": "C3917EF1EE885B29E7B410AF31421208882F205E3B823239961469AA3700E2B4"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Trading\\StorageTradeTransaction.cs",
+    "Hash": "EC242BA3E19175292E7CB9B5EB6D274109B129F4B6CF3A941788C036D2E41E83"
+  },
+  {
+    "Path": "D:\\project\\魔法存储\\Source\\MagicStorage\\Trading\\StorageLaunchPaymentPatches.cs",
+    "Hash": "D9E2033C0227F8480E6FED377330CBE7BABAAB886CED53FAD4CDCACBAE032950"
+  }
+]

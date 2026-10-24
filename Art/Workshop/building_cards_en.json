@@ -44,8 +44,10 @@
     "name": "Auto-Restocking Shelf",
     "body": "Keeps small amounts available for frequent use by colonists or detection by other mods.",
     "effects": [
-      "Choose up to three item types, one stack each, with separate restock limits.",
-      "Recommended for everyday supplies such as food and medicine."
+      "Recommended for everyday supplies such as food and medicine.",
+      "Can directly replace a nutrient paste dispenser hopper.",
+      "Set items individually, or use filter mode to choose a category of items.",
+      "A high-stack version is also available."
     ]
   },
   {
@@ -53,7 +55,8 @@
     "name": "Construction Supply Unit",
     "body": "Delivers building materials directly to construction blueprints.",
     "effects": [
-      "Automatically supplies construction sites within 40 cells.",
+      "Automatically supplies materials to building blueprints within range.",
+      "Adjust the supply range in the mod settings.",
       "Colonists still do the construction work."
     ]
   },

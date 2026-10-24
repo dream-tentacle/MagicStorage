@@ -27,7 +27,8 @@ namespace Verse
                         placedAction?.Invoke(existing, merged);
                         if (item.Destroyed) return true;
                     }
-                if (map.Ground.FindAll(t => t.Spawned && t.Position == position).Count >= 3) return false;
+                int capacity = (map.haulDestinationManager.SlotGroupParentAt(position) as MagicStorage.Building_StorageSupplyShelf)?.SlotCount ?? 3;
+                if (map.Ground.FindAll(t => t.Spawned && t.Position == position && t.def.category == ThingCategory.Item).Count >= capacity) return false;
             }
             int count = Math.Min(item.stackCount, map.DropBudget);
             if (count <= 0) return false;

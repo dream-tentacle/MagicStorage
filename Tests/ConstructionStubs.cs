@@ -7,6 +7,7 @@ using Verse;
 
 namespace UnityEngine
 {
+    public static class GUIUtility { public static string systemCopyBuffer; }
     public struct Color { }
     public struct Vector3
     {
@@ -17,6 +18,7 @@ namespace UnityEngine
 }
 namespace Verse
 {
+    public static class Prefs { public static bool DevMode; }
     public struct TargetInfo
     {
         public IntVec3 Cell;
@@ -31,7 +33,7 @@ namespace Verse
     public class Graphic { }
     public class Graphic_Random : Graphic { }
     public class TerrainDef { }
-    public class BuildingProperties { public bool isAttachment, isPowerConduit; public RimWorld.StorageSettings fixedStorageSettings; }
+    public class BuildingProperties { public bool isAttachment, isPowerConduit, repairable = true; public int maxItemsInCell = 1; public RimWorld.StorageSettings fixedStorageSettings; }
     public partial class ThingDef
     {
         public object entityDefToBuild;
@@ -79,7 +81,9 @@ namespace Verse
         }
         public static Thing Spawn(Thing thing, IntVec3 position, Map map, Rot4 rotation)
         {
+            thing.holdingOwner?.Remove(thing);
             thing.Position = position; thing.Map = map; thing.Rotation = rotation; thing.Spawned = true;
+            if (thing.def.category == ThingCategory.Item && !map.Ground.Contains(thing)) map.Ground.Add(thing);
             map.listerThings.Things.Add(thing); return thing;
         }
     }
@@ -91,28 +95,70 @@ namespace Verse
     { public Plan Plan = new Plan(); public bool TryGetPlan(IntVec3 cell, out Plan plan) { plan = Plan; return true; } }
     public partial class Map
     {
+        public DesignationManager designationManager = new DesignationManager();
         public int Wipes;
         public RimWorld.EnrouteManager enrouteManager = new RimWorld.EnrouteManager();
         public TerrainGrid terrainGrid = new TerrainGrid();
         public PlanManager planManager = new PlanManager();
     }
+    public class DesignationManager
+    {
+        public readonly HashSet<Thing> Deconstruct = new HashSet<Thing>();
+        public object DesignationOn(Thing target, object def) => Deconstruct.Contains(target) ? new object() : null;
+    }
+    public class MoteDualAttached : Thing { }
     public class PawnPathFollower
     { public Thing Old, New; public void NotifyThingTransformed(Thing old, Thing replacement) { Old = old; New = replacement; } }
     public partial class Pawn { public PawnPathFollower pather = new PawnPathFollower(); }
 }
 namespace RimWorld
 {
+    // Controlled native dispatch boundaries; tests do not simulate pawn job search.
+    public class WorkGiver_FixBrokenDownBuilding
+    {
+        public static bool NativeEligibility = true;
+        public static int CheckCalls, JobCalls;
+        public static readonly Verse.AI.Job NativeJob = new Verse.AI.Job();
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public virtual bool HasJobOnThing(Pawn pawn, Thing t, bool forced = false)
+        { CheckCalls++; return NativeEligibility; }
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public virtual Verse.AI.Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
+        { JobCalls++; return NativeJob; }
+    }
+
+    public static partial class ThingDefOf { public static ThingDef ComponentIndustrial = new ThingDef(); }
     public static class MoteMaker
     {
         public static int Beams;
         public static ThingDef Def;
         public static TargetInfo Source, Destination;
         public static UnityEngine.Vector3 SourceOffset, DestinationOffset;
-        public static void MakeInteractionOverlay(ThingDef def, TargetInfo source, TargetInfo destination,
+        public static MoteDualAttached LastBeam;
+        public static MoteDualAttached MakeInteractionOverlay(ThingDef def, TargetInfo source, TargetInfo destination,
             UnityEngine.Vector3 sourceOffset, UnityEngine.Vector3 destinationOffset)
         {
             Beams++; Def=def; Source=source; Destination=destination;
             SourceOffset=sourceOffset; DestinationOffset=destinationOffset;
+            return LastBeam = new MoteDualAttached { def = def };
+        }
+    }
+    public static class DesignationDefOf { public static readonly object Deconstruct = new object(); }
+    public class BreakdownManager : MapComponent
+    {
+        public readonly HashSet<Thing> brokenDownThings = new HashSet<Thing>();
+        public BreakdownManager(Map map) : base(map) { }
+    }
+    // Controlled native state transition; the real component updates power and overlays too.
+    public class CompBreakdownable : ThingComp
+    {
+        public bool BrokenDown = true;
+        public int Repairs;
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public void Notify_Repaired()
+        {
+            BrokenDown = false; Repairs++;
+            parent.Map.GetComponent<BreakdownManager>().brokenDownThings.Remove(parent);
         }
     }
     public interface IConstructible { List<ThingDefCountClass> TotalMaterialCost(); }

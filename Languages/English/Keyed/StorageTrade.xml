@@ -2,8 +2,47 @@
 <LanguageData>
   <MS_Payment_Unavailable>Cannot complete this payment: not enough available resources, or the storage network is unavailable.</MS_Payment_Unavailable>
   <MS_Trade_Command>Trade with {0} through magic storage</MS_Trade_Command>
+  <MS_Trade_CeleTechUnavailable>The trade shuttle is no longer available for trade</MS_Trade_CeleTechUnavailable>
   <MS_Trade_InventoryNotice>Magic storage trade: goods and silver from networks and connected restocking shelves. Purchases are delivered on the ground.</MS_Trade_InventoryNotice>
   <MS_Trade_Unavailable>Cannot complete this trade: goods or silver in the network or connected restocking shelves are unavailable, or the trader can no longer trade. Check the quantities or reset the list.</MS_Trade_Unavailable>
+  <MS_Trade_Failed>Cannot complete this trade: {0}</MS_Trade_Failed>
+  <MS_Trade_UnknownItem>unknown item</MS_Trade_UnknownItem>
+  <MS_Trade_Fail_SessionClosed>This trade session has closed. Reopen the trade window.</MS_Trade_Fail_SessionClosed>
+  <MS_Trade_Fail_TraderChanged>Another trade has replaced the current trader. Reopen the trade window.</MS_Trade_Fail_TraderChanged>
+  <MS_Trade_Fail_NegotiatorChanged>The negotiator for this trade has changed. Reopen the trade window.</MS_Trade_Fail_NegotiatorChanged>
+  <MS_Trade_Fail_NegotiatorUnavailable>The negotiator has been destroyed or is no longer on a map.</MS_Trade_Fail_NegotiatorUnavailable>
+  <MS_Trade_Fail_TraderUnavailable>The game currently considers this trader unable to trade. They may have stopped trading, be unable to interact, or have no tradeable goods left.</MS_Trade_Fail_TraderUnavailable>
+  <MS_Trade_Fail_TradePermission>The negotiator no longer meets the requirements to trade with this trader.</MS_Trade_Fail_TradePermission>
+  <MS_Trade_Fail_TraderLeftMap>The trader has been destroyed, left the map, or moved to a different map.</MS_Trade_Fail_TraderLeftMap>
+  <MS_Trade_Fail_TraderDismissed>The trader has been dismissed and no longer accepts trade.</MS_Trade_Fail_TraderDismissed>
+  <MS_Trade_Fail_ShipUnavailable>The orbital trader has departed or no longer accepts trade.</MS_Trade_Fail_ShipUnavailable>
+  <MS_Trade_Fail_ConsoleMissing>The comms console used for this trade has been destroyed, moved, or is no longer on the negotiator's map.</MS_Trade_Fail_ConsoleMissing>
+  <MS_Trade_Fail_ConsoleUnavailable>The comms console used for this trade cannot currently be used.</MS_Trade_Fail_ConsoleUnavailable>
+  <MS_Trade_Fail_CannotTalk>The negotiator cannot currently talk and cannot conduct orbital trade.</MS_Trade_Fail_CannotTalk>
+  <MS_Trade_Fail_GroundTarget>The interaction target for this trade has been destroyed, left the map, or moved to a different map.</MS_Trade_Fail_GroundTarget>
+  <MS_Trade_Fail_CallbackRejected>A third-party mod considers this trade target unavailable.</MS_Trade_Fail_CallbackRejected>
+  <MS_Trade_Fail_CallbackError>A third-party mod encountered an error while checking the trade target. See the log for details.</MS_Trade_Fail_CallbackError>
+  <MS_Trade_Fail_NoCore>No storage core is available for this trade.</MS_Trade_Fail_NoCore>
+  <MS_Trade_Fail_CoreMissing>A storage core used for this trade has been destroyed or is missing.</MS_Trade_Fail_CoreMissing>
+  <MS_Trade_Fail_CoreNotWorking>Storage core "{0}" cannot operate. Check its power and storage network status.</MS_Trade_Fail_CoreNotWorking>
+  <MS_Trade_Fail_CoreUnavailable>Storage core "{0}" is on a different map, no longer belongs to the player, or is in fog.</MS_Trade_Fail_CoreUnavailable>
+  <MS_Trade_Fail_CoreBeacon>Storage core "{0}" is no longer covered by a powered orbital trade beacon.</MS_Trade_Fail_CoreBeacon>
+  <MS_Trade_Fail_CoreSellingBlocked>Selling items near storage core "{0}" is prohibited: {1}</MS_Trade_Fail_CoreSellingBlocked>
+  <MS_Trade_Fail_CoreUnreachable>The trader or trading pawn cannot reach storage core "{0}".</MS_Trade_Fail_CoreUnreachable>
+  <MS_Trade_Fail_CurrencyMissing>The trade list has no payment currency. Reset the list.</MS_Trade_Fail_CurrencyMissing>
+  <MS_Trade_Fail_CurrencyCount>Not enough currency is available for payment: required {0}, currently available {1}.</MS_Trade_Fail_CurrencyCount>
+  <MS_Trade_Fail_BuyCount>The trader does not have enough "{0}": buying {1}, currently held by the trader {2}.</MS_Trade_Fail_BuyCount>
+  <MS_Trade_Fail_SellCount>Not enough "{0}" is available to sell: required {1}, currently available {2}. {3}</MS_Trade_Fail_SellCount>
+  <MS_Trade_Fail_SourceChanged>Some items are no longer in their recorded trade sources. Reset the list.</MS_Trade_Fail_SourceChanged>
+  <MS_Trade_Fail_ItemNotSellable>Some items no longer meet the conditions for sale.</MS_Trade_Fail_ItemNotSellable>
+  <MS_Trade_Fail_ReservationClosed>This trade's item reservations have ended or were reused. Reset the list.</MS_Trade_Fail_ReservationClosed>
+  <MS_Trade_Fail_InvalidRequest>The trade source or requested quantity for "{0}" is invalid. Reset the list.</MS_Trade_Fail_InvalidRequest>
+  <MS_Trade_Fail_DuplicateItem>The same stack of "{0}" was counted more than once. Reset the list.</MS_Trade_Fail_DuplicateItem>
+  <MS_Trade_Fail_ShelfCount>Shelf stock of "{0}" is unavailable or insufficient: required {1}, currently available {2}.</MS_Trade_Fail_ShelfCount>
+  <MS_Trade_Fail_ReserveCount>Could not reserve "{0}" from storage: required {1}, successfully reserved {2}.</MS_Trade_Fail_ReserveCount>
+  <MS_Trade_Fail_ReservationSession>The trade participants or storage network changed while reserving items.</MS_Trade_Fail_ReservationSession>
+  <MS_Trade_Fail_ItemPolicyChanged>The storage core or sale conditions for "{0}" changed while reserving items.</MS_Trade_Fail_ItemPolicyChanged>
+  <MS_Trade_Fail_ReservationChanged>The storage reservation for "{0}" is no longer valid. The items, quantities, or storage network changed.</MS_Trade_Fail_ReservationChanged>
   <MS_Trade_OrbitalCommand>Trade with {0} through orbital magic storage</MS_Trade_OrbitalCommand>
   <MS_Trade_OrbitalInventoryNotice>Magic storage orbital trade: network and connected shelf goods and silver, with beacon-covered cores. Purchases arrive in drop pods.</MS_Trade_OrbitalInventoryNotice>
   <MS_Trade_NoCoveredCore>A powered orbital trade beacon must cover an available storage core</MS_Trade_NoCoveredCore>

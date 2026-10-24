@@ -9,15 +9,23 @@ namespace Verse
     public class DefModExtension { }
     public static class DefDatabase<T> where T : class
     {
-        public static T GetNamedSilentFail(string name) => name == "MS_Mote_ConstructionSupplyBeam" ? SupplyBeam as T : null;
+        public static T GetNamedSilentFail(string name) => name == "MS_Mote_ConstructionSupplyBeam" ? SupplyBeam as T :
+            name == "MS_Mote_ConstructionRepairBeam" ? RepairBeam as T :
+            name == "MS_Mote_ConstructionRepairBeamFallback" ? RepairBeamFallback as T : null;
         public static ThingDef SupplyBeam = new ThingDef();
+        public static ThingDef RepairBeam = new ThingDef(), RepairBeamFallback = new ThingDef();
         private static readonly Dictionary<string, T> values = new Dictionary<string, T>();
         public static T GetNamed(string name)
         {
             if (!values.TryGetValue(name, out var value))
             {
-                if (name != "MS_CosmicCrafting" && name != "MS_TakeStorageApparel") throw new Exception("Unknown fixture def: " + name);
-                value = new JobDef() as T; values[name] = value;
+                if (name == "MealLavish") value = new ThingDef() as T;
+                else
+                {
+                    if (name != "MS_CosmicCrafting" && name != "MS_TakeStorageApparel" && name != "MS_TradeWithStorageCeleTech") throw new Exception("Unknown fixture def: " + name);
+                    value = new JobDef() as T;
+                }
+                values[name] = value;
             }
             return value;
         }

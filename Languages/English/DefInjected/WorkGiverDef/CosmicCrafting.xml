@@ -15,4 +15,7 @@
   <MS_CosmicCrafting.label>cosmic workbench crafting</MS_CosmicCrafting.label>
   <MS_CosmicCrafting.verb>craft at a cosmic workbench</MS_CosmicCrafting.verb>
   <MS_CosmicCrafting.gerund>crafting at</MS_CosmicCrafting.gerund>
+  <MS_CosmicHauling.label>cosmic workbench burning</MS_CosmicHauling.label>
+  <MS_CosmicHauling.verb>burn at a cosmic workbench</MS_CosmicHauling.verb>
+  <MS_CosmicHauling.gerund>burning at</MS_CosmicHauling.gerund>
 </LanguageData>

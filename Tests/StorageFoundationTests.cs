@@ -35,13 +35,18 @@ internal static class StorageFoundationTests
         {
             TenUnitCounts(); CapacityAndRollback(); Topology();
             assertions += CosmicCraftingTests.Run();
+            assertions += CraftingOrderGroupTests.Run();
             assertions += ConstructionSupplyTests.Run();
+            assertions += LogicalFloorsCompatibilityTests.Run();
             assertions += StorageReservationTests.Run();
             assertions += StorageUnitTransferTests.Run();
             assertions += StorageTradeTests.Run();
             IncomingSlotCompetition(); IncomingMergeCompetition(); IncomingExactAllocation(); IncomingLifecycle();
             assertions += StorageReceiverTests.Run();
             assertions += StorageSupplyShelfTests.Run();
+#if CONSTRUCTION_REPAIR_TESTS
+            assertions += ConstructionRepairTests.Run();
+#endif
 #if WORKBENCH_UNLOCK_TESTS
             assertions += WorkbenchUnlockTests.Run();
 #endif

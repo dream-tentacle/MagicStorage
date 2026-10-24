@@ -2,6 +2,221 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_14</defName>
+    <label>Version log</label>
+    <version>1.0.14</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Skill ranges can now be set to unlimited.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved messages when a trade fails.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_13</defName>
+    <label>Version log</label>
+    <version>1.0.13</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>The construction supply unit can now automatically repair broken-down facilities. This feature can be disabled on the building.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_12</defName>
+    <label>Version log</label>
+    <version>1.0.12</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved recipe grouping priority settings. Work order is affected by groups.</li>
+          <li>The default placement of new orders can now be configured in the mod settings.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_11</defName>
+    <label>Version log</label>
+    <version>1.0.11</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added grouping mode to the workbench recipe list.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_10</defName>
+    <label>Version log</label>
+    <version>1.0.10</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed a trade compatibility bug.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added quick food setup to restocking shelves.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added dd.Logical Floors compatibility for the construction supply unit.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_9</defName>
+    <label>Version log</label>
+    <version>1.0.9</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Both restocking shelves can now serve as hoppers for nutrient paste dispensers.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_8</defName>
+    <label>Version log</label>
+    <version>1.0.8</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>Added the high-stack restocking shelf with 10 storage slots.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added compatibility with Raven Race's gifting system.</li>
+          <li>Added compatibility with Monolyn Race's production facilities.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_7</defName>
+    <label>Version log</label>
+    <version>1.0.7</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added a public entry point for the trade window to make integration easier for third-party mods.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Cosmic workbench lists now allow workbenches to be marked with a cross, moving them to the bottom.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_6</defName>
+    <label>Version log</label>
+    <version>1.0.6</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added compatibility with CeleTech Arsenal's trade shuttles.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_5</defName>
+    <label>Version log</label>
+    <version>1.0.5</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added filter mode to the auto-restocking shelf. Select multiple item types, and the shelf will automatically choose items it can stock.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_4</defName>
+    <label>Version log</label>
+    <version>1.0.4</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added compatibility with [FSF] Complex Jobs.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_3</defName>
+    <label>Version log</label>
+    <version>1.0.3</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved feedback when the mech gestator has insufficient materials.</li>
+          <li>Improved the mech gestator's material retrieval logic.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_2</defName>
+    <label>Version log</label>
+    <version>1.0.2</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>The construction supply unit's supply radius can now be configured.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_0_1</defName>
+    <label>Version log</label>
+    <version>1.0.1</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed a bug that allowed storage conduits and hidden storage conduits to be uninstalled and moved.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_0_0</defName>
     <label>Version log</label>
     <version>1.0.0</version>

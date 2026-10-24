@@ -19,6 +19,13 @@ namespace Verse
         public object icon;
         public System.Action action;
     }
+    public sealed class Command_Toggle : Gizmo
+    {
+        public string defaultLabel, defaultDesc;
+        public object icon;
+        public System.Func<bool> isActive;
+        public System.Action toggleAction;
+    }
     public partial class WindowStack
     {
         public readonly System.Collections.Generic.List<object> Windows = new System.Collections.Generic.List<object>();

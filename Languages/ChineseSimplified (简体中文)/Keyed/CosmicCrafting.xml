@@ -25,11 +25,24 @@
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
   <MS_Craft_Orders>已添加的制作任务</MS_Craft_Orders>
   <MS_Craft_DragToSort>左/右键拖拽以排序</MS_Craft_DragToSort>
-  <MS_Craft_DragOrder>按住左键或右键拖拽任务块可调整制作顺序。</MS_Craft_DragOrder>
+  <MS_Craft_GroupModeOff>开启分组模式，工作顺序受到组别影响</MS_Craft_GroupModeOff>
+  <MS_Craft_GroupModeOn>关闭分组模式，按相同的制作优先级显示平铺列表，保留已有分组。</MS_Craft_GroupModeOn>
+  <MS_Craft_StartGroup>开始分组</MS_Craft_StartGroup>
+  <MS_Craft_FinishGroup>完成分组</MS_Craft_FinishGroup>
+  <MS_Craft_NewGroup>新分组 {0}</MS_Craft_NewGroup>
+  <MS_Craft_Ungrouped>未分组</MS_Craft_Ungrouped>
+  <MS_Craft_RenameGroup>编辑分组名称</MS_Craft_RenameGroup>
+  <MS_Craft_DeleteGroup>删除分组，将其中的制作任务移至“未分组”。</MS_Craft_DeleteGroup>
+  <MS_Craft_GroupConfirm>确定</MS_Craft_GroupConfirm>
+  <MS_Craft_GroupCancel>取消</MS_Craft_GroupCancel>
+  <MS_Craft_DragOrder>按住左键或右键拖拽任务块可调整制作优先级，跨组拖动会同时改变任务归属。</MS_Craft_DragOrder>
+  <MS_Craft_DragGroup>点击展开或收起。按住左键或右键拖拽标题可调整整组的制作优先级。</MS_Craft_DragGroup>
   <MS_Craft_Details>详细</MS_Craft_Details>
   <MS_Craft_Workbenches>工作台</MS_Craft_Workbenches>
   <MS_Craft_FavoriteWorkbench>收藏此工作台并置顶。</MS_Craft_FavoriteWorkbench>
   <MS_Craft_UnfavoriteWorkbench>取消收藏此工作台。</MS_Craft_UnfavoriteWorkbench>
+  <MS_Craft_BottomWorkbench>将此工作台置底，并取消收藏。</MS_Craft_BottomWorkbench>
+  <MS_Craft_RestoreWorkbenchOrder>取消置底，恢复此工作台的普通排序。</MS_Craft_RestoreWorkbenchOrder>
   <MS_Craft_CompactModeOff>开启工作台列表的紧凑模式。</MS_Craft_CompactModeOff>
   <MS_Craft_CompactModeOn>关闭工作台列表的紧凑模式。</MS_Craft_CompactModeOn>
   <MS_Craft_RecipeCompactModeOff>开启配方列表的紧凑模式。</MS_Craft_RecipeCompactModeOff>
@@ -42,6 +55,7 @@
   <MS_Craft_NoOrders>尚未添加制作任务。点击右侧工作台选择配方。</MS_Craft_NoOrders>
   <MS_Craft_NoMatchingWorkbenches>当前筛选条件下没有已解锁且有可用配方的工作台。</MS_Craft_NoMatchingWorkbenches>
   <MS_Craft_All>全部</MS_Craft_All>
+  <MS_Craft_HaulingTabHint>原版的火化炉任务是搬运类型，很神奇吧？</MS_Craft_HaulingTabHint>
   <MS_Craft_AllRecipes>全部配方</MS_Craft_AllRecipes>
   <MS_Craft_ModFilter>Mod：{0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>工作台：{0}</MS_Craft_WorkbenchFilter>
@@ -79,6 +93,7 @@
   <MS_Craft_Worker_NonMechs>非机械体</MS_Craft_Worker_NonMechs>
   <MS_Craft_AnyMechanitor>任何机械师</MS_Craft_AnyMechanitor>
   <MS_Craft_Skill>技能范围：{0}</MS_Craft_Skill>
+  <MS_Craft_UnlimitedSkill>无限制</MS_Craft_UnlimitedSkill>
   <MS_Craft_MinSkill>最低技能</MS_Craft_MinSkill>
   <MS_Craft_MaxSkill>最高技能</MS_Craft_MaxSkill>
   <MS_Craft_NamedWorkerHint>与原版相同：指定人物时忽略此技能范围；配方自身的最低技能要求仍然有效。</MS_Craft_NamedWorkerHint>
@@ -92,4 +107,6 @@
   <MS_Craft_MaxQuality>最高品质：{0}</MS_Craft_MaxQuality>
   <MS_Craft_Incapable>无法从事此工作</MS_Craft_Incapable>
   <MS_Craft_WorkDisabled>未分配此工作</MS_Craft_WorkDisabled>
+  <MS_Gestation_MissingMaterials>材料不足（可获取/需求）：{0}</MS_Gestation_MissingMaterials>
+  <MS_Gestation_MaterialCount>{0} {1}/{2}</MS_Gestation_MaterialCount>
 </LanguageData>

@@ -2,6 +2,8 @@
 <LanguageData>
 
   <MS_StorageSupplyShelf.label>自动补货架</MS_StorageSupplyShelf.label>
-  <MS_StorageSupplyShelf.description>从相连的存储网络自动补充物品的小型货架，供日常食物、医药等小量取货。\n\n存储优先级用于现有库存的搬运判断，殖民者不会将物品搬入此架。建议优先级不低于核心存储设置，否则容易反复被搬运。</MS_StorageSupplyShelf.description>
+  <MS_StorageSupplyShelf.description>从相连的存储网络自动补充物品的小型货架，供日常食物、医药等小量取货。可以直接代替营养膏机的料斗。\n\n存储优先级用于现有库存的搬运判断，殖民者不会将物品搬入此架。建议优先级不低于核心存储设置，否则容易反复被搬运。\n\n可以在建筑下方按钮设置筛选模式，从而选择多种物品。</MS_StorageSupplyShelf.description>
+  <MS_HighStackSupplyShelf.label>高堆叠供货架</MS_HighStackSupplyShelf.label>
+  <MS_HighStackSupplyShelf.description>从相连的存储网络自动补充物品的高容量货架，最多存放10堆物品。各个位置可分别设置补货上限，也可开启筛选模式，让所有位置共用储存筛选条件。可以直接代替营养膏机的料斗。\n\n存储优先级用于现有库存的搬运判断，殖民者不会将物品搬入此架。建议优先级不低于核心存储设置，否则容易反复被搬运。</MS_HighStackSupplyShelf.description>
 
 </LanguageData>

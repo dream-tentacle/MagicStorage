@@ -9,7 +9,10 @@ namespace MagicStorage
     // Contents stay spawned. Native searches, reservations and pickup jobs see ordinary items.
     public sealed class Building_StorageSupplyShelf : Building, ISlotGroupParent
     {
-        public const int SlotCount = 3;
+        public int SlotCount
+        {
+            get { EnsureSlotCapacity(); return selections.Count; }
+        }
         // Session-only clipboard; never serialized or tied to a source building.
         private static ShelfPreset copiedPreset;
 
@@ -19,13 +22,20 @@ namespace MagicStorage
             internal readonly List<int> RestockLimits;
             internal readonly List<StorageShelfFilter> Filters;
             internal readonly StoragePriority Priority;
+            internal readonly bool FilterMode;
+            internal readonly ThingFilter SharedFilter = new ThingFilter();
+            internal readonly List<int> FilterLimits;
 
             internal ShelfPreset(Building_StorageSupplyShelf shelf)
             {
+                shelf.EnsureSlotCapacity();
                 Selections = new List<ThingDef>(shelf.selections);
-                RestockLimits = Enumerable.Range(0, SlotCount).Select(shelf.RestockLimit).ToList();
+                RestockLimits = Enumerable.Range(0, shelf.SlotCount).Select(shelf.RestockLimit).ToList();
                 Filters = shelf.filters.Select(filter => filter.Clone()).ToList();
                 Priority = shelf.GetStoreSettings().Priority;
+                FilterMode = shelf.FilterMode;
+                SharedFilter.CopyAllowancesFrom(shelf.SharedFilter);
+                FilterLimits = new List<int>(shelf.filterLimits);
             }
         }
 
@@ -34,30 +44,110 @@ namespace MagicStorage
         private void PastePreset()
         {
             if (copiedPreset == null) return;
+            if (filterMode != copiedPreset.FilterMode && !TrySetFilterMode(copiedPreset.FilterMode)) return;
             // Replace all slots together so swapped selections cannot conflict.
             selections = new List<ThingDef>(copiedPreset.Selections);
             restockLimits = new List<int>(copiedPreset.RestockLimits);
             filters = copiedPreset.Filters.Select(filter => filter.Clone()).ToList();
+            SharedFilter.CopyAllowancesFrom(copiedPreset.SharedFilter);
+            filterLimits = new List<int>(copiedPreset.FilterLimits);
+            EnsureSlotCapacity();
             GetStoreSettings().Priority = copiedPreset.Priority;
             ClearRestockFailures();
             RefreshSettings();
         }
 
         private StorageRefreshTimer refreshTimer;
-        private List<ThingDef> selections = new List<ThingDef> { null, null, null };
-        private List<int> restockLimits = new List<int> { 0, 0, 0 };
-        private List<StorageShelfFilter> filters = new List<StorageShelfFilter>
-            { new StorageShelfFilter(), new StorageShelfFilter(), new StorageShelfFilter() };
+        private List<ThingDef> selections = new List<ThingDef>();
+        private List<int> restockLimits = new List<int>();
+        private List<StorageShelfFilter> filters = new List<StorageShelfFilter>();
         private readonly SlotGroup slotGroup;
         private List<IntVec3> cells;
         private StorageSettings settings;
-        private readonly StorageShelfRestockFailure[] restockFailures = new StorageShelfRestockFailure[SlotCount];
-        internal StorageShelfRestockFailure RestockFailure(int slot) =>
-            restockFailures[slot]?.IsCurrent == true ? restockFailures[slot] : null;
-        internal void ClearRestockFailures() => Array.Clear(restockFailures, 0, SlotCount);
+        private bool filterMode;
+        private ThingFilter sharedFilter;
+        private List<int> filterLimits = new List<int>();
+        private List<Thing> slotStocks = new List<Thing>();
+
+        private void EnsureSlotCapacity()
+        {
+            int count = Math.Max(1, def?.building?.maxItemsInCell ?? 3);
+            ResizeSlots(ref selections, count, () => null);
+            ResizeSlots(ref restockLimits, count, () => 0);
+            ResizeSlots(ref filters, count, () => new StorageShelfFilter());
+            ResizeSlots(ref filterLimits, count, () => 75);
+            ResizeSlots(ref slotStocks, count, () => null);
+            if (restockFailures.Length != count) Array.Resize(ref restockFailures, count);
+        }
+
+        private static void ResizeSlots<T>(ref List<T> list, int count, Func<T> create)
+        {
+            if (list == null) list = new List<T>();
+            while (list.Count < count) list.Add(create());
+            if (list.Count > count) list.RemoveRange(count, list.Count - count);
+        }
+
+        public bool FilterMode => filterMode;
+        public ThingFilter SharedFilter => sharedFilter ?? (sharedFilter = new ThingFilter(RefreshSettings));
+        public int FilterLimit(int slot) { EnsureSlotCapacity(); return Math.Max(0, filterLimits[slot]); }
+        public void SetFilterLimit(int slot, int value)
+        { if (slot >= 0 && slot < SlotCount) filterLimits[slot] = Math.Max(0, value); }
+        internal int SupplyLimit(int slot, ThingDef itemDef) =>
+            filterMode ? Math.Min(FilterLimit(slot), itemDef?.stackLimit ?? 0) : RestockLimit(slot);
+
+        // Keep real stack references: identical definitions may occupy independent positions.
+        public Thing StockAt(int slot)
+        { EnsureSlotCapacity(); return IsShelfStock(slotStocks[slot]) ? slotStocks[slot] : null; }
+        internal void SetStock(int slot, Thing item) { slotStocks[slot] = item; }
+        private bool IsShelfStock(Thing item) => item != null && !item.Destroyed && item.Spawned &&
+            Spawned && item.Map == Map && item.Position == Position;
+        internal void ResolveStockSlots(List<Thing> items)
+        {
+            var assigned = new HashSet<Thing>();
+            for (int i = 0; i < SlotCount; i++)
+                if (!IsShelfStock(slotStocks[i]) || !assigned.Add(slotStocks[i])) slotStocks[i] = null;
+            for (int i = 0; i < SlotCount; i++)
+                if (slotStocks[i] == null)
+                {
+                    Thing item = items.Find(t => !assigned.Contains(t) && AllowsStock(i, t));
+                    if (item == null && !filterMode)
+                        item = items.Find(t => !assigned.Contains(t) && t.def == selections[i]);
+                    if (item != null) { slotStocks[i] = item; assigned.Add(item); }
+                }
+        }
+        internal int StockSlot(Thing item) => slotStocks.IndexOf(item);
+
+        public bool TrySetFilterMode(bool value)
+        {
+            if (value == filterMode) return true;
+            if (!StorageShelfSupply.TryReturnAll(this))
+            {
+                Find.WindowStack.Add(new Dialog_MessageBox("MS_Shelf_ModeBlocked".Translate(),
+                    title: "MS_Shelf_ModeBlockedTitle".Translate()));
+                return false;
+            }
+            filterMode = value;
+            slotStocks = Enumerable.Repeat<Thing>(null, SlotCount).ToList();
+            ClearRestockFailures();
+            RefreshSettings();
+            return true;
+        }
+
+        private void SetFoodFilter()
+        {
+            if (!TrySetFilterMode(true)) return;
+            var foodFilter = new ThingFilter();
+            foodFilter.SetAllow(ThingCategoryDefOf.Foods, true);
+            SharedFilter.CopyAllowancesFrom(foodFilter);
+        }
+
+        private StorageShelfRestockFailure[] restockFailures = new StorageShelfRestockFailure[0];
+        internal StorageShelfRestockFailure RestockFailure(int slot)
+        { EnsureSlotCapacity(); return restockFailures[slot]?.IsCurrent == true ? restockFailures[slot] : null; }
+        internal void ClearRestockFailures() { EnsureSlotCapacity(); Array.Clear(restockFailures, 0, restockFailures.Length); }
         internal void RecordRestockFailure(int slot, int current, StorageShelfFailureReason reason)
         {
-            if (filters[slot].WarnWhenRestockFails && reason != StorageShelfFailureReason.None && current < RestockLimit(slot))
+            if (!filterMode && filters[slot].WarnWhenRestockFails && reason != StorageShelfFailureReason.None && current < RestockLimit(slot))
                 restockFailures[slot] = new StorageShelfRestockFailure(this, slot, current, reason);
         }
 
@@ -74,11 +164,16 @@ namespace MagicStorage
         public string SlotYielderLabel() => LabelCap;
         public IEnumerable<IntVec3> AllSlotCells() => AllSlotCellsList();
         public List<IntVec3> AllSlotCellsList() => cells ?? (cells = new List<IntVec3> { Position });
-        public ThingDef SelectedDef(int slot) => selections[slot];
-        public StorageShelfFilter SlotFilter(int slot) => filters[slot];
-        public bool AllowsStock(int slot, Thing item) => item != null && item.def == selections[slot] &&
-            GetParentStoreSettings().AllowedToAccept(item) && filters[slot].Allows(item);
-        public int RestockLimit(int slot) => Math.Max(0, Math.Min(restockLimits[slot], selections[slot]?.stackLimit ?? 0));
+        public ThingDef SelectedDef(int slot) { EnsureSlotCapacity(); return selections[slot]; }
+        public StorageShelfFilter SlotFilter(int slot) { EnsureSlotCapacity(); return filters[slot]; }
+        public bool AllowsStock(int slot, Thing item)
+        {
+            EnsureSlotCapacity();
+            return item != null && GetParentStoreSettings().AllowedToAccept(item) &&
+                (filterMode ? SharedFilter.Allows(item) : item.def == selections[slot] && filters[slot].Allows(item));
+        }
+        public int RestockLimit(int slot)
+        { EnsureSlotCapacity(); return Math.Max(0, Math.Min(restockLimits[slot], selections[slot]?.stackLimit ?? 0)); }
         public bool SetRestockLimit(int slot, int value)
         {
             if (slot < 0 || slot >= SlotCount || selections[slot] == null) return false;
@@ -95,8 +190,7 @@ namespace MagicStorage
 
         public bool SetSelection(int slot, ThingDef itemDef)
         {
-            if (slot < 0 || slot >= SlotCount || (itemDef != null &&
-                (!CanSelect(itemDef) || selections.Where((_, i) => i != slot).Contains(itemDef)))) return false;
+            if (slot < 0 || slot >= SlotCount || (itemDef != null && !CanSelect(itemDef))) return false;
             if (selections[slot] != itemDef)
             {
                 restockLimits[slot] = itemDef?.stackLimit ?? 0;
@@ -130,9 +224,11 @@ namespace MagicStorage
 
         private void RefreshSettings()
         {
+            EnsureSlotCapacity();
             if (settings == null) settings = new StorageSettings(this) { Priority = StoragePriority.Critical };
             settings.filter.SetDisallowAll();
-            foreach (ThingDef itemDef in selections) if (itemDef != null) settings.filter.SetAllow(itemDef, true);
+            if (filterMode) settings.filter.CopyAllowancesFrom(SharedFilter);
+            else foreach (ThingDef itemDef in selections) if (itemDef != null) settings.filter.SetAllow(itemDef, true);
             Notify_SettingsChanged();
         }
 
@@ -166,25 +262,24 @@ namespace MagicStorage
             Scribe_Collections.Look(ref selections, "supplySelections", LookMode.Def);
             Scribe_Collections.Look(ref restockLimits, "restockLimits", LookMode.Value);
             Scribe_Collections.Look(ref filters, "supplyFilters", LookMode.Deep);
+            Scribe_Values.Look(ref filterMode, "filterMode", false);
+            if (sharedFilter == null) sharedFilter = new ThingFilter(RefreshSettings);
+            Scribe_Deep.Look(ref sharedFilter, "sharedSupplyFilter", (Action)RefreshSettings);
+            Scribe_Collections.Look(ref filterLimits, "filterRestockLimits", LookMode.Value);
+            Scribe_Collections.Look(ref slotStocks, "supplySlotStocks", LookMode.Reference);
             StoragePriority priority = GetStoreSettings().Priority;
             Scribe_Values.Look(ref priority, "storagePriority", StoragePriority.Critical);
             if (priority != settings.Priority) settings.Priority = priority;
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                if (selections == null) selections = new List<ThingDef>();
-                while (selections.Count < SlotCount) selections.Add(null);
-                if (selections.Count > SlotCount) selections.RemoveRange(SlotCount, selections.Count - SlotCount);
-                if (restockLimits == null) restockLimits = new List<int>();
-                while (restockLimits.Count < SlotCount) restockLimits.Add(0);
-                if (restockLimits.Count > SlotCount) restockLimits.RemoveRange(SlotCount, restockLimits.Count - SlotCount);
-                if (filters == null) filters = new List<StorageShelfFilter>();
-                while (filters.Count < SlotCount) filters.Add(new StorageShelfFilter());
-                if (filters.Count > SlotCount) filters.RemoveRange(SlotCount, filters.Count - SlotCount);
-                for (int i = 0; i < SlotCount; i++) if (filters[i] == null) filters[i] = new StorageShelfFilter();
-                var seen = new HashSet<ThingDef>();
+                EnsureSlotCapacity();
                 for (int i = 0; i < SlotCount; i++)
-                    if (selections[i] != null && (!CanSelect(selections[i]) || !seen.Add(selections[i]))) selections[i] = null;
-                for (int i = 0; i < SlotCount; i++) restockLimits[i] = RestockLimit(i);
+                {
+                    if (filters[i] == null) filters[i] = new StorageShelfFilter();
+                    if (selections[i] != null && !CanSelect(selections[i])) selections[i] = null;
+                    restockLimits[i] = RestockLimit(i);
+                    filterLimits[i] = Math.Max(0, filterLimits[i]);
+                }
                 RefreshSettings();
             }
         }
@@ -214,9 +309,13 @@ namespace MagicStorage
                 yield return new Command_Action
                 {
                     defaultLabel = "MS_Shelf_Configure".Translate(),
-                    defaultDesc = "MS_Shelf_ConfigureDesc".Translate(),
+                    defaultDesc = "MS_Shelf_ConfigureDesc".Translate(SlotCount),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/ConfigureShelf"),
-                    action = () => Find.WindowStack.Add(new Dialog_StorageSupplyShelf(this))
+                    action = () =>
+                    {
+                        if (filterMode) Find.WindowStack.Add(new Dialog_StorageShelfSharedFilter(this));
+                        else Find.WindowStack.Add(new Dialog_StorageSupplyShelf(this));
+                    }
                 };
                 yield return new Command_Action
                 {
@@ -236,6 +335,21 @@ namespace MagicStorage
                 };
                 if (copiedPreset == null) paste.Disable("MS_Shelf_NeedCopiedPreset".Translate());
                 yield return paste;
+                yield return new Command_Toggle
+                {
+                    defaultLabel = "MS_Shelf_FilterMode".Translate(),
+                    defaultDesc = "MS_Shelf_FilterModeDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/DesirePower"),
+                    isActive = () => filterMode,
+                    toggleAction = () => TrySetFilterMode(!filterMode)
+                };
+                yield return new Command_Action
+                {
+                    defaultLabel = "MS_Shelf_QuickFood".Translate(),
+                    defaultDesc = "MS_Shelf_QuickFoodDesc".Translate(),
+                    icon = DefDatabase<ThingDef>.GetNamed("MealLavish").uiIcon,
+                    action = SetFoodFilter
+                };
                 if (Spawned && Find.Selector.NumSelected == 1)
                 {
                     foreach (Thing item in slotGroup.HeldThings)

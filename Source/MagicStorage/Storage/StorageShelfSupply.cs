@@ -16,43 +16,88 @@ namespace MagicStorage
             shelf.ClearRestockFailures();
             if (!shelf.Spawned || shelf.Faction != Faction.OfPlayer ||
                 shelf.IsForbidden(Faction.OfPlayer)) return;
-            var stocks = new Dictionary<ThingDef, Thing>();
             var items = new List<Thing>(shelf.GetSlotGroup().HeldThings);
+            items.Sort((a, b) => Reserved(shelf, b).CompareTo(Reserved(shelf, a)));
+            shelf.ResolveStockSlots(items);
             if (shelf.Position.ContainsStaticFire(shelf.Map))
             {
-                for (int i = 0; i < Building_StorageSupplyShelf.SlotCount; i++)
+                for (int i = 0; i < shelf.SlotCount; i++)
                 {
-                    Thing stock = items.Find(t => shelf.AllowsStock(i, t));
+                    Thing stock = shelf.StockAt(i);
                     if (stock != null && (Reserved(shelf, stock) || stock.IsForbidden(shelf.Faction))) continue;
                     shelf.RecordRestockFailure(i, stock?.stackCount ?? 0, StorageShelfFailureReason.Burning);
                 }
                 return;
             }
-            // Prefer a reserved stack as the retained representative of a configured type.
-            items.Sort((a, b) => Reserved(shelf, b).CompareTo(Reserved(shelf, a)));
-            var configured = new Dictionary<ThingDef, int>();
-            for (int i = 0; i < Building_StorageSupplyShelf.SlotCount; i++)
-                if (shelf.SelectedDef(i) != null) configured.Add(shelf.SelectedDef(i), i);
             foreach (Thing item in items)
             {
-                if (configured.TryGetValue(item.def, out int slot) && shelf.AllowsStock(slot, item) &&
-                    !stocks.ContainsKey(item.def)) stocks.Add(item.def, item);
-                else if (!Reserved(shelf, item) && !item.IsForbidden(shelf.Faction)) RemoveStock(shelf, item);
+                int slot = shelf.StockSlot(item);
+                if ((slot < 0 || !shelf.AllowsStock(slot, item)) &&
+                    !Reserved(shelf, item) && !item.IsForbidden(shelf.Faction)) RemoveStock(shelf, item);
             }
-            for (int i = 0; i < Building_StorageSupplyShelf.SlotCount; i++)
+            for (int i = 0; i < shelf.SlotCount; i++)
             {
-                ThingDef itemDef = shelf.SelectedDef(i);
-                int limit = shelf.RestockLimit(i);
+                Thing stock = shelf.StockAt(i);
+                if (stock != null && !shelf.AllowsStock(i, stock)) continue;
+                ThingDef itemDef = shelf.FilterMode ? stock?.def : shelf.SelectedDef(i);
+                if (shelf.FilterMode && stock == null && shelf.FilterLimit(i) > 0 && shelf.CanWork)
+                {
+                    Thing candidate = null;
+                    shelf.Network.VisitStoredStacksMatching(d => shelf.SharedFilter.Allows(d), t =>
+                    {
+                        if (shelf.AllowsStock(i, t) && shelf.Network.AvailableToWithdraw(t) > 0)
+                        { candidate = t; return false; }
+                        return true;
+                    });
+                    itemDef = candidate?.def;
+                }
+                int limit = shelf.SupplyLimit(i, itemDef);
                 if (itemDef == null || limit == 0) continue;
-                stocks.TryGetValue(itemDef, out Thing stock);
                 if (stock != null && stock.stackCount >= limit) continue;
-                // A rejected but reserved/forbidden stack keeps its type's one stack occupied.
-                if (stock == null && items.Exists(t => t.Spawned && t.Map == shelf.Map && t.Position == shelf.Position && t.def == itemDef)) continue;
                 if (stock != null && (Reserved(shelf, stock) || stock.IsForbidden(shelf.Faction))) continue;
                 StorageShelfFailureReason reason = shelf.CanWork
                     ? Refill(shelf, i, itemDef, ref stock, limit) : StorageShelfFailureReason.NetworkUnavailable;
                 shelf.RecordRestockFailure(i, stock?.stackCount ?? 0, reason);
+                shelf.SetStock(i, stock);
             }
+        }
+
+        internal static bool TryReturnAll(Building_StorageSupplyShelf shelf)
+        {
+            if (!shelf.Spawned) return true;
+            shelf.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            var items = new List<Thing>(shelf.GetSlotGroup().HeldThings);
+            if (items.Count == 0) return true;
+            if (!shelf.CanWork) return false;
+            StorageNetwork network = shelf.Network;
+            // Reject known failures before touching any item or native pickup reservation.
+            foreach (Thing item in items)
+                if (Reserved(shelf, item) || item.IsForbidden(shelf.Faction) ||
+                    network.GetCountCanAccept(item) < item.stackCount) return false;
+            foreach (Thing item in items)
+            {
+                if (!shelf.CanWork || shelf.Network != network) return false;
+                var manager = shelf.Map.GetComponent<MapComponent_StorageNetworks>();
+                var batch = manager.CreateRecovery(shelf.Position);
+                batch.ExcludeCell(shelf.Position);
+                bool complete = false;
+                try
+                {
+                    item.DeSpawn();
+                    if (batch.Contents.TryAdd(item, false))
+                        complete = network.TryStore(batch.Contents, item, item.stackCount).Complete;
+                }
+                finally
+                {
+                    // A failed or partial transfer keeps the remainder on the same shelf.
+                    if (!item.Destroyed && !item.Spawned &&
+                        (item.holdingOwner == null || batch.Contents.Contains(item)))
+                        GenSpawn.Spawn(item, shelf.Position, shelf.Map, Rot4.North);
+                    manager.ReleaseRecovery(batch);
+                }
+                if (!complete) return false;
+            }
+            return true;
         }
 
         private static void RemoveStock(Building_StorageSupplyShelf shelf, Thing item)
@@ -89,7 +134,7 @@ namespace MagicStorage
                 int available = network.AvailableToWithdraw(source);
                 if (available < source.stackCount) reservedStock = true;
                 if (available <= 0) continue;
-                if ((stock == null && shelf.GetSlotGroup().HeldThingsCount >= Building_StorageSupplyShelf.SlotCount) ||
+                if ((stock == null && shelf.GetSlotGroup().HeldThingsCount >= shelf.SlotCount) ||
                     !StoreUtility.IsGoodStoreCell(shelf.Position, shelf.Map, source, null, shelf.Faction)) continue;
                 placeable = true;
                 int count = Math.Min(missing, available);
@@ -106,8 +151,7 @@ namespace MagicStorage
                     if (received == null) { transferFailed = true; continue; }
                     received.SetForbidden(false, false);
                     // Direct mode never searches adjacent cells. The saved batch protects a failed placement.
-                    if (batch.Contents.TryDrop(received, shelf.Position, shelf.Map, ThingPlaceMode.Direct,
-                        out Thing placed, playDropSound: false)) stock = placed;
+                    if (PlaceStock(shelf, batch.Contents, received, ref stock)) shelf.SetStock(slot, stock);
                     else
                     {
                         placementFailed = true;
@@ -127,6 +171,26 @@ namespace MagicStorage
             if (!placeable && !reservedStock) return StorageShelfFailureReason.NoSpace;
             if (reservedStock) return StorageShelfFailureReason.ReservedStock;
             return StorageShelfFailureReason.NoStock;
+        }
+
+        private static bool PlaceStock(Building_StorageSupplyShelf shelf, ThingOwner holder, Thing received, ref Thing stock)
+        {
+            bool couldMergeIntoAnotherSlot = false;
+            foreach (Thing existing in shelf.GetSlotGroup().HeldThings)
+                if (existing != stock && existing.CanStackWith(received))
+                { couldMergeIntoAnotherSlot = true; break; }
+            if (!couldMergeIntoAnotherSlot)
+            {
+                if (!holder.TryDrop(received, shelf.Position, shelf.Map, ThingPlaceMode.Direct,
+                    out Thing placed, playDropSound: false)) return false;
+                stock = placed;
+                return true;
+            }
+            // Native direct dropping merges into the first compatible stack in the cell.
+            // Duplicate selections need an exact destination or a distinct physical stack.
+            if (stock != null) return stock.TryAbsorbStack(received, true);
+            stock = GenSpawn.Spawn(received, shelf.Position, shelf.Map, Rot4.North);
+            return stock != null && stock.Spawned;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MagicStorage
                 (order.WorkerKind != CraftingWorkerKind.Anyone && order.WorkerKind != CraftingWorkerKind.Printers)) return false;
             var recipe = order.Recipe;
             if (ModsConfig.BiotechActive && recipe.mechanitorOnlyRecipe) return false;
-            if (recipe.workSkill != null && (skillLevel < order.SkillRange.min || skillLevel > order.SkillRange.max)) return false;
+            if (recipe.workSkill != null && !order.AllowsSkillLevel(skillLevel)) return false;
             return recipe.skillRequirements == null || recipe.skillRequirements.All(r => skillLevel >= r.minLevel);
         }
     }
@@ -54,7 +54,7 @@ namespace MagicStorage
             if (order.Recipe.workSkill != null && (pawn.skills != null || pawn.IsColonyMech))
             {
                 int level = pawn.skills != null ? pawn.skills.GetSkill(order.Recipe.workSkill).Level : pawn.RaceProps.mechFixedSkillLevel;
-                if (level < order.SkillRange.min || level > order.SkillRange.max) return false;
+                if (!order.AllowsSkillLevel(level)) return false;
             }
             return !ModsConfig.BiotechActive || !order.Recipe.mechanitorOnlyRecipe || MechanitorUtility.IsMechanitor(pawn);
         }

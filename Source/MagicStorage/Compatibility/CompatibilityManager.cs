@@ -8,7 +8,7 @@ namespace MagicStorage
     internal static class CompatibilityManager
     {
         private static readonly IStorageCompatibility[] modules =
-        { new MonolynCompatibility(), new NivarianCannonCompatibility(), new DynamicTradeInterfaceCompatibility() };
+        { new MonolynCompatibility(), new NivarianCannonCompatibility(), new DynamicTradeInterfaceCompatibility(), new CeleTechTradeCompatibility(), new RavenGiftCompatibility(), new LogicalFloorsCompatibility() };
 
         static CompatibilityManager()
         {

@@ -28,6 +28,25 @@ namespace Verse
 }
 namespace ASEL
 {
+    public class Building_MonolynProducer : Building, IThingHolder
+    {
+        public bool working = true, pause;
+        public List<ThingDefCountClass> requiredCost = new List<ThingDefCountClass>();
+        public ThingOwner innerContainer;
+        public int OriginalTicks;
+        public Building_MonolynProducer() { innerContainer = new ThingOwner(this); }
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        protected override void Tick() { OriginalTicks++; }
+        public void RunTick() { Tick(); }
+        public new IThingHolder ParentHolder => null;
+        public ThingOwner GetDirectlyHeldThings() => innerContainer;
+        public void GetChildHolders(List<IThingHolder> children) { }
+    }
+    public class Building_Crucible : Building_MonolynProducer
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        protected override void Tick() { base.Tick(); }
+    }
     public static class MNEffecterDefOf { public static EffecterDef LanternTransfer = new EffecterDef(); }
     public class PlaceWorker_LightBuilder
     {

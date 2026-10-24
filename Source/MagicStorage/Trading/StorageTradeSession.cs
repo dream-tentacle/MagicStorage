@@ -20,12 +20,24 @@ namespace MagicStorage
         private readonly Pawn negotiator;
         private readonly ITrader trader;
         private readonly Building_CommsConsole console;
+        private readonly Thing groundTarget;
+        private readonly Func<bool> additionalUsable;
+        private readonly HashSet<Building_StorageCore> selectedCores;
+        private bool callbackFailed;
+        private string unavailableReason;
+        internal bool IsOrbital { get; }
         private TradeDeal deal;
         private StorageTradeTransaction transaction;
         private bool closed;
 
-        private StorageTradeSession(Pawn negotiator, ITrader trader, Building_CommsConsole console)
-        { this.negotiator = negotiator; this.trader = trader; this.console = console; }
+        private StorageTradeSession(StorageTradeOptions options)
+        {
+            negotiator = options.Negotiator; trader = options.Trader; console = options.CommsConsole;
+            groundTarget = options.GroundTarget; additionalUsable = options.IsStillValid;
+            IsOrbital = options.Mode == StorageTradeMode.Orbital;
+            selectedCores = options.NetworkScope == StorageTradeNetworkScope.SpecifiedCores
+                ? new HashSet<Building_StorageCore>(options.Cores) : null;
+        }
 
         internal static bool TryGet(TradeDeal deal, out StorageTradeSession session)
         {
@@ -42,15 +54,69 @@ namespace MagicStorage
             return false;
         }
 
-        internal static void Open(Pawn negotiator, ITrader trader, Building_CommsConsole console = null)
+        // Internal convenience adapter. External mods use StorageTradeApi and explicit modes/scopes.
+        internal static StorageTradeOpenResult Open(Pawn negotiator, ITrader trader, Building_CommsConsole console = null,
+            Thing groundTarget = null, Func<bool> groundTargetUsable = null) => StorageTradeApi.Open(new StorageTradeOptions
         {
-            if (opening != null || Find.WindowStack.WindowOfType<Dialog_Trade>() != null ||
-                DynamicTradeInterfaceCompatibility.HasTradeWindow()) return;
-            var session = new StorageTradeSession(negotiator, trader, console);
+            Negotiator = negotiator, Trader = trader, CommsConsole = console,
+            Mode = console != null ? StorageTradeMode.Orbital : StorageTradeMode.Ground,
+            GroundTarget = groundTarget, IsStillValid = groundTargetUsable
+        });
+
+        internal static bool HasTradeWindow() => Find.WindowStack.WindowOfType<Dialog_Trade>() != null ||
+            DynamicTradeInterfaceCompatibility.HasTradeWindow();
+
+        internal static StorageTradeOpenResult OpenValidated(StorageTradeOptions options)
+        {
+            var session = new StorageTradeSession(options);
+            string reason = session.TraderUnavailableReason();
+            if (reason != null)
+                return new StorageTradeOpenResult(StorageTradeOpenStatus.TraderUnavailable, reason);
+            reason = session.NetworkUnavailableReason();
+            if (reason != null)
+                return new StorageTradeOpenResult(StorageTradeOpenStatus.NoEligibleNetwork, reason, !HasTradeWindow());
+            // A callback must not replace the global trade while we validate the request.
+            if (HasTradeWindow()) return new StorageTradeOpenResult(StorageTradeOpenStatus.TradeWindowAlreadyOpen);
+            var previousTrader = TradeSession.trader;
+            var previousNegotiator = TradeSession.playerNegotiator;
+            var previousDeal = TradeSession.deal;
+            bool previousGiftMode = TradeSession.giftMode;
+            var previousWindows = new HashSet<Window>(Find.WindowStack.Windows.OfType<Window>());
             opening = session;
-            try { Find.WindowStack.Add(new Dialog_StorageTrade(negotiator, trader, session)); }
-            catch { session.Dispose(); throw; }
+            string failure = "The trade window was not retained or the session became unavailable during opening.";
+            try
+            {
+                Find.WindowStack.Add(new Dialog_StorageTrade(options.Negotiator, options.Trader, session));
+                if (!session.closed && session.deal != null && session.Usable() &&
+                    (Find.WindowStack.Windows.OfType<Dialog_StorageTrade>().Any(window => window.Session == session) ||
+                     DynamicTradeInterfaceCompatibility.HasWindow(session)))
+                    return new StorageTradeOpenResult(StorageTradeOpenStatus.Opened);
+            }
+            catch (Exception error)
+            {
+                failure = error.Message;
+                Log.Error("[MagicStorage] Unable to open storage trade: " + error);
+            }
             finally { opening = null; }
+
+            bool clean = true;
+            foreach (var window in Find.WindowStack.Windows.OfType<Dialog_StorageTrade>().Where(window => window.Session == session).ToList())
+            {
+                try { Find.WindowStack.TryRemove(window, false); }
+                catch (Exception error) { clean = false; Log.Error("[MagicStorage] Failed trade window cleanup: " + error); }
+            }
+            clean &= DynamicTradeInterfaceCompatibility.CloseWindows(session);
+            session.Dispose();
+            if (ReferenceEquals(TradeSession.trader, session.trader) && TradeSession.playerNegotiator == session.negotiator &&
+                (ReferenceEquals(TradeSession.deal, session.deal) || ReferenceEquals(TradeSession.deal, previousDeal)))
+            {
+                TradeSession.trader = previousTrader; TradeSession.playerNegotiator = previousNegotiator;
+                TradeSession.deal = previousDeal; TradeSession.giftMode = previousGiftMode;
+            }
+            bool restored = ReferenceEquals(TradeSession.trader, previousTrader) && TradeSession.playerNegotiator == previousNegotiator &&
+                ReferenceEquals(TradeSession.deal, previousDeal) && TradeSession.giftMode == previousGiftMode;
+            bool unexpectedWindow = Find.WindowStack.Windows.OfType<Window>().Any(window => !previousWindows.Contains(window));
+            return new StorageTradeOpenResult(StorageTradeOpenStatus.OpenFailed, failure, clean && restored && !HasTradeWindow() && !unexpectedWindow);
         }
 
         internal static bool HasCore(Map map)
@@ -64,16 +130,83 @@ namespace MagicStorage
 
         private bool Usable()
         {
-            if (closed || !ReferenceEquals(TradeSession.trader, trader) ||
-                TradeSession.playerNegotiator != negotiator || !negotiator.Spawned || !trader.CanTradeNow ||
-                !negotiator.CanTradeWith(trader.Faction, trader.TraderKind).Accepted) return false;
+            unavailableReason = UnavailableReason();
+            return unavailableReason == null;
+        }
+
+        private string UnavailableReason()
+        {
+            if (closed) return "MS_Trade_Fail_SessionClosed".Translate();
+            if (!ReferenceEquals(TradeSession.trader, trader)) return "MS_Trade_Fail_TraderChanged".Translate();
+            if (TradeSession.playerNegotiator != negotiator) return "MS_Trade_Fail_NegotiatorChanged".Translate();
+            return TraderUnavailableReason() ?? NetworkUnavailableReason();
+        }
+
+        private string TraderUnavailableReason()
+        {
+            if (closed) return "MS_Trade_Fail_SessionClosed".Translate();
+            if (!negotiator.Spawned || negotiator.Destroyed) return "MS_Trade_Fail_NegotiatorUnavailable".Translate();
             if (trader is Pawn pawnTrader)
-                return pawnTrader.Spawned && negotiator.Map == pawnTrader.Map && !pawnTrader.mindState.traderDismissed;
-            if (trader is TradeShip ship)
-                return ship.Map == negotiator.Map && negotiator.Map.passingShipManager.passingShips.Contains(ship) &&
-                    console != null && console.Spawned && console.Map == negotiator.Map && console.CanUseCommsNow &&
-                    negotiator.health.capacities.CapableOf(PawnCapacityDefOf.Talking);
-            return false;
+            {
+                if (!pawnTrader.Spawned || pawnTrader.Destroyed || pawnTrader.Map != negotiator.Map)
+                    return "MS_Trade_Fail_TraderLeftMap".Translate();
+                if (pawnTrader.mindState.traderDismissed) return "MS_Trade_Fail_TraderDismissed".Translate();
+            }
+            if (!trader.CanTradeNow) return (IsOrbital ? "MS_Trade_Fail_ShipUnavailable" : "MS_Trade_Fail_TraderUnavailable").Translate();
+            if (!negotiator.CanTradeWith(trader.Faction, trader.TraderKind).Accepted)
+                return "MS_Trade_Fail_TradePermission".Translate();
+            if (IsOrbital)
+            {
+                var ship = (TradeShip)trader;
+                if (ship.Map != negotiator.Map || !negotiator.Map.passingShipManager.passingShips.Contains(ship))
+                    return "MS_Trade_Fail_ShipUnavailable".Translate();
+                if (console == null || console.Destroyed || !console.Spawned || console.Map != negotiator.Map)
+                    return "MS_Trade_Fail_ConsoleMissing".Translate();
+                if (!console.CanUseCommsNow) return "MS_Trade_Fail_ConsoleUnavailable".Translate();
+                if (!negotiator.health.capacities.CapableOf(PawnCapacityDefOf.Talking))
+                    return "MS_Trade_Fail_CannotTalk".Translate();
+            }
+            else if (groundTarget == null || groundTarget.Destroyed || !groundTarget.Spawned || groundTarget.Map != negotiator.Map)
+                return "MS_Trade_Fail_GroundTarget".Translate();
+            if (callbackFailed) return "MS_Trade_Fail_CallbackError".Translate();
+            try { return additionalUsable?.Invoke() == false ? "MS_Trade_Fail_CallbackRejected".Translate().ToString() : null; }
+            catch (Exception error)
+            {
+                callbackFailed = true;
+                Log.Error("[MagicStorage] Trade validity callback failed; this session is unavailable: " + error);
+                return "MS_Trade_Fail_CallbackError".Translate();
+            }
+        }
+
+        private string NetworkUnavailableReason()
+        {
+            negotiator.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+            if (selectedCores != null)
+            {
+                if (selectedCores.Count == 0) return "MS_Trade_Fail_NoCore".Translate();
+                foreach (var core in selectedCores)
+                    if (!CoreEligible(core, out var reason)) return CoreUnavailableReason(core, reason);
+                return null;
+            }
+            string firstReason = null;
+            foreach (var core in negotiator.Map.listerBuildings.allBuildingsColonist.OfType<Building_StorageCore>())
+            {
+                if (CoreEligible(core, out var reason)) return null;
+                if (firstReason == null) firstReason = CoreUnavailableReason(core, reason);
+            }
+            return firstReason ?? "MS_Trade_Fail_NoCore".Translate().ToString();
+        }
+
+        // Only called after CoreEligible fails; keep its existing inventory-filtering semantics.
+        private string CoreUnavailableReason(Building_StorageCore core, string reason)
+        {
+            if (core == null || core.Destroyed) return "MS_Trade_Fail_CoreMissing".Translate();
+            if (!core.CanWork) return "MS_Trade_Fail_CoreNotWorking".Translate(core.LabelCap);
+            if (core.Faction != Faction.OfPlayer || core.Map != negotiator.Map || core.Position.Fogged(negotiator.Map))
+                return "MS_Trade_Fail_CoreUnavailable".Translate(core.LabelCap);
+            if (IsOrbital && !BeaconCovers(core)) return "MS_Trade_Fail_CoreBeacon".Translate(core.LabelCap);
+            if (reason != null) return "MS_Trade_Fail_CoreSellingBlocked".Translate(core.LabelCap, reason);
+            return "MS_Trade_Fail_CoreUnreachable".Translate(core.LabelCap);
         }
 
         internal static bool HasOrbitalCore(Map map)
@@ -90,19 +223,22 @@ namespace MagicStorage
 
         private bool CoreEligible(Building_StorageCore core, out string reason)
         {
-            return CoreEligible(core, negotiator.Map, trader is TradeShip, trader as Pawn, out reason);
+            reason = null;
+            if (selectedCores != null && !selectedCores.Contains(core)) return false;
+            Thing groundActor = trader is Pawn ? trader as Pawn : groundTarget != null ? negotiator : null;
+            return CoreEligible(core, negotiator.Map, IsOrbital, groundActor, out reason);
         }
 
-        internal static bool OrbitalCoreEligible(Building_StorageCore core, Map map) =>
-            CoreEligible(core, map, true, null, out _);
+        internal static bool PaymentCoreEligible(Building_StorageCore core, Map map) =>
+            CoreEligible(core, map, false, null, out _);
 
-        private static bool CoreEligible(Building_StorageCore core, Map map, bool orbital, Pawn pawnTrader, out string reason)
+        private static bool CoreEligible(Building_StorageCore core, Map map, bool orbital, Thing groundTrader, out string reason)
         {
             reason = null;
-            if (core == null || !core.CanWork || core.Faction != Faction.OfPlayer || core.Map != map || core.Position.Fogged(map)) return false;
+            if (core == null || core.Destroyed || !core.CanWork || core.Faction != Faction.OfPlayer || core.Map != map || core.Position.Fogged(map)) return false;
             if (orbital && !BeaconCovers(core)) return false;
-            if (pawnTrader != null &&
-                !map.reachability.CanReach(pawnTrader.Position, core, PathEndMode.Touch, TraverseMode.PassDoors, Danger.Some)) return false;
+            if (groundTrader != null &&
+                !map.reachability.CanReach(groundTrader.Position, core, PathEndMode.Touch, TraverseMode.PassDoors, Danger.Some)) return false;
             Room room = core.GetRoom();
             if (room == null) return true;
             int cells = GenRadial.NumCellsInRadius(6.9f);
@@ -192,25 +328,46 @@ namespace MagicStorage
         {
             prepared = null;
             transaction?.Dispose(); transaction = null;
-            if (!Usable()) return Reject();
+            if (!Usable()) return Reject(unavailableReason);
             negotiator.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             deal.UpdateCurrencyCount();
             // Match native affordability before limiting the trader's payment after its short-funds confirmation.
-            if (!TradeSession.giftMode && (deal.CurrencyTradeable == null ||
-                deal.CurrencyTradeable.CountPostDealFor(Transactor.Colony) < 0)) return Reject();
+            if (!TradeSession.giftMode)
+            {
+                var currency = deal.CurrencyTradeable;
+                if (currency == null) return Reject("MS_Trade_Fail_CurrencyMissing".Translate());
+                if (currency.CountPostDealFor(Transactor.Colony) < 0)
+                    return Reject("MS_Trade_Fail_CurrencyCount".Translate(-(long)currency.CountToTransfer,
+                        currency.CountHeldBy(Transactor.Colony)));
+            }
             limitCurrency(deal);
             var requests = new List<StorageTradeRequest>();
             foreach (Tradeable line in deal.AllTradeables)
             {
                 if (line.ActionToDo == TradeAction.PlayerBuys && line.CountToTransferToSource > line.CountHeldBy(Transactor.Trader))
-                    return Reject();
+                    return Reject("MS_Trade_Fail_BuyCount".Translate(ItemLabel(line.AnyThing),
+                        line.CountToTransferToSource, line.CountHeldBy(Transactor.Trader)));
                 if (line.ActionToDo != TradeAction.PlayerSells) continue;
                 int remaining = line.CountToTransferToDestination;
+                string sourceReason = null;
                 foreach (Thing item in line.thingsColony.OrderBy(item => shelfSources.ContainsKey(item)))
                 {
                     if (remaining == 0) break;
-                    if (!sources.TryGetValue(item, out StorageNetwork network) || !CoreEligible(network.Core, out _) ||
-                        !TradeUtility.PlayerSellableNow(item, trader)) continue;
+                    if (!sources.TryGetValue(item, out StorageNetwork network))
+                    {
+                        if (sourceReason == null) sourceReason = "MS_Trade_Fail_SourceChanged".Translate();
+                        continue;
+                    }
+                    if (!CoreEligible(network.Core, out var coreReason))
+                    {
+                        if (sourceReason == null) sourceReason = CoreUnavailableReason(network.Core, coreReason);
+                        continue;
+                    }
+                    if (!TradeUtility.PlayerSellableNow(item, trader))
+                    {
+                        if (sourceReason == null) sourceReason = "MS_Trade_Fail_ItemNotSellable".Translate();
+                        continue;
+                    }
                     shelfSources.TryGetValue(item, out var shelf);
                     int count = Math.Min(remaining, Available(item));
                     if (count <= 0) continue;
@@ -218,19 +375,30 @@ namespace MagicStorage
                         Usable = () => Usable() && CoreEligible(network.Core, out _) && TradeUtility.PlayerSellableNow(item, trader) });
                     remaining -= count;
                 }
-                if (remaining != 0) return Reject();
+                if (remaining != 0)
+                    return Reject("MS_Trade_Fail_SellCount".Translate(ItemLabel(line.AnyThing),
+                        line.CountToTransferToDestination, line.CountToTransferToDestination - remaining, sourceReason ?? ""));
             }
             var candidate = new StorageTradeTransaction(requests, Usable);
-            if (!candidate.Reserve()) return Reject();
+            if (!candidate.Reserve())
+            {
+                string reason = unavailableReason;
+                if (reason == null)
+                    reason = (candidate.FailureKey ?? "MS_Trade_Fail_ReservationChanged").Translate(
+                        ItemLabel(candidate.FailedRequest?.Item), candidate.FailedRequest?.Count ?? 0, candidate.FailureAvailable);
+                return Reject(reason);
+            }
             transaction = prepared = candidate;
             return true;
         }
 
-        private bool Reject()
+        private static string ItemLabel(Thing item) => item?.LabelCap ?? "MS_Trade_UnknownItem".Translate().ToString();
+
+        private bool Reject(string reason)
         {
             Find.WindowStack.WindowOfType<Dialog_Trade>()?.FlashSilver();
             DynamicTradeInterfaceCompatibility.FlashSilver(this);
-            Messages.Message("MS_Trade_Unavailable".Translate(), MessageTypeDefOf.RejectInput, false);
+            Messages.Message("MS_Trade_Failed".Translate(reason), MessageTypeDefOf.RejectInput, false);
             return false;
         }
 
@@ -241,7 +409,8 @@ namespace MagicStorage
                 throw new InvalidOperationException("Storage trade quantity changed after reservation.");
             Map map = negotiator.Map;
             var manager = map.GetComponent<MapComponent_StorageNetworks>();
-            var batch = manager.CreateRecovery(trader is Pawn pawnTrader ? pawnTrader.Position : console.Position);
+            var batch = manager.CreateRecovery(groundTarget != null ? groundTarget.Position :
+                trader is Pawn pawnTrader ? pawnTrader.Position : console.Position);
             var items = new List<Thing>();
             try
             {
@@ -302,7 +471,7 @@ namespace MagicStorage
         public override void DoWindowContents(Rect inRect)
         {
             Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width, 26f),
-                (TradeSession.trader is TradeShip ? "MS_Trade_OrbitalInventoryNotice" : "MS_Trade_InventoryNotice").Translate());
+                (session.IsOrbital ? "MS_Trade_OrbitalInventoryNotice" : "MS_Trade_InventoryNotice").Translate());
             inRect.yMin += 28f;
             bool enabled = MagicStorageMod.Settings.TradeItemFilters;
             if (enabled != filtersWereEnabled)

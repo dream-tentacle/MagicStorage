@@ -10,21 +10,24 @@ namespace MagicStorage
     public sealed class Dialog_StorageSupplyShelf : Window
     {
         private readonly Building_StorageSupplyShelf shelf;
-        private readonly string[] limitBuffers = new string[Building_StorageSupplyShelf.SlotCount];
-        private readonly ThingDef[] displayedDefs = new ThingDef[Building_StorageSupplyShelf.SlotCount];
-        public override Vector2 InitialSize => new Vector2(620, 630);
+        private readonly string[] limitBuffers;
+        private readonly ThingDef[] displayedDefs;
+        private Vector2 slotsScroll;
+        public override Vector2 InitialSize => new Vector2(Math.Min(620, UI.screenWidth), Math.Min(630, UI.screenHeight));
         public Dialog_StorageSupplyShelf(Building_StorageSupplyShelf shelf)
         {
             this.shelf = shelf;
+            limitBuffers = new string[shelf.SlotCount];
+            displayedDefs = new ThingDef[shelf.SlotCount];
             doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true;
         }
         public override void DoWindowContents(Rect rect)
         {
-            if (!shelf.Spawned) { Close(); return; }
+            if (!shelf.Spawned || shelf.FilterMode || shelf.SlotCount != limitBuffers.Length) { Close(); return; }
             Text.Font = GameFont.Medium;
             Widgets.Label(new Rect(0, 0, rect.width - 30, 36), "MS_Shelf_Title".Translate());
             Text.Font = GameFont.Small;
-            Widgets.Label(new Rect(0, 42, rect.width, 58), "MS_Shelf_ConfigureDesc".Translate());
+            Widgets.Label(new Rect(0, 42, rect.width, 58), "MS_Shelf_ConfigureDesc".Translate(shelf.SlotCount));
             StorageSettings settings = shelf.GetStoreSettings();
             Rect priorityRect = new Rect(0, 108, rect.width, 32);
             if (Widgets.ButtonText(priorityRect, "Priority".Translate() + ": " + settings.Priority.Label().CapitalizeFirst()))
@@ -41,11 +44,17 @@ namespace MagicStorage
             TooltipHandler.TipRegion(priorityRect, "MS_Shelf_PriorityHint".Translate());
             Widgets.Label(new Rect(0, 148, rect.width, 52), "MS_Shelf_PriorityHint".Translate());
             var stocks = new List<Thing>(shelf.GetSlotGroup().HeldThings);
-            for (int i = 0; i < Building_StorageSupplyShelf.SlotCount; i++)
+            shelf.ResolveStockSlots(stocks);
+            Rect listRect = new Rect(0, 208, rect.width, Math.Max(1, rect.height - 268));
+            float contentHeight = shelf.SlotCount * 105f;
+            Rect view = new Rect(0, 0, rect.width - (contentHeight > listRect.height ? 20 : 0), contentHeight);
+            Widgets.BeginScrollView(listRect, ref slotsScroll, view);
+            for (int i = 0; i < shelf.SlotCount; i++)
             {
                 int slot = i;
                 ThingDef itemDef = shelf.SelectedDef(slot);
-                Rect row = new Rect(0, 208 + i * 105, rect.width, 97);
+                Rect row = new Rect(0, i * 105, view.width, 97);
+                if (row.yMax < slotsScroll.y || row.y > slotsScroll.y + listRect.height) continue;
                 Widgets.DrawMenuSection(row);
                 Widgets.Label(new Rect(row.x + 10, row.y + 6, 90, 25), "MS_Shelf_Slot".Translate(slot + 1));
                 if (itemDef != null) Widgets.DefIcon(new Rect(10, row.y + 40, 32, 32), itemDef);
@@ -65,7 +74,7 @@ namespace MagicStorage
                     Widgets.TextFieldNumeric(limitRect, ref limit, ref limitBuffers[slot], 0, itemDef.stackLimit);
                     shelf.SetRestockLimit(slot, limit);
                     TooltipHandler.TipRegion(limitRect, "MS_Shelf_LimitTip".Translate(itemDef.stackLimit));
-                    int count = stocks.Where(t => t.def == itemDef).Sum(t => t.stackCount);
+                    int count = shelf.StockAt(slot)?.stackCount ?? 0;
                     Widgets.Label(new Rect(50, row.y + 62, row.width - 260, 25),
                         "MS_Shelf_Stock".Translate(count, shelf.RestockLimit(slot)));
                     if (Widgets.ButtonText(new Rect(row.width - 194, row.y + 74, 184, 22), "MS_Shelf_Filter".Translate()))
@@ -77,6 +86,7 @@ namespace MagicStorage
                 if (Widgets.ButtonText(new Rect(row.width - 90, row.y + 40, 80, 32), "MS_Shelf_Clear".Translate()))
                     shelf.SetSelection(slot, null);
             }
+            Widgets.EndScrollView();
         }
     }
 
@@ -184,7 +194,7 @@ namespace MagicStorage
                 TooltipHandler.TipRegion(rect, row.Category.description);
                 return;
             }
-            bool elsewhere = Enumerable.Range(0, Building_StorageSupplyShelf.SlotCount)
+            bool elsewhere = !(owner is Building_StorageSupplyShelf) && Enumerable.Range(0, Building_TransportSupplier.SlotCount)
                 .Any(i => i != slot && selectedDef(i) == row.Item);
             if (selectedDef(slot) == row.Item) Widgets.DrawHighlightSelected(rect);
             else if (!elsewhere) Widgets.DrawHighlightIfMouseover(rect);

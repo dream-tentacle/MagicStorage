@@ -10,4 +10,9 @@
     <driverClass>MagicStorage.JobDriver_StorageOrbitalTrade</driverClass>
     <reportString>正在通过魔法存储进行轨道交易。</reportString>
   </JobDef>
+  <JobDef>
+    <defName>MS_TradeWithStorageCeleTech</defName>
+    <driverClass>MagicStorage.JobDriver_StorageCeleTechTrade</driverClass>
+    <reportString>正在通过魔法存储与TargetA交易。</reportString>
+  </JobDef>
 </Defs>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <ThingDef ParentName="MS_StorageBuildingBase">
+  <ThingDef Name="MS_StorageSupplyShelfBase" ParentName="MS_StorageBuildingBase">
     <defName>MS_StorageSupplyShelf</defName>
     <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <label>auto-restocking shelf</label>
-    <description>A small shelf that automatically restocks from its connected storage network, providing small quantities of food, medicine and other everyday supplies.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.</description>
+    <description>A small shelf that automatically restocks from its connected storage network, providing small quantities of food, medicine and other everyday supplies. Can directly replace a nutrient paste dispenser's hopper.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.\n\nUse the buttons below the selected building to enable filter mode and choose multiple item types.</description>
     <thingClass>MagicStorage.Building_StorageSupplyShelf</thingClass>
     <tickerType>Normal</tickerType>
     <size>(1,1)</size>
@@ -14,6 +14,8 @@
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
     <building>
+      <isHopper>true</isHopper>
+      <!-- Controls shelf slot count, restocking settings and item layout. -->
       <maxItemsInCell>3</maxItemsInCell>
       <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
       <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
@@ -37,5 +39,15 @@
     <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
     <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
     <uiOrder>3107</uiOrder>
+  </ThingDef>
+  <ThingDef ParentName="MS_StorageSupplyShelfBase">
+    <defName>MS_HighStackSupplyShelf</defName>
+    <label>high-stack restocking shelf</label>
+    <description>A high-capacity shelf that automatically restocks up to 10 stacks of items from its connected storage network. Each slot can have its own restocking limit, and filter mode allows all slots to share a storage filter. Can directly replace a nutrient paste dispenser's hopper.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.</description>
+    <building>
+      <maxItemsInCell>10</maxItemsInCell>
+    </building>
+    <costList Inherit="False"><Steel>120</Steel><ComponentIndustrial>6</ComponentIndustrial></costList>
+    <uiOrder>3108</uiOrder>
   </ThingDef>
 </Defs>

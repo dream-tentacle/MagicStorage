@@ -50,7 +50,7 @@ namespace MagicStorage
             {
                 defaultLabel = "MS_Transport_CreateGroup".Translate(),
                 defaultDesc = "MS_Transport_CreateGroupDesc".Translate(pods.Count),
-                icon = CompLaunchable.LaunchCommandTex,
+                icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/CreateTransportGroup"),
                 groupable = false,
                 action = () => CreateGroup(source)
             };

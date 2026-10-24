@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using Verse;
 namespace Verse
 {
+    public partial struct Rot4 { public static Rot4 North => new Rot4(); }
+    public class Dialog_MessageBox
+    {
+        public readonly string Text;
+        public Dialog_MessageBox(string text, string title = null) { Text = text; }
+    }
     public partial class ThingDef
     {
         public bool PlayerAcquirable = true, specialDisallowed;
@@ -42,4 +48,5 @@ namespace RimWorld
 namespace MagicStorage
 {
     public class Dialog_StorageSupplyShelf { public Dialog_StorageSupplyShelf(Building_StorageSupplyShelf shelf) { } }
+    public class Dialog_StorageShelfSharedFilter { public Dialog_StorageShelfSharedFilter(Building_StorageSupplyShelf shelf) { } }
 }

@@ -11,6 +11,15 @@ namespace MagicStorage
         public const int MinUnitSlots = 1;
         public const int MaxUnitSlots = 10000;
         private int storageUnitSlots = DefaultUnitSlots;
+        public const int DefaultConstructionSupplyRadius = 40;
+        public const int MinConstructionSupplyRadius = 1;
+        public const int MaxConstructionSupplyRadius = 500;
+        private int constructionSupplyRadius = DefaultConstructionSupplyRadius;
+        public int ConstructionSupplyRadius
+        {
+            get => constructionSupplyRadius;
+            set => constructionSupplyRadius = Math.Max(MinConstructionSupplyRadius, Math.Min(MaxConstructionSupplyRadius, value));
+        }
         public const int DefaultCosmicWorkbenchWorkSpeedPercent = 100;
         public const int MinCosmicWorkbenchWorkSpeedPercent = 50;
         public const int MaxCosmicWorkbenchWorkSpeedPercent = 1000;
@@ -32,6 +41,7 @@ namespace MagicStorage
         public const int MaxRefreshSeconds = 60;
         public bool SimplifiedMode = true;
         public bool WorkbenchUnlockMode;
+        public bool NewWorkbenchOrdersFirst = true;
         public bool AllowPrinterParameterChanges;
         public bool CaravanItemFilters;
         public bool TradeItemFilters;
@@ -68,8 +78,10 @@ namespace MagicStorage
         public void RestoreDefaults()
         {
             StorageUnitSlots = DefaultUnitSlots;
+            ConstructionSupplyRadius = DefaultConstructionSupplyRadius;
             CosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
             WorkbenchUnlockMode = false;
+            NewWorkbenchOrdersFirst = true;
             AllowPrinterParameterChanges = false;
             CaravanItemFilters = false;
             TradeItemFilters = false;
@@ -97,10 +109,13 @@ namespace MagicStorage
             }
             Scribe_Values.Look(ref storageUnitSlots, "storageUnitSlots", DefaultUnitSlots);
             StorageUnitSlots = storageUnitSlots;
+            Scribe_Values.Look(ref constructionSupplyRadius, "constructionSupplyRadius", DefaultConstructionSupplyRadius);
+            ConstructionSupplyRadius = constructionSupplyRadius;
             Scribe_Values.Look(ref cosmicWorkbenchWorkSpeedPercent, "cosmicWorkbenchWorkSpeedPercent", DefaultCosmicWorkbenchWorkSpeedPercent);
             CosmicWorkbenchWorkSpeedPercent = cosmicWorkbenchWorkSpeedPercent;
             Scribe_Values.Look(ref SimplifiedMode, "simplifiedMode", true);
             Scribe_Values.Look(ref WorkbenchUnlockMode, "workbenchUnlockMode", false);
+            Scribe_Values.Look(ref NewWorkbenchOrdersFirst, "newWorkbenchOrdersFirst", true);
             Scribe_Values.Look(ref AllowPrinterParameterChanges, "allowPrinterParameterChanges", false);
             Scribe_Values.Look(ref CaravanItemFilters, "caravanItemFilters", false);
             Scribe_Values.Look(ref TradeItemFilters, "tradeItemFilters", false);

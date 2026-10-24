@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using RimWorld;
 using Verse;
@@ -17,7 +18,7 @@ namespace MagicStorage
                 pawn.mechanitor != null && pawn.mechanitor.HasBandwidthToResurrect(corpse)));
 
         internal static bool TryPlan(Building_CosmicMechGestator table, Bill bill, Pawn pawn,
-            out Dictionary<Thing, int> allocations)
+            out Dictionary<Thing, int> allocations, List<string> missing = null)
         {
             allocations = null;
             if (!table.NetworkReady || !CosmicGestationCatalog.Supports(bill) ||
@@ -38,26 +39,47 @@ namespace MagicStorage
                 Allows = t => ingredient.filter.Allows(t) &&
                     (ingredient.IsFixedIngredient || bill.ingredientFilter.Allows(t))
             }).ToList();
-            return CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
-                recipe.ignoreIngredientCountTakeEntireStacks, out allocations);
+            if (CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
+                recipe.ignoreIngredientCountTakeEntireStacks, out allocations)) return true;
+
+            things.Clear();
+            StorageMaterialSources.GetShelfStacks(network, d => bill.IsFixedOrAllowedIngredient(d) &&
+                recipe.ingredients.Any(i => i.filter.Allows(d)), things);
+            AddStocks(things, false);
+            var shortages = missing == null ? null : new List<CraftingMaterialShortage>();
+            bool complete = CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
+                recipe.ignoreIngredientCountTakeEntireStacks, out allocations, shortages);
+            if (!complete && missing != null)
+                foreach (var shortage in shortages)
+                {
+                    var ingredient = recipe.ingredients[shortage.NeedIndex];
+                    var kind = shortage.Kind as ThingDef;
+                    double available = shortage.Available, required = shortage.Required;
+                    if (ingredient.IsFixedIngredient)
+                    {
+                        kind = ingredient.FixedIngredient;
+                        double value = recipe.IngredientValueGetter.ValuePerUnitOf(kind);
+                        if (recipe.allowMixingIngredients && value > 0) available /= value;
+                        required = !recipe.allowMixingIngredients && recipe.ignoreIngredientCountTakeEntireStacks
+                            ? 1 : ingredient.CountRequiredOfFor(kind, recipe, bill);
+                    }
+                    missing.Add("MS_Gestation_MaterialCount".Translate(kind?.label ?? ingredient.filter.Summary,
+                        available.ToString("0.##", CultureInfo.CurrentCulture),
+                        required.ToString("0.##", CultureInfo.CurrentCulture)));
+                }
+            return complete;
 
             void AddStocks(IEnumerable<Thing> items, bool inside)
             {
                 foreach (var item in items.Where(t => Allows(bill, pawn, t)))
                 {
-                    int count = inside ? item.stackCount : network.AvailableToWithdraw(item);
+                    int count = inside ? item.stackCount : StorageMaterialSources.Available(network, item);
                     if (count <= 0 || (!bill.recipe.allowMixingIngredients &&
                         bill.recipe.ignoreIngredientCountTakeEntireStacks && count != item.stackCount)) continue;
                     stocks.Add(new CraftingMaterialStock<Thing> { Item = item, Kind = item.def,
                         Count = count, Value = bill.recipe.IngredientValueGetter.ValuePerUnitOf(item.def) });
                 }
             }
-        }
-
-        private sealed class Claim
-        {
-            internal Thing Item, Received, Delivered;
-            internal int Count;
         }
 
         // Called only when the job is actually accepted, never during work/menu
@@ -68,60 +90,77 @@ namespace MagicStorage
                 !TryPlan(table, bill, pawn, out var plan)) return false;
             var network = table.Network;
             var manager = table.Map.GetComponent<MapComponent_StorageNetworks>();
-            var staging = manager.CreateRecovery(table.InteractionCell);
             var existing = plan.Where(p => table.innerContainer.Contains(p.Key)).ToList();
-            var claims = plan.Where(p => !table.innerContainer.Contains(p.Key))
-                .Select(p => new Claim { Item = p.Key, Count = p.Value }).ToList();
+            var delivered = new List<ThingCount>();
             bool prepared = false;
-            try
+            using (var transfer = new StorageMaterialTransaction(table.Map, table.InteractionCell))
             {
-                foreach (var claim in claims)
-                    if (network.ReserveOutgoing(claim, claim.Item, claim.Count, table) != claim.Count) return false;
-                foreach (var claim in claims)
-                    if (!network.TryWithdrawReserved(claim, claim.Item, claim.Count, staging.Contents,
-                        out claim.Received).Complete) return false;
-                if (!table.NetworkReady || table.Network != network || bill.DeletedOrDereferenced ||
-                    bill.suspended || !bill.PawnAllowedToStartAnew(pawn)) return false;
-                foreach (var claim in claims)
-                    if (StorageTransfer.Move(staging.Contents, table.innerContainer, claim.Received, claim.Count,
-                        table.Map, table.InteractionCell, out claim.Delivered, false) != claim.Count) return false;
+                try
+                {
+                    foreach (var pair in plan.Where(p => !table.innerContainer.Contains(p.Key)))
+                        if (!Allows(bill, pawn, pair.Key) || StorageMaterialSources.Available(network, pair.Key) < pair.Value ||
+                            !transfer.Add(pair.Key, pair.Value, pair.Key.Spawned ? null : network, table)) return false;
+                    if (transfer.Requests.Count > 0 && !transfer.TryStage()) return false;
+                    if (!table.NetworkReady || table.Network != network || bill.DeletedOrDereferenced ||
+                        bill.suspended || !bill.PawnAllowedToStartAnew(pawn)) return false;
+                    foreach (var request in transfer.Requests)
+                    {
+                        Thing received = null;
+                        bool complete;
+                        try
+                        {
+                            complete = transfer.Deliver(request, item => StorageTransfer.Move(item.holdingOwner,
+                                table.innerContainer, item, request.Count, table.Map, table.InteractionCell,
+                                out received, false) == request.Count);
+                        }
+                        finally
+                        {
+                            if (received != null) delivered.Add(new ThingCount(received, received.stackCount));
+                        }
+                        if (!complete || request.DeliveredCount != request.Count) return false;
+                    }
 
-                // Bind the order in the same synchronous operation as delivery.
-                // Deleting it before the worker arrives now follows native cleanup.
-                bill.Notify_DoBillStarted(pawn);
-                job.targetQueueB = new List<LocalTargetInfo>();
-                job.countQueue = new List<int>();
-                foreach (var pair in existing)
-                {
-                    job.targetQueueB.Add(pair.Key); job.countQueue.Add(pair.Value);
+                    // Bind the order in the same synchronous operation as delivery.
+                    // Deleting it before the worker arrives now follows native cleanup.
+                    bill.Notify_DoBillStarted(pawn);
+                    job.targetQueueB = new List<LocalTargetInfo>();
+                    job.countQueue = new List<int>();
+                    foreach (var pair in existing)
+                    {
+                        job.targetQueueB.Add(pair.Key); job.countQueue.Add(pair.Value);
+                    }
+                    foreach (var item in delivered)
+                    { job.targetQueueB.Add(item.Thing); job.countQueue.Add(item.Count); }
+                    prepared = true;
+                    return true;
                 }
-                foreach (var claim in claims)
-                { job.targetQueueB.Add(claim.Delivered); job.countQueue.Add(claim.Count); }
-                prepared = true;
-                return true;
-            }
-            catch (Exception exception)
-            {
-                bill.suspended = true;
-                Log.Error("[MagicStorage] Could not prepare mech gestation materials: " + exception);
-                return false;
-            }
-            finally
-            {
-                foreach (var claim in claims)
+                catch (Exception exception)
                 {
-                    network.ReleaseOutgoing(claim);
-                    if (!prepared && claim.Delivered != null && table.innerContainer.Contains(claim.Delivered))
-                        StorageTransfer.Move(table.innerContainer, staging.Contents, claim.Delivered,
-                            claim.Delivered.stackCount, table.Map, table.InteractionCell, false);
+                    bill.suspended = true;
+                    Log.Error("[MagicStorage] Could not prepare mech gestation materials: " + exception);
+                    return false;
                 }
-                if (!prepared)
+                finally
                 {
-                    foreach (var item in new List<Thing>(staging.Contents))
-                        if (table.NetworkReady && table.Network == network)
-                            network.TryStore(staging.Contents, item, item.stackCount);
+                    if (!prepared && delivered.Count > 0)
+                    {
+                        var recovery = manager.CreateRecovery(table.InteractionCell);
+                        try
+                        {
+                            foreach (var entry in delivered)
+                            {
+                                var item = entry.Thing;
+                                if (!table.innerContainer.Contains(item)) continue;
+                                if (table.NetworkReady && table.Network == network)
+                                    network.TryStore(table.innerContainer, item, item.stackCount);
+                                if (!item.Destroyed && table.innerContainer.Contains(item))
+                                    StorageTransfer.Move(table.innerContainer, recovery.Contents, item,
+                                        item.stackCount, table.Map, table.InteractionCell, false);
+                            }
+                        }
+                        finally { manager.ReleaseRecovery(recovery); }
+                    }
                 }
-                manager.ReleaseRecovery(staging);
             }
         }
     }

@@ -38,8 +38,8 @@ namespace MagicStorage
             // Shelves are a fallback: do not scan or take their everyday supplies when
             // the network alone can satisfy this batch. Keep network stacks first.
             things.Clear();
-            foreach (var shelf in network.Core.Map.GetComponent<MapComponent_StorageNetworks>().SupplyShelves)
-                if (UsableShelf(network, shelf)) things.AddRange(shelf.GetSlotGroup().HeldThings);
+            StorageMaterialSources.GetShelfStacks(network, d => bill.IsFixedOrAllowedIngredient(d) &&
+                recipe.ingredients.Any(i => i.filter.Allows(d)), things);
             stocks.AddRange(Stocks(network, order, bill, things));
             return CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
                 recipe.ignoreIngredientCountTakeEntireStacks, out allocations);
@@ -64,20 +64,7 @@ namespace MagicStorage
                     order.Recipe.ingredients.Any(i => i.filter.Allows(t)) &&
                     (!order.Recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh);
 
-        private static bool UsableShelf(StorageNetwork network, Building_StorageSupplyShelf shelf) =>
-            shelf.Spawned && shelf.Map == network.Core.Map && shelf.Network == network &&
-            shelf.Faction == network.Core.Faction && !shelf.IsForbidden(network.Core.Faction) &&
-            !shelf.IsBurning() && !shelf.Position.ContainsStaticFire(shelf.Map);
-
-        internal static int Available(StorageNetwork network, Thing item)
-        {
-            if (network?.CanWork != true || item == null || item.Destroyed) return 0;
-            if (!item.Spawned) return network.AvailableToWithdraw(item);
-            if (item.Map != network.Core.Map || item.IsForbidden(network.Core.Faction) || item.IsBurning()) return 0;
-            var shelf = item.Map.haulDestinationManager.SlotGroupParentAt(item.Position) as Building_StorageSupplyShelf;
-            return shelf != null && UsableShelf(network, shelf) && !StorageShelfSupply.Reserved(shelf, item)
-                ? item.stackCount : 0;
-        }
+        internal static int Available(StorageNetwork network, Thing item) => StorageMaterialSources.Available(network, item);
     }
 
     // Preparation is synchronous. Publish the real holder before moving any ingredients

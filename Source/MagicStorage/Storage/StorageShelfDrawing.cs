@@ -31,19 +31,23 @@ namespace MagicStorage
                 item.def.category != ThingCategory.Item) return false;
             shelf = item.Map.haulDestinationManager.SlotGroupParentAt(item.Position) as Building_StorageSupplyShelf;
             if (shelf == null) return false;
-            for (int i = 0; i < Building_StorageSupplyShelf.SlotCount; i++)
-                if (shelf.SelectedDef(i) == item.def) { slot = i; return true; }
+            slot = shelf.StockSlot(item);
+            if (slot >= 0 && shelf.StockAt(slot) == item) return true;
+            shelf.ResolveStockSlots(new System.Collections.Generic.List<Thing>(shelf.GetSlotGroup().HeldThings));
+            slot = shelf.StockSlot(item);
+            if (slot >= 0) return true;
             // Reserved/forbidden leftovers may temporarily outlive a changed selection.
             // They remain visible without rearranging the configured stock.
-            slot = item.thingIDNumber % Building_StorageSupplyShelf.SlotCount;
+            slot = item.thingIDNumber % shelf.SlotCount;
             return true;
         }
 
         internal static Vector3 Center(Thing item, Building_StorageSupplyShelf shelf, int slot)
         {
-            Vector3 center = shelf.Position.ToVector3Shifted() + StorageShelfLayout.Offset(slot);
+            Vector3 center = shelf.Position.ToVector3Shifted() + StorageShelfLayout.Offset(slot, shelf.SlotCount);
             // Draw in front of the shelf, with the lower row on top at overlaps.
-            center.y = Math.Max(item.def.Altitude, shelf.def.Altitude) + 0.02f + slot * 0.004f;
+            center.y = Math.Max(item.def.Altitude, shelf.def.Altitude) + 0.02f +
+                slot * 0.008f / Math.Max(1, shelf.SlotCount - 1);
             return center;
         }
 
@@ -56,7 +60,7 @@ namespace MagicStorage
 
         private static void LabelOffset(Thing thing, ref float worldOffsetZ)
         {
-            if (TryGetShelf(thing, out _, out _)) worldOffsetZ = -StorageShelfLayout.ItemSize / 2f;
+            if (TryGetShelf(thing, out var shelf, out _)) worldOffsetZ = -StorageShelfLayout.ItemSizeFor(shelf.SlotCount) / 2f;
         }
 
         private static Graphic DisplayGraphic(Thing item)
@@ -68,7 +72,7 @@ namespace MagicStorage
             return graphic;
         }
 
-        private static void Geometry(Graphic graphic, Rot4 rotation, out Vector2 size, out float angle, out bool flip)
+        private static void Geometry(Graphic graphic, Rot4 rotation, int slotCount, out Vector2 size, out float angle, out bool flip)
         {
             size = graphic.drawSize;
             flip = !graphic.ShouldDrawRotated && ((rotation == Rot4.West && graphic.WestFlipped) ||
@@ -78,7 +82,7 @@ namespace MagicStorage
             if (graphic.ShouldDrawRotated && ((rotation == Rot4.West && graphic.WestFlipped) ||
                 (rotation == Rot4.East && graphic.EastFlipped))) angle += 180f;
             if (flip && graphic.data != null) angle += graphic.data.flipExtraRotation;
-            size = StorageShelfLayout.FitSize(size, angle);
+            size = StorageShelfLayout.FitSize(size, angle, slotCount);
         }
 
         internal static bool PrintItem(SectionLayer_ThingsGeneral __instance, Thing t)
@@ -86,7 +90,7 @@ namespace MagicStorage
             if (!TryGetShelf(t, out var shelf, out int slot)) return true;
             if (t.def.dontPrint) return false;
             Graphic graphic = DisplayGraphic(t);
-            Geometry(graphic, t.Rotation, out Vector2 size, out float angle, out bool flip);
+            Geometry(graphic, t.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
             Material material = graphic.MatAt(t.Rotation, t);
             Graphic.TryGetTextureAtlasReplacementInfo(material, t.def.category.ToAtlasGroup(), flip, true,
                 out material, out Vector2[] uvs, out Color32 color);
@@ -102,7 +106,7 @@ namespace MagicStorage
             if (__instance.def.drawerType == DrawerType.RealtimeOnly)
             {
                 Graphic graphic = DisplayGraphic(__instance);
-                Geometry(graphic, __instance.Rotation, out Vector2 size, out float angle, out bool flip);
+                Geometry(graphic, __instance.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
                 Graphics.DrawMesh(flip ? MeshPool.GridPlaneFlip(size) : MeshPool.GridPlane(size),
                     Center(__instance, shelf, slot), Quaternion.AngleAxis(angle, Vector3.up),
                     graphic.MatAt(__instance.Rotation, __instance), 0);

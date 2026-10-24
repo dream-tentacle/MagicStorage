@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
 using HarmonyLib;
 using RimWorld;
 using Verse;
@@ -11,18 +13,29 @@ namespace MagicStorage
     [StaticConstructorOnStartup]
     internal static class StorageLaunchPaymentPatches
     {
+        [ThreadStatic] private static SupplyScope active;
+        private static bool sourcePatched;
+
+        private sealed class SupplyScope
+        {
+            internal SupplyScope Previous;
+            internal StorageMaterialTransaction Transfer;
+        }
+
         static StorageLaunchPaymentPatches()
         {
             var harmony = new Harmony("mjcg.magicstorage.trading.payment");
+            harmony.Patch(AccessTools.Method(typeof(TradeUtility), nameof(TradeUtility.LaunchThingsOfType)),
+                prefix: new HarmonyMethod(typeof(StorageLaunchPaymentPatches), nameof(BeginSupply)),
+                transpiler: new HarmonyMethod(typeof(StorageLaunchPaymentPatches), nameof(IncludeStoredSource)),
+                finalizer: new HarmonyMethod(typeof(StorageLaunchPaymentPatches), nameof(EndSupply)));
             harmony.Patch(AccessTools.Method(typeof(TradeUtility), nameof(TradeUtility.AllLaunchableThingsForTrade)),
                 postfix: new HarmonyMethod(typeof(StorageLaunchPaymentPatches), nameof(LaunchableThings)));
-            harmony.Patch(AccessTools.Method(typeof(TradeUtility), nameof(TradeUtility.LaunchThingsOfType)),
-                prefix: new HarmonyMethod(typeof(StorageLaunchPaymentPatches), nameof(Pay)));
         }
 
         private static void LaunchableThings(Map map, ITrader trader, ref IEnumerable<Thing> __result)
         {
-            if (map != null && trader == null) __result = WithStorage(__result, map);
+            if (sourcePatched && map != null && trader == null) __result = WithStorage(__result, map);
         }
 
         private static IEnumerable<Thing> WithStorage(IEnumerable<Thing> original, Map map)
@@ -41,7 +54,7 @@ namespace MagicStorage
             var result = new List<StorageNetwork>();
             var seen = new HashSet<StorageNetwork>();
             foreach (Building building in map.listerBuildings.allBuildingsColonist)
-                if (building is Building_StorageCore core && StorageTradeSession.OrbitalCoreEligible(core, map) &&
+                if (building is Building_StorageCore core && StorageTradeSession.PaymentCoreEligible(core, map) &&
                     seen.Add(core.Network)) result.Add(core.Network);
             return result;
         }
@@ -60,77 +73,79 @@ namespace MagicStorage
             return stacks;
         }
 
-        private static IEnumerable<Thing> Ground(Map map, ThingDef def)
+        internal static IEnumerable<CodeInstruction> IncludeStoredSource(IEnumerable<CodeInstruction> instructions,
+            MethodBase __originalMethod)
         {
-            var seen = new HashSet<Thing>();
-            foreach (Building_OrbitalTradeBeacon beacon in Building_OrbitalTradeBeacon.AllPowered(map))
-                foreach (IntVec3 cell in beacon.TradeableCells)
-                    foreach (Thing item in cell.GetThingList(map))
-                        if (item.def == def && StorageMaterialTransaction.GroundAvailable(map, item, false) &&
-                            seen.Add(item)) yield return item;
-        }
-
-        private static bool Pay(ThingDef resDef, int debt, Map map, TradeShip trader)
-        {
-            if (map == null || trader != null || debt <= 0 || resDef == null) return true;
-            List<StorageNetwork> networks = Networks(map);
-            if (networks.Count == 0)
+            var code = new List<CodeInstruction>(instructions);
+            var locals = __originalMethod.GetMethodBody().LocalVariables;
+            int match = -1, local = -1, matches = 0;
+            for (int i = 0; i + 1 < code.Count; i++)
             {
-                // A caller may have checked the balance while a core was still
-                // covered. Losing that core must not turn a fee into a partial charge.
-                long count = 0;
-                foreach (Thing item in Ground(map, resDef))
-                {
-                    count += item.stackCount;
-                    if (count >= debt) return true;
-                }
-                return Reject();
+                if (code[i].opcode != OpCodes.Ldnull || !code[i + 1].IsStloc()) continue;
+                int candidate = code[i + 1].LocalIndex();
+                if (candidate >= locals.Count || locals[candidate].LocalType != typeof(Thing)) continue;
+                // The selected stack is initialized to null each iteration. Its first
+                // read tests whether the existing source search found anything.
+                int read = code.FindIndex(i + 2, c => c.IsLdloc() && c.LocalIndex() == candidate);
+                if (read < 0) continue;
+                int next = read + 1;
+                while (next < code.Count && code[next].opcode == OpCodes.Nop) next++;
+                if (next == code.Count || (code[next].opcode != OpCodes.Ldnull &&
+                    code[next].opcode != OpCodes.Brtrue && code[next].opcode != OpCodes.Brtrue_S)) continue;
+                match = read; local = candidate; matches++;
+            }
+            sourcePatched = matches == 1;
+            if (!sourcePatched)
+            {
+                Log.Error("[MagicStorage] Launch payment source search did not match exactly once; stored payment queries are disabled.");
+                return code;
             }
 
-            // Match the native ground-payment policy: ground job reservations do not
-            // prevent launch. Stored stock still uses the shared outgoing reservations.
-            using (var payment = new StorageMaterialTransaction(map, IntVec3.Invalid, false))
+            // Keep the original load, including its labels/exception boundaries.
+            // Replace only its value and write it back for the native deduction loop.
+            code.InsertRange(match + 1, new[]
             {
-                int remaining = debt;
-                var seen = new HashSet<Thing>();
-                foreach (Thing item in Ground(map, resDef))
-                {
-                    int count = Math.Min(remaining, item.stackCount);
-                    if (!payment.Add(item, count)) return Reject();
-                    seen.Add(item);
-                    remaining -= count;
-                    if (remaining == 0) break;
-                }
-                foreach (StorageNetwork network in networks)
-                {
-                    if (remaining == 0) break;
-                    foreach (Thing item in Stocks(network, resDef))
-                    {
-                        if (!seen.Add(item)) continue;
-                        int count = Math.Min(remaining, item.stackCount);
-                        if (!payment.Add(item, count, network, network.Core)) return Reject();
-                        remaining -= count;
-                        if (remaining == 0) break;
-                    }
-                }
-                if (remaining != 0 || !Eligible(payment, map) || !payment.TryStage() ||
-                    !Eligible(payment, map) || !payment.ConsumeAll()) return Reject();
-            }
-            return false;
+                new CodeInstruction(OpCodes.Ldarg_0), new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldarg_2), new CodeInstruction(OpCodes.Ldarg_3),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(StorageLaunchPaymentPatches), nameof(StoredSource))),
+                new CodeInstruction(OpCodes.Dup), CodeInstruction.StoreLocal(local)
+            });
+            return code;
         }
 
-        private static bool Eligible(StorageMaterialTransaction payment, Map map)
+        private static void BeginSupply(out SupplyScope __state)
         {
-            foreach (var request in payment.Requests)
-                if (request.Network != null &&
-                    !StorageTradeSession.OrbitalCoreEligible(request.Network.Core, map)) return false;
-            return true;
+            __state = new SupplyScope { Previous = active };
+            active = __state;
         }
 
-        private static bool Reject()
+        private static Thing StoredSource(Thing original, ThingDef resDef, int debt, Map map, TradeShip trader)
         {
-            Messages.Message("MS_Payment_Unavailable".Translate(), MessageTypeDefOf.RejectInput, false);
-            return false;
+            if (original != null || trader != null || map == null || resDef == null || debt <= 0 || active == null)
+                return original;
+            active.Transfer?.Dispose();
+            active.Transfer = null;
+            foreach (StorageNetwork network in Networks(map))
+                foreach (Thing item in Stocks(network, resDef))
+                {
+                    var transfer = new StorageMaterialTransaction(map, network.Core.Position);
+                    active.Transfer = transfer;
+                    if (transfer.Add(item, Math.Min(debt, item.stackCount), network, network.Core) &&
+                        transfer.TryStage() && StorageTradeSession.PaymentCoreEligible(network.Core, map))
+                        return transfer.Requests[0].Received;
+                    transfer.Dispose();
+                    active.Transfer = null;
+                }
+            return null;
+        }
+
+        private static void EndSupply(SupplyScope __state)
+        {
+            // Nested launches get their own extraction scope. Only our unconsumed
+            // staged items are returned; existing payment side effects are untouched.
+            if (__state == null) return;
+            try { __state.Transfer?.Dispose(); }
+            finally { active = __state.Previous; }
         }
     }
 }

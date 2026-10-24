@@ -77,6 +77,9 @@ namespace MagicStorage
             listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode,
                 "MS_SettingsWorkbenchUnlockModeHelp".Translate());
             listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsNewWorkbenchOrdersFirst".Translate(), ref Settings.NewWorkbenchOrdersFirst,
+                "MS_SettingsNewWorkbenchOrdersFirstHelp".Translate());
+            listing.Gap();
             listing.CheckboxLabeled("MS_SettingsAllowPrinterParameterChanges".Translate(), ref Settings.AllowPrinterParameterChanges);
             listing.Gap();
             listing.Label("MS_SettingsUnitSlotsHelp".Translate());
@@ -84,6 +87,12 @@ namespace MagicStorage
             listing.TextFieldNumericLabeled("MS_SettingsUnitSlots".Translate(), ref slots, ref unitSlotsBuffer,
                 MagicStorageSettings.MinUnitSlots, MagicStorageSettings.MaxUnitSlots);
             Settings.StorageUnitSlots = slots;
+            listing.Gap();
+            listing.Label("MS_SettingsConstructionSupplyRadius".Translate(Settings.ConstructionSupplyRadius));
+            Settings.ConstructionSupplyRadius = (int)System.Math.Round(listing.Slider(
+                Settings.ConstructionSupplyRadius,
+                MagicStorageSettings.MinConstructionSupplyRadius,
+                MagicStorageSettings.MaxConstructionSupplyRadius), System.MidpointRounding.AwayFromZero);
             listing.Gap();
             listing.Label("MS_SettingsCosmicWorkbenchWorkSpeed".Translate(Settings.CosmicWorkbenchWorkSpeedPercent));
             int speedStep = MagicStorageSettings.CosmicWorkbenchWorkSpeedStep;

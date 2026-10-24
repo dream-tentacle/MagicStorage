@@ -2,8 +2,47 @@
 <LanguageData>
   <MS_Payment_Unavailable>无法完成付款：可用资源不足，或存储网络已不可用。</MS_Payment_Unavailable>
   <MS_Trade_Command>通过魔法存储与{0}交易</MS_Trade_Command>
+  <MS_Trade_CeleTechUnavailable>贸易无人机已无法交易</MS_Trade_CeleTechUnavailable>
   <MS_Trade_InventoryNotice>魔法存储交易：使用核心网络及相连补货架上的物品和白银，买入物品放在地面。</MS_Trade_InventoryNotice>
   <MS_Trade_Unavailable>无法完成交易：网络或补货架上的物品、白银已不可用，或商人已无法交易。请检查数量或重置清单。</MS_Trade_Unavailable>
+  <MS_Trade_Failed>无法完成交易：{0}</MS_Trade_Failed>
+  <MS_Trade_UnknownItem>未知物品</MS_Trade_UnknownItem>
+  <MS_Trade_Fail_SessionClosed>本次交易已关闭，请重新打开交易窗口。</MS_Trade_Fail_SessionClosed>
+  <MS_Trade_Fail_TraderChanged>当前交易的商人已被其他交易替换，请重新打开交易窗口。</MS_Trade_Fail_TraderChanged>
+  <MS_Trade_Fail_NegotiatorChanged>当前交易的谈判者已发生变化，请重新打开交易窗口。</MS_Trade_Fail_NegotiatorChanged>
+  <MS_Trade_Fail_NegotiatorUnavailable>谈判者已被摧毁或离开地图。</MS_Trade_Fail_NegotiatorUnavailable>
+  <MS_Trade_Fail_TraderUnavailable>原版判定商人当前不可交易，可能已停止交易、无法互动或没有可交易货物。</MS_Trade_Fail_TraderUnavailable>
+  <MS_Trade_Fail_TradePermission>谈判者已不再满足与该商人交易的条件。</MS_Trade_Fail_TradePermission>
+  <MS_Trade_Fail_TraderLeftMap>商人已被摧毁、离开地图或不在谈判者所在地图。</MS_Trade_Fail_TraderLeftMap>
+  <MS_Trade_Fail_TraderDismissed>商人已被要求离开，不再接受交易。</MS_Trade_Fail_TraderDismissed>
+  <MS_Trade_Fail_ShipUnavailable>轨道商船已离开或不再接受交易。</MS_Trade_Fail_ShipUnavailable>
+  <MS_Trade_Fail_ConsoleMissing>本次交易使用的通讯台已被摧毁、移走或不在谈判者所在地图。</MS_Trade_Fail_ConsoleMissing>
+  <MS_Trade_Fail_ConsoleUnavailable>本次交易使用的通讯台当前无法使用。</MS_Trade_Fail_ConsoleUnavailable>
+  <MS_Trade_Fail_CannotTalk>谈判者当前无法说话，不能进行轨道交易。</MS_Trade_Fail_CannotTalk>
+  <MS_Trade_Fail_GroundTarget>本次交易的交互目标已被摧毁、离开地图或不在谈判者所在地图。</MS_Trade_Fail_GroundTarget>
+  <MS_Trade_Fail_CallbackRejected>第三方模组判定本次交易目标已不可用。</MS_Trade_Fail_CallbackRejected>
+  <MS_Trade_Fail_CallbackError>第三方模组检查交易目标时发生异常，详情见日志。</MS_Trade_Fail_CallbackError>
+  <MS_Trade_Fail_NoCore>本次交易没有可用的存储核心。</MS_Trade_Fail_NoCore>
+  <MS_Trade_Fail_CoreMissing>本次交易使用的存储核心已被摧毁或丢失。</MS_Trade_Fail_CoreMissing>
+  <MS_Trade_Fail_CoreNotWorking>存储核心“{0}”无法工作，请检查供电和存储网络状态。</MS_Trade_Fail_CoreNotWorking>
+  <MS_Trade_Fail_CoreUnavailable>存储核心“{0}”不在谈判者所在地图、已不属于玩家或位于迷雾中。</MS_Trade_Fail_CoreUnavailable>
+  <MS_Trade_Fail_CoreBeacon>存储核心“{0}”已失去通电的轨道贸易信标覆盖。</MS_Trade_Fail_CoreBeacon>
+  <MS_Trade_Fail_CoreSellingBlocked>存储核心“{0}”附近不允许出售物品：{1}</MS_Trade_Fail_CoreSellingBlocked>
+  <MS_Trade_Fail_CoreUnreachable>商人或交易交互者无法到达存储核心“{0}”。</MS_Trade_Fail_CoreUnreachable>
+  <MS_Trade_Fail_CurrencyMissing>交易清单中缺少支付货币，请重置清单。</MS_Trade_Fail_CurrencyMissing>
+  <MS_Trade_Fail_CurrencyCount>可用于支付的交易货币不足：需要 {0}，当前可用 {1}。</MS_Trade_Fail_CurrencyCount>
+  <MS_Trade_Fail_BuyCount>商人的“{0}”数量不足：需要买入 {1}，商人当前持有 {2}。</MS_Trade_Fail_BuyCount>
+  <MS_Trade_Fail_SellCount>“{0}”的可出售数量不足：需要 {1}，当前可用 {2}。{3}</MS_Trade_Fail_SellCount>
+  <MS_Trade_Fail_SourceChanged>部分物品已不在本次交易记录的来源中，请重置清单。</MS_Trade_Fail_SourceChanged>
+  <MS_Trade_Fail_ItemNotSellable>部分物品已不满足当前出售条件。</MS_Trade_Fail_ItemNotSellable>
+  <MS_Trade_Fail_ReservationClosed>本次交易的物品预留已结束或被重复使用，请重置清单。</MS_Trade_Fail_ReservationClosed>
+  <MS_Trade_Fail_InvalidRequest>“{0}”的交易来源或请求数量无效，请重置清单。</MS_Trade_Fail_InvalidRequest>
+  <MS_Trade_Fail_DuplicateItem>“{0}”的同一堆物品被重复计入交易，请重置清单。</MS_Trade_Fail_DuplicateItem>
+  <MS_Trade_Fail_ShelfCount>补货架上的“{0}”已不可用或数量不足：需要 {1}，当前可用 {2}。</MS_Trade_Fail_ShelfCount>
+  <MS_Trade_Fail_ReserveCount>无法预留存储网络中的“{0}”：需要 {1}，成功预留 {2}。</MS_Trade_Fail_ReserveCount>
+  <MS_Trade_Fail_ReservationSession>预留物品时，交易参与者或存储网络状态发生变化。</MS_Trade_Fail_ReservationSession>
+  <MS_Trade_Fail_ItemPolicyChanged>预留物品时，“{0}”的存储核心或出售条件发生变化。</MS_Trade_Fail_ItemPolicyChanged>
+  <MS_Trade_Fail_ReservationChanged>“{0}”的存储预留已失效，物品、数量或存储网络状态发生变化。</MS_Trade_Fail_ReservationChanged>
   <MS_Trade_OrbitalCommand>通过魔法存储与{0}进行轨道交易</MS_Trade_OrbitalCommand>
   <MS_Trade_OrbitalInventoryNotice>魔法存储轨道交易：使用信标覆盖核心的网络及其相连补货架上的物品和白银，买入物品由空投舱送达。</MS_Trade_OrbitalInventoryNotice>
   <MS_Trade_NoCoveredCore>需要通电的轨道贸易信标覆盖可用存储核心</MS_Trade_NoCoveredCore>

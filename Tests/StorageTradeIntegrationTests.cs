@@ -62,17 +62,335 @@ internal static class StorageTradeIntegrationTests
             RuntimeHelpers.RunClassConstructor(typeof(StorageTradePatches).TypeHandle);
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver(); RefusalAndCancellation(); ChangedSources(); MultiCoreAndGifts(); Orbital();
             ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading();
+            PublicApiValidation(); PublicApiScope(); PublicApiTopology(); PublicApiFailures();
+            FailureDiagnostics(); ReservationDiagnostics();
             var harmony = new Harmony("magicstorage.tests.dynamictrade");
             harmony.Patch(AccessTools.Method(typeof(Dialog_Trade), nameof(Dialog_Trade.PostOpen)),
                 prefix: new HarmonyMethod(AccessTools.DeclaredMethod(typeof(Dialog_TradePatches), "Prefix")));
             new DynamicTradeInterfaceCompatibility().Apply(harmony);
             DynamicNativeFallback(); DynamicOrdinary(); DynamicSaleAndPurchase(); DynamicCancelAndFailures(); DynamicOrbital();
             DynamicShelfTrading();
+            PublicApiDynamic();
+            checks += CeleTechTradeTests.Run();
+            checks += StorageLaunchPaymentTests.Run();
+            checks += RavenGiftTests.Run();
+            // The new scoped getter hook must leave all existing trade/payment paths intact.
+            Dialog_TradePatches.Replace = false;
+            OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver();
             checks += StorageLaunchPaymentTests.Run();
             Console.WriteLine("PASS: " + checks + " trade integration assertions (actual production Harmony hooks and sessions; native UI, pricing and delivery boundaries stubbed).");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+    }
+
+    private static StorageTradeOptions Options(Fixture f) => new StorageTradeOptions { Negotiator = f.Negotiator, Trader = f.Trader };
+
+    private static void RejectsWith(TradeDeal deal, string reason)
+    {
+        int executions = TradeDeal.NativeExecutions;
+        Equal(false, deal.TryExecute(out _), "diagnosed refusal rejects trade");
+        Equal(reason, Messages.LastText, "diagnosed refusal identifies the exact failed check");
+        Equal(executions, TradeDeal.NativeExecutions, "diagnosed refusal never reaches native settlement");
+    }
+
+    private static void FailureDiagnostics()
+    {
+        Translation.Values["MS_Trade_Failed"] = "{0}";
+        Translation.Values["MS_Trade_Fail_SellCount"] = "{0}|{1}|{2}|{3}";
+        Translation.Values["MS_Trade_Fail_BuyCount"] = "{0}|{1}|{2}";
+        Translation.Values["MS_Trade_Fail_CurrencyCount"] = "{0}|{1}";
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 10);
+        var dialog = f.Open(); var deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+        TradeSession.trader = new Pawn(); RejectsWith(deal, "MS_Trade_Fail_TraderChanged"); TradeSession.trader = f.Trader;
+        TradeSession.playerNegotiator = new Pawn(); RejectsWith(deal, "MS_Trade_Fail_NegotiatorChanged"); TradeSession.playerNegotiator = f.Negotiator;
+        f.Negotiator.Spawned = false; RejectsWith(deal, "MS_Trade_Fail_NegotiatorUnavailable"); f.Negotiator.Spawned = true;
+        f.Trader.Spawned = false; f.Trader.CanTradeNow = false;
+        RejectsWith(deal, "MS_Trade_Fail_TraderLeftMap"); f.Trader.Spawned = f.Trader.CanTradeNow = true;
+        f.Trader.Map = new Map(); RejectsWith(deal, "MS_Trade_Fail_TraderLeftMap"); f.Trader.Map = f.Map;
+        f.Trader.mindState.traderDismissed = true; RejectsWith(deal, "MS_Trade_Fail_TraderDismissed"); f.Trader.mindState.traderDismissed = false;
+        f.Trader.CanTradeNow = false; RejectsWith(deal, "MS_Trade_Fail_TraderUnavailable"); f.Trader.CanTradeNow = true;
+        f.Negotiator.AllowedTrade = false; RejectsWith(deal, "MS_Trade_Fail_TradePermission"); f.Negotiator.AllowedTrade = true;
+        f.Map.reachability.Unreachable.Add(f.Core); RejectsWith(deal, "MS_Trade_Fail_CoreUnreachable"); f.Map.reachability.Unreachable.Clear();
+        f.Map.listerBuildings.allBuildingsColonist.Remove(f.Core); RejectsWith(deal, "MS_Trade_Fail_NoCore"); f.Map.listerBuildings.allBuildingsColonist.Add(f.Core);
+        stock.stale = true; RejectsWith(deal, "test item|4|0|MS_Trade_Fail_ItemNotSellable"); stock.stale = false;
+        stock.stackCount = 2; RejectsWith(deal, "test item|4|2|"); stock.stackCount = 10;
+        var owner = new object(); f.Core.Network.ReserveOutgoing(owner, stock, 8);
+        RejectsWith(deal, "test item|4|2|"); f.Core.Network.ReleaseOutgoing(owner);
+        Equal(10, stock.stackCount, "all diagnostics preserve stock");
+        f.Close(dialog);
+
+        f = new Fixture(); f.Stock(ThingDefOf.Silver, 20);
+        var traderGoods = new Thing { def = def, stackCount = 5 }; f.Trader.inventory.innerContainer.TryAdd(traderGoods);
+        dialog = f.Open(); deal = TradeSession.deal;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = 3;
+        traderGoods.stackCount = 2; RejectsWith(deal, "test item|3|2"); traderGoods.stackCount = 5;
+        var silver = deal.CurrencyTradeable.thingsColony.Single(); silver.stackCount = 2;
+        RejectsWith(deal, "3|2"); silver.stackCount = 20;
+        deal.AllTradeables.Remove(deal.CurrencyTradeable); RejectsWith(deal, "MS_Trade_Fail_CurrencyMissing");
+        f.Close(dialog);
+
+        f = new Fixture(); bool valid = true, callbackThrows = false;
+        var options = Options(f); options.IsStillValid = () => { if (callbackThrows) throw new Exception("Diagnostic callback failure"); return valid; };
+        Equal(true, StorageTradeApi.Open(options).Opened, "diagnostic callback trade opens");
+        dialog = Find.WindowStack.WindowOfType<Dialog_Trade>(); deal = TradeSession.deal;
+        valid = false; RejectsWith(deal, "MS_Trade_Fail_CallbackRejected"); valid = true;
+        callbackThrows = true; RejectsWith(deal, "MS_Trade_Fail_CallbackError"); callbackThrows = false;
+        RejectsWith(deal, "MS_Trade_Fail_CallbackError");
+        f.Close(dialog);
+
+        f = new Fixture(); var ship = new TradeShip { Map = f.Map }; f.Map.passingShipManager.passingShips.Add(ship);
+        var console = new Building_CommsConsole { Spawned = true, Map = f.Map };
+        var beacon = new Building_OrbitalTradeBeacon(); beacon.TradeableCells.Add(f.Core.Position); f.Map.Beacons.Add(beacon);
+        StorageTradeSession.Open(f.Negotiator, ship, console); dialog = Find.WindowStack.WindowOfType<Dialog_Trade>(); deal = TradeSession.deal;
+        ship.CanTradeNow = false; RejectsWith(deal, "MS_Trade_Fail_ShipUnavailable"); ship.CanTradeNow = true;
+        f.Map.passingShipManager.passingShips.Remove(ship); RejectsWith(deal, "MS_Trade_Fail_ShipUnavailable"); f.Map.passingShipManager.passingShips.Add(ship);
+        console.Spawned = false; RejectsWith(deal, "MS_Trade_Fail_ConsoleMissing"); console.Spawned = true;
+        console.CanUseCommsNow = false; RejectsWith(deal, "MS_Trade_Fail_ConsoleUnavailable"); console.CanUseCommsNow = true;
+        f.Negotiator.health.capacities.manipulation = false; RejectsWith(deal, "MS_Trade_Fail_CannotTalk"); f.Negotiator.health.capacities.manipulation = true;
+        beacon.Powered = false; RejectsWith(deal, "MS_Trade_Fail_CoreBeacon"); beacon.Powered = true;
+        Equal(true, StorageTradeSession.TryGet(deal, out var session), "closed session fixture captures session");
+        f.Close(dialog);
+        Equal(false, session.Prepare(out _), "closed session remains invalid");
+        Equal("MS_Trade_Fail_SessionClosed", Messages.LastText, "closed session explains why reopening is needed");
+        foreach (string key in new[] { "MS_Trade_Failed", "MS_Trade_Fail_SellCount", "MS_Trade_Fail_BuyCount", "MS_Trade_Fail_CurrencyCount" })
+            Translation.Values.Remove(key);
+    }
+
+    private static void ReservationDiagnostics()
+    {
+        var f = new Fixture(); var item = f.Stock(new ThingDef(), 3);
+        var request = new StorageTradeRequest { Network = f.Core.Network, Item = item, Count = 5 };
+        using (var tx = new StorageTradeTransaction(new List<StorageTradeRequest> { request }, () => true))
+        {
+            Equal(false, tx.Reserve(), "partial reservation is rejected");
+            Equal("MS_Trade_Fail_ReserveCount", tx.FailureKey, "partial reservation reports its own failure");
+            Equal(request, tx.FailedRequest, "failure retains the exact source stack");
+            Equal(3, tx.FailureAvailable, "failure retains count before rolling back reservations");
+        }
+        Equal(3, f.Core.Network.AvailableToWithdraw(item), "diagnostic failure releases partial reservation");
+        using (var tx = new StorageTradeTransaction(new List<StorageTradeRequest> { request, request }, () => true))
+        {
+            request.Count = 1;
+            Equal(false, tx.Reserve(), "duplicate request still fails");
+            Equal("MS_Trade_Fail_DuplicateItem", tx.FailureKey, "duplicate stack is distinguished from missing stock");
+        }
+        var shelfItem = f.ShelfStock(new ThingDef(), 2, out var shelf);
+        request = new StorageTradeRequest { Network = f.Core.Network, Item = shelfItem, Shelf = shelf, Count = 3 };
+        using (var tx = new StorageTradeTransaction(new List<StorageTradeRequest> { request }, () => true))
+        {
+            Equal(false, tx.Reserve(), "short shelf inventory still fails");
+            Equal("MS_Trade_Fail_ShelfCount", tx.FailureKey, "shelf failure is distinguished from network reservation");
+            Equal(2, tx.FailureAvailable, "shelf failure retains available count");
+        }
+    }
+
+    private static void PublicApiValidation()
+    {
+        var f = new Fixture(); var options = Options(f);
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(null).Status, "null API request refused");
+        options.Trader = null;
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "missing trader refused");
+        options = Options(f); options.Mode = (StorageTradeMode)99;
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "unknown mode refused");
+        options = Options(f); options.NetworkScope = StorageTradeNetworkScope.SpecifiedCores;
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "explicit empty scope never becomes all networks");
+        options.Cores = new[] { f.Core, null };
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "null core refused");
+        options = Options(f); options.Cores = new[] { f.Core };
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "cores cannot silently be ignored");
+        options = Options(f); options.Trader = new TradeShip { Map = f.Map };
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "non-Pawn ground trader requires a physical target");
+        options.Mode = StorageTradeMode.Orbital;
+        Equal(StorageTradeOpenStatus.InvalidRequest, StorageTradeApi.Open(options).Status, "orbital request requires console");
+        options = Options(f); options.IsStillValid = () => false;
+        var result = StorageTradeApi.Open(options);
+        Equal(StorageTradeOpenStatus.TraderUnavailable, result.Status, "custom validity failure refused");
+        Equal(false, result.CanFallbackToVanilla, "unavailable trader does not recommend opening native trade");
+        options.IsStillValid = () => { throw new InvalidOperationException("Controlled callback failure"); };
+        Equal(StorageTradeOpenStatus.TraderUnavailable, StorageTradeApi.Open(options).Status, "callback exception is contained");
+        options = Options(f); f.Trader.CanTradeNow = false;
+        Equal(StorageTradeOpenStatus.TraderUnavailable, StorageTradeApi.Open(options).Status, "departed trader refused before constructor");
+        f.Trader.CanTradeNow = true;
+        f.Map.reachability.Unreachable.Add(f.Core);
+        result = StorageTradeApi.Open(Options(f));
+        Equal(StorageTradeOpenStatus.NoEligibleNetwork, result.Status, "ineligible cores cannot produce fake success");
+        Equal(true, result.CanFallbackToVanilla, "absent network permits normal opener");
+        f.Map.reachability.Unreachable.Clear();
+        StorageTradeOpenStatus nested = StorageTradeOpenStatus.Opened;
+        options = Options(f); options.IsStillValid = () => { nested = StorageTradeApi.Open(Options(f)).Status; return true; };
+        result = StorageTradeApi.Open(options);
+        Equal(StorageTradeOpenStatus.Opened, result.Status, "empty network is eligible for buying");
+        Equal(StorageTradeOpenStatus.OpeningInProgress, nested, "validation callback cannot recursively overwrite trade globals");
+        var deal = TradeSession.deal;
+        result = StorageTradeApi.Open(Options(f));
+        Equal(StorageTradeOpenStatus.TradeWindowAlreadyOpen, result.Status, "second native window refused");
+        Equal(false, result.CanFallbackToVanilla, "existing window must not trigger ordinary fallback");
+        Equal(deal, TradeSession.deal, "duplicate request leaves original deal intact");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+        Find.WindowStack.Add(new Dialog_Trade(f.Negotiator, f.Trader));
+        deal = TradeSession.deal;
+        Equal(StorageTradeOpenStatus.TradeWindowAlreadyOpen, StorageTradeApi.Open(Options(f)).Status, "ordinary trade window also blocks API");
+        Equal(deal, TradeSession.deal, "ordinary active deal preserved");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+    }
+
+    private static void PublicApiScope()
+    {
+        var f = new Fixture(); var def = new ThingDef(); f.Stock(def, 10); f.Stock(ThingDefOf.Silver, 2);
+        var selectedShelf = f.ShelfStock(def, 5, out _);
+        var coreB = new Building_StorageCore(); var unitB = new Building_StorageUnit();
+        f.Register(coreB, 50); f.Register(unitB, 51); f.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
+        unitB.Inventory.Contents.TryAdd(new Thing { def = def, stackCount = 40 });
+        Equal(true, unitB.Inventory.Contents.TryAdd(new Thing { def = ThingDefOf.Silver, stackCount = 60 }), "fixture stores other network silver within stack limit");
+        var cores = new List<Building_StorageCore> { f.Core, f.Core };
+        var options = Options(f); options.NetworkScope = StorageTradeNetworkScope.SpecifiedCores; options.Cores = cores;
+        Equal(StorageTradeOpenStatus.Opened, StorageTradeApi.Open(options).Status, "explicit core opens with duplicates normalized");
+        var dialog = Find.WindowStack.WindowOfType<Dialog_Trade>(); var deal = TradeSession.deal;
+        Equal(15, deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "scope includes selected shelf but excludes other network");
+        Equal(2, deal.CurrencyTradeable.CountHeldBy(Transactor.Colony), "silver list uses identical core scope");
+        cores.Clear(); cores.Add(coreB); options.NetworkScope = StorageTradeNetworkScope.AllEligible; options.Trader = new Pawn();
+        deal.Reset();
+        Equal(15, deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "mutating caller options and collection never changes live scope");
+        f.Trader.inventory.innerContainer.TryAdd(new Thing { def = def, stackCount = 10 }); deal.Reset();
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = 3;
+        Equal(false, deal.TryExecute(out _), "unselected silver cannot fund purchase");
+        Equal(60L, coreB.Network.GetTotalCount(ThingDefOf.Silver), "failed purchase leaves other network currency intact");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -12;
+        Equal(true, deal.TryExecute(out _), "scoped mixed shelf sale succeeds");
+        Equal(0L, f.Core.Network.GetTotalCount(def), "selected network deducted");
+        Equal(3, selectedShelf.stackCount, "selected shelf pays shortfall");
+        Equal(40L, coreB.Network.GetTotalCount(def), "other network goods untouched");
+        f.Core.Spawned = false;
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -1;
+        Equal(false, deal.TryExecute(out _), "invalid selected core cannot switch to another network on confirmation");
+        deal.Reset();
+        Equal(false, deal.AllTradeables.Any(t => t.thingsColony.Count != 0), "refresh after core loss never widens scope");
+        f.Close(dialog); f.Core.Spawned = true;
+        options = Options(f); options.NetworkScope = StorageTradeNetworkScope.SpecifiedCores; options.Cores = new[] { f.Core, coreB };
+        Equal(StorageTradeOpenStatus.Opened, StorageTradeApi.Open(options).Status, "multiple explicit cores supported");
+        Equal(43, TradeSession.deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "multiple selected networks aggregate once");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+
+        bool valid = true; options = Options(f); options.IsStillValid = () => valid;
+        Equal(true, StorageTradeApi.Open(options).Opened, "callback-valid request opens");
+        deal = TradeSession.deal; deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -1; valid = false;
+        Equal(false, deal.TryExecute(out _), "custom validity rechecked at settlement");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+        options = Options(f); options.IsStillValid = () => { if (!valid) throw new Exception("Controlled later callback error"); return true; };
+        valid = true; Equal(true, StorageTradeApi.Open(options).Opened, "second callback request opens");
+        valid = false; deal = TradeSession.deal; deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -1;
+        Equal(false, deal.TryExecute(out _), "later callback exception refuses trade without throwing");
+        valid = true;
+        Equal(false, deal.TryExecute(out _), "faulted callback session stays invalid");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+    }
+
+    private static void PublicApiTopology()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 10);
+        var options = Options(f); options.NetworkScope = StorageTradeNetworkScope.SpecifiedCores; options.Cores = new[] { f.Core };
+        var manager = f.Map.GetComponent<MapComponent_StorageNetworks>(); var oldNetwork = f.Core.Network;
+        manager.MarkDirty();
+        Equal(true, StorageTradeApi.Open(options).Opened, "open resolves selected core after pending network rebuild");
+        Equal(false, ReferenceEquals(oldNetwork, f.Core.Network), "fixture rebuilt network identity");
+        var dialog = Find.WindowStack.WindowOfType<Dialog_Trade>(); var deal = TradeSession.deal;
+        Equal(10, deal.AllTradeables.Find(t => t.ThingDef == def).CountHeldBy(Transactor.Colony), "rebuilt selected network inventory visible");
+        deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        manager.MarkDirty();
+        Equal(false, deal.TryExecute(out _), "stale network source cannot settle after topology change");
+        Equal(10, stock.stackCount, "topology rejection preserves real goods");
+        deal.Reset(); deal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -3;
+        Equal(true, deal.TryExecute(out _), "refresh binds new network and allows correct sale");
+        Equal(7L, f.Core.Network.GetTotalCount(def), "refreshed selected core deducts exact quantity");
+        f.Close(dialog);
+        var other = new Fixture(); options = Options(other); options.NetworkScope = StorageTradeNetworkScope.SpecifiedCores; options.Cores = new[] { f.Core };
+        Equal(StorageTradeOpenStatus.NoEligibleNetwork, StorageTradeApi.Open(options).Status, "core on another map cannot be selected");
+        options.Cores = new[] { other.Core, f.Core };
+        Equal(StorageTradeOpenStatus.NoEligibleNetwork, StorageTradeApi.Open(options).Status, "partially invalid explicit selection cannot silently shrink");
+    }
+
+    private static void PublicApiFailures()
+    {
+        var f = new Fixture(); var def = new ThingDef(); var stock = f.Stock(def, 10);
+        var previousDeal = TradeSession.deal; var previousTrader = TradeSession.trader;
+        var previousNegotiator = TradeSession.playerNegotiator; TradeSession.giftMode = true;
+        Dialog_Trade.ConstructorHook = () => { throw new InvalidOperationException("Controlled constructor failure"); };
+        StorageTradeOpenResult result;
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Dialog_Trade.ConstructorHook = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "constructor failure reported");
+        Equal(true, result.CanFallbackToVanilla, "clean constructor failure permits fallback");
+        Equal(previousDeal, TradeSession.deal, "constructor failure restores previous deal");
+        Equal(previousTrader, TradeSession.trader, "constructor failure restores previous trader");
+        Equal(previousNegotiator, TradeSession.playerNegotiator, "constructor failure restores previous negotiator");
+        Equal(true, TradeSession.giftMode, "constructor failure restores gift flag");
+        TradeDeal failedDeal = null;
+        Find.WindowStack.BeforeAdd = window =>
+        {
+            failedDeal = TradeSession.deal;
+            failedDeal.AllTradeables.Find(t => t.ThingDef == def).CountToTransfer = -4;
+            Equal(true, StorageTradeSession.TryGet(failedDeal, out var session) && session.Prepare(out _), "failure fixture reserves real network goods");
+            throw new InvalidOperationException("Controlled pre-insert failure");
+        };
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Find.WindowStack.BeforeAdd = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "pre-insert failure reported");
+        Equal(true, result.CanFallbackToVanilla, "clean pre-insert failure permits fallback");
+        Equal(false, StorageTradeSession.TryGet(failedDeal, out _), "failed deal binding removed");
+        Equal(10, f.Core.Network.AvailableToWithdraw(stock), "failed open releases prepared reservations");
+        Find.WindowStack.AfterAdd = window => { throw new InvalidOperationException("Controlled post-insert failure"); };
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Find.WindowStack.AfterAdd = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "post-insert failure reported");
+        Equal(0, Find.WindowStack.Windows.Count, "partially inserted native window removed");
+        Equal(true, result.CanFallbackToVanilla, "partial native window cleaned before fallback");
+        Find.WindowStack.AfterAdd = window => Find.WindowStack.TryRemove(window, false);
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Find.WindowStack.AfterAdd = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "silently removed window is never success");
+        var unsupported = new Window();
+        Find.WindowStack.AfterAdd = window =>
+        {
+            Find.WindowStack.Windows.Add(unsupported);
+            Find.WindowStack.TryRemove(window, false);
+        };
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Find.WindowStack.AfterAdd = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "unknown replacement is not assumed successful");
+        Equal(false, result.CanFallbackToVanilla, "unknown remaining window prevents unsafe fallback");
+        Equal(true, Find.WindowStack.Windows.Contains(unsupported), "API never removes unrelated window");
+        Find.WindowStack.TryRemove(unsupported, false);
+        Equal(true, StorageTradeApi.Open(Options(f)).Opened, "failures do not poison next opening");
+        f.Close(Find.WindowStack.WindowOfType<Dialog_Trade>());
+    }
+
+    private static void PublicApiDynamic()
+    {
+        var f = new Fixture(); f.Stock(new ThingDef(), 10);
+        Equal(true, StorageTradeApi.Open(Options(f)).Opened, "public API recognizes successful DTI replacement");
+        var window = Find.WindowStack.WindowOfType<Window_DynamicTrade>();
+        Equal(true, window != null, "dynamic window retained");
+        Equal(StorageTradeOpenStatus.TradeWindowAlreadyOpen, StorageTradeApi.Open(Options(f)).Status, "DTI blocks duplicate API opening");
+        Find.WindowStack.TryRemove(window, false);
+        Window_DynamicTrade.FailPreOpen = true;
+        StorageTradeOpenResult result;
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Window_DynamicTrade.FailPreOpen = false; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "DTI PreOpen failure reported");
+        Equal(true, result.CanFallbackToVanilla, "clean DTI failure permits fallback");
+        Find.WindowStack.AfterAdd = added =>
+        {
+            if (added is Window_DynamicTrade) throw new InvalidOperationException("Controlled partial DTI open");
+        };
+        try { result = StorageTradeApi.Open(Options(f)); }
+        finally { Find.WindowStack.AfterAdd = null; }
+        Equal(StorageTradeOpenStatus.OpenFailed, result.Status, "partial DTI failure reported");
+        Equal(0, Find.WindowStack.Windows.Count, "partially inserted DTI window removed");
+        Equal(true, result.CanFallbackToVanilla, "partial DTI cleanup permits fallback");
+        Equal(true, StorageTradeApi.Open(Options(f)).Opened, "DTI can reopen after partial failure");
+        Find.WindowStack.TryRemove(Find.WindowStack.WindowOfType<Window_DynamicTrade>(), false);
     }
 
     private static void OrdinaryAndScoped()
@@ -488,8 +806,7 @@ internal static class StorageTradeIntegrationTests
         Equal(false, StorageTradeSession.TryGet(deal, out _), "exceptional dynamic close still removes context");
 
         Window_DynamicTrade.FailPreOpen = true;
-        try { StorageTradeSession.Open(f.Negotiator, f.Trader); throw new Exception("Expected dynamic open exception"); }
-        catch (InvalidOperationException) { }
+        try { Equal(StorageTradeOpenStatus.OpenFailed, StorageTradeSession.Open(f.Negotiator, f.Trader).Status, "dynamic open failure is reported explicitly"); }
         finally { Window_DynamicTrade.FailPreOpen = false; }
         Equal(false, StorageTradeSession.TryGet(TradeSession.deal, out _), "failed replacement leaves no session");
         Equal(0, Find.WindowStack.Windows.Count, "failed PreOpen leaves no trade window");

@@ -6,13 +6,19 @@ using System.Collections.Generic;
 namespace RimWorld { public static class MapMeshFlagDefOf { public static object Things; } }
 namespace Verse
 {
+    public static partial class GenRadial { public const float MaxRadialPatternRadius = 100f; }
     [AttributeUsage(AttributeTargets.Class)] public sealed class StaticConstructorOnStartupAttribute : Attribute { }
     public enum ThingCategory { Item, Building, Pawn }
-    public enum LookMode { Deep, Def, Value }
+    public enum LookMode { Deep, Def, Value, Reference }
     public enum LoadSaveMode { Inactive, PostLoadInit }
     public static class Scribe { public static LoadSaveMode mode; }
     public static class Scribe_Deep { public static void Look<T>(ref T value, string key, params object[] args) { } }
-    public static partial class Scribe_Collections { public static void Look<T>(ref List<T> value, string key, LookMode mode, params object[] args) { } }
+    public static partial class Scribe_Collections
+    {
+        public static Func<string, object, LookMode, object> Boundary;
+        public static void Look<T>(ref List<T> value, string key, LookMode mode, params object[] args)
+        { if (Boundary != null) value = (List<T>)Boundary(key, value, mode); }
+    }
     public static class Translation
     {
         public static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
@@ -142,8 +148,16 @@ namespace Verse
         public ReservationManager reservationManager = new ReservationManager();
         public object component;
         public MagicStorage.MapComponent_CosmicCrafting craftingComponent;
-        public T GetComponent<T>() => typeof(T) == typeof(MagicStorage.MapComponent_CosmicCrafting)
-            ? (T)(object)(craftingComponent ?? (craftingComponent = new MagicStorage.MapComponent_CosmicCrafting(this))) : (T)component;
+        private readonly Dictionary<Type, MapComponent> extraComponents = new Dictionary<Type, MapComponent>();
+        public T GetComponent<T>()
+        {
+            if (typeof(T) == typeof(MagicStorage.MapComponent_CosmicCrafting))
+                return (T)(object)(craftingComponent ?? (craftingComponent = new MagicStorage.MapComponent_CosmicCrafting(this)));
+            if (component is T) return (T)component;
+            if (!extraComponents.TryGetValue(typeof(T), out var value))
+                extraComponents[typeof(T)] = value = (MapComponent)Activator.CreateInstance(typeof(T), this);
+            return (T)(object)value;
+        }
         public IThingHolder ParentHolder => null;
         public ThingOwner GetDirectlyHeldThings() => null;
         public void GetChildHolders(List<IThingHolder> list) { }
@@ -156,6 +170,7 @@ namespace Verse
         public virtual void MapComponentTick() { }
         public virtual void ExposeData() { }
         public virtual void FinalizeInit() { }
+        public virtual void MapRemoved() { }
     }
 }
 namespace MagicStorage

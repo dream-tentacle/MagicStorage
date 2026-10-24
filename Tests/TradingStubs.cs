@@ -19,7 +19,12 @@ namespace UnityEngine
 namespace Verse
 {
     public static partial class Widgets { public static void Label(UnityEngine.Rect rect, string text) { } }
-    public static class Messages { public static int Rejects; public static void Message(string text, object type, bool historical) { Rejects++; } }
+    public static class Messages
+    {
+        public static int Rejects;
+        public static string LastText;
+        public static void Message(string text, object type, bool historical) { Rejects++; LastText = text; }
+    }
     public class Window
     {
         public virtual UnityEngine.Vector2 InitialSize => new UnityEngine.Vector2(1024, 900);
@@ -32,8 +37,9 @@ namespace Verse
     }
     public partial class WindowStack
     {
+        internal Action<Window> BeforeAdd, AfterAdd;
         public T WindowOfType<T>() where T : class => Windows.OfType<T>().FirstOrDefault();
-        public void Add(Window window) { window.PreOpen(); Windows.Add(window); window.PostOpen(); }
+        public void Add(Window window) { BeforeAdd?.Invoke(window); window.PreOpen(); Windows.Add(window); window.PostOpen(); AfterAdd?.Invoke(window); }
         public bool TryRemove(Window window, bool doCloseSound = true)
         {
             if (!Windows.Remove(window)) return false;
@@ -43,8 +49,12 @@ namespace Verse
     public static class ThingMaker { public static Thing MakeThing(ThingDef def) => new Thing { def = def }; }
     public class Room { }
     public static class RoomBoundary { public static Room GetRoom(this Thing thing) => null; public static Room GetRoom(this IntVec3 cell, Map map) => null; }
-    public static class GenRadial { public static int NumCellsInRadius(float radius) => 0; public static IntVec3[] RadialPattern = new IntVec3[0]; }
-    public partial class Thing { public bool PreventPlayerSellingThingsNearby(out string reason) { reason = null; return false; } }
+    public static partial class GenRadial { public static int NumCellsInRadius(float radius) => 0; public static IntVec3[] RadialPattern = new IntVec3[0]; }
+    public partial class Thing
+    {
+        public string LabelCap => "test item";
+        public bool PreventPlayerSellingThingsNearby(out string reason) { reason = null; return false; }
+    }
     public partial class Map
     {
         public BuildingLister listerBuildings = new BuildingLister();
@@ -121,7 +131,7 @@ namespace RimWorld
         }
     }
     public static class PawnCapacityDefOf { public static object Talking = new object(); }
-    public static class ThingDefOf { public static ThingDef Silver = new ThingDef(); }
+    public static partial class ThingDefOf { public static ThingDef Silver = new ThingDef(); }
     public static partial class TradeUtility { public static bool PlayerSellableNow(Thing item, ITrader trader) => !item.stale; }
     public static class TradeSession
     {
@@ -216,12 +226,14 @@ namespace RimWorld
     }
     public class Dialog_Trade : Window
     {
+        internal static Action ConstructorHook;
         private readonly bool giftsOnly = false;
         public int Flashes;
         public Dialog_Trade(Pawn negotiator, ITrader trader)
         {
             TradeSession.playerNegotiator = negotiator; TradeSession.trader = trader;
             TradeSession.giftMode = false; TradeSession.deal = new TradeDeal();
+            ConstructorHook?.Invoke();
         }
         public void FlashSilver() { Flashes++; }
         [MethodImpl(MethodImplOptions.NoInlining)]

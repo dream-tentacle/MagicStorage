@@ -2,12 +2,12 @@
 <LanguageData>
   <MS_Shelf_Configure>配置补货</MS_Shelf_Configure>
   <MS_Shelf_CopyPreset>复制预设</MS_Shelf_CopyPreset>
-  <MS_Shelf_CopyPresetDesc>复制此货架的物品、补货上限、筛选条件、补货失败提醒和优先级。</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_CopyPresetDesc>复制此货架的模式、物品、各格补货上限、筛选条件、补货失败提醒和优先级。</MS_Shelf_CopyPresetDesc>
   <MS_Shelf_PastePreset>粘贴预设</MS_Shelf_PastePreset>
   <MS_Shelf_PastePresetDesc>将已复制的预设应用到选中的补货架，覆盖现有配置。支持多选货架。</MS_Shelf_PastePresetDesc>
   <MS_Shelf_NeedCopiedPreset>需要先复制预设</MS_Shelf_NeedCopiedPreset>
   <MS_Shelf_Title>自动补货架</MS_Shelf_Title>
-  <MS_Shelf_ConfigureDesc>分别指定三种物品及补货上限，每种最多一堆</MS_Shelf_ConfigureDesc>
+  <MS_Shelf_ConfigureDesc>分别指定{0}个格子的物品及补货上限，允许选择相同物品。</MS_Shelf_ConfigureDesc>
   <MS_Shelf_PriorityHint>殖民者不会将物品搬入此架；补货仅由相连的存储网络提供。</MS_Shelf_PriorityHint>
   <MS_Shelf_Limit>补货上限</MS_Shelf_Limit>
   <MS_Shelf_LimitTip>补货数量上限：0～{0}。调低上限不会移走已有库存。</MS_Shelf_LimitTip>
@@ -19,7 +19,7 @@
   <MS_Shelf_Contents>货架库存：{0} / {1} 堆</MS_Shelf_Contents>
   <MS_Shelf_Use>殖民者可直接领取。仅自动补货，不接收普通搬运。</MS_Shelf_Use>
   <MS_Shelf_PickTitle>选择位置 {0} 的物品</MS_Shelf_PickTitle>
-  <MS_Shelf_PickHint>展开分类或搜索，点击物品名称即可选中。每个位置只指定一种物品，三个位置不能重复。</MS_Shelf_PickHint>
+  <MS_Shelf_PickHint>展开分类或搜索，点击物品名称即可选中。每个位置只指定一种物品，不同位置可以重复。</MS_Shelf_PickHint>
   <MS_Shelf_AlreadySelected>其他位置已经指定了此物品。</MS_Shelf_AlreadySelected>
   <MS_Shelf_Filter>筛选条件</MS_Shelf_Filter>
   <MS_Shelf_FilterTitle>位置 {0} 的筛选条件</MS_Shelf_FilterTitle>
@@ -42,4 +42,13 @@
   <MS_Shelf_Failure_PlacementFailed>物品无法放到货架上</MS_Shelf_Failure_PlacementFailed>
   <MS_Shelf_Failure_TransferFailed>物品转移失败</MS_Shelf_Failure_TransferFailed>
   <MS_Shelf_Failure_Burning>货架所在格着火，暂时无法补货</MS_Shelf_Failure_Burning>
+  <MS_Shelf_FilterMode>筛选模式</MS_Shelf_FilterMode>
+  <MS_Shelf_FilterModeDesc>所有格子共用储存筛选条件，各自设置堆叠上限。切换模式前会将架上物品退回核心；无法全部退回时不切换。</MS_Shelf_FilterModeDesc>
+  <MS_Shelf_QuickFood>一键食物</MS_Shelf_QuickFood>
+  <MS_Shelf_QuickFoodDesc>切换至筛选模式，并将共用筛选条件设为全部食物。若无法切换模式，则保留原筛选条件。</MS_Shelf_QuickFoodDesc>
+  <MS_Shelf_SharedFilterHint>所有格子共用以下筛选条件，各自补充至设定上限。空格按网络物品列表顺序选择第一个符合条件且可取出的物品。</MS_Shelf_SharedFilterHint>
+  <MS_Shelf_SlotLimit>位置 {0} 堆叠上限</MS_Shelf_SlotLimit>
+  <MS_Shelf_SharedLimitTip>仅控制此格的补货数量，实际数量不超过物品自身的堆叠上限。0表示暂停补货；调低上限不会移走已有库存。</MS_Shelf_SharedLimitTip>
+  <MS_Shelf_ModeBlockedTitle>无法切换补货架模式</MS_Shelf_ModeBlockedTitle>
+  <MS_Shelf_ModeBlocked>无法将架上物品全部退回核心，补货架保持当前模式。请检查网络连接、核心储存筛选和剩余空间，并确保物品未被禁用或预留。</MS_Shelf_ModeBlocked>
 </LanguageData>
