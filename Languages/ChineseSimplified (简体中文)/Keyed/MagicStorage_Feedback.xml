@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_FeedbackTitle>发送反馈</MS_FeedbackTitle>
+  <MS_FeedbackPrivacy>点击上传将发送问题描述、当前游戏日志、已启用模组列表、版本信息及 Steam ID，仅管理员可查看。日志可能包含本机路径，请确认后上传。</MS_FeedbackPrivacy>
+  <MS_FeedbackVersions>游戏：{0}　魔法存储：{1}</MS_FeedbackVersions>
+  <MS_FeedbackCollected>已启用 {0} 个模组，日志约 {1} KB</MS_FeedbackCollected>
+  <MS_FeedbackShowMods>查看模组列表</MS_FeedbackShowMods>
+  <MS_FeedbackHideMods>收起模组列表</MS_FeedbackHideMods>
+  <MS_FeedbackSubject>标题（至少 4 个字符）</MS_FeedbackSubject>
+  <MS_FeedbackDescription>问题描述与复现步骤（至少 10 个字符）</MS_FeedbackDescription>
+  <MS_FeedbackClose>关闭</MS_FeedbackClose>
+  <MS_FeedbackSend>上传反馈</MS_FeedbackSend>
+  <MS_FeedbackNetworkHint>需要能连接ChatGPT</MS_FeedbackNetworkHint>
+  <MS_FeedbackUploading>正在上传，请稍候……</MS_FeedbackUploading>
+  <MS_FeedbackSuccess>反馈已上传，编号：{0}</MS_FeedbackSuccess>
+  <MS_FeedbackUploadFailed>上传失败，请检查网络后稍后重试。</MS_FeedbackUploadFailed>
+  <MS_FeedbackTimeout>上传超时，请稍后重试。</MS_FeedbackTimeout>
+  <MS_FeedbackCooldown>请间隔一分钟后再上传。</MS_FeedbackCooldown>
+  <MS_FeedbackRateLimited>提交次数或今日上传总量已达上限，请稍后重试。</MS_FeedbackRateLimited>
+  <MS_FeedbackTooLarge>反馈内容过大，请缩短描述后重试。</MS_FeedbackTooLarge>
+  <MS_FeedbackNoLog>未获取到当前日志，请在出现问题后再提交。</MS_FeedbackNoLog>
+  <MS_FeedbackSteamId>Steam ID：{0}</MS_FeedbackSteamId>
+  <MS_FeedbackSteamUnavailable>未获取</MS_FeedbackSteamUnavailable>
+  <MS_FeedbackTitleTooShort>标题至少需要 4 个字符。</MS_FeedbackTitleTooShort>
+  <MS_FeedbackDescriptionTooShort>问题描述至少需要 10 个字符。</MS_FeedbackDescriptionTooShort>
+  <MS_FeedbackGizmoLabel>反馈</MS_FeedbackGizmoLabel>
+  <MS_FeedbackGizmoDesc>反馈信息</MS_FeedbackGizmoDesc>
+  <MS_FeedbackConfirmation>你确认要提交反馈信息吗？反馈将会上传日志和模组列表，并发送到服务器。</MS_FeedbackConfirmation>
+</LanguageData>

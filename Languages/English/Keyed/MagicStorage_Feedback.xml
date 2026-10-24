@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_FeedbackTitle>Send feedback</MS_FeedbackTitle>
+  <MS_FeedbackPrivacy>Uploading sends your description, current game log, active mod list, version information and Steam ID. Only administrators can view this data. Logs may contain local file paths. Review before uploading.</MS_FeedbackPrivacy>
+  <MS_FeedbackVersions>Game: {0}   Magic Storage: {1}</MS_FeedbackVersions>
+  <MS_FeedbackCollected>{0} active mods; about {1} KB of log data</MS_FeedbackCollected>
+  <MS_FeedbackShowMods>View mod list</MS_FeedbackShowMods>
+  <MS_FeedbackHideMods>Hide mod list</MS_FeedbackHideMods>
+  <MS_FeedbackSubject>Title (at least 4 characters)</MS_FeedbackSubject>
+  <MS_FeedbackDescription>Description and steps to reproduce (at least 10 characters)</MS_FeedbackDescription>
+  <MS_FeedbackClose>Close</MS_FeedbackClose>
+  <MS_FeedbackSend>Upload feedback</MS_FeedbackSend>
+  <MS_FeedbackNetworkHint></MS_FeedbackNetworkHint>
+  <MS_FeedbackUploading>Uploading feedback…</MS_FeedbackUploading>
+  <MS_FeedbackSuccess>Feedback uploaded. Reference: {0}</MS_FeedbackSuccess>
+  <MS_FeedbackUploadFailed>Upload failed. Check your connection and try again later.</MS_FeedbackUploadFailed>
+  <MS_FeedbackTimeout>Upload timed out. Try again later.</MS_FeedbackTimeout>
+  <MS_FeedbackCooldown>Please wait one minute before uploading again.</MS_FeedbackCooldown>
+  <MS_FeedbackRateLimited>The submission or daily upload limit has been reached. Try again later.</MS_FeedbackRateLimited>
+  <MS_FeedbackTooLarge>The feedback is too large. Shorten the description and try again.</MS_FeedbackTooLarge>
+  <MS_FeedbackNoLog>No current log was found. Submit feedback after the issue occurs.</MS_FeedbackNoLog>
+  <MS_FeedbackSteamId>Steam ID: {0}</MS_FeedbackSteamId>
+  <MS_FeedbackSteamUnavailable>Unavailable</MS_FeedbackSteamUnavailable>
+  <MS_FeedbackTitleTooShort>The title must contain at least 4 characters.</MS_FeedbackTitleTooShort>
+  <MS_FeedbackDescriptionTooShort>The description must contain at least 10 characters.</MS_FeedbackDescriptionTooShort>
+  <MS_FeedbackGizmoLabel>Feedback</MS_FeedbackGizmoLabel>
+  <MS_FeedbackGizmoDesc>Feedback information</MS_FeedbackGizmoDesc>
+  <MS_FeedbackConfirmation>Are you sure you want to submit feedback? Your logs and mod list will be uploaded and sent to the server.</MS_FeedbackConfirmation>
+</LanguageData>

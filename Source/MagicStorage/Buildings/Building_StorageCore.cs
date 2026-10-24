@@ -116,6 +116,21 @@ namespace MagicStorage
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Inventory"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageInventory(this))
                 };
+            if (Spawned && Faction == Faction.OfPlayer)
+                yield return new Command_Action
+                {
+                    defaultLabel = "MS_FeedbackGizmoLabel".Translate(),
+                    defaultDesc = "MS_FeedbackGizmoDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Feedback"),
+                    action = () => Find.WindowStack.Add(new Dialog_MessageBox(
+                        "MS_FeedbackConfirmation".Translate(),
+                        buttonAText: "Confirm".Translate(),
+                        buttonAAction: Dialog_Feedback.Open,
+                        buttonBText: "Cancel".Translate(),
+                        title: "MS_FeedbackGizmoLabel".Translate(),
+                        acceptAction: Dialog_Feedback.Open,
+                        cancelAction: () => { }))
+                };
             if (DebugSettings.godMode && Spawned && Faction == Faction.OfPlayer)
                 yield return new Command_Action
                 {

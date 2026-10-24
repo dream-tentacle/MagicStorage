@@ -2,10 +2,16 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
-    <defName>MS_UpdateNotice_1_0_14</defName>
+    <defName>MS_UpdateNotice_1_1_0</defName>
     <label>Version log</label>
-    <version>1.0.14</version>
+    <version>1.1.0</version>
     <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>You can now submit suggestions and bug reports from the storage core or the mod settings.</li>
+        </entries>
+      </li>
       <li>
         <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
         <entries>

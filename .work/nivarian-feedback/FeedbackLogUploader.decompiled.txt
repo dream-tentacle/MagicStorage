@@ -1,0 +1,567 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using Nivarian;
+using RimWorld;
+using Steamworks;
+using UnityEngine;
+using Verse;
+
+namespace Nivarian_Race.Code.Feedback;
+
+public static class FeedbackLogUploader
+{
+	public sealed class UploadResult
+	{
+		public bool Success;
+
+		public int HttpCode;
+
+		public string MessageKey;
+
+		public Exception Exception;
+	}
+
+	public sealed class UploadCapture
+	{
+		public string LogText;
+
+		public string Status;
+	}
+
+	public sealed class UploadProgress
+	{
+		public long BytesSent;
+
+		public long TotalBytes = 1L;
+
+		public float Fraction;
+	}
+
+	private sealed class ProgressStream : Stream
+	{
+		private readonly byte[] _data;
+
+		private readonly UploadProgress _progress;
+
+		private int _position;
+
+		public override bool CanRead => true;
+
+		public override bool CanSeek => false;
+
+		public override bool CanWrite => false;
+
+		public override long Length => _data.Length;
+
+		public override long Position
+		{
+			get
+			{
+				return _position;
+			}
+			set
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		public ProgressStream(byte[] data, UploadProgress progress)
+		{
+			_data = data;
+			_progress = progress;
+		}
+
+		public override void Flush()
+		{
+		}
+
+		public override int Read(byte[] buffer, int offset, int count)
+		{
+			int val = _data.Length - _position;
+			int num = Math.Min(count, val);
+			if (num <= 0)
+			{
+				return 0;
+			}
+			Buffer.BlockCopy(_data, _position, buffer, offset, num);
+			_position += num;
+			Report();
+			return num;
+		}
+
+		private void Report()
+		{
+			_progress.BytesSent = _position;
+			_progress.TotalBytes = _data.Length;
+			_progress.Fraction = (float)_position / (float)_data.Length;
+		}
+
+		public override long Seek(long offset, SeekOrigin origin)
+		{
+			throw new NotSupportedException();
+		}
+
+		public override void SetLength(long value)
+		{
+			throw new NotSupportedException();
+		}
+
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			throw new NotSupportedException();
+		}
+	}
+
+	public const int TimeoutSeconds = 60;
+
+	private const int SummaryCap = 1000;
+
+	private const int DetailCap = 8000000;
+
+	private const int LegacyDetailCap = 512000;
+
+	private const string LocalDevBaseUrl = "http://127.0.0.1:5199";
+
+	private const string LocalDevUploadPath = "/uploadrimlog";
+
+	private const string LocalDevApiKey = "";
+
+	public static string GetSteamId64()
+	{
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		try
+		{
+			if (!SteamAPI.IsSteamRunning())
+			{
+				return null;
+			}
+			return SteamUser.GetSteamID().m_SteamID.ToString();
+		}
+		catch
+		{
+			return null;
+		}
+	}
+
+	public static string GetGameVersion()
+	{
+		try
+		{
+			return VersionControl.CurrentVersionString;
+		}
+		catch
+		{
+			return null;
+		}
+	}
+
+	public static string GetModVersion()
+	{
+		try
+		{
+			NivarianMod mod = LoadedModManager.GetMod<NivarianMod>();
+			object obj;
+			if (mod == null)
+			{
+				obj = null;
+			}
+			else
+			{
+				ModContentPack content = ((Mod)mod).Content;
+				obj = ((content != null) ? content.ModMetaData : null);
+			}
+			ModMetaData val = (ModMetaData)obj;
+			return (val == null) ? null : val.ModVersion;
+		}
+		catch
+		{
+			return null;
+		}
+	}
+
+	public static List<string> GetActiveMods()
+	{
+		List<string> list = new List<string>();
+		try
+		{
+			foreach (ModMetaData item in ModsConfig.ActiveModsInLoadOrder)
+			{
+				if (item != null)
+				{
+					string name = item.Name;
+					string packageId = item.PackageId;
+					list.Add(GenText.NullOrEmpty(packageId) ? name : (name + " (" + packageId + ")"));
+				}
+			}
+		}
+		catch
+		{
+		}
+		return list;
+	}
+
+	public static string GetLogPath()
+	{
+		try
+		{
+			return Application.consoleLogPath;
+		}
+		catch
+		{
+			return null;
+		}
+	}
+
+	public static string ReadLogText()
+	{
+		try
+		{
+			string logPath = GetLogPath();
+			if (GenText.NullOrEmpty(logPath) || !File.Exists(logPath))
+			{
+				return string.Empty;
+			}
+			return File.ReadAllText(logPath);
+		}
+		catch
+		{
+			return string.Empty;
+		}
+	}
+
+	public static string DetectStatus(string logText)
+	{
+		if (GenText.NullOrEmpty(logText))
+		{
+			return "clean";
+		}
+		if (logText.IndexOf("Exception", StringComparison.OrdinalIgnoreCase) >= 0 || logText.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) >= 0)
+		{
+			return "error";
+		}
+		if (logText.IndexOf("warning", StringComparison.OrdinalIgnoreCase) >= 0)
+		{
+			return "warn";
+		}
+		return "clean";
+	}
+
+	public static UploadCapture CaptureLog()
+	{
+		List<LogMessage> list = null;
+		try
+		{
+			list = Log.Messages?.ToList();
+		}
+		catch
+		{
+			list = null;
+		}
+		if (list != null && list.Count > 0)
+		{
+			return new UploadCapture
+			{
+				LogText = FormatMessages(list),
+				Status = DetectStatusFromTypes(list)
+			};
+		}
+		string logText = ReadLogText();
+		return new UploadCapture
+		{
+			LogText = logText,
+			Status = DetectStatus(logText)
+		};
+	}
+
+	private static string FormatMessages(List<LogMessage> messages)
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002d: Invalid comparison between Unknown and I4
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0032: Invalid comparison between Unknown and I4
+		StringBuilder stringBuilder = new StringBuilder(4096);
+		foreach (LogMessage message in messages)
+		{
+			StringBuilder stringBuilder2 = stringBuilder;
+			LogMessageType type = message.type;
+			string value = (((int)type == 1) ? "WARNING" : (((int)type != 2) ? "INFO" : "ERROR"));
+			stringBuilder2.Append(value);
+			stringBuilder.Append(' ');
+			if (message.repeats > 1)
+			{
+				stringBuilder.Append("(×").Append(message.repeats).Append(") ");
+			}
+			stringBuilder.Append(message.text).Append('\n');
+			string stackTrace = message.StackTrace;
+			if (stackTrace != null && stackTrace != "No stack trace.")
+			{
+				string[] array = stackTrace.Split('\n');
+				foreach (string text in array)
+				{
+					stringBuilder.Append("    ").Append(text.TrimEnd('\r')).Append('\n');
+				}
+			}
+			stringBuilder.Append('\n');
+		}
+		return stringBuilder.ToString();
+	}
+
+	private static string DetectStatusFromTypes(List<LogMessage> messages)
+	{
+		if (GenCollection.Any<LogMessage>(messages, (Predicate<LogMessage>)((LogMessage m) => (int)m.type == 2)))
+		{
+			return "error";
+		}
+		if (GenCollection.Any<LogMessage>(messages, (Predicate<LogMessage>)((LogMessage m) => (int)m.type == 1)))
+		{
+			return "warn";
+		}
+		return "clean";
+	}
+
+	public static Task<UploadResult> UploadAsync(string playerDescription, UploadProgress progress)
+	{
+		UploadCapture capture = CaptureLog();
+		return Task.Run(async delegate
+		{
+			try
+			{
+				NivarianSettings settings = NivarianMod.Settings;
+				string text2;
+				string text3;
+				string text;
+				if (settings != null && settings.UseLocalDevServer)
+				{
+					text = "http://127.0.0.1:5199";
+					text2 = "/uploadrimlog";
+					text3 = "";
+				}
+				else
+				{
+					text = settings?.FeedbackServerUrl ?? string.Empty;
+					text2 = settings?.FeedbackServerPath ?? string.Empty;
+					text3 = settings?.FeedbackApiKey ?? string.Empty;
+				}
+				if (GenText.NullOrEmpty(text))
+				{
+					return new UploadResult
+					{
+						MessageKey = "Nivarian.Feedback.Upload.NotConfigured"
+					};
+				}
+				text = text.TrimEnd('/');
+				if (!Uri.TryCreate(text, UriKind.Absolute, out var _))
+				{
+					return new UploadResult
+					{
+						MessageKey = "Nivarian.Feedback.Upload.BadUrl"
+					};
+				}
+				if (GenText.NullOrEmpty(text2) || !text2.StartsWith("/"))
+				{
+					text2 = "/uploadrimlog";
+				}
+				string text4 = (playerDescription ?? string.Empty).Trim();
+				if (text4.Length > 1000)
+				{
+					text4 = text4.Substring(0, 1000);
+				}
+				string detail = ((capture.LogText.Length <= 8000000) ? capture.LogText : capture.LogText.Substring(capture.LogText.Length - 512000));
+				var payload = new
+				{
+					modVersion = Cap(GetModVersion() ?? string.Empty, 64),
+					gameVersion = Cap(GetGameVersion() ?? string.Empty, 64),
+					playerId = Cap(GetSteamId64() ?? string.Empty, 32),
+					status = capture.Status,
+					summary = text4,
+					detail = detail,
+					mods = GetActiveMods(),
+					timestamp = DateTime.UtcNow.ToString("o")
+				};
+				HttpClient client = new HttpClient
+				{
+					Timeout = TimeSpan.FromSeconds(60.0)
+				};
+				try
+				{
+					if (!GenText.NullOrEmpty(text3))
+					{
+						((HttpHeaders)client.DefaultRequestHeaders).Add("X-Api-Key", text3);
+					}
+					byte[] bytes = Encoding.UTF8.GetBytes(BuildJson(payload));
+					progress.TotalBytes = bytes.Length;
+					StreamContent content = new StreamContent((Stream)new ProgressStream(bytes, progress));
+					try
+					{
+						((HttpContent)content).Headers.ContentType = new MediaTypeHeaderValue("application/json");
+						((HttpContent)content).Headers.ContentLength = bytes.Length;
+						HttpResponseMessage val = await client.PostAsync(text + text2, (HttpContent)(object)content);
+						try
+						{
+							int statusCode = (int)val.StatusCode;
+							switch (statusCode)
+							{
+							case 201:
+								return new UploadResult
+								{
+									Success = true,
+									HttpCode = statusCode
+								};
+							case 400:
+							case 401:
+								return new UploadResult
+								{
+									MessageKey = "Nivarian.Feedback.Upload.BadRequest",
+									HttpCode = statusCode
+								};
+							default:
+								return new UploadResult
+								{
+									MessageKey = "Nivarian.Feedback.Upload.Failed",
+									HttpCode = statusCode
+								};
+							}
+						}
+						finally
+						{
+							((IDisposable)val)?.Dispose();
+						}
+					}
+					finally
+					{
+						((IDisposable)content)?.Dispose();
+					}
+				}
+				finally
+				{
+					((IDisposable)client)?.Dispose();
+				}
+			}
+			catch (Exception exception)
+			{
+				return new UploadResult
+				{
+					MessageKey = "Nivarian.Feedback.Upload.Failed",
+					Exception = exception
+				};
+			}
+		});
+	}
+
+	private static string Cap(string value, int cap)
+	{
+		if (value == null || value.Length <= cap)
+		{
+			return value ?? string.Empty;
+		}
+		return value.Substring(0, cap);
+	}
+
+	private static string BuildJson(object payload)
+	{
+		PropertyInfo[] properties = payload.GetType().GetProperties();
+		StringBuilder stringBuilder = new StringBuilder(256);
+		stringBuilder.Append('{');
+		for (int i = 0; i < properties.Length; i++)
+		{
+			if (i > 0)
+			{
+				stringBuilder.Append(',');
+			}
+			PropertyInfo propertyInfo = properties[i];
+			stringBuilder.Append('"').Append(propertyInfo.Name).Append("\":");
+			object value = propertyInfo.GetValue(payload, null);
+			stringBuilder.Append(ToJsonValue(value));
+		}
+		stringBuilder.Append('}');
+		return stringBuilder.ToString();
+	}
+
+	private static string ToJsonValue(object value)
+	{
+		if (value != null)
+		{
+			if (!(value is string s))
+			{
+				if (value is IEnumerable enumerable && !(value is string))
+				{
+					StringBuilder stringBuilder = new StringBuilder();
+					stringBuilder.Append('[');
+					bool flag = true;
+					foreach (object item in enumerable)
+					{
+						if (!flag)
+						{
+							stringBuilder.Append(',');
+						}
+						stringBuilder.Append(ToJsonValue(item));
+						flag = false;
+					}
+					stringBuilder.Append(']');
+					return stringBuilder.ToString();
+				}
+				return "\"" + EscapeJson(value.ToString()) + "\"";
+			}
+			return "\"" + EscapeJson(s) + "\"";
+		}
+		return "null";
+	}
+
+	private static string EscapeJson(string s)
+	{
+		if (s == null)
+		{
+			return string.Empty;
+		}
+		StringBuilder stringBuilder = new StringBuilder(s.Length + 32);
+		foreach (char c in s)
+		{
+			switch (c)
+			{
+			case '"':
+				stringBuilder.Append("\\\"");
+				continue;
+			case '\\':
+				stringBuilder.Append("\\\\");
+				continue;
+			case '\n':
+				stringBuilder.Append("\\n");
+				continue;
+			case '\r':
+				stringBuilder.Append("\\r");
+				continue;
+			case '\t':
+				stringBuilder.Append("\\t");
+				continue;
+			case '\b':
+				stringBuilder.Append("\\b");
+				continue;
+			case '\f':
+				stringBuilder.Append("\\f");
+				continue;
+			}
+			if (c < ' ')
+			{
+				StringBuilder stringBuilder2 = stringBuilder.Append("\\u");
+				int num = c;
+				stringBuilder2.Append(num.ToString("x4"));
+			}
+			else
+			{
+				stringBuilder.Append(c);
+			}
+		}
+		return stringBuilder.ToString();
+	}
+}

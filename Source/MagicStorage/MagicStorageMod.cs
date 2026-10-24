@@ -113,6 +113,9 @@ namespace MagicStorage
             }
             if (listing.ButtonText("MS_SettingsOpenUpdateLog".Translate()))
                 Dialog_UpdateNotice.Open(UpdateNoticeUtility.AllNotices());
+            listing.Gap();
+            if (listing.ButtonText("MS_FeedbackTitle".Translate()))
+                Dialog_Feedback.Open();
         }
 
         private void DrawAccessibilitySettings(Listing_Standard listing)
