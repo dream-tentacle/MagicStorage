@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using Verse;
 namespace Verse
 {
+    public partial class Thing
+    {
+        public float TestAmbientTemperature = 25f;
+        public float AmbientTemperature
+        {
+            [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+            get { return TestAmbientTemperature; }
+        }
+    }
     public partial struct Rot4 { public static Rot4 North => new Rot4(); }
     public class Dialog_MessageBox
     {
         public readonly string Text;
-        public Dialog_MessageBox(string text, string title = null) { Text = text; }
+        public Dialog_MessageBox(string text, string title = null, string buttonAText = null,
+            System.Action buttonAAction = null, string buttonBText = null,
+            System.Action acceptAction = null, System.Action cancelAction = null) { Text = text; }
     }
     public partial class ThingDef
     {

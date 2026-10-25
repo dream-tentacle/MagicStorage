@@ -119,6 +119,7 @@ namespace MagicStorage
             if (Spawned && Faction == Faction.OfPlayer)
                 yield return new Command_Action
                 {
+                    Order = 10001f,
                     defaultLabel = "MS_FeedbackGizmoLabel".Translate(),
                     defaultDesc = "MS_FeedbackGizmoDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Feedback"),

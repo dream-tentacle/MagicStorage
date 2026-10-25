@@ -13,6 +13,11 @@ namespace MagicStorage
 
         internal static void Process(Building_StorageSupplyShelf shelf)
         {
+            using (StorageFloorContext.Enter(shelf)) ProcessOnFloor(shelf);
+        }
+
+        private static void ProcessOnFloor(Building_StorageSupplyShelf shelf)
+        {
             shelf.ClearRestockFailures();
             if (!shelf.Spawned || shelf.Faction != Faction.OfPlayer ||
                 shelf.IsForbidden(Faction.OfPlayer)) return;
@@ -35,6 +40,12 @@ namespace MagicStorage
                 if ((slot < 0 || !shelf.AllowsStock(slot, item)) &&
                     !Reserved(shelf, item) && !item.IsForbidden(shelf.Faction)) RemoveStock(shelf, item);
             }
+            HashSet<ThingDef> stockedDefs = null;
+            if (shelf.FilterMode && shelf.DistinctItems)
+            {
+                stockedDefs = new HashSet<ThingDef>();
+                foreach (Thing item in shelf.GetSlotGroup().HeldThings) stockedDefs.Add(item.def);
+            }
             for (int i = 0; i < shelf.SlotCount; i++)
             {
                 Thing stock = shelf.StockAt(i);
@@ -43,7 +54,8 @@ namespace MagicStorage
                 if (shelf.FilterMode && stock == null && shelf.FilterLimit(i) > 0 && shelf.CanWork)
                 {
                     Thing candidate = null;
-                    shelf.Network.VisitStoredStacksMatching(d => shelf.SharedFilter.Allows(d), t =>
+                    shelf.Network.VisitStoredStacksMatching(d => shelf.SharedFilter.Allows(d) &&
+                        (stockedDefs == null || !stockedDefs.Contains(d)), t =>
                     {
                         if (shelf.AllowsStock(i, t) && shelf.Network.AvailableToWithdraw(t) > 0)
                         { candidate = t; return false; }
@@ -59,6 +71,7 @@ namespace MagicStorage
                     ? Refill(shelf, i, itemDef, ref stock, limit) : StorageShelfFailureReason.NetworkUnavailable;
                 shelf.RecordRestockFailure(i, stock?.stackCount ?? 0, reason);
                 shelf.SetStock(i, stock);
+                if (stock != null) stockedDefs?.Add(stock.def);
             }
         }
 
@@ -181,16 +194,15 @@ namespace MagicStorage
                 { couldMergeIntoAnotherSlot = true; break; }
             if (!couldMergeIntoAnotherSlot)
             {
-                if (!holder.TryDrop(received, shelf.Position, shelf.Map, ThingPlaceMode.Direct,
-                    out Thing placed, playDropSound: false)) return false;
+                if (!StorageFloorContext.TryDrop(holder, received, shelf, out Thing placed)) return false;
                 stock = placed;
                 return true;
             }
             // Native direct dropping merges into the first compatible stack in the cell.
             // Duplicate selections need an exact destination or a distinct physical stack.
             if (stock != null) return stock.TryAbsorbStack(received, true);
-            stock = GenSpawn.Spawn(received, shelf.Position, shelf.Map, Rot4.North);
-            return stock != null && stock.Spawned;
+            stock = StorageFloorContext.SpawnDistinct(holder, received, shelf);
+            return stock != null && stock.Spawned && StorageFloorContext.SameFloor(stock, shelf);
         }
     }
 }

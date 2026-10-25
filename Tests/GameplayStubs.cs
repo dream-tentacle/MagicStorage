@@ -30,7 +30,12 @@ namespace Verse
             return value;
         }
     }
-    public class Faction { public static readonly Faction OfPlayer = new Faction(); }
+    public partial class Faction
+    {
+        public static readonly Faction OfPlayer = new Faction();
+        public FactionDef def = new FactionDef();
+    }
+    public partial class FactionDef { public string pawnsPlural = "colonists"; }
     public partial struct IntVec3
     {
         public bool InHorDistOf(IntVec3 other, float distance) => DistanceToSquared(other) <= distance * distance;

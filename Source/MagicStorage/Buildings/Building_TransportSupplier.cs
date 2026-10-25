@@ -10,11 +10,34 @@ namespace MagicStorage
     {
         private StorageRefreshTimer refreshTimer;
         public const int SlotCount = 3;
+        public const int DefaultTargetLimit = 75;
         private bool directSupply;
         private bool genericContainerSupply;
         private Thing genericContainerTarget;
         private int genericContainerIndex = -1;
         private List<ThingDef> selections = new List<ThingDef> { null, null, null };
+        private List<int> targetLimits = new List<int> { DefaultTargetLimit, DefaultTargetLimit, DefaultTargetLimit };
+        public int TargetLimit(int slot) => targetLimits[slot];
+        public void SetTargetLimit(int slot, int value)
+        {
+            if (slot >= 0 && slot < SlotCount) targetLimits[slot] = Math.Max(0, value);
+        }
+
+        // Recount the real destination before each transfer, including stock from other suppliers.
+        // Subtract with a wide accumulator so large modded stacks cannot overflow into free space.
+        private int TargetDeficit(ThingOwner target, int slot)
+        {
+            long remaining = TargetLimit(slot);
+            if (remaining <= 0 || selections[slot] == null) return 0;
+            foreach (Thing existing in target)
+            {
+                if (existing.Destroyed || existing.def != selections[slot]) continue;
+                remaining -= existing.stackCount;
+                if (remaining <= 0) return 0;
+            }
+            return (int)remaining;
+        }
+
         public bool DirectSupply => directSupply;
         public bool GenericContainerSupply => genericContainerSupply;
         public ThingDef SelectedDef(int slot) => selections[slot];
@@ -183,14 +206,17 @@ namespace MagicStorage
             }
             StorageNetwork network = Network;
             var stacks = new List<Thing>();
-            foreach (ThingDef itemDef in selections)
+            for (int slot = 0; slot < SlotCount; slot++)
             {
-                if (itemDef == null) continue;
+                ThingDef itemDef = selections[slot];
+                if (itemDef == null || TargetLimit(slot) == 0) continue;
                 stacks.Clear(); network.GetStacks(itemDef, stacks);
                 foreach (Thing item in stacks)
                 {
                     if (!CanWork || Network != network || !GenericTargetValid(target, container)) return;
-                    int count = network.AvailableToWithdraw(item);
+                    int deficit = TargetDeficit(container, slot);
+                    if (deficit == 0) break;
+                    int count = Math.Min(network.AvailableToWithdraw(item), deficit);
                     if (count > 0) network.TryTransferTo(item, count, container);
                 }
             }
@@ -235,16 +261,19 @@ namespace MagicStorage
         {
             StorageNetwork network = Network;
             var stacks = new List<Thing>();
-            // Exhaust each selected type before considering the next priority.
-            foreach (ThingDef itemDef in selections)
+            // Fill each type to its target inventory limit before the next priority.
+            for (int slot = 0; slot < SlotCount; slot++)
             {
-                if (itemDef == null) continue;
+                ThingDef itemDef = selections[slot];
+                if (itemDef == null || TargetLimit(slot) == 0) continue;
                 stacks.Clear(); network.GetStacks(itemDef, stacks);
                 foreach (Thing item in stacks)
                 {
                     if (!CanWork || Network != network || !transporter.parent.Spawned || transporter.parent.Destroyed) return;
-                    int count = Math.Min(network.AvailableToWithdraw(item),
-                        StorageTransportExchange.CountThatFits(item, StorageTransportGroups.FreeMass(transporter)));
+                    int deficit = TargetDeficit(transporter.innerContainer, slot);
+                    if (deficit == 0) break;
+                    int count = Math.Min(deficit, Math.Min(network.AvailableToWithdraw(item),
+                        StorageTransportExchange.CountThatFits(item, StorageTransportGroups.FreeMass(transporter))));
                     if (count > 0) network.TryTransferTo(item, count, transporter.innerContainer);
                 }
             }
@@ -261,7 +290,9 @@ namespace MagicStorage
                 target.Refuel(fuel);
                 return;
             }
-            StorageFuelSupply.Deliver(this, Network, target, selections, immediate);
+            // Fuel has its own target level; a zero item limit still explicitly pauses that fuel.
+            StorageFuelSupply.Deliver(this, Network, target,
+                selections.Where((def, slot) => def != null && TargetLimit(slot) > 0), immediate);
         }
 
         public override void ExposeData()
@@ -273,9 +304,14 @@ namespace MagicStorage
             Scribe_References.Look(ref genericContainerTarget, "transportGenericContainerTarget");
             Scribe_Values.Look(ref genericContainerIndex, "transportGenericContainerIndex", -1);
             Scribe_Collections.Look(ref selections, "transportSupplySelections", LookMode.Def);
+            Scribe_Collections.Look(ref targetLimits, "transportTargetLimits", LookMode.Value);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 Contents.dontTickContents = true;
+                if (targetLimits == null) targetLimits = new List<int>();
+                while (targetLimits.Count < SlotCount) targetLimits.Add(DefaultTargetLimit);
+                if (targetLimits.Count > SlotCount) targetLimits.RemoveRange(SlotCount, targetLimits.Count - SlotCount);
+                for (int i = 0; i < SlotCount; i++) targetLimits[i] = Math.Max(0, targetLimits[i]);
                 if (selections == null) selections = new List<ThingDef>();
                 while (selections.Count < SlotCount) selections.Add(null);
                 if (selections.Count > SlotCount) selections.RemoveRange(SlotCount, selections.Count - SlotCount);

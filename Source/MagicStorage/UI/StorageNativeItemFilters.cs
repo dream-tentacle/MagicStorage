@@ -41,7 +41,7 @@ namespace MagicStorage
 
         private static void FilterTradeCache(Dialog_Trade __instance, List<Tradeable> ___cachedTradeables)
         {
-            if (!MagicStorageMod.Settings.TradeItemFilters || !(__instance is Dialog_StorageTrade dialog)) return;
+            if (!(__instance is Dialog_StorageTrade dialog) || !dialog.UseItemFilters) return;
             ___cachedTradeables.RemoveAll(row => !row.IsCurrency && !dialog.ItemFilters.Allows(row.AnyThing));
             __instance.CommonSearchWidget.noResultsMatched = ___cachedTradeables.Count == 0;
         }

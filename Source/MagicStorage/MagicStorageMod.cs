@@ -74,6 +74,9 @@ namespace MagicStorage
 
         private void DrawGeneralSettings(Listing_Standard listing)
         {
+            if (listing.ButtonText("MS_Guide_Title".Translate()))
+                Find.WindowStack.Add(new Dialog_StorageGuide());
+            listing.Gap();
             listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode,
                 "MS_SettingsWorkbenchUnlockModeHelp".Translate());
             listing.Gap();

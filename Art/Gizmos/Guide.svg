@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Storage guide</title>
+  <g fill="#FFD54A">
+    <path d="M34 40C34 22 46 12 65 12C84 12 96 22 96 38C96 50 89 57 80 63C72 68 71 71 71 80H55V76C55 63 60 57 70 51C77 47 80 43 80 38C80 31 74 27 65 27C56 27 50 32 50 40Z"/>
+    <circle cx="63" cy="102" r="10"/>
+  </g>
+</svg>

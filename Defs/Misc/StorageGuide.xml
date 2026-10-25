@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ConceptDef>
+    <defName>MS_StorageGuide</defName>
+    <label>magic storage guide</label>
+    <priority>70</priority>
+    <needsOpportunity>true</needsOpportunity>
+    <helpText>Select a storage control core and open Storage guide. It checks this core's network, walks you through storing and withdrawing items, and explains why items may not be accepted. Connect at least three receivers so hauling reservations do not occupy every available receiver. The guide is also available in the mod settings.</helpText>
+  </ConceptDef>
+</Defs>

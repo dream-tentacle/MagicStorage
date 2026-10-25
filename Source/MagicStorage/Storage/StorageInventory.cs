@@ -172,6 +172,7 @@ namespace MagicStorage
     public sealed class StorageThingOwner : ThingOwner<Thing>
     {
         private readonly Building_StorageUnit unit;
+        private bool restoringTrade;
 
         public StorageThingOwner(Building_StorageUnit unit) : base(unit, false, LookMode.Deep)
         {
@@ -181,6 +182,7 @@ namespace MagicStorage
 
         public override int GetCountCanAccept(Thing item, bool canMergeWithExistingStacks = true)
         {
+            if (restoringTrade) return base.GetCountCanAccept(item, canMergeWithExistingStacks);
             if (item == null || item.Destroyed || item.stackCount <= 0 ||
                 item.def.category != ThingCategory.Item || item.def.destroyOnDrop || item.def.stackLimit <= 0) return 0;
             maxStacks = unit.SlotCapacity;
@@ -189,6 +191,15 @@ namespace MagicStorage
             if (canMergeWithExistingStacks)
                 space += unit.Inventory.GetCountCanMerge(item, (int)(item.stackCount - space));
             return (int)Math.Min(item.stackCount, space);
+        }
+
+        // Restore only goods just taken from this unit. A receiver may have filled the freed slot before failing.
+        internal bool RestoreTradeItem(Thing item)
+        {
+            int previousMax = maxStacks;
+            restoringTrade = true; maxStacks = int.MaxValue;
+            try { return base.TryAdd(item, false); }
+            finally { restoringTrade = false; maxStacks = previousMax; }
         }
 
         public override bool TryAdd(Thing item, bool canMergeWithExistingStacks = true)

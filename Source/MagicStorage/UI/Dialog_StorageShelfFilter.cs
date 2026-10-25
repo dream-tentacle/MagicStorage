@@ -43,11 +43,16 @@ namespace MagicStorage
                 }
                 Find.WindowStack.Add(new FloatMenu(options));
             }
+            bool distinctItems = shelf.DistinctItems;
+            Rect distinctRect = new Rect(0, 144, rect.width, 28);
+            Widgets.CheckboxLabeled(distinctRect, "MS_Shelf_DistinctItems".Translate(), ref distinctItems);
+            shelf.DistinctItems = distinctItems;
+            TooltipHandler.TipRegion(distinctRect, "MS_Shelf_DistinctItemsTip".Translate());
             int columns = Math.Min(3, shelf.SlotCount);
             int rows = (shelf.SlotCount - 1) / columns + 1;
             float contentHeight = rows * 66f;
             float limitsHeight = Math.Min(contentHeight, 132f);
-            Rect limitsRect = new Rect(0, 144, rect.width, limitsHeight);
+            Rect limitsRect = new Rect(0, 180, rect.width, limitsHeight);
             Rect view = new Rect(0, 0, rect.width - (contentHeight > limitsHeight ? 20 : 0), contentHeight);
             float width = view.width / columns;
             Widgets.BeginScrollView(limitsRect, ref limitsScroll, view);

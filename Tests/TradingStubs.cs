@@ -106,19 +106,28 @@ namespace RimWorld
         void GiveSoldThingToPlayer(Thing item, int count, Pawn negotiator);
     }
     public class PassingShipManager
-    { public readonly List<TradeShip> passingShips = new List<TradeShip>(); }
-    public class Building_CommsConsole : Building { public bool CanUseCommsNow = true; }
+    { public readonly List<PassingShip> passingShips = new List<PassingShip>(); }
+    public interface ICommunicable { }
+    public class PassingShip : ICommunicable
+    {
+        public Map Map;
+        public Faction Faction { get; set; }
+        public string GetCallLabel() => "orbital trader";
+    }
+    public class Building_CommsConsole : Building
+    {
+        public bool CanUseCommsNow = true;
+        public IEnumerable<ICommunicable> GetCommTargets(Pawn pawn) => pawn.Map.passingShipManager.passingShips;
+    }
     public class Building_OrbitalTradeBeacon
     {
         public bool Powered = true;
         public readonly HashSet<IntVec3> TradeableCells = new HashSet<IntVec3>();
         public static IEnumerable<Building_OrbitalTradeBeacon> AllPowered(Map map) => map.Beacons.Where(b => b.Powered);
     }
-    public class TradeShip : ITrader
+    public class TradeShip : PassingShip, ITrader
     {
-        public Map Map;
         public bool CanTradeNow { get; set; } = true;
-        public Faction Faction { get; set; }
         public TraderKindDef TraderKind { get; } = new TraderKindDef();
         public readonly ThingOwner Stock = new ThingOwner(null);
         public IEnumerable<Thing> Goods => Stock;
@@ -130,7 +139,11 @@ namespace RimWorld
             Map.Ground.Add(part); DropPods++;
         }
     }
-    public static class PawnCapacityDefOf { public static object Talking = new object(); }
+    public static class PawnCapacityDefOf
+    {
+        public sealed class Capacity { public string label = "talking"; }
+        public static readonly Capacity Talking = new Capacity();
+    }
     public static partial class ThingDefOf { public static ThingDef Silver = new ThingDef(); }
     public static partial class TradeUtility { public static bool PlayerSellableNow(Thing item, ITrader trader) => !item.stale; }
     public static class TradeSession
@@ -187,7 +200,7 @@ namespace RimWorld
     {
         public static Tradeable TradeableMatching(Thing item, List<Tradeable> list) => list.Find(t => t.ThingDef == item.def);
     }
-    public class TradeDeal
+    public partial class TradeDeal
     {
         public static List<Thing> OrdinaryGoods = new List<Thing>();
         public static int NativeFills, NativeExecutions;

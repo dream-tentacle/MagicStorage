@@ -70,6 +70,7 @@ internal static class TransportSupplierTests
         AllReturnsReservedTogether(); AutoLoadingAndDirections(); Preservation(); QuantityEditing(); MassStoppingPoints();
         ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply(); CachedPreview();
         SharedLaunchCapacity();
+        TargetInventoryLimits(); TransportInventoryLimits(); TargetLimitPersistence();
         FilterGroupingAndSelections();
         GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
         return assertions;
@@ -383,6 +384,98 @@ internal static class TransportSupplierTests
         var empty = new Fixture(); empty.Target(10);
         Equal(true, empty.Supplier.GetGizmos().OfType<Command_Action>().Last().disabled, "empty manual supplier disables immediate command");
     }
+    private static void TargetInventoryLimits()
+    {
+        var f = new Fixture(); var high = new ThingDef { stackLimit = 1000 }; var low = new ThingDef { stackLimit = 1000 };
+        f.Store(high, 100, "a"); f.Store(high, 100, "b"); f.Store(low, 100);
+        f.Select(0, high); f.Select(1, low); f.Supplier.TrySwitchMode(); ToggleGeneric(f);
+        Equal(75, f.Supplier.TargetLimit(0), "new supply selection defaults to 75 items");
+        f.Supplier.SetTargetLimit(1, 5);
+        var target = GenericTarget(f);
+        target.Container.TryAdd(new Thing { def = high, stackCount = 20, variant = "a" }, false);
+        target.Container.TryAdd(new Thing { def = high, stackCount = 30, variant = "b" }, false);
+        f.Supplier.SupplyTransporter();
+        Equal(75L, f.Count(target.Container, high), "counts all variants and only supplies 25 missing items");
+        Equal(175L, f.Net.GetTotalCount(high), "does not empty unlimited generic storage into target");
+        Equal(5L, f.Count(target.Container, low), "moves on to lower priority after reaching high limit");
+        f.Supplier.SupplyTransporter(true);
+        Equal(175L, f.Net.GetTotalCount(high), "immediate supply also stops at inventory limit");
+        target.Container.First(t => t.def == high).SplitOff(10).Destroy();
+        f.Supplier.SupplyTransporter(true);
+        Equal(75L, f.Count(target.Container, high), "consumption causes exact top-up");
+        Equal(165L, f.Net.GetTotalCount(high), "top-up only consumes the deficit");
+        f.Supplier.SetTargetLimit(0, 10); f.Supplier.SupplyTransporter();
+        Equal(75L, f.Count(target.Container, high), "lowering limit does not reclaim excess target stock");
+        f.Supplier.SetTargetLimit(0, 0);
+        foreach (Thing item in target.Container.Where(t => t.def == high).ToList()) target.Container.Remove(item);
+        f.Supplier.SupplyTransporter(true);
+        Equal(0L, f.Count(target.Container, high), "zero pauses even an empty target and immediate supply");
+        f.Supplier.SetTargetLimit(0, 75); f.Supplier.SupplyTransporter();
+        var second = new Building_TransportSupplier { Map = f.Map, Position = f.Supplier.Position,
+            Rotation = f.Supplier.Rotation, Faction = Faction.OfPlayer, Spawned = true };
+        second.node = new CompStorageNode { parent = second }; f.Manager.Register(second.node); f.Manager.EnsureCurrent();
+        second.SetSelection(0, high); second.TrySwitchMode();
+        second.GetGizmos().OfType<Command_Toggle>().Single().toggleAction();
+        second.SupplyTransporter();
+        Equal(75L, f.Count(target.Container, high), "second supplier sees first supplier's existing target stock");
+        f.Supplier.SetTargetLimit(0, int.MaxValue);
+        foreach (Thing item in target.Container.Where(t => t.def == high).ToList()) target.Container.Remove(item);
+        target.Container.TryAdd(new Thing { def = high, stackCount = 2000000000 }, false);
+        target.Container.TryAdd(new Thing { def = high, stackCount = 2000000000 }, false);
+        long remaining = f.Net.GetTotalCount(high);
+        f.Supplier.SupplyTransporter();
+        Equal(remaining, f.Net.GetTotalCount(high), "target counts exceeding int range do not wrap and request more");
+    }
+
+    private static void TransportInventoryLimits()
+    {
+        var f = new Fixture(); var high = new ThingDef(); var low = new ThingDef();
+        f.Store(high, 40); f.Store(low, 40); f.Select(0, high); f.Select(1, low);
+        f.Supplier.SetTargetLimit(0, 8); f.Supplier.SetTargetLimit(1, 10); f.Supplier.TrySwitchMode();
+        var pod = f.Target(12); pod.innerContainer.TryAdd(new Thing { def = high, stackCount = 3 });
+        f.Supplier.SupplyTransporter();
+        Equal(8L, f.Count(pod.innerContainer, high), "transporter counts pre-existing cargo toward quantity cap");
+        Equal(4L, f.Count(pod.innerContainer, low), "transporter still obeys mass capacity");
+        pod.MassCapacity = 100; f.Supplier.SetTargetLimit(0, 0); f.Supplier.SetTargetLimit(1, 9);
+        f.Supplier.SupplyTransporter(true);
+        Equal(8L, f.Count(pod.innerContainer, high), "paused transporter item retains its existing cargo");
+        Equal(9L, f.Count(pod.innerContainer, low), "immediate transporter supply observes item limit");
+        var fuelFixture = new Fixture(); fuelFixture.Store(high, 40); fuelFixture.Store(low, 40);
+        fuelFixture.Select(0, high); fuelFixture.Select(1, low);
+        fuelFixture.Supplier.SetTargetLimit(0, 0); fuelFixture.Supplier.SetTargetLimit(1, 1);
+        fuelFixture.Supplier.TrySwitchMode(); var fuel = fuelFixture.FuelTarget(high, low); fuel.TargetFuelLevel = 10;
+        fuelFixture.Supplier.SupplyTransporter(true);
+        Equal(40L, fuelFixture.Net.GetTotalCount(high), "zero disables selected fuel");
+        Equal(30L, fuelFixture.Net.GetTotalCount(low), "positive fuel limits retain native fuel target semantics");
+        Equal(10f, fuel.Fuel, "fuel refills to its own target rather than item count limit");
+    }
+
+    private static void TargetLimitPersistence()
+    {
+        var supplier = new Building_TransportSupplier();
+        supplier.SetTargetLimit(0, 0); supplier.SetTargetLimit(1, 1234); supplier.SetTargetLimit(2, int.MaxValue);
+        List<int> saved = null;
+        try
+        {
+            Scribe_Collections.Boundary = (key, value, mode) =>
+            {
+                if (key == "transportTargetLimits")
+                { Equal(LookMode.Value, mode, "limits saved by value"); saved = new List<int>((List<int>)value); }
+                return value;
+            };
+            supplier.ExposeData();
+            Equal(3, saved.Count, "all three limit slots sent to serialization");
+            Scribe_Collections.Boundary = (key, value, mode) => key == "transportTargetLimits" ? new List<int>(saved) : value;
+            var restored = new Building_TransportSupplier();
+            Scribe.mode = LoadSaveMode.PostLoadInit; restored.ExposeData();
+            Equal(0, restored.TargetLimit(0), "paused slot restored");
+            Equal(1234, restored.TargetLimit(1), "custom limit restored");
+            Equal(int.MaxValue, restored.TargetLimit(2), "large limit restored exactly");
+            restored.SetTargetLimit(1, -1); Equal(0, restored.TargetLimit(1), "negative API input clamps to pause");
+        }
+        finally { Scribe_Collections.Boundary = null; Scribe.mode = LoadSaveMode.Inactive; }
+    }
+
     private static void SupplyModes()
     {
         var f = new Fixture(); var def = new ThingDef(); Thing cargo = f.Cargo(def, 2);

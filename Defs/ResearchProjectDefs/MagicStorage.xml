@@ -4,6 +4,8 @@
     <defName>MS_BasicMagicStorage</defName>
     <label>basic magic storage</label>
     <description>Unlock basic buildings for the magic storage network.</description>
+    <discoveredLetterTitle>About: Trading with magic storage</discoveredLetterTitle>
+    <discoveredLetterText>You have mastered basic magic storage technology.\n\nWhen trading with visiting traders or orbital trade ships, you must select the dedicated "Trade with ... using magic storage" option to access items in magic storage.\n\nThe normal trade option cannot access items in magic storage. If you forget to use the dedicated option, you are responsible for the consequences.</discoveredLetterText>
     <baseCost>10</baseCost>
     <techLevel>Industrial</techLevel>
     <tab>MS_MagicStorage</tab>

@@ -71,7 +71,7 @@ namespace Verse.AI
 {
     public enum TargetIndex { A, B, C, None }
     public enum JobCondition { Succeeded, Incompletable, InterruptForced }
-    public class Job
+    public partial class Job
     {
         public JobDef def;
         public RimWorld.HaulMode haulMode;
@@ -140,6 +140,7 @@ namespace Verse.AI
     public static class Toils_Goto
     {
         public static int SourceVisits, DestinationVisits;
+        public static Toil GotoCell(TargetIndex index, PathEndMode end) => GotoThing(index, end);
         public static Toil GotoThing(TargetIndex index, PathEndMode end, bool canGotoSpawnedParent = false) =>
             new Toil { initAction = () => { if (index == TargetIndex.A) SourceVisits++; else DestinationVisits++; } };
     }

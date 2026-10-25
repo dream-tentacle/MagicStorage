@@ -53,7 +53,7 @@ namespace MagicStorage
         private static void OrbitalOption(PassingShip __instance, Building_CommsConsole console, Pawn negotiator,
             FloatMenuOption __result)
         {
-            if (__instance is TradeShip ship && negotiator.CanTradeWith(ship.Faction, ship.TraderKind).Accepted &&
+            if (__instance is ITrader trader && negotiator.CanTradeWith(trader.Faction, trader.TraderKind).Accepted &&
                 Building_OrbitalTradeBeacon.AllPowered(console.Map).Any())
                 Wrap(__result, console.Map);
         }

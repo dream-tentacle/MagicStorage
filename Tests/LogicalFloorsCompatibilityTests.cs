@@ -40,11 +40,18 @@ internal static class LogicalFloorsCompatibilityTests
             native.Patch(AccessTools.Method(typeof(Verse.AI.EnrouteUtility), "GetSpaceRemainingWithEnroute"), transpiler: route);
             foreach (int floor in new[] { 0, 1, 2, 11 }) FrameStaysOnBlueprintFloor(floor);
             TerrainChecksUseTargetFloor(); DeliveryUsesTargetFloor(); RepairUsesTargetFloor(); ExceptionsRestoreCaller();
+            FloorNetworkConnections(); ShelfSuppliesAcrossFloors(); PlacementFailurePreservesOwnership();
         }
         finally
         {
             harmony.UnpatchAll(harmony.Id); native.UnpatchAll(native.Id);
             throwOnCheck = false;
+            StorageFloorContext.FloorOf = null;
+            StorageFloorContext.EnterFloor = null;
+            StorageFloorContext.SetDetachedFloor = null;
+            StorageFloorContext.PlaceItem = null;
+            StorageFloorContext.HasFloorAt = null;
+            LogicalFloors.API.FloorApi.StructuralFloor = true;
         }
         // Removing/omitting the optional adapter leaves the original construction path intact.
         var plain = new Fixture();
@@ -53,7 +60,11 @@ internal static class LogicalFloorsCompatibilityTests
     }
 
     private static HarmonyMethod Hook(string name) => new HarmonyMethod(typeof(LogicalFloorsCompatibilityTests), name);
-    private static void Spawn(Thing __0) => LogicalFloors.API.FloorApi.Floors[__0] = LogicalFloors.API.FloorApi.CurrentFloor;
+    private static void Spawn(Thing __0)
+    {
+        if (!LogicalFloors.API.FloorApi.Floors.ContainsKey(__0))
+            LogicalFloors.API.FloorApi.Floors[__0] = LogicalFloors.API.FloorApi.CurrentFloor;
+    }
     private static void Wipe() => wipeFloor = LogicalFloors.API.FloorApi.CurrentFloor;
     private static void RepairBeam() => repairBeamFloor = LogicalFloors.API.FloorApi.CurrentFloor;
     private static void RepairNotification(CompBreakdownable __instance) =>
@@ -204,19 +215,186 @@ internal static class LogicalFloorsCompatibilityTests
         Equal(true, failed, "original exception is preserved");
         Equal(2, LogicalFloors.API.FloorApi.CurrentFloor, "exception restores enclosing caller floor");
     }
+
+    private static CompStorageNode RegisterFloorNode(Map map, Thing thing, int x, int floor)
+    {
+        thing.Map = map; thing.Position = new IntVec3(x, 0); thing.Spawned = true; thing.Faction = Faction.OfPlayer;
+        LogicalFloors.Floors.Set(thing, floor);
+        var node = new CompStorageNode { parent = thing };
+        if (thing is Building_StorageUnit unit) unit.node = node;
+        if (thing is Building building) building.node = node;
+        map.GetComponent<MapComponent_StorageNetworks>().Register(node);
+        return node;
+    }
+
+    private static void FloorNetworkConnections()
+    {
+        foreach (int floor in new[] { 1, 2, 11 })
+        {
+            var map = new Map(); var manager = map.GetComponent<MapComponent_StorageNetworks>();
+            var core = RegisterFloorNode(map, new Building_StorageCore(), 0, 0);
+            RegisterFloorNode(map, new Building_StorageConduit(), 1, 0);
+            var bridge = RegisterFloorNode(map, new Building_StorageConduit(), 1, floor);
+            var shelf = RegisterFloorNode(map, new Building_StorageSupplyShelf(), 2, floor);
+            Equal(core.Network, shelf.Network, "same-coordinate cables connect floors incrementally");
+            manager.MarkDirty(); manager.EnsureCurrent();
+            Equal(core.Network, shelf.Network, "rebuild follows each node floor after crossing cable");
+            manager.Unregister(bridge); manager.EnsureCurrent();
+            Equal(false, core.Network == shelf.Network, "removing vertical cable splits floors");
+            manager.Register(bridge); manager.EnsureCurrent();
+            Equal(core.Network, shelf.Network, "replacing vertical cable rejoins floors");
+
+            var lowerBuilding = RegisterFloorNode(map, new Building_StorageUnit(), 20, 0);
+            var upperBuilding = RegisterFloorNode(map, new Building_StorageUnit(), 20, floor);
+            var upperNeighbor = RegisterFloorNode(map, new Building_StorageSupplyShelf(), 21, floor);
+            Equal(false, lowerBuilding.Network == upperBuilding.Network, "overlapping devices do not connect across floors");
+            Equal(upperBuilding.Network, upperNeighbor.Network, "ordinary same-floor adjacency remains connected");
+            var cable = RegisterFloorNode(map, new Building_StorageConduit(), 30, 0);
+            var shiftedCable = RegisterFloorNode(map, new Building_StorageConduit(), 31, floor);
+            Equal(false, cable.Network == shiftedCable.Network, "offset cables do not connect across floors");
+            var device = RegisterFloorNode(map, new Building_StorageSupplyShelf(), 30, floor);
+            Equal(false, cable.Network == device.Network, "cable cannot connect directly to another-floor device");
+            var enemyCable = new Building_StorageConduit();
+            var enemy = RegisterFloorNode(map, enemyCable, 30, floor);
+            enemyCable.Faction = new Faction(); manager.MarkDirty(); manager.EnsureCurrent();
+            Equal(false, cable.Network == enemy.Network, "vertical bridge respects faction");
+            Equal(false, lowerBuilding.Network == upperBuilding.Network, "rebuild also separates overlapping devices");
+        }
+    }
+
+    private static void ShelfSuppliesAcrossFloors()
+    {
+        foreach (var pair in new[] { new[] { 0, 1 }, new[] { 1, 0 }, new[] { 0, 11 }, new[] { 11, 2 }, new[] { 2, 11 } })
+        {
+            var map = new Map(); var manager = map.GetComponent<MapComponent_StorageNetworks>();
+            var unit = new Building_StorageUnit(); var shelf = new Building_StorageSupplyShelf();
+            var def = new ThingDef(); var parent = new StorageSettings(); parent.filter.SetAllow(def, true);
+            shelf.def.building = new BuildingProperties { fixedStorageSettings = parent, maxItemsInCell = 3 };
+            RegisterFloorNode(map, new Building_StorageCore(), 0, pair[0]);
+            RegisterFloorNode(map, unit, 1, pair[0]);
+            RegisterFloorNode(map, new Building_StorageConduit(), 2, pair[0]);
+            RegisterFloorNode(map, new Building_StorageConduit(), 2, pair[1]);
+            RegisterFloorNode(map, shelf, 3, pair[1]);
+            manager.EnsureCurrent(); map.haulDestinationManager.SlotParents[shelf.Position] = shelf;
+            var source = new Thing { def = def, stackCount = 60 };
+            LogicalFloors.Floors.Set(source, pair[0]); unit.Inventory.Contents.TryAdd(source, false);
+            var foreign = new Thing { def = def, stackCount = 4, Map = map, Position = shelf.Position, Spawned = true };
+            LogicalFloors.Floors.Set(foreign, pair[0]); map.Ground.Add(foreign);
+            shelf.GetStoreSettings();
+            shelf.SetStock(0, foreign);
+            Equal<Thing>(null, shelf.StockAt(0), "same-coordinate other-floor stack is not shelf stock");
+            Equal(false, shelf.Accepts(foreign), "other-floor stack is not stored on this shelf");
+            int[] limits = { 3, 5, 7 };
+            for (int i = 0; i < limits.Length; i++) { shelf.SetSelection(i, def); shelf.SetRestockLimit(i, limits[i]); }
+            LogicalFloors.FieldRouting.TargetMap = map; LogicalFloors.FieldRouting.TargetFloor = pair[1];
+            LogicalFloors.FieldRouting.Reservations = new ReservationManager();
+            LogicalFloors.FieldRouting.Interactions = new PhysicalInteractionReservationManager();
+            using (LogicalFloors.API.FloorApi.EnterFloor(map, 8))
+            {
+                shelf.RefreshSupply();
+                for (int i = 0; i < limits.Length; i++)
+                {
+                    Thing stock = shelf.StockAt(i);
+                    Equal(true, stock != null && stock.Spawned, "all duplicate selections are physically stocked");
+                    Equal(pair[1], LogicalFloors.API.FloorApi.GetFloor(stock), "output uses shelf floor, not source or caller floor");
+                    Equal(limits[i], stock.stackCount, "cross-floor duplicate slots retain independent quantities");
+                }
+                Equal(45L, unit.Inventory.GetTotalCount(def), "cross-floor output consumes exactly the requested stock");
+                Equal(4, foreign.stackCount, "other-floor stack is not merged into or taken");
+                shelf.RefreshSupply();
+                Equal(45L, unit.Inventory.GetTotalCount(def), "full shelf does not repeatedly extract stock");
+                shelf.StockAt(0).stackCount = 1;
+                LogicalFloors.FieldRouting.Reservations.Reserved.Add(shelf.StockAt(0));
+                Equal(true, StorageShelfSupply.Reserved(shelf, shelf.StockAt(0)), "reservation lookup routes to shelf floor outside refresh");
+                shelf.RefreshSupply();
+                Equal(1, shelf.StockAt(0).stackCount, "reserved destination stack is not refilled");
+                LogicalFloors.FieldRouting.Reservations.Reserved.Clear();
+                shelf.RefreshSupply();
+                Equal(3, shelf.StockAt(0).stackCount, "unreserved exact duplicate slot refills on its own floor");
+                Equal(8, LogicalFloors.API.FloorApi.CurrentFloor, "supply restores enclosing caller floor");
+            }
+        }
+    }
+
+    private static void PlacementFailurePreservesOwnership()
+    {
+        var map = new Map();
+        var shelf = new Building_StorageSupplyShelf { Map = map, Spawned = true, Position = new IntVec3(5, 5) };
+        LogicalFloors.Floors.Set(shelf, 11);
+        var holder = map.GetComponent<MapComponent_StorageNetworks>().CreateRecovery(shelf.Position).Contents;
+        var item = new Thing { stackCount = 10 }; LogicalFloors.Floors.Set(item, 0); holder.TryAdd(item, false);
+        LogicalFloors.API.FloorApi.StructuralFloor = false;
+        try
+        {
+            Equal(false, StorageFloorContext.TryDrop(holder, item, shelf, out _), "missing structural floor refuses direct placement");
+            Equal(true, holder.Contains(item), "rejected API placement restores original owner");
+            Equal<Thing>(null, StorageFloorContext.SpawnDistinct(holder, item, shelf), "missing structural floor refuses distinct spawn");
+            Equal(true, holder.Contains(item), "rejected distinct spawn never detaches stock");
+            Equal(false, item.Spawned, "rejected placement never falls back to ground floor");
+            Equal(0, LogicalFloors.API.FloorApi.GetFloor(item), "rejected placement preserves remembered membership");
+        }
+        finally { LogicalFloors.API.FloorApi.StructuralFloor = true; }
+
+        var original = StorageFloorContext.PlaceItem;
+        StorageFloorContext.PlaceItem = ThrowPlacement;
+        try
+        {
+            bool threw = false;
+            try { StorageFloorContext.TryDrop(holder, item, shelf, out _); }
+            catch (InvalidOperationException) { threw = true; }
+            Equal(true, threw, "placement exception is preserved");
+            Equal(true, holder.Contains(item), "placement exception retains real item in original owner");
+            Equal(10, item.stackCount, "placement exception does not duplicate or consume stock");
+        }
+        finally { StorageFloorContext.PlaceItem = original; }
+    }
+
+    private static bool ThrowPlacement(Thing item, Map map, int floor, IntVec3 cell, out Thing result)
+    { result = null; throw new InvalidOperationException("controlled placement failure"); }
 }
 
 namespace LogicalFloors.API
 {
+    public readonly struct FloorPosition
+    {
+        public readonly Map Map;
+        public readonly int Floor;
+        public readonly IntVec3 Cell;
+        public FloorPosition(Map map, int floor, IntVec3 cell) { Map = map; Floor = floor; Cell = cell; }
+    }
+
     public static class FloorApi
     {
         public static bool Supported = true;
+        public static bool StructuralFloor = true;
         public static int CurrentFloor;
         public static Map CurrentMap;
         public static readonly Dictionary<Thing, int> Floors = new Dictionary<Thing, int>();
         public static bool SupportsApi(int version) => Supported && version == 1;
         public static int GetFloor(Thing thing) => Floors.TryGetValue(thing, out int floor) ? floor : 0;
         public static IDisposable EnterFloor(Map map, int floor) => new Scope(map, floor);
+        public static bool HasStructuralFloor(FloorPosition destination) => StructuralFloor;
+        public static bool TryPlaceItem(Thing item, FloorPosition destination, ThingPlaceMode mode, out Thing result)
+        {
+            if (item.Spawned || item.holdingOwner != null) throw new InvalidOperationException("API requires detached item");
+            result = null;
+            if (!HasStructuralFloor(destination)) return false;
+            int previousFloor = GetFloor(item); Floors[item] = destination.Floor;
+            var buffer = new ThingOwner(null); buffer.TryAdd(item, false);
+            bool placed = false;
+            try
+            {
+                using (EnterFloor(destination.Map, destination.Floor))
+                    placed = buffer.TryDrop(item, destination.Cell, destination.Map, mode, out result,
+                        placedAction: (stock, count) => Floors[stock] = destination.Floor, playDropSound: false);
+                return placed;
+            }
+            finally
+            {
+                if (buffer.Contains(item)) buffer.Remove(item);
+                if (!placed && !item.Spawned && !item.Destroyed) Floors[item] = previousFloor;
+            }
+        }
         private sealed class Scope : IDisposable
         {
             private readonly Map previousMap;
@@ -230,6 +408,10 @@ namespace LogicalFloors.API
 
 namespace LogicalFloors
 {
+    public static class Floors
+    {
+        public static void Set(Thing item, int floor) => API.FloorApi.Floors[item] = floor;
+    }
     public static class Bootstrap
     {
         public static bool Ready;
@@ -243,10 +425,14 @@ namespace LogicalFloors
         public static TerrainGrid Terrain;
         public static PlanManager Plans;
         public static EnrouteManager Enroute;
+        public static ReservationManager Reservations;
+        public static PhysicalInteractionReservationManager Interactions;
         private static bool Target(Map map) => map == TargetMap && map == API.FloorApi.CurrentMap && API.FloorApi.CurrentFloor == TargetFloor;
         private static TerrainGrid TerrainAt(Map map) => Target(map) ? Terrain : map.terrainGrid;
         private static PlanManager PlansAt(Map map) => Target(map) ? Plans : map.planManager;
         private static EnrouteManager EnrouteAt(Map map) => Target(map) ? Enroute : map.enrouteManager;
+        private static ReservationManager ReservationsAt(Map map) => Target(map) && Reservations != null ? Reservations : map.reservationManager;
+        private static PhysicalInteractionReservationManager InteractionsAt(Map map) => Target(map) && Interactions != null ? Interactions : map.physicalInteractionReservationManager;
         public static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions)
         {
             foreach (var instruction in instructions)
@@ -254,7 +440,9 @@ namespace LogicalFloors
                 if (instruction.opcode == OpCodes.Ldfld && instruction.operand is FieldInfo field && field.DeclaringType == typeof(Map))
                 {
                     string getter = field.Name == "terrainGrid" ? nameof(TerrainAt) : field.Name == "planManager" ? nameof(PlansAt) :
-                        field.Name == "enrouteManager" ? nameof(EnrouteAt) : null;
+                        field.Name == "enrouteManager" ? nameof(EnrouteAt) :
+                        field.Name == "reservationManager" ? nameof(ReservationsAt) :
+                        field.Name == "physicalInteractionReservationManager" ? nameof(InteractionsAt) : null;
                     if (getter != null)
                     { instruction.opcode = OpCodes.Call; instruction.operand = AccessTools.Method(typeof(FieldRouting), getter); }
                 }

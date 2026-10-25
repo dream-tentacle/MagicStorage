@@ -29,7 +29,7 @@
   <MS_Transport_DirectMode>Supply mode: Continuous supply</MS_Transport_DirectMode>
   <MS_Transport_Configure>Select supply items</MS_Transport_Configure>
   <MS_Transport_ConfigureTitle>Material supplier · Continuous supply</MS_Transport_ConfigureTitle>
-  <MS_Transport_DirectHint>Select up to three item types to send directly from the network at the configured refresh interval. The supplier stores nothing. Higher rows have priority; unavailable or incompatible items are skipped. Items reserved by other tasks are excluded.</MS_Transport_DirectHint>
+  <MS_Transport_DirectHint>Select up to three item types, supplied directly from the network in priority order. Transporters and generic containers are topped up to each item limit (default 75; 0 pauses). Fuel devices retain their own target fuel level; 0 also pauses that fuel.</MS_Transport_DirectHint>
   <MS_Transport_PrioritySlot>Priority {0}</MS_Transport_PrioritySlot>
   <MS_Transport_PickTitle>Select an item for priority {0}</MS_Transport_PickTitle>
   <MS_Transport_PickHint>Select one item type per slot. Higher slots are supplied first; duplicate selections are not allowed.</MS_Transport_PickHint>
@@ -50,4 +50,6 @@
   <MS_Transport_GroupAlreadyAssigned>A selected transport pod already belongs to a launch group. Select only ungrouped pods.</MS_Transport_GroupAlreadyAssigned>
   <MS_Transport_GroupInvalid>Select ungrouped player-owned transport pods of the same type on the same map.</MS_Transport_GroupInvalid>
   <MS_Transport_GroupMass>Launch group mass: {0} / {1} kg</MS_Transport_GroupMass>
+  <MS_Transport_TargetLimit>Target inventory limit</MS_Transport_TargetLimit>
+  <MS_Transport_TargetLimitHelp>Counts all items of this type in the selected destination and supplies only the deficit. Default 75; 0 pauses. Excess stock is not reclaimed. Automatic and immediate supply both obey this limit, alongside transporter mass limits. Positive item limits do not replace a fuel device's own target level.</MS_Transport_TargetLimitHelp>
 </LanguageData>

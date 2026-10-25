@@ -9,7 +9,7 @@ using HarmonyLib;
 using DynamicTradeInterface.Patches;
 using DynamicTradeInterface.UserInterface;
 
-internal static class StorageTradeIntegrationTests
+internal static partial class StorageTradeIntegrationTests
 {
     private static int checks;
     private static void Equal<T>(T expected, T actual, string message)
@@ -61,17 +61,20 @@ internal static class StorageTradeIntegrationTests
         {
             RuntimeHelpers.RunClassConstructor(typeof(StorageTradePatches).TypeHandle);
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver(); RefusalAndCancellation(); ChangedSources(); MultiCoreAndGifts(); Orbital();
-            ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading();
+            ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading(); CustomOrbitalTrader();
             PublicApiValidation(); PublicApiScope(); PublicApiTopology(); PublicApiFailures();
             FailureDiagnostics(); ReservationDiagnostics();
+            InventoryApiMap(); InventoryApiPortable(); InventoryApiRecovery(); InventoryApiPortableWindow();
             var harmony = new Harmony("magicstorage.tests.dynamictrade");
             harmony.Patch(AccessTools.Method(typeof(Dialog_Trade), nameof(Dialog_Trade.PostOpen)),
                 prefix: new HarmonyMethod(AccessTools.DeclaredMethod(typeof(Dialog_TradePatches), "Prefix")));
             new DynamicTradeInterfaceCompatibility().Apply(harmony);
             DynamicNativeFallback(); DynamicOrdinary(); DynamicSaleAndPurchase(); DynamicCancelAndFailures(); DynamicOrbital();
             DynamicShelfTrading();
-            PublicApiDynamic();
+            PublicApiDynamic(); CustomOrbitalTrader();
+            InventoryApiPortableWindow();
             checks += CeleTechTradeTests.Run();
+            HoverCompatibility();
             checks += StorageLaunchPaymentTests.Run();
             checks += RavenGiftTests.Run();
             // The new scoped getter hook must leave all existing trade/payment paths intact.
@@ -518,6 +521,76 @@ internal static class StorageTradeIntegrationTests
         Equal(7L, f.Core.Network.GetTotalCount(def) + secondCore.Network.GetTotalCount(def), "gift deducts across networks accurately");
         f.Close(dialog);
     }
+    // Milira's ship inherits PassingShip directly, so a TradeShip subclass cannot reproduce the bug.
+    private sealed class IndependentTradeShip : PassingShip, ITrader
+    {
+        public bool CanTradeNow { get; set; } = true;
+        public TraderKindDef TraderKind { get; } = new TraderKindDef();
+        public readonly ThingOwner Stock = new ThingOwner(null);
+        public IEnumerable<Thing> Goods => Stock;
+        public int SoldCallbacks, BoughtCallbacks;
+        public void GiveSoldThingToTrader(Thing item, int count, Pawn negotiator)
+        { SoldCallbacks++; Stock.TryAdd(item.SplitOff(count), false); }
+        public void GiveSoldThingToPlayer(Thing item, int count, Pawn negotiator)
+        {
+            BoughtCallbacks++;
+            var part = item.SplitOff(count); part.Spawned = true; part.Map = Map; Map.Ground.Add(part);
+        }
+    }
+
+    private static void CustomOrbitalTrader()
+    {
+        var f = new Fixture(); var goods = new ThingDef(); f.Stock(goods, 12); f.Stock(ThingDefOf.Silver, 30);
+        var ship = new IndependentTradeShip { Map = f.Map };
+        ship.Stock.TryAdd(new Thing { def = goods, stackCount = 4 }, false);
+        ship.Stock.TryAdd(new Thing { def = ThingDefOf.Silver, stackCount = 100 }, false);
+        f.Map.passingShipManager.passingShips.Add(ship);
+        f.Map.passingShipManager.passingShips.Add(new PassingShip { Map = f.Map });
+        var console = new Building_CommsConsole { Spawned = true, Map = f.Map };
+        var provider = new FloatMenuOptionProvider_StorageOrbitalTrade();
+        var context = new FloatMenuContext { map = f.Map, FirstSelectedPawn = f.Negotiator };
+        Equal(1, provider.GetOptionsFor(console, context).Count(), "custom ship has storage menu; non-trading passing ships do not");
+        Equal(null, provider.GetOptionsFor(console, context).Single().action, "custom orbital menu requires a covered core");
+        var beacon = new Building_OrbitalTradeBeacon(); beacon.TradeableCells.Add(f.Core.Position); f.Map.Beacons.Add(beacon);
+        f.Negotiator.AllowedTrade = false;
+        Equal(null, provider.GetOptionsFor(console, context).Single().action, "custom orbital menu enforces trade permission");
+        f.Negotiator.AllowedTrade = true;
+        var vanilla = new TradeShip { Map = f.Map }; f.Map.passingShipManager.passingShips.Add(vanilla);
+        Equal(2, provider.GetOptionsFor(console, context).Count(), "vanilla and custom orbital traders coexist");
+        f.Map.passingShipManager.passingShips.Remove(vanilla);
+        provider.GetOptionsFor(console, context).Single().action();
+        Equal(ship, f.Negotiator.jobs.curJob.commTarget, "orbital job retains the custom ship");
+        var driver = new JobDriver_StorageOrbitalTrade { pawn = f.Negotiator, job = f.Negotiator.jobs.curJob };
+        driver.SetupToils(); driver.RunTestToils();
+        var window = Find.WindowStack.Windows.OfType<Window>().Single(); var deal = TradeSession.deal;
+        Equal(ship, TradeSession.trader, "custom job opens with original ITrader instance");
+        Equal(true, StorageTradeSession.TryGet(deal, out var session) && session.IsOrbital, "custom passing ship opens an orbital session");
+        deal.AllTradeables.Find(t => t.ThingDef == goods).CountToTransfer = -3;
+        Equal(true, deal.TryExecute(out _), "custom ship sells network goods");
+        Equal(9L, f.Core.Network.GetTotalCount(goods), "custom sale deducts exact stock");
+        Equal(1, ship.SoldCallbacks, "sale uses original custom trader callback");
+        Equal(1, ship.BoughtCallbacks, "sale proceeds use original custom delivery callback");
+        deal.AllTradeables.Find(t => t.ThingDef == goods).CountToTransfer = 2;
+        Equal(true, deal.TryExecute(out _), "custom ship purchases use stored silver");
+        Equal(28L, f.Core.Network.GetTotalCount(ThingDefOf.Silver), "custom purchase pays exact stored silver");
+        Equal(2, f.Map.Ground.Where(t => t.def == goods).Sum(t => t.stackCount), "custom purchase preserves trader delivery");
+        deal.AllTradeables.Find(t => t.ThingDef == goods).CountToTransfer = -1;
+        ship.CanTradeNow = false;
+        Equal(0, provider.GetOptionsFor(console, context).Count(), "departed custom trader has no storage option");
+        Equal(false, deal.TryExecute(out _), "departed custom trader cannot settle stale trade");
+        ship.CanTradeNow = true; f.Map.passingShipManager.passingShips.Remove(ship);
+        Equal(false, deal.TryExecute(out _), "removed custom ship cannot settle stale trade");
+        f.Map.passingShipManager.passingShips.Add(ship); ship.Map = new Map();
+        Equal(false, deal.TryExecute(out _), "custom ship on another map cannot settle");
+        ship.Map = f.Map; console.CanUseCommsNow = false;
+        Equal(false, deal.TryExecute(out _), "custom trade rechecks console power");
+        console.CanUseCommsNow = true; beacon.Powered = false;
+        Equal(false, deal.TryExecute(out _), "custom trade rechecks beacon power");
+        Equal(9L, f.Core.Network.GetTotalCount(goods), "all failed custom settlements preserve stock");
+        Find.WindowStack.TryRemove(window, false);
+        Equal(false, StorageTradeSession.TryGet(deal, out _), "custom window close disposes session");
+    }
+
     private static void Orbital()
     {
         var f = new Fixture(); var product = new ThingDef(); var stock = f.Stock(product, 15); f.Stock(ThingDefOf.Silver, 20);

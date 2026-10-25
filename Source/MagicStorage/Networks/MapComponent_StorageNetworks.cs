@@ -49,7 +49,7 @@ namespace MagicStorage
                 cells.Add(cell);
                 if (!grid.TryGetValue(cell, out var list)) grid.Add(cell, list = new List<CompStorageNode>());
                 list.Add(node);
-                DirtyDrawing(cell);
+                DirtyDrawing(cell, node.parent);
             }
             occupied.Add(node, cells);
             if (!dirty) ConnectIncrementally(node, cells);
@@ -71,7 +71,7 @@ namespace MagicStorage
                     var list = grid[cell];
                     list.Remove(node);
                     if (list.Count == 0) grid.Remove(cell);
-                    DirtyDrawing(cell);
+                    DirtyDrawing(cell, node.parent);
                 }
                 occupied.Remove(node);
             }
@@ -91,9 +91,9 @@ namespace MagicStorage
             var adjacent = new HashSet<StorageNetwork>();
             foreach (var cell in cells)
             {
-                CollectAdjacent(cell, node, adjacent);
+                CollectAdjacent(cell, node, adjacent, true);
                 foreach (var direction in GenAdj.CardinalDirections)
-                    CollectAdjacent(cell + direction, node, adjacent);
+                    CollectAdjacent(cell + direction, node, adjacent, false);
             }
             StorageNetwork target = null;
             foreach (var network in adjacent)
@@ -114,30 +114,31 @@ namespace MagicStorage
             topologyChanged = true;
         }
 
-        private void CollectAdjacent(IntVec3 cell, CompStorageNode added, HashSet<StorageNetwork> result)
+        private void CollectAdjacent(IntVec3 cell, CompStorageNode added, HashSet<StorageNetwork> result, bool sameCell)
         {
             if (!grid.TryGetValue(cell, out var list)) return;
             foreach (var node in list)
-                if (node != added && node.parent.Faction == added.parent.Faction && node.Network != null)
+                if (node != added && CanConnect(added, node, sameCell) && node.Network != null)
                     result.Add(node.Network);
         }
 
         internal void NotifyFactionChanged(Thing thing)
         {
-            foreach (var cell in thing.OccupiedRect()) DirtyDrawing(cell);
+            foreach (var cell in thing.OccupiedRect()) DirtyDrawing(cell, thing);
             MarkDirty();
         }
 
-        private void DirtyDrawing(IntVec3 cell)
+        private void DirtyDrawing(IntVec3 cell, Thing owner)
         {
-            map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Things, true, false);
+            using (StorageFloorContext.Enter(map, owner))
+                map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Things, true, false);
         }
 
         public bool HasNodeAt(IntVec3 cell, Thing from)
         {
             if (!grid.TryGetValue(cell, out var list)) return false;
             foreach (var node in list)
-                if (node.parent.Faction == from.Faction) return true;
+                if (node.parent.Faction == from.Faction && StorageFloorContext.SameFloor(node.parent, from)) return true;
             return false;
         }
 
@@ -181,9 +182,9 @@ namespace MagicStorage
                     network.AddNode(node);
                     foreach (var cell in occupied[node])
                     {
-                        EnqueueAt(cell, root, visited, queue);
+                        EnqueueAt(cell, node, visited, queue, true);
                         foreach (var direction in GenAdj.CardinalDirections)
-                            EnqueueAt(cell + direction, root, visited, queue);
+                            EnqueueAt(cell + direction, node, visited, queue, false);
                     }
                 }
                 network.FinishRebuild();
@@ -217,11 +218,16 @@ namespace MagicStorage
             else if (topologyChanged) FinishTopologyChange();
         }
 
-        private void EnqueueAt(IntVec3 cell, CompStorageNode root, HashSet<CompStorageNode> visited, Queue<CompStorageNode> queue)
+        private static bool CanConnect(CompStorageNode from, CompStorageNode to, bool sameCell) =>
+            from.parent.Faction == to.parent.Faction &&
+            (StorageFloorContext.SameFloor(from.parent, to.parent) ||
+             sameCell && from.parent is Building_StorageConduit && to.parent is Building_StorageConduit);
+
+        private void EnqueueAt(IntVec3 cell, CompStorageNode from, HashSet<CompStorageNode> visited, Queue<CompStorageNode> queue, bool sameCell)
         {
             if (!grid.TryGetValue(cell, out var list)) return;
             foreach (var node in list)
-                if (node.parent.Faction == root.parent.Faction && visited.Add(node)) queue.Enqueue(node);
+                if (CanConnect(from, node, sameCell) && visited.Add(node)) queue.Enqueue(node);
         }
 
         internal StorageRecoveryBatch CreateRecovery(IntVec3 origin)

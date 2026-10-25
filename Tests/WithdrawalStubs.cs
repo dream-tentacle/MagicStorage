@@ -15,8 +15,9 @@ namespace Verse
         public Thing GetInnerIfMinified()
         { InnerLookups++; return this is MinifiedThing minified ? minified.InnerThing : this; }
         public void SetForbidden(bool value, bool warn = true) { forbidden = value; }
+        public object TestExtraComp;
         public T TryGetComp<T>() where T : class =>
-            (this as ThingWithComps)?.AllComps.Find(comp => comp is T) as T ?? new RimWorld.CompForbiddable { parent = this } as T;
+            TestExtraComp as T ?? (this as ThingWithComps)?.AllComps.Find(comp => comp is T) as T ?? new RimWorld.CompForbiddable { parent = this } as T;
     }
     public class ThingComp { public Thing parent; }
     public class ThingWithComps : Thing { public List<ThingComp> AllComps = new List<ThingComp>(); }

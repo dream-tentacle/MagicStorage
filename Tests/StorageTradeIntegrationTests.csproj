@@ -67,11 +67,14 @@
     <Compile Include="ReceiverStubs.cs" />
     <Compile Include="SupplyShelfStubs.cs" />
     <Compile Include="StorageSupplyShelfTests.cs" />
+    <Compile Include="StorageShelfTemperatureTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfTemperaturePatches.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfHaulingPatches.cs" />
     <Compile Include="ResourceCounterStubs.cs" />
     <Compile Include="StorageResourceCounterTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageFloorContext.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfFilter.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfRestockFailure.cs" />
@@ -100,6 +103,11 @@
     <Compile Include="DynamicTradeInterfaceStubs.cs" />
     <Compile Include="CeleTechTradeStubs.cs" />
     <Compile Include="CeleTechTradeTests.cs" />
+    <Compile Include="GravshipHoverTradeStubs.cs" />
+    <Compile Include="GravshipHoverTradeTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\GravshipHoverTradeCompatibility.cs" />
+    <Compile Include="OrbitalTradeStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Trading\FloatMenuOptionProvider_StorageOrbitalTrade.cs" />
     <Compile Include="RavenGiftStubs.cs" />
     <Compile Include="RavenGiftTests.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
@@ -107,8 +115,10 @@
     <Compile Include="..\Source\MagicStorage\Compatibility\CeleTechTradeCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\RavenGiftCompatibility.cs" />
     <Compile Include="StorageTradeIntegrationTests.cs" />
+    <Compile Include="StorageTradeInventoryTests.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeSession.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradeApi.cs" />
+    <Compile Include="..\Source\MagicStorage\Trading\StorageTradeInventory.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\Tradeable_Storage.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageTradePatches.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\StorageLaunchPaymentPatches.cs" />

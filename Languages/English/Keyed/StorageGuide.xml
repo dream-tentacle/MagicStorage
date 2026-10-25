@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Guide_Title>Storage guide</MS_Guide_Title>
+  <MS_Guide_Description>Learn to store and withdraw items, check this network, and find out why items are not being stored.</MS_Guide_Description>
+  <MS_Guide_ChooseCore>Choose a control core on this map</MS_Guide_ChooseCore>
+  <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
+  <MS_Guide_Basics>Getting started</MS_Guide_Basics>
+  <MS_Guide_Diagnosis>Why are items not being stored?</MS_Guide_Diagnosis>
+  <MS_Guide_NoMap>Load a colony to check a network and use the action buttons.</MS_Guide_NoMap>
+  <MS_Guide_NoCore>Build or choose a control core on this map. Checks apply only to that core's network; buildings in other networks do not count.</MS_Guide_NoCore>
+  <MS_Guide_Progress>This core's learning progress: {0} / {1}</MS_Guide_Progress>
+  <MS_Guide_ProgressHelp>Basic steps record learning progress and remain complete once learned. Every advanced building must be built and connected to the selected core; progress reflects its current connection. Chapters unavailable without their DLC are excluded.</MS_Guide_ProgressHelp>
+  <MS_Guide_Current>Current setup: {0}</MS_Guide_Current>
+  <MS_Guide_Met>ready</MS_Guide_Met>
+  <MS_Guide_Unmet>not ready</MS_Guide_Unmet>
+  <MS_Guide_Step0>1. Build a control core</MS_Guide_Step0>
+  <MS_Guide_Body0>Each storage network needs exactly one control core. It manages inventory, storage filters and priority. Separate networks if more than one core is connected.</MS_Guide_Body0>
+  <MS_Guide_Step1>2. Connect a storage unit</MS_Guide_Step1>
+  <MS_Guide_Body1>Connect at least one storage unit to hold items. Use storage conduits to link buildings and check their network status. Storage conduits are separate from the power grid and do not transmit power.</MS_Guide_Body1>
+  <MS_Guide_Step2>3. Connect at least three receivers</MS_Guide_Step2>
+  <MS_Guide_Body2>Hauling reserves storage receivers. Connect at least three to the same network so every receiver is less likely to be occupied at once, delaying further hauling. Fewer than three still work.</MS_Guide_Body2>
+  <MS_Guide_Receivers>Receivers connected to this network: {0} / 3 (recommended)</MS_Guide_Receivers>
+  <MS_Guide_Step3>4. Set storage rules</MS_Guide_Step3>
+  <MS_Guide_Body3>A new core accepts nothing. Open its storage settings, allow the items you want and set a suitable priority. Connected receivers share these rules. This step checks whether at least one item type is allowed; individual items must still pass all filter conditions.</MS_Guide_Body3>
+  <MS_Guide_Step4>5. Store your first items</MS_Guide_Step4>
+  <MS_Guide_Body4>Let colonists haul allowed items to a receiver. They enter storage when the receiver refreshes, completing this step. Open the inventory to check, or use the diagnosis page to find blockers.</MS_Guide_Body4>
+  <MS_Guide_Step5>6. Withdraw items</MS_Guide_Step5>
+  <MS_Guide_Body5>Open the inventory, select quantities to withdraw and confirm. This step completes when at least one item is withdrawn and placed on the map. Items reserved by other jobs cannot be withdrawn yet.</MS_Guide_Body5>
+  <MS_Guide_Build>Build: {0}</MS_Guide_Build>
+  <MS_Guide_BuildLocked>This building is not currently available. Check research and other construction requirements.</MS_Guide_BuildLocked>
+  <MS_Guide_LocateCore>Show the control core</MS_Guide_LocateCore>
+  <MS_Guide_LocateReceivers>Show and select connected receivers</MS_Guide_LocateReceivers>
+  <MS_Guide_OpenFilter>Open the core's storage settings</MS_Guide_OpenFilter>
+  <MS_Guide_OpenInventory>Open inventory / withdraw items</MS_Guide_OpenInventory>
+  <MS_Guide_DiagIntro>These checks apply to the selected core's current network. If a building is missing from the count, select it and check its connection.</MS_Guide_DiagIntro>
+  <MS_Guide_NetworkFix>The network cannot work yet. Check conduit connections and ensure exactly one core is connected. Allow time for a network rebuild to finish.</MS_Guide_NetworkFix>
+  <MS_Guide_UnitFix>This network has no storage units. Build and connect at least one.</MS_Guide_UnitFix>
+  <MS_Guide_FilterFix>The core allows no items. Set its storage filter first.</MS_Guide_FilterFix>
+  <MS_Guide_Priority>Current storage priority: {0}</MS_Guide_Priority>
+  <MS_Guide_SampleHelp>Inspect an actual item on a receiver. Full slots may still have room to merge stacks, so capacity checks use this item's actual acceptance result.</MS_Guide_SampleHelp>
+  <MS_Guide_NoSample>No items are waiting on connected receivers. Slot counts alone cannot tell whether a particular item can be stored.</MS_Guide_NoSample>
+  <MS_Guide_Sample>Inspect item: {0} · {1}</MS_Guide_Sample>
+  <MS_Guide_Rejected>The core's filter rejects this item.</MS_Guide_Rejected>
+  <MS_Guide_NoCapacity>No capacity is currently available for this item. Other hauling jobs may have reserved that capacity.</MS_Guide_NoCapacity>
+  <MS_Guide_Forbidden>This item is forbidden, so the receiver skips it.</MS_Guide_Forbidden>
+  <MS_Guide_Reserved>A job has reserved this item. The receiver waits for the reservation to end.</MS_Guide_Reserved>
+  <MS_Guide_WaitRefresh>No blockers above were found. Resume the game and wait for the next receiver refresh.</MS_Guide_WaitRefresh>
+  <MS_Guide_LocateItem>Show this item</MS_Guide_LocateItem>
+  <MS_Guide_HaulingAdvice>Hauling suggestions (not automatically checked): check hauling work assignments, paths to items and receivers, allowed areas, and competing storage priorities. Too few receivers can leave them all reserved by hauling jobs.</MS_Guide_HaulingAdvice>
+  <MS_Guide_Reabsorb>Withdrawn items being stored again? Receivers absorb allowed items on their surface. Avoid placing receivers directly beside the core; leave room for withdrawn items.</MS_Guide_Reabsorb>
+  <MS_Guide_Nav0>1. Control core</MS_Guide_Nav0>
+  <MS_Guide_Nav1>2. Storage units</MS_Guide_Nav1>
+  <MS_Guide_Nav2>3. Three receivers</MS_Guide_Nav2>
+  <MS_Guide_Nav3>4. Storage rules</MS_Guide_Nav3>
+  <MS_Guide_Nav4>5. Store items</MS_Guide_Nav4>
+  <MS_Guide_Nav5>6. Withdraw items</MS_Guide_Nav5>
+  <MS_Guide_Nav6>Troubleshooting</MS_Guide_Nav6>
+  <MS_Guide_TargetNetwork>Network to inspect</MS_Guide_TargetNetwork>
+  <MS_Guide_FilterReady>The core allows at least one item type</MS_Guide_FilterReady>
+  <MS_Guide_Learned>This learning step is complete</MS_Guide_Learned>
+  <MS_Guide_NotLearned>This learning step is not complete yet</MS_Guide_NotLearned>
+  <MS_Guide_SampleSection>Inspect a waiting item</MS_Guide_SampleSection>
+  <MS_Guide_AdviceSection>Other things to check</MS_Guide_AdviceSection>
+  <MS_Guide_Diagram0>3 receivers</MS_Guide_Diagram0>
+  <MS_Guide_Diagram1>Control core</MS_Guide_Diagram1>
+  <MS_Guide_Diagram2>Storage unit</MS_Guide_Diagram2>
+  <MS_Guide_Schematic>Connection diagram · link with storage conduits</MS_Guide_Schematic>
+  <MS_Guide_ShowReceiversShort>Show receivers</MS_Guide_ShowReceiversShort>
+  <MS_Guide_OpenFilterShort>Storage settings</MS_Guide_OpenFilterShort>
+  <MS_Guide_OpenInventoryShort>Inventory / withdraw</MS_Guide_OpenInventoryShort>
+  <MS_Guide_Advanced>Advanced</MS_Guide_Advanced>
+  <MS_Guide_AdvancedTips>Usage tips</MS_Guide_AdvancedTips>
+  <MS_Guide_AdvancedBuilt>Built on this map: {0}</MS_Guide_AdvancedBuilt>
+  <MS_Guide_AdvancedConnected>Connected to the selected core: {0}</MS_Guide_AdvancedConnected>
+  <MS_Guide_AdvancedLocate>Locate building</MS_Guide_AdvancedLocate>
+  <MS_Guide_AdvancedTarget>{0} · {1} · {2}</MS_Guide_AdvancedTarget>
+  <MS_Guide_AdvancedSameNetwork>Selected network</MS_Guide_AdvancedSameNetwork>
+  <MS_Guide_AdvancedOtherNetwork>Outside selected network</MS_Guide_AdvancedOtherNetwork>
+  <MS_Guide_AdvancedRepairCount>With repair mode enabled: {0}</MS_Guide_AdvancedRepairCount>
+  <MS_Guide_AdvancedFilterCount>Using filter mode: {0}</MS_Guide_AdvancedFilterCount>
+  <MS_Guide_AdvancedColdCount>With low-temperature mode enabled: {0}</MS_Guide_AdvancedColdCount>
+  <MS_Guide_AdvancedDirectCount>Using continuous supply: {0}</MS_Guide_AdvancedDirectCount>
+  <MS_Guide_AdvancedUnlockMode>Workbench unlock mode: {0}</MS_Guide_AdvancedUnlockMode>
+  <MS_Guide_Enabled>Enabled</MS_Guide_Enabled>
+  <MS_Guide_Disabled>Disabled</MS_Guide_Disabled>
+  <MS_Guide_AdvancedStatusScope>A network connection alone does not make a gestation bill ready. Check mechanitor and bill requirements at the gestator.</MS_Guide_AdvancedStatusScope>
+  <MS_Guide_AdvancedWorkbenchBody>Produces items directly using materials in magic storage.</MS_Guide_AdvancedWorkbenchBody>
+  <MS_Guide_AdvancedWorkbenchTips>With workbench unlock mode enabled in mod settings, spend construction materials to unlock a workbench's recipes. Unlocks are shared within the save.</MS_Guide_AdvancedWorkbenchTips>
+  <MS_Guide_AdvancedGestatorBody>The cosmic mech gestator requires Biotech. Connect it to the storage network and add mech recipes to that gestator's own bill list.\n\nWhen a mechanitor starts work, ingredients move directly from the network into the gestator without hauling. Each gestator has independent bills, and mech production still follows the applicable gestation requirements.</MS_Guide_AdvancedGestatorBody>
+  <MS_Guide_AdvancedGestatorTips>After connecting the network, check the bill, available mechanitor and required ingredients at the gestator.\n\nCancelling unfinished gestation returns ingredients to the network where possible, placing the remainder near the interaction cell. A completed mech is not returned to storage as an item.</MS_Guide_AdvancedGestatorTips>
+  <MS_Guide_AdvancedShelfBody>The restocking shelf places network items on the map for colonists to take, such as food and medicine. It can also replace a nutrient paste dispenser hopper. Connect it, then use its building commands to set items and restocking limits.\n\nChoose items per slot in assigned mode, or share one filter across all slots in filter mode. Configure quality, condition and material filters, or use the food filter shortcut.</MS_Guide_AdvancedShelfBody>
+  <MS_Guide_AdvancedShelfTips>Colonists do not haul into the shelf. Keep its priority at least as high as the core to avoid repeated hauling away. Switching modes first returns shelf contents to the network; the switch is blocked if anything cannot be returned.\n\nLow-temperature mode needs neither power nor a network connection. It lowers item temperature by 100°C, down to −10°C, preserving already colder temperatures. Items can still rot in very hot conditions.\n\nIn filter mode, Distinct items makes empty slots skip item types already present; it does not remove existing duplicates. Shelf presets can be copied and pasted, and restocking failure notifications can be configured.</MS_Guide_AdvancedShelfTips>
+  <MS_Guide_AdvancedConstructionBody>Connect the construction supply unit and keep construction sites within its supply radius. It periodically sends ingredients directly to friendly construction sites; colonists still perform the construction work. Adjust the radius in mod settings.\n\nRepair mode also fixes broken-down buildings within range. Each repair takes three seconds and consumes one component from the network.</MS_Guide_AdvancedConstructionBody>
+  <MS_Guide_AdvancedConstructionTips>Select the building to see its radius. If materials are not arriving, check network stock, site requirements and distance.\n\nRepair mode fixes breakdowns, not ordinary hit-point damage. It skips buildings reserved by colonists. Toggle repair mode using the building command.</MS_Guide_AdvancedConstructionTips>
+  <MS_Guide_AdvancedApparelBody>Connect an apparel adapter and store apparel in the network. Colonists compare apparel on the map and in storage using their apparel policies and normal outfit scoring, collecting suitable items through the adapter.\n\nEach adapter serves one colonist at a time and must be reachable.</MS_Guide_AdvancedApparelBody>
+  <MS_Guide_AdvancedApparelTips>A connection does not force an outfit change. If nobody collects apparel, check the apparel policy, whether a better item is available, and whether the adapter is reachable or occupied.\n\nThe adapter supplies apparel. Use a restocking shelf for everyday food, medicine and other items.</MS_Guide_AdvancedApparelTips>
+  <MS_Guide_AdvancedFuelBody>Connect the fuel supplier and stock fuel accepted by the target buildings. It automatically refuels friendly buildings within 20 cells, respecting each target's fuel filter, automatic refueling toggle and refueling conditions.\n\nAutomatic delivery waits for the target's refueling conditions rather than topping up every small deficit. With sufficient stock, it refills to the target amount.</MS_Guide_AdvancedFuelBody>
+  <MS_Guide_AdvancedFuelTips>Select the supplier to see its radius or use Refill now. Immediate delivery can ignore the fuel-percentage threshold, but still respects the automatic refueling toggle and other conditions.\n\nCheck distance, accepted fuel, automatic refueling and available stock. Buildings requiring an atomic refill will not receive a partial refill when fuel is insufficient.</MS_Guide_AdvancedFuelTips>
+  <MS_Guide_AdvancedTransportBody>The material supplier feeds a transporter or refuelable building directly in front of it, so orientation matters.\n\nManual mode: move items into the supplier using its transfer window, then let it deliver them. Continuous mode: select up to three item types, supplied directly from the network in top-to-bottom priority order without internal storage. If an item is unavailable or rejected, the next choice is tried.\n\nTransporters and generic containers are topped up to each item limit (default 75; 0 pauses). Excess stock is not reclaimed. Immediate supply obeys the same limits. Fuel devices keep their own target fuel level; 0 also pauses that fuel.</MS_Guide_AdvancedTransportBody>
+  <MS_Guide_AdvancedTransportTips>Empty the supplier's own inventory before switching modes. Use its building commands to configure items or deliver immediately.\n\nFor transport pods, create a launch group before selecting cargo.\n\nGeneric container supply targets containers exposed by other buildings; choose a target if several are available. This improves compatibility but does not guarantee that the other mod recognizes the delivered items. Transporters and fuel devices use dedicated rules first.</MS_Guide_AdvancedTransportTips>
+  <MS_Guide_AdvancedCaravanBody>Connect the caravan teleporter, open its caravan formation window and choose members and supplies from the network.\n\nOn confirmation, supplies move into the members' inventories and the members immediately form a caravan on the world map. There is no need to withdraw those items manually and wait for normal loading.</MS_Guide_AdvancedCaravanBody>
+</LanguageData>

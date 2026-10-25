@@ -93,6 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MagicStorageMod.cs" />
+    <Compile Include="Guide\CompStorageGuide.cs" />
+    <Compile Include="UI\Dialog_StorageGuide.cs" />
+    <Compile Include="UI\Dialog_StorageGuide.Advanced.cs" />
     <Compile Include="Feedback\FeedbackUploader.cs" />
     <Compile Include="UI\Dialog_Feedback.cs" />
     <Compile Include="UpdateNotice\UpdateNoticeDef.cs" />
@@ -107,6 +110,7 @@
     <Compile Include="Compatibility\MonolynProductionSupply.cs" />
     <Compile Include="Compatibility\DynamicTradeInterfaceCompatibility.cs" />
     <Compile Include="Compatibility\CeleTechTradeCompatibility.cs" />
+    <Compile Include="Compatibility\GravshipHoverTradeCompatibility.cs" />
     <Compile Include="Compatibility\RavenGiftCompatibility.cs" />
     <Compile Include="Compatibility\NivarianCannonApi.cs" />
     <Compile Include="Compatibility\NivarianCannonCompatibility.cs" />
@@ -139,6 +143,7 @@
     <Compile Include="Trading\StorageTradeTransaction.cs" />
     <Compile Include="Trading\StorageTradeSession.cs" />
     <Compile Include="Trading\StorageTradeApi.cs" />
+    <Compile Include="Trading\StorageTradeInventory.cs" />
     <Compile Include="Trading\Tradeable_Storage.cs" />
     <Compile Include="Trading\StorageTradePatches.cs" />
     <Compile Include="Trading\StorageLaunchPaymentPatches.cs" />
@@ -146,6 +151,7 @@
     <Compile Include="Trading\FloatMenuOptionProvider_StorageTrade.cs" />
     <Compile Include="Trading\FloatMenuOptionProvider_StorageOrbitalTrade.cs" />
     <Compile Include="Buildings\Building_StorageSupplyShelf.cs" />
+    <Compile Include="Storage\StorageFloorContext.cs" />
     <Compile Include="Storage\StorageShelfSupply.cs" />
     <Compile Include="Storage\StorageShelfFilter.cs" />
     <Compile Include="Storage\StorageShelfRestockFailure.cs" />
@@ -210,6 +216,7 @@
     <Compile Include="Storage\StorageReception.cs" />
     <Compile Include="Storage\StorageReceiverHaulingPatches.cs" />
     <Compile Include="Storage\StorageShelfHaulingPatches.cs" />
+    <Compile Include="Storage\StorageShelfTemperaturePatches.cs" />
     <Compile Include="Networks\StorageNetwork.cs" />
     <Compile Include="Networks\CompStorageNode.cs" />
     <Compile Include="Networks\StorageConnectionQuery.cs" />

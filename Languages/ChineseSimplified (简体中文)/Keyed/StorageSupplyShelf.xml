@@ -2,7 +2,9 @@
 <LanguageData>
   <MS_Shelf_Configure>配置补货</MS_Shelf_Configure>
   <MS_Shelf_CopyPreset>复制预设</MS_Shelf_CopyPreset>
-  <MS_Shelf_CopyPresetDesc>复制此货架的模式、物品、各格补货上限、筛选条件、补货失败提醒和优先级。</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_CopyPresetDesc>复制此货架的模式、低温设置、物品、各格补货上限、筛选条件、补货失败提醒和优先级。</MS_Shelf_CopyPresetDesc>
+  <MS_Shelf_LowTemperatureMode>低温模式</MS_Shelf_LowTemperatureMode>
+  <MS_Shelf_LowTemperatureModeDesc>使架上物品的温度降低100°C，最低降至−10°C；原本更冷则保持原温度。无需供电或网络连接。高温环境下仍可能腐烂。</MS_Shelf_LowTemperatureModeDesc>
   <MS_Shelf_PastePreset>粘贴预设</MS_Shelf_PastePreset>
   <MS_Shelf_PastePresetDesc>将已复制的预设应用到选中的补货架，覆盖现有配置。支持多选货架。</MS_Shelf_PastePresetDesc>
   <MS_Shelf_NeedCopiedPreset>需要先复制预设</MS_Shelf_NeedCopiedPreset>
@@ -47,6 +49,8 @@
   <MS_Shelf_QuickFood>一键食物</MS_Shelf_QuickFood>
   <MS_Shelf_QuickFoodDesc>切换至筛选模式，并将共用筛选条件设为全部食物。若无法切换模式，则保留原筛选条件。</MS_Shelf_QuickFoodDesc>
   <MS_Shelf_SharedFilterHint>所有格子共用以下筛选条件，各自补充至设定上限。空格按网络物品列表顺序选择第一个符合条件且可取出的物品。</MS_Shelf_SharedFilterHint>
+  <MS_Shelf_DistinctItems>互不相同</MS_Shelf_DistinctItems>
+  <MS_Shelf_DistinctItemsTip>空格补货时跳过此货架上已有的物品类型，继续选择下一个。同种物品的不同材质或品质仍视为同一类型。已有库存仍正常补足，不会自动移走重复物品。</MS_Shelf_DistinctItemsTip>
   <MS_Shelf_SlotLimit>位置 {0} 堆叠上限</MS_Shelf_SlotLimit>
   <MS_Shelf_SharedLimitTip>仅控制此格的补货数量，实际数量不超过物品自身的堆叠上限。0表示暂停补货；调低上限不会移走已有库存。</MS_Shelf_SharedLimitTip>
   <MS_Shelf_ModeBlockedTitle>无法切换补货架模式</MS_Shelf_ModeBlockedTitle>

@@ -31,7 +31,7 @@ namespace MagicStorage
                 PlayerKnowledgeDatabase.KnowledgeDemonstrated(ConceptDefOf.InteractingWithTraders, KnowledgeAmount.Total);
             };
             yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(label, action,
-                MenuOptionPriority.InitiateSocial, null, clickedPawn), actor, clickedPawn);
+                MenuOptionPriority.SummonThreat, null, clickedPawn, orderInPriority: int.MaxValue), actor, clickedPawn);
         }
     }
 

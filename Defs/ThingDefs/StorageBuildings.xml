@@ -47,7 +47,10 @@
       <drawRotated>false</drawRotated>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
-    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <comps>
+      <li Class="MagicStorage.CompProperties_StorageNode" />
+      <li Class="MagicStorage.CompProperties_StorageGuide" />
+    </comps>
     <inspectorTabs><li>ITab_Storage</li></inspectorTabs>
     <costList><Steel>80</Steel><ComponentIndustrial>4</ComponentIndustrial></costList>
     <uiOrder>3100</uiOrder>

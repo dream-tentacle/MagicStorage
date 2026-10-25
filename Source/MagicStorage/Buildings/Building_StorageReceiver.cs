@@ -72,7 +72,8 @@ namespace MagicStorage
                 if (!CanWork) break;
                 if (!item.Spawned || item.Map != Map || item.Position != Position ||
                     item.IsForbidden(Faction) || Map.reservationManager.IsReservedByAnyoneOf(item, Faction)) continue;
-                StorageReception.Transfer(Network, item, Map, Position);
+                var result = StorageReception.Transfer(Network, item, Map, Position);
+                if (result.Transferred > 0) Network.Core?.GetComp<CompStorageGuide>()?.Complete(4);
             }
         }
 
@@ -109,7 +110,7 @@ namespace MagicStorage
         }
 
         public override string GetInspectString() =>
-            (base.GetInspectString() + "\n" + "MS_ReceiverCapacity".Translate(slotGroup.HeldThingsCount, MaxItemsInCell) +
+            (base.GetInspectString() + "\n" + "MS_ReceiverCapacity".Translate(Spawned ? slotGroup.HeldThingsCount : 0, MaxItemsInCell) +
              "\n" + "MS_ReceiverUse".Translate()).Trim();
     }
 }

@@ -60,7 +60,7 @@ internal static class StorageSupplyShelfTests
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
         StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
         StockSelectionCommands();
-        DuplicateSlots(); SharedFilterRestocking(); ModeSwitchReturns(); SharedFilterPresets();
+        DuplicateSlots(); SharedFilterRestocking(); DistinctFilterRestocking(); ModeSwitchReturns(); SharedFilterPresets();
         ConfigurableSlotCounts(); DifferentSizePresets();
         return assertions;
     }
@@ -221,7 +221,8 @@ internal static class StorageSupplyShelfTests
     {
         var f = new Fixture();
         Equal(false, f.Shelf.FilterMode, "filter mode defaults off");
-        Command_Toggle toggle = f.Shelf.GetGizmos().OfType<Command_Toggle>().Single();
+        Command_Toggle toggle = f.Shelf.GetGizmos().OfType<Command_Toggle>().Single(command =>
+            command.defaultLabel == "MS_Shelf_FilterMode".Translate());
         Equal(false, toggle.isActive(), "native toggle starts unchecked");
         toggle.toggleAction();
         Equal(true, toggle.isActive(), "native toggle reflects enabled filter mode");
@@ -257,6 +258,37 @@ internal static class StorageSupplyShelfTests
         f.Tick();
         Equal("good", f.Shelf.StockAt(0).variant, "native shared quality filter applies to actual source stacks");
         Equal(15L, f.Core.Network.GetTotalCount(f.X), "nonmatching variant remains stored");
+    }
+
+    private static void DistinctFilterRestocking()
+    {
+        foreach (int slots in new[] { 3, 10 })
+        {
+            var f = new Fixture(shelfSlots: slots);
+            Equal(false, f.Shelf.DistinctItems, "distinct item types defaults off");
+            f.Shelf.TrySetFilterMode(true);
+            f.Shelf.SharedFilter.SetAllow(f.X, true); f.Shelf.SharedFilter.SetAllow(f.Y, true);
+            for (int i = 0; i < slots; i++) f.Shelf.SetFilterLimit(i, 4);
+            f.Shelf.DistinctItems = true;
+            f.Store(f.X, 20, "first"); f.Store(f.X, 20, "other material or quality"); f.Store(f.Y, 10);
+            f.Tick();
+            Equal(f.X, f.Shelf.StockAt(0).def, "distinct mode retains inventory order");
+            Equal(f.Y, f.Shelf.StockAt(1).def, "same-pass selection skips all variants of the first type");
+            Equal(2, f.Shelf.GetSlotGroup().HeldThingsCount, "slots remain empty when no unused type is available");
+            f.Shelf.StockAt(0).SplitOff(2); f.Tick();
+            Equal(4, f.Shelf.StockAt(0).stackCount, "existing stock still tops up in distinct mode");
+            Thing emptied = f.Shelf.StockAt(0); emptied.SplitOff(emptied.stackCount);
+            f.Tick();
+            Equal(f.X, f.Shelf.StockAt(0).def, "a fully removed type becomes eligible again");
+            Equal(2, f.Shelf.GetSlotGroup().HeldThingsCount, "later occupied slots also exclude their types");
+            f.Shelf.DistinctItems = false; f.Tick();
+            Equal(true, f.Shelf.StockAt(2) != null, "disabling distinct mode allows another stack of an existing type");
+            Thing duplicate = f.Shelf.StockAt(2); duplicate.SplitOff(2);
+            f.Store(f.X, 4, duplicate.variant);
+            f.Shelf.DistinctItems = true; f.Tick();
+            Equal(duplicate, f.Shelf.StockAt(2), "enabling distinct mode preserves duplicate stock");
+            Equal(4, duplicate.stackCount, "existing duplicates continue topping up");
+        }
     }
 
     private static void ModeSwitchReturns()
@@ -306,11 +338,14 @@ internal static class StorageSupplyShelfTests
     {
         var f = new Fixture(); f.Shelf.TrySetFilterMode(true);
         f.Shelf.SharedFilter.SetAllow(f.X, true); f.Shelf.SetFilterLimit(0, 3); f.Shelf.SetFilterLimit(1, 8);
+        f.Shelf.DistinctItems = true;
         PresetCommand(f.Shelf, "MS_Shelf_CopyPreset").action();
+        f.Shelf.DistinctItems = false;
         f.Shelf.SharedFilter.SetAllow(f.X, false); f.Shelf.SetFilterLimit(0, 9);
         var other = new Fixture();
         PresetCommand(other.Shelf, "MS_Shelf_PastePreset").action();
         Equal(true, other.Shelf.FilterMode, "preset includes mode");
+        Equal(true, other.Shelf.DistinctItems, "preset keeps distinct mode snapshot after source edits");
         Equal(true, other.Shelf.SharedFilter.Allows(f.X), "preset filter snapshot survives later edits");
         Equal(3, other.Shelf.FilterLimit(0), "preset first slot cap retained");
         Equal(8, other.Shelf.FilterLimit(1), "preset second slot cap retained");

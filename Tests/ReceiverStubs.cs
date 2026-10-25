@@ -75,7 +75,8 @@ namespace RimWorld
                 var building = (Building)parent;
                 if (!building.Spawned) throw new System.NullReferenceException("Despawned slot group parent has no map.");
                 return building.Map.Ground.Where(t => t.Spawned && t.Map == building.Map &&
-                    parent.AllSlotCellsList().Contains(t.Position) && t.def.category == ThingCategory.Item);
+                    parent.AllSlotCellsList().Contains(t.Position) && t.def.category == ThingCategory.Item &&
+                    MagicStorage.StorageFloorContext.SameFloor(t, building));
             }
         }
         public int HeldThingsCount => HeldThings.Count();

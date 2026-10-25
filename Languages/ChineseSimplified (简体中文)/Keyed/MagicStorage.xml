@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_ConstructionRepairMode>修理模式</MS_ConstructionRepairMode>
   <MS_ConstructionRepairModeDesc>自动修复供应范围内发生故障的建筑。每次修理持续3秒，并消耗相连存储网络中的1个零部件。跳过已被殖民者预约的建筑。</MS_ConstructionRepairModeDesc>
-  <MS_ConstructionSupplyUse>自动供应半径{0}格内的建造材料，施工由殖民者完成。</MS_ConstructionSupplyUse>
+  <MS_ConstructionSupplyUse>当前自动供应半径为{0}格，可在模组选项中调整。供给单元提供建造材料，施工由殖民者完成。</MS_ConstructionSupplyUse>
   <MS_NetworkStatus>存储网络：{0}</MS_NetworkStatus>
   <MS_Status_Rebuilding>正在重建连接</MS_Status_Rebuilding>
   <MS_Status_NoCore>未连接控制核心</MS_Status_NoCore>

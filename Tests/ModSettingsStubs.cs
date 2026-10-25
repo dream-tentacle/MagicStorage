@@ -11,6 +11,7 @@ namespace MagicStorage
     }
     internal static class UpdateNoticeUtility { internal static object AllNotices() => null; }
     internal static class Dialog_UpdateNotice { internal static void Open(object notices) { } }
+    internal static class Dialog_Feedback { internal static void Open() { } }
 }
 #if !TRADING_STUB_RECT
 namespace UnityEngine

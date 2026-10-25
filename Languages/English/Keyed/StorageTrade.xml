@@ -10,7 +10,9 @@
   <MS_Trade_Fail_SessionClosed>This trade session has closed. Reopen the trade window.</MS_Trade_Fail_SessionClosed>
   <MS_Trade_Fail_TraderChanged>Another trade has replaced the current trader. Reopen the trade window.</MS_Trade_Fail_TraderChanged>
   <MS_Trade_Fail_NegotiatorChanged>The negotiator for this trade has changed. Reopen the trade window.</MS_Trade_Fail_NegotiatorChanged>
-  <MS_Trade_Fail_NegotiatorUnavailable>The negotiator has been destroyed or is no longer on a map.</MS_Trade_Fail_NegotiatorUnavailable>
+  <MS_Trade_Fail_NegotiatorUnavailable>The negotiator is no longer available for this trade.</MS_Trade_Fail_NegotiatorUnavailable>
+  <MS_Trade_Fail_PortableUnit>A selected storage unit is missing, has been placed on a map, or no longer belongs to the player.</MS_Trade_Fail_PortableUnit>
+  <MS_Trade_PortableInventoryNotice>Magic storage trade: goods and silver from the selected carried storage units. Purchases follow the trader's delivery rules.</MS_Trade_PortableInventoryNotice>
   <MS_Trade_Fail_TraderUnavailable>The game currently considers this trader unable to trade. They may have stopped trading, be unable to interact, or have no tradeable goods left.</MS_Trade_Fail_TraderUnavailable>
   <MS_Trade_Fail_TradePermission>The negotiator no longer meets the requirements to trade with this trader.</MS_Trade_Fail_TradePermission>
   <MS_Trade_Fail_TraderLeftMap>The trader has been destroyed, left the map, or moved to a different map.</MS_Trade_Fail_TraderLeftMap>
@@ -48,4 +50,6 @@
   <MS_Trade_NoCoveredCore>A powered orbital trade beacon must cover an available storage core</MS_Trade_NoCoveredCore>
   <MS_Trade_VanillaWarning>You are using the vanilla trade option! To trade items stored in magic storage, choose the other trade option.</MS_Trade_VanillaWarning>
   <MS_Trade_DoNotShowAgain>Don't show again</MS_Trade_DoNotShowAgain>
+  <MS_Trade_HoverNoNetwork>The gravship needs storage units connected to exactly one carried storage core.</MS_Trade_HoverNoNetwork>
+  <MS_Trade_HoverUnavailable>The gravship, settlement or negotiator is no longer available for hover trade.</MS_Trade_HoverUnavailable>
 </LanguageData>

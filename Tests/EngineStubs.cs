@@ -47,7 +47,7 @@ namespace Verse
         public int DistanceToSquared(IntVec3 b) => (x-b.x)*(x-b.x)+(z-b.z)*(z-b.z);
         public float DistanceTo(IntVec3 b) => (float)Math.Sqrt(DistanceToSquared(b));
     }
-    public static class GenAdj
+    public static partial class GenAdj
     {
         public static IntVec3[] CardinalDirections = { new IntVec3(1,0), new IntVec3(-1,0), new IntVec3(0,1), new IntVec3(0,-1) };
     }
@@ -177,6 +177,7 @@ namespace MagicStorage
 {
     using Verse;
     public class CompStorageNode { public Thing parent; public StorageNetwork Network; }
+    public class Building_StorageConduit : Verse.Building { }
     public class Building_StorageUnit : Thing, IThingHolder
     {
         private int? slotCapacityOverride;

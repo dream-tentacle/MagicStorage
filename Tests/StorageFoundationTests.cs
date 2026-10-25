@@ -44,6 +44,7 @@ internal static class StorageFoundationTests
             IncomingSlotCompetition(); IncomingMergeCompetition(); IncomingExactAllocation(); IncomingLifecycle();
             assertions += StorageReceiverTests.Run();
             assertions += StorageSupplyShelfTests.Run();
+            assertions += StorageShelfTemperatureTests.Run();
 #if CONSTRUCTION_REPAIR_TESTS
             assertions += ConstructionRepairTests.Run();
 #endif

@@ -18,7 +18,7 @@ namespace MagicStorage
             Pawn actor = context.FirstSelectedPawn;
             foreach (ICommunicable target in console.GetCommTargets(actor))
             {
-                if (!(target is TradeShip ship) || !ship.CanTradeNow) continue;
+                if (!(target is PassingShip ship) || !(ship is ITrader trader) || !trader.CanTradeNow) continue;
                 string label = "MS_Trade_OrbitalCommand".Translate(ship.GetCallLabel());
                 string reason = null;
                 if (!actor.CanReach(console, PathEndMode.InteractionCell, Danger.Some)) reason = "NoPath".Translate();
@@ -26,10 +26,10 @@ namespace MagicStorage
                 else if (!console.CanUseCommsNow) reason = "CannotUseNoPower".Translate();
                 else if (!actor.health.capacities.CapableOf(PawnCapacityDefOf.Talking))
                     reason = "IncapableOfCapacity".Translate(PawnCapacityDefOf.Talking.label, actor.Named("PAWN"));
-                else if (!actor.CanTradeWith(ship.Faction, ship.TraderKind).Accepted) reason = "MissingTitleAbility".Translate();
+                else if (!actor.CanTradeWith(trader.Faction, trader.TraderKind).Accepted) reason = "MissingTitleAbility".Translate();
                 else if (!StorageTradeSession.HasOrbitalCore(context.map)) reason = "MS_Trade_NoCoveredCore".Translate();
                 if (reason != null) { yield return new FloatMenuOption(label + ": " + reason, null); continue; }
-                TradeShip selected = ship;
+                PassingShip selected = ship;
                 Action action = () =>
                 {
                     Job job = JobMaker.MakeJob(StorageTradeDefOf.MS_TradeWithStorageOrbital, console);
@@ -38,7 +38,7 @@ namespace MagicStorage
                     PlayerKnowledgeDatabase.KnowledgeDemonstrated(ConceptDefOf.OpeningComms, KnowledgeAmount.Total);
                 };
                 yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(label, action,
-                    MenuOptionPriority.InitiateSocial), actor, console);
+                    MenuOptionPriority.SummonThreat, orderInPriority: int.MaxValue), actor, console);
             }
         }
     }
@@ -46,22 +46,22 @@ namespace MagicStorage
     public sealed class JobDriver_StorageOrbitalTrade : JobDriver
     {
         private Building_CommsConsole Console => (Building_CommsConsole)TargetThingA;
-        private TradeShip Ship => job.commTarget as TradeShip;
+        private ITrader Trader => job.commTarget as ITrader;
         public override bool TryMakePreToilReservations(bool errorOnFailed) =>
             pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed);
         protected override IEnumerable<Toil> MakeNewToils()
         {
             this.FailOnDespawnedOrNull(TargetIndex.A);
-            this.FailOn(() => !Console.CanUseCommsNow || Ship == null || !Ship.CanTradeNow);
+            this.FailOn(() => !Console.CanUseCommsNow || Trader == null || !Trader.CanTradeNow);
             yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.InteractionCell);
             Toil open = ToilMaker.MakeToil("StorageOrbitalTrade");
             open.initAction = () =>
             {
-                if (Console.CanUseCommsNow && Ship?.CanTradeNow == true && StorageTradeSession.HasOrbitalCore(pawn.Map))
+                if (Console.CanUseCommsNow && Trader?.CanTradeNow == true && StorageTradeSession.HasOrbitalCore(pawn.Map))
                 {
-                    var result = StorageTradeSession.Open(pawn, Ship, Console);
+                    var result = StorageTradeSession.Open(pawn, Trader, Console);
                     if (result.Opened)
-                        PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter_Send(System.Linq.Enumerable.OfType<Pawn>(Ship.Goods),
+                        PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter_Send(System.Linq.Enumerable.OfType<Pawn>(Trader.Goods),
                             "LetterRelatedPawnsTradeShip".Translate(Faction.OfPlayer.def.pawnsPlural), LetterDefOf.NeutralEvent);
                 }
             };

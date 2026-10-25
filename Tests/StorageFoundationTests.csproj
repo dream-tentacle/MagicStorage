@@ -76,10 +76,13 @@
     <Compile Include="ReceiverStubs.cs" />
     <Compile Include="SupplyShelfStubs.cs" />
     <Compile Include="StorageSupplyShelfTests.cs" />
+    <Compile Include="StorageShelfTemperatureTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfTemperaturePatches.cs" />
     <Compile Include="ResourceCounterStubs.cs" />
     <Compile Include="StorageResourceCounterTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageFloorContext.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfFilter.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfRestockFailure.cs" />

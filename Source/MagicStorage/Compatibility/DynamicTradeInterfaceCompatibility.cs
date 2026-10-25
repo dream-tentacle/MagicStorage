@@ -74,13 +74,16 @@ namespace MagicStorage
             return clean;
         }
 
-        private static void BeginReplacement(Dialog_Trade __0, out Replacement __state)
+        private static bool BeginReplacement(Dialog_Trade __0, out Replacement __state)
         {
             __state = null;
+            // DTI's map/caravan widgets do not support unspawned portable negotiators.
+            if (__0 is Dialog_StorageTrade portable && portable.Session.IsPortable) return false;
             if (!(__0 is Dialog_StorageTrade source) || TradeSession.deal == null ||
-                !StorageTradeSession.TryGet(TradeSession.deal, out var session) || session != source.Session) return;
+                !StorageTradeSession.TryGet(TradeSession.deal, out var session) || session != source.Session) return true;
             __state = new Replacement { Source = source, Session = session, Previous = replacing };
             replacing = __state;
+            return true;
         }
 
         internal static bool DeferClose(Dialog_StorageTrade source)

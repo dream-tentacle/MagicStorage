@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Guide_Title>存储指南</MS_Guide_Title>
+  <MS_Guide_Description>学习基础存取，检查当前网络配置，并排查物品无法入库的原因。</MS_Guide_Description>
+  <MS_Guide_ChooseCore>选择当前地图的控制核心</MS_Guide_ChooseCore>
+  <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
+  <MS_Guide_Basics>基础存取</MS_Guide_Basics>
+  <MS_Guide_Diagnosis>为什么没有存进去？</MS_Guide_Diagnosis>
+  <MS_Guide_NoMap>载入殖民地后，可以检查网络状态并使用操作按钮。</MS_Guide_NoMap>
+  <MS_Guide_NoCore>请先建造或选择当前地图的控制核心。检查只针对所选核心的网络，其他网络的建筑不计入。</MS_Guide_NoCore>
+  <MS_Guide_Progress>此核心的教学进度：{0} / {1}</MS_Guide_Progress>
+  <MS_Guide_ProgressHelp>基础步骤记录学习进度，已学会后保持完成。进阶建筑均需建造并接入所选核心网络，按当前连接状态计入进度；缺少对应DLC的章节不计入。</MS_Guide_ProgressHelp>
+  <MS_Guide_Current>当前配置：{0}</MS_Guide_Current>
+  <MS_Guide_Met>已满足</MS_Guide_Met>
+  <MS_Guide_Unmet>未满足</MS_Guide_Unmet>
+  <MS_Guide_Step0>1. 建造控制核心</MS_Guide_Step0>
+  <MS_Guide_Body0>每个存储网络只能有一个控制核心。核心负责管理库存、存储筛选和优先级。多个核心连接在一起时，需要分开网络。</MS_Guide_Body0>
+  <MS_Guide_Step1>2. 接入存储单元</MS_Guide_Step1>
+  <MS_Guide_Body1>至少接入一个存储单元来保存物品。用存储线连接建筑，并检查其网络状态。存储线独立于电网，不传输电力。</MS_Guide_Body1>
+  <MS_Guide_Step2>3. 接入至少三个存储接收器</MS_Guide_Step2>
+  <MS_Guide_Body2>搬运过程中会占用存储接收器。建议在同一网络接入至少三个，避免接收器全部被占用，影响后续搬运。少于三个仍可工作。</MS_Guide_Body2>
+  <MS_Guide_Receivers>同一网络已接入接收器：{0} / 3 个（推荐）</MS_Guide_Receivers>
+  <MS_Guide_Step3>4. 设置接收规则</MS_Guide_Step3>
+  <MS_Guide_Body3>核心默认不接收任何物品。打开核心的存储设置，允许需要存入的物品，并设置合适的优先级。同一网络的接收器共用这些规则。此步检查是否已允许至少一种物品；具体物品能否入库仍取决于完整筛选条件。</MS_Guide_Body3>
+  <MS_Guide_Step4>5. 存入第一批物品</MS_Guide_Step4>
+  <MS_Guide_Body4>让殖民者把允许存储的物品搬到接收器。物品会在接收器刷新时存入网络，成功后此步自动完成。可打开库存确认，也可切换到排障页检查阻塞原因。</MS_Guide_Body4>
+  <MS_Guide_Step5>6. 取出物品</MS_Guide_Step5>
+  <MS_Guide_Body5>打开库存，选择需要取出的数量并确认。至少一个物品成功取出并放到地图上后，此步完成。已被其他任务预留的物品暂时不能取出。</MS_Guide_Body5>
+  <MS_Guide_Build>建造：{0}</MS_Guide_Build>
+  <MS_Guide_BuildLocked>该建筑当前不可建造。请检查研究与其他建造条件。</MS_Guide_BuildLocked>
+  <MS_Guide_LocateCore>定位控制核心</MS_Guide_LocateCore>
+  <MS_Guide_LocateReceivers>定位并选择已连接的接收器</MS_Guide_LocateReceivers>
+  <MS_Guide_OpenFilter>打开核心存储设置</MS_Guide_OpenFilter>
+  <MS_Guide_OpenInventory>打开库存／取出物品</MS_Guide_OpenInventory>
+  <MS_Guide_DiagIntro>以下检查针对所选核心当前所属的网络。若某个建筑未计入，请选中它检查连接状态。</MS_Guide_DiagIntro>
+  <MS_Guide_NetworkFix>网络尚不可工作。请确认存储线连接完整，并且同一网络只有一个控制核心；网络重建期间请稍候。</MS_Guide_NetworkFix>
+  <MS_Guide_UnitFix>当前网络没有存储单元，请建造并接入至少一个。</MS_Guide_UnitFix>
+  <MS_Guide_FilterFix>核心未允许任何物品，请先设置存储筛选。</MS_Guide_FilterFix>
+  <MS_Guide_Priority>当前存储优先级：{0}</MS_Guide_Priority>
+  <MS_Guide_SampleHelp>检查接收器表面的一件实际物品。槽位已用满时仍可能合并堆叠，因此容量判断使用该物品的实际接收结果。</MS_Guide_SampleHelp>
+  <MS_Guide_NoSample>已连接的接收器表面没有可检查的物品。仅凭总槽位数量，无法判断某件物品能否入库。</MS_Guide_NoSample>
+  <MS_Guide_Sample>检查物品：{0} · {1}</MS_Guide_Sample>
+  <MS_Guide_Rejected>核心筛选不接受这件物品。</MS_Guide_Rejected>
+  <MS_Guide_NoCapacity>网络当前没有可用于接收这件物品的容量，容量可能已被其他搬运预留。</MS_Guide_NoCapacity>
+  <MS_Guide_Forbidden>这件物品处于禁止状态，接收器会跳过它。</MS_Guide_Forbidden>
+  <MS_Guide_Reserved>这件物品正被任务预留，接收器会等待预留解除。</MS_Guide_Reserved>
+  <MS_Guide_WaitRefresh>未发现上述阻塞条件。请恢复游戏运行，等待下一次接收器刷新。</MS_Guide_WaitRefresh>
+  <MS_Guide_LocateItem>定位这件物品</MS_Guide_LocateItem>
+  <MS_Guide_HaulingAdvice>搬运排查建议（未自动判定）：检查殖民者是否启用搬运工作、物品与接收器是否可达、允许区域是否覆盖，以及其他存储区的优先级。接收器过少时，搬运预留可能占用所有接收器。</MS_Guide_HaulingAdvice>
+  <MS_Guide_Reabsorb>手动取出的物品又被吸回去了？接收器会吸入其表面符合筛选的物品。建议不要紧贴控制核心放置接收器，给取出的物品留出空间。</MS_Guide_Reabsorb>
+  <MS_Guide_Nav0>1. 控制核心</MS_Guide_Nav0>
+  <MS_Guide_Nav1>2. 存储单元</MS_Guide_Nav1>
+  <MS_Guide_Nav2>3. 三个接收器</MS_Guide_Nav2>
+  <MS_Guide_Nav3>4. 接收规则</MS_Guide_Nav3>
+  <MS_Guide_Nav4>5. 存入物品</MS_Guide_Nav4>
+  <MS_Guide_Nav5>6. 取出物品</MS_Guide_Nav5>
+  <MS_Guide_Nav6>问题排查</MS_Guide_Nav6>
+  <MS_Guide_TargetNetwork>正在检查的网络</MS_Guide_TargetNetwork>
+  <MS_Guide_FilterReady>核心已允许至少一种物品</MS_Guide_FilterReady>
+  <MS_Guide_Learned>已完成此教学步骤</MS_Guide_Learned>
+  <MS_Guide_NotLearned>尚未完成此教学步骤</MS_Guide_NotLearned>
+  <MS_Guide_SampleSection>检查待入库物品</MS_Guide_SampleSection>
+  <MS_Guide_AdviceSection>其他排查建议</MS_Guide_AdviceSection>
+  <MS_Guide_Diagram0>接收器 × 3</MS_Guide_Diagram0>
+  <MS_Guide_Diagram1>控制核心</MS_Guide_Diagram1>
+  <MS_Guide_Diagram2>存储单元</MS_Guide_Diagram2>
+  <MS_Guide_Schematic>连接示意 · 用存储线接入同一网络</MS_Guide_Schematic>
+  <MS_Guide_ShowReceiversShort>定位接收器</MS_Guide_ShowReceiversShort>
+  <MS_Guide_OpenFilterShort>存储设置</MS_Guide_OpenFilterShort>
+  <MS_Guide_OpenInventoryShort>库存与取出</MS_Guide_OpenInventoryShort>
+  <MS_Guide_Advanced>进阶</MS_Guide_Advanced>
+  <MS_Guide_AdvancedTips>使用提示</MS_Guide_AdvancedTips>
+  <MS_Guide_AdvancedBuilt>当前地图已建造：{0} 个</MS_Guide_AdvancedBuilt>
+  <MS_Guide_AdvancedConnected>已接入所选核心的网络：{0} 个</MS_Guide_AdvancedConnected>
+  <MS_Guide_AdvancedLocate>定位与操作</MS_Guide_AdvancedLocate>
+  <MS_Guide_AdvancedTarget>{0} · {1} · {2}</MS_Guide_AdvancedTarget>
+  <MS_Guide_AdvancedSameNetwork>所选网络</MS_Guide_AdvancedSameNetwork>
+  <MS_Guide_AdvancedOtherNetwork>未接入所选网络</MS_Guide_AdvancedOtherNetwork>
+  <MS_Guide_AdvancedRepairCount>其中开启修理模式：{0} 个</MS_Guide_AdvancedRepairCount>
+  <MS_Guide_AdvancedFilterCount>其中使用筛选模式：{0} 个</MS_Guide_AdvancedFilterCount>
+  <MS_Guide_AdvancedColdCount>其中开启低温模式：{0} 个</MS_Guide_AdvancedColdCount>
+  <MS_Guide_AdvancedDirectCount>其中使用持续供给：{0} 个</MS_Guide_AdvancedDirectCount>
+  <MS_Guide_AdvancedUnlockMode>工作台解锁模式：{0}</MS_Guide_AdvancedUnlockMode>
+  <MS_Guide_Enabled>开启</MS_Guide_Enabled>
+  <MS_Guide_Disabled>关闭</MS_Guide_Disabled>
+  <MS_Guide_AdvancedStatusScope>网络已连接不代表可以开始培育；机械师和任务条件仍需在培育器上检查。</MS_Guide_AdvancedStatusScope>
+  <MS_Guide_AdvancedWorkbenchBody>直接使用魔法存储中的材料生产。</MS_Guide_AdvancedWorkbenchBody>
+  <MS_Guide_AdvancedWorkbenchTips>模组设置中的工作台解锁模式开启后，需要消耗建造材料解锁对应工作台的配方；解锁记录在当前存档中共享。</MS_Guide_AdvancedWorkbenchTips>
+  <MS_Guide_AdvancedGestatorBody>宇宙机械体培育器需要启用生物科技。将它接入存储网络，并在这台培育器自己的任务清单中添加机械体配方。\n\n机械师开始制造时，材料直接从网络送入培育器，无需殖民者搬运。每台培育器的任务独立管理，培育过程继续遵循机械体制造的相关条件。</MS_Guide_AdvancedGestatorBody>
+  <MS_Guide_AdvancedGestatorTips>网络接通后，还需检查任务、可用机械师及配方所需材料。请在培育器上查看具体任务状态。\n\n取消尚未完成的培育时，材料优先退回网络；无法退回的材料会放到交互位置附近。已经完成的机械体不会作为物品存回网络。</MS_Guide_AdvancedGestatorTips>
+  <MS_Guide_AdvancedShelfBody>自动补货架将网络物品摆到地图上，供殖民者领取食物、医药等日常物资，也可以代替营养膏机的料斗。连接网络后，在建筑按钮中设置物品及各格补货上限。\n\n指定模式按格选择物品；筛选模式让所有格子共用筛选条件。可设置品质、耐久、材质等条件，也可使用食物快捷筛选。</MS_Guide_AdvancedShelfBody>
+  <MS_Guide_AdvancedShelfTips>殖民者不会把物品搬入补货架。建议货架优先级不低于核心，避免物品反复被搬走。切换模式前须将架上物品退回网络，无法全部退回时不会切换。\n\n低温模式无需供电或网络连接：物品温度降低100°C，最低降至−10°C；原本更冷则保持原温度，高温环境下仍可能腐烂。\n\n筛选模式的“互不相同”会让空格避开架上已有的物品类型；已有重复库存不会自动移走。可复制、粘贴货架配置，并设置补货失败提醒。</MS_Guide_AdvancedShelfTips>
+  <MS_Guide_AdvancedConstructionBody>将建筑供给单元接入存储网络，并让工地处于供应范围内。它会定期把所需材料直接送到己方工地，殖民者仍负责实际施工。供应范围可在模组设置中调整。\n\n开启修理模式后，它还会自动修复范围内发生故障的建筑。每次修理持续3秒，消耗网络中的1个零部件。</MS_Guide_AdvancedConstructionBody>
+  <MS_Guide_AdvancedConstructionTips>选中建筑可查看供应范围。没有供料时，检查网络库存、工地所需材料与距离。\n\n修理模式针对建筑故障，不是恢复一般损伤的耐久度；已被殖民者预留的建筑会被跳过。可在建筑按钮中开关修理模式。</MS_Guide_AdvancedConstructionTips>
+  <MS_Guide_AdvancedApparelBody>将衣物适配器接入网络，并在网络中存放衣物。殖民者会按自己的衣物政策和正常换装规则，比较地图与网络中的衣物，通过适配器领取合适的衣物。\n\n每个适配器同一时间只能供一名殖民者使用，殖民者需要能够到达它。</MS_Guide_AdvancedApparelBody>
+  <MS_Guide_AdvancedApparelTips>连接网络不会强制殖民者换装。没有领取衣物时，先检查衣物政策是否允许、是否存在更合适的衣物，以及适配器是否可达或正被占用。\n\n适配器用于衣物领取；日常食物、医药等物资应通过自动补货架提供。</MS_Guide_AdvancedApparelTips>
+  <MS_Guide_AdvancedFuelBody>将燃料供给器接入网络，在其中备好目标建筑需要的燃料。供给器会为半径20格内的己方建筑自动补料，遵循目标的燃料筛选、自动补充开关与补料条件。\n\n自动补料并非少一点就立刻补满，而是在目标满足补料条件后执行；库存充足时补至目标量。</MS_Guide_AdvancedFuelBody>
+  <MS_Guide_AdvancedFuelTips>选中供给器可查看范围，也可点击“立即补充”。立即补充可以忽略燃料百分比阈值，但仍遵循自动补充开关等其他条件。\n\n没有供料时，检查距离、目标的燃料类型、自动补充开关，以及网络中是否有可用燃料。需要一次加足的设备，在燃料不足时不会部分填充。</MS_Guide_AdvancedFuelTips>
+  <MS_Guide_AdvancedTransportBody>物资补给器向正前方的运输容器或燃料设备供料，放置时注意朝向。\n\n手动暂存模式：通过物资转移界面把物品放入补给器，再由它送往目标。持续供给模式：最多选择三种物品，按从上到下的优先级直接从网络供给，自身不暂存。缺货或目标无法接收时会尝试下一项。\n\n运输容器和通用容器会按每种物品的目标库存上限补足差额，默认75个，0表示暂停；已超上限时不自动取回。立即供给也遵守此上限。燃料设备仍按自身目标燃料量补充，0同样暂停。</MS_Guide_AdvancedTransportBody>
+  <MS_Guide_AdvancedTransportTips>切换模式前必须清空补给器自身存货。可通过建筑按钮配置物品或立即供给。\n\n为空投仓装货前，先建立发射组，再选择装入物品。\n\n通用容器供给用于其他建筑公开的容器；多个容器时需选择目标。它提高兼容能力，但不保证目标模组能正确识别存入。运输容器和燃料设备优先使用专用规则。</MS_Guide_AdvancedTransportTips>
+  <MS_Guide_AdvancedCaravanBody>将远行队传送器接入存储网络，点击建筑上的组建远行队按钮，选择人员和网络物资。\n\n确认后，所选物资直接进入远行队成员的背包，人员立即在大地图上形成远行队。无需先把这些物资手动取出再等待普通装载。</MS_Guide_AdvancedCaravanBody>
+</LanguageData>

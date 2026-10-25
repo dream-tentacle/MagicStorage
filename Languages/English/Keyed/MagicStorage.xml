@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_ConstructionRepairMode>Repair mode</MS_ConstructionRepairMode>
   <MS_ConstructionRepairModeDesc>Automatically repairs broken-down buildings within the supply range. Each repair takes 3 seconds and consumes 1 component from the connected storage network. Buildings already reserved by colonists are skipped.</MS_ConstructionRepairModeDesc>
-  <MS_ConstructionSupplyUse>Automatically supplies construction materials within {0} cells. Colonists perform construction.</MS_ConstructionSupplyUse>
+  <MS_ConstructionSupplyUse>The current automatic supply radius is {0} cells and can be adjusted in the mod options. The unit supplies construction materials; colonists perform construction.</MS_ConstructionSupplyUse>
   <MS_NetworkStatus>Storage network: {0}</MS_NetworkStatus>
   <MS_Status_Rebuilding>rebuilding connections</MS_Status_Rebuilding>
   <MS_Status_NoCore>no control core connected</MS_Status_NoCore>

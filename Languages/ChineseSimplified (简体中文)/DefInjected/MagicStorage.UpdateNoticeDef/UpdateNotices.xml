@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_1_1.label>版本日志</MS_UpdateNotice_1_1_1.label>
+  <MS_UpdateNotice_1_1_1.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.0.heading>
+  <MS_UpdateNotice_1_1_1.sections.0.entries.0>修复卸载存储口后的报错</MS_UpdateNotice_1_1_1.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_1.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.1.heading>
+  <MS_UpdateNotice_1_1_1.sections.1.entries.0>与米莉拉帝国商船兼容</MS_UpdateNotice_1_1_1.sections.1.entries.0>
+  <MS_UpdateNotice_1_1_1.sections.1.entries.1>与 dd.Logical Floors 兼容优化</MS_UpdateNotice_1_1_1.sections.1.entries.1>
+  <MS_UpdateNotice_1_1_1.sections.2.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.2.heading>
+  <MS_UpdateNotice_1_1_1.sections.2.entries.0>研究完基础魔法存储后，弹出魔法存储交易须知</MS_UpdateNotice_1_1_1.sections.2.entries.0>
+  <MS_UpdateNotice_1_1_1.sections.2.entries.1>将魔法存储交易选项排在最前</MS_UpdateNotice_1_1_1.sections.2.entries.1>
+  <MS_UpdateNotice_1_1_1.sections.2.entries.2>新增教学提示</MS_UpdateNotice_1_1_1.sections.2.entries.2>
+  <MS_UpdateNotice_1_1_1.sections.3.heading>&lt;color=#FF6B6B&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.3.heading>
+  <MS_UpdateNotice_1_1_1.sections.3.entries.0>补货架筛选模式的配置页面可以开启互不相同选项</MS_UpdateNotice_1_1_1.sections.3.entries.0>
+  <MS_UpdateNotice_1_1_1.sections.3.entries.1>持续供给模式新增各物品的目标库存上限，避免向目标容器过量输送物资</MS_UpdateNotice_1_1_1.sections.3.entries.1>
   <MS_UpdateNotice_1_1_0.label>版本日志</MS_UpdateNotice_1_1_0.label>
   <MS_UpdateNotice_1_1_0.sections.0.heading>&lt;color=#FF6B6B&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_1_0.sections.0.heading>
   <MS_UpdateNotice_1_1_0.sections.0.entries.0>现在可以在核心或者mod选项中反馈意见和bug</MS_UpdateNotice_1_1_0.sections.0.entries.0>
@@ -21,15 +34,15 @@
   <MS_UpdateNotice_1_0_10.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.0.heading>
   <MS_UpdateNotice_1_0_10.sections.0.entries.0>修复交易的兼容性bug</MS_UpdateNotice_1_0_10.sections.0.entries.0>
   <MS_UpdateNotice_1_0_10.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.1.heading>
-  <MS_UpdateNotice_1_0_10.sections.1.entries.0>供货架新增一键食物功能</MS_UpdateNotice_1_0_10.sections.1.entries.0>
+  <MS_UpdateNotice_1_0_10.sections.1.entries.0>补货架新增一键食物功能</MS_UpdateNotice_1_0_10.sections.1.entries.0>
   <MS_UpdateNotice_1_0_10.sections.2.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_10.sections.2.heading>
   <MS_UpdateNotice_1_0_10.sections.2.entries.0>建筑供给单元兼容dd.Logical Floors</MS_UpdateNotice_1_0_10.sections.2.entries.0>
   <MS_UpdateNotice_1_0_9.label>版本日志</MS_UpdateNotice_1_0_9.label>
   <MS_UpdateNotice_1_0_9.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_9.sections.0.heading>
-  <MS_UpdateNotice_1_0_9.sections.0.entries.0>现在两种供货架都可以承担营养膏机的料斗的功能</MS_UpdateNotice_1_0_9.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_9.sections.0.entries.0>现在两种补货架都可以承担营养膏机的料斗的功能</MS_UpdateNotice_1_0_9.sections.0.entries.0>
   <MS_UpdateNotice_1_0_8.label>版本日志</MS_UpdateNotice_1_0_8.label>
   <MS_UpdateNotice_1_0_8.sections.0.heading>&lt;color=#FF6B6B&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.0.heading>
-  <MS_UpdateNotice_1_0_8.sections.0.entries.0>新增高堆叠供货架，容量10格</MS_UpdateNotice_1_0_8.sections.0.entries.0>
+  <MS_UpdateNotice_1_0_8.sections.0.entries.0>新增高堆叠补货架，容量10格</MS_UpdateNotice_1_0_8.sections.0.entries.0>
   <MS_UpdateNotice_1_0_8.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.1.heading>
   <MS_UpdateNotice_1_0_8.sections.1.entries.0>兼容渡鸦赠礼系统</MS_UpdateNotice_1_0_8.sections.1.entries.0>
   <MS_UpdateNotice_1_0_8.sections.1.entries.1>兼容墨诺灵的生产设施</MS_UpdateNotice_1_0_8.sections.1.entries.1>

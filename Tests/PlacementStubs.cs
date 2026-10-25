@@ -19,7 +19,7 @@ namespace Verse
             {
                 if (map.DropBudget < item.stackCount) return false;
                 foreach (Thing existing in map.Ground)
-                    if (existing.Spawned && existing.Position == position && existing.CanStackWith(item) &&
+                    if (existing.Spawned && existing.Position == position && MagicStorage.StorageFloorContext.SameFloor(existing, item) && existing.CanStackWith(item) &&
                         existing.def.stackLimit > existing.stackCount)
                     {
                         int merged = Math.Min(item.stackCount, existing.def.stackLimit - existing.stackCount);
@@ -28,7 +28,7 @@ namespace Verse
                         if (item.Destroyed) return true;
                     }
                 int capacity = (map.haulDestinationManager.SlotGroupParentAt(position) as MagicStorage.Building_StorageSupplyShelf)?.SlotCount ?? 3;
-                if (map.Ground.FindAll(t => t.Spawned && t.Position == position && t.def.category == ThingCategory.Item).Count >= capacity) return false;
+                if (map.Ground.FindAll(t => t.Spawned && t.Position == position && MagicStorage.StorageFloorContext.SameFloor(t, item) && t.def.category == ThingCategory.Item).Count >= capacity) return false;
             }
             int count = Math.Min(item.stackCount, map.DropBudget);
             if (count <= 0) return false;

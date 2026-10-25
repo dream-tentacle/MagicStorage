@@ -23,6 +23,8 @@ namespace MagicStorage
             internal readonly List<StorageShelfFilter> Filters;
             internal readonly StoragePriority Priority;
             internal readonly bool FilterMode;
+            internal readonly bool DistinctItems;
+            internal readonly bool LowTemperatureMode;
             internal readonly ThingFilter SharedFilter = new ThingFilter();
             internal readonly List<int> FilterLimits;
 
@@ -34,6 +36,8 @@ namespace MagicStorage
                 Filters = shelf.filters.Select(filter => filter.Clone()).ToList();
                 Priority = shelf.GetStoreSettings().Priority;
                 FilterMode = shelf.FilterMode;
+                DistinctItems = shelf.DistinctItems;
+                LowTemperatureMode = shelf.LowTemperatureMode;
                 SharedFilter.CopyAllowancesFrom(shelf.SharedFilter);
                 FilterLimits = new List<int>(shelf.filterLimits);
             }
@@ -51,6 +55,8 @@ namespace MagicStorage
             filters = copiedPreset.Filters.Select(filter => filter.Clone()).ToList();
             SharedFilter.CopyAllowancesFrom(copiedPreset.SharedFilter);
             filterLimits = new List<int>(copiedPreset.FilterLimits);
+            DistinctItems = copiedPreset.DistinctItems;
+            lowTemperatureMode = copiedPreset.LowTemperatureMode;
             EnsureSlotCapacity();
             GetStoreSettings().Priority = copiedPreset.Priority;
             ClearRestockFailures();
@@ -65,6 +71,8 @@ namespace MagicStorage
         private List<IntVec3> cells;
         private StorageSettings settings;
         private bool filterMode;
+        private bool distinctItems;
+        private bool lowTemperatureMode;
         private ThingFilter sharedFilter;
         private List<int> filterLimits = new List<int>();
         private List<Thing> slotStocks = new List<Thing>();
@@ -88,6 +96,8 @@ namespace MagicStorage
         }
 
         public bool FilterMode => filterMode;
+        public bool LowTemperatureMode => lowTemperatureMode;
+        public bool DistinctItems { get => distinctItems; set => distinctItems = value; }
         public ThingFilter SharedFilter => sharedFilter ?? (sharedFilter = new ThingFilter(RefreshSettings));
         public int FilterLimit(int slot) { EnsureSlotCapacity(); return Math.Max(0, filterLimits[slot]); }
         public void SetFilterLimit(int slot, int value)
@@ -100,7 +110,7 @@ namespace MagicStorage
         { EnsureSlotCapacity(); return IsShelfStock(slotStocks[slot]) ? slotStocks[slot] : null; }
         internal void SetStock(int slot, Thing item) { slotStocks[slot] = item; }
         private bool IsShelfStock(Thing item) => item != null && !item.Destroyed && item.Spawned &&
-            Spawned && item.Map == Map && item.Position == Position;
+            Spawned && item.Map == Map && item.Position == Position && StorageFloorContext.SameFloor(item, this);
         internal void ResolveStockSlots(List<Thing> items)
         {
             var assigned = new HashSet<Thing>();
@@ -203,8 +213,7 @@ namespace MagicStorage
         }
 
         // Accepts describes an existing stack's storage; HaulDestinationEnabled gates new hauling.
-        public bool Accepts(Thing item) => item != null && Spawned && item.Spawned &&
-            item.Map == Map && item.Position == Position && item.def.category == ThingCategory.Item;
+        public bool Accepts(Thing item) => IsShelfStock(item) && item.def.category == ThingCategory.Item;
 
         public StorageSettings GetStoreSettings()
         {
@@ -263,6 +272,8 @@ namespace MagicStorage
             Scribe_Collections.Look(ref restockLimits, "restockLimits", LookMode.Value);
             Scribe_Collections.Look(ref filters, "supplyFilters", LookMode.Deep);
             Scribe_Values.Look(ref filterMode, "filterMode", false);
+            Scribe_Values.Look(ref distinctItems, "distinctItems", false);
+            Scribe_Values.Look(ref lowTemperatureMode, "lowTemperatureMode", false);
             if (sharedFilter == null) sharedFilter = new ThingFilter(RefreshSettings);
             Scribe_Deep.Look(ref sharedFilter, "sharedSupplyFilter", (Action)RefreshSettings);
             Scribe_Collections.Look(ref filterLimits, "filterRestockLimits", LookMode.Value);
@@ -337,6 +348,14 @@ namespace MagicStorage
                 yield return paste;
                 yield return new Command_Toggle
                 {
+                    defaultLabel = "MS_Shelf_LowTemperatureMode".Translate(),
+                    defaultDesc = "MS_Shelf_LowTemperatureModeDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/TempLower"),
+                    isActive = () => lowTemperatureMode,
+                    toggleAction = () => lowTemperatureMode = !lowTemperatureMode
+                };
+                yield return new Command_Toggle
+                {
                     defaultLabel = "MS_Shelf_FilterMode".Translate(),
                     defaultDesc = "MS_Shelf_FilterModeDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/DesirePower"),
@@ -363,7 +382,7 @@ namespace MagicStorage
             }
         }
         public override string GetInspectString() =>
-            (base.GetInspectString() + "\n" + "MS_Shelf_Contents".Translate(slotGroup.HeldThingsCount, SlotCount) +
+            (base.GetInspectString() + "\n" + "MS_Shelf_Contents".Translate(Spawned ? slotGroup.HeldThingsCount : 0, SlotCount) +
              "\n" + "MS_Shelf_Use".Translate()).Trim();
     }
 }

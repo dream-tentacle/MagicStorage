@@ -292,6 +292,7 @@ namespace MagicStorage
                 else
                 {
                     var result = StorageWithdrawal.Execute(core, network, rows, forbid);
+                    if (result.Withdrawn > result.Pending) core.GetComp<CompStorageGuide>()?.Complete(5);
                     string message = "MS_UI_Result".Translate(result.Withdrawn - result.Pending, result.Pending, result.Requested - result.Withdrawn);
                     if (result.Withdrawn == result.Requested)
                     {

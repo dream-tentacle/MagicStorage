@@ -2,6 +2,41 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_1</defName>
+    <label>Version log</label>
+    <version>1.1.1</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed an error after uninstalling a storage receiver.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added compatibility with Milira Imperium trade ships.</li>
+          <li>Improved compatibility with dd.Logical Floors.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Completing basic magic storage research now sends a notice about trading with magic storage.</li>
+          <li>Magic storage trade options now appear at the top of the menu.</li>
+          <li>Added tutorial hints.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Content update&lt;/color&gt;</heading>
+        <entries>
+          <li>The restocking shelf's filter mode configuration page now includes a distinct item types option.</li>
+          <li>Continuous supply now supports per-item target inventory limits, preventing excessive transfers into the destination container.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_1_0</defName>
     <label>Version log</label>
     <version>1.1.0</version>

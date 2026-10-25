@@ -8,7 +8,9 @@ namespace Verse
     public interface IThingHolderTickable { bool ShouldTickContents { get; } }
     public class Gizmo
     {
+        public float Order { get; set; }
         public bool disabled;
+        public bool Disabled { get => disabled; set => disabled = value; }
         public bool alsoClickIfOtherInGroupClicked = true;
         public string disabledReason;
         public void Disable(string reason = null) { disabled = true; disabledReason = reason; }
@@ -35,6 +37,8 @@ namespace Verse
 }
 namespace MagicStorage
 {
+    public sealed class CompStorageGuide : Verse.ThingComp { internal void Complete(int step) { } }
+    public sealed class Dialog_StorageGuide { public Dialog_StorageGuide(Building_StorageCore core = null) { } }
     public class Dialog_CosmicCrafting { public Dialog_CosmicCrafting(Building_StorageCore core) { } }
     public class Dialog_StorageInventory { public Dialog_StorageInventory(Building_StorageCore core) { } }
 }

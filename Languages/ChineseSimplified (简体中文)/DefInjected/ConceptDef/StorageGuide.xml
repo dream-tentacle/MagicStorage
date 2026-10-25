@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_StorageGuide.label>魔法存储指南</MS_StorageGuide.label>
+  <MS_StorageGuide.helpText>选中存储控制核心，打开“存储指南”，可以检查该核心的网络配置，学习存入和取出物品，并排查物品无法入库的原因。建议接入至少三个存储接收器，避免搬运时接收器全部被占用。也可以从模组设置中打开指南。</MS_StorageGuide.helpText>
+</LanguageData>
