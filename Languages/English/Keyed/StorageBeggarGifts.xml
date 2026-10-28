@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Beggar_Give>Give {0}x {1} to {RECEIVER_nameDef} via magic storage</MS_Beggar_Give>
+  <MS_Beggar_Insufficient>Insufficient stock ({0} available, {1} required)</MS_Beggar_Insufficient>
+  <MS_Beggar_Unavailable>Cannot complete the gift through magic storage: the supplies or quest state have changed.</MS_Beggar_Unavailable>
+</LanguageData>

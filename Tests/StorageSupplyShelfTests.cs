@@ -60,7 +60,7 @@ internal static class StorageSupplyShelfTests
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
         StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
         StockSelectionCommands();
-        DuplicateSlots(); SharedFilterRestocking(); DistinctFilterRestocking(); ModeSwitchReturns(); SharedFilterPresets();
+        DuplicateSlots(); SharedFilterRestocking(); DistinctFilterRestocking(); ModeSwitchReturns(); ManualRecall(); SharedFilterPresets();
         ConfigurableSlotCounts(); DifferentSizePresets();
         return assertions;
     }
@@ -332,6 +332,37 @@ internal static class StorageSupplyShelfTests
         Equal(false, f.Shelf.TrySetFilterMode(true), "disconnected shelf with contents cannot switch");
         Equal(false, f.Shelf.FilterMode, "network failure retains original mode");
         Equal(0L, f.Pending(), "failed mode switches create no hidden recovery stock");
+    }
+
+    private static void ManualRecall()
+    {
+        var f = new Fixture();
+        f.Shelf.SetSelection(0, f.X); f.Shelf.SetSelection(1, f.Y);
+        f.Store(f.X, 25); f.Store(f.Y, 8); f.Tick();
+        Equal(2, f.Shelf.GetSlotGroup().HeldThingsCount, "manual recall starts with shelf stock");
+        Equal(true, StorageShelfSupply.TryReturnAll(f.Shelf), "manual recall returns every stack");
+        Equal(0, f.Shelf.GetSlotGroup().HeldThingsCount, "manual recall empties the whole shelf");
+        Equal(25L, f.Core.Network.GetTotalCount(f.X), "recalled stack returns to the network");
+        Equal(8L, f.Core.Network.GetTotalCount(f.Y), "each recalled type is conserved");
+        Equal(0L, f.Pending(), "manual recall leaves no hidden recovery stock");
+        f.Tick();
+        Equal(f.X, f.Shelf.SelectedDef(0), "manual recall keeps the slot selection");
+        Equal(2, f.Shelf.GetSlotGroup().HeldThingsCount, "manual recall leaves restocking active");
+
+        f = new Fixture(); f.Shelf.SetSelection(0, f.X); f.Store(f.X, 20); f.Tick();
+        f.Core.Settings.allow = false;
+        Equal(false, StorageShelfSupply.TryReturnAll(f.Shelf), "rejected recall reports failure");
+        Equal(1, f.Shelf.GetSlotGroup().HeldThingsCount, "rejected recall leaves stock on the shelf");
+        Equal(20, f.Shelf.StockAt(0).stackCount, "rejected recall preserves the whole stack");
+        Equal(0L, f.Pending(), "rejected recall creates no recovery stock");
+        f.Core.Settings.allow = true;
+        Thing reserved = f.Shelf.StockAt(0); f.Map.reservationManager.Reserved.Add(reserved);
+        Equal(false, StorageShelfSupply.TryReturnAll(f.Shelf), "reserved stock blocks recall");
+        Equal(true, reserved.Spawned, "reserved stock is not moved");
+        f.Map.reservationManager.Reserved.Clear();
+        Equal(true, StorageShelfSupply.TryReturnAll(f.Shelf), "recall succeeds once the stock is free");
+        Equal(0, f.Shelf.GetSlotGroup().HeldThingsCount, "successful recall empties the shelf");
+        Equal(20L, f.Core.Network.GetTotalCount(f.X), "late recall still conserves the stack");
     }
 
     private static void SharedFilterPresets()

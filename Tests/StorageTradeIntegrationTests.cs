@@ -20,8 +20,10 @@ internal static partial class StorageTradeIntegrationTests
         internal readonly Building_StorageCore Core = new Building_StorageCore();
         internal readonly Building_StorageUnit Unit = new Building_StorageUnit();
         internal readonly Pawn Negotiator = new Pawn(), Trader = new Pawn();
+        internal readonly ThingOwner SpawnedThings;
         internal Fixture()
         {
+            SpawnedThings = new ThingOwner<Thing>(Map);
             Find.WindowStack.Windows.Clear(); TradeDeal.RefuseExecution = TradeDeal.ThrowExecution = false;
             Map.component = new MapComponent_StorageNetworks(Map);
             Register(Core, 0); Register(Unit, 1);
@@ -46,6 +48,7 @@ internal static partial class StorageTradeIntegrationTests
             Register(shelf, 2);
             Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             var item = new Thing { def = def, stackCount = count, Spawned = true, Map = Map, Position = shelf.Position };
+            if (!SpawnedThings.TryAdd(item, false)) throw new InvalidOperationException("Could not register shelf stock in the map container.");
             Map.Ground.Add(item);
             return item;
         }
@@ -61,7 +64,7 @@ internal static partial class StorageTradeIntegrationTests
         {
             RuntimeHelpers.RunClassConstructor(typeof(StorageTradePatches).TypeHandle);
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver(); RefusalAndCancellation(); ChangedSources(); MultiCoreAndGifts(); Orbital();
-            ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading(); CustomOrbitalTrader();
+            ShelfSilverMapOwnership(); ShelfTrading(); ShelfEligibility(); OrbitalShelfTrading(); CustomOrbitalTrader();
             PublicApiValidation(); PublicApiScope(); PublicApiTopology(); PublicApiFailures();
             FailureDiagnostics(); ReservationDiagnostics();
             InventoryApiMap(); InventoryApiPortable(); InventoryApiRecovery(); InventoryApiPortableWindow();
@@ -77,6 +80,7 @@ internal static partial class StorageTradeIntegrationTests
             HoverCompatibility();
             checks += StorageLaunchPaymentTests.Run();
             checks += RavenGiftTests.Run();
+            RadioCompatibility();
             // The new scoped getter hook must leave all existing trade/payment paths intact.
             Dialog_TradePatches.Replace = false;
             OrdinaryAndScoped(); ReservedSale(); BuyWithCoreSilver();
@@ -642,6 +646,34 @@ internal static partial class StorageTradeIntegrationTests
         f.Close(dialog);
         var ordinary = new Dialog_Trade(f.Negotiator, ship);
         Equal(false, StorageTradeSession.TryGet(TradeSession.deal, out _), "ordinary orbital trade retains native scope");
+    }
+
+    private static void ShelfSilverMapOwnership()
+    {
+        int stackLimit = ThingDefOf.Silver.stackLimit;
+        ThingDefOf.Silver.stackLimit = 500;
+        try
+        {
+            foreach (bool mapOwned in new[] { true, false })
+            {
+                var f = new Fixture(); var product = new ThingDef();
+                var silver = f.ShelfStock(ThingDefOf.Silver, 500, out _);
+                if (!mapOwned) f.SpawnedThings.Remove(silver);
+                f.Trader.inventory.innerContainer.TryAdd(new Thing { def = product, stackCount = 30 });
+                var dialog = f.Open(); var deal = TradeSession.deal;
+                Equal(0L, f.Core.Network.GetTotalCount(ThingDefOf.Silver), "fixture has no network silver");
+                Equal(1, deal.AllTradeables.Count(line => line.IsCurrency), "shelf silver has one currency record");
+                Equal(500, deal.CurrencyTradeable.CountHeldBy(Transactor.Colony), "currency row counts all 500 shelf silver with either map ownership model");
+                Equal(true, deal.CurrencyTradeable.thingsColony.Contains(silver), "currency record references the real shelf stack");
+                deal.AllTradeables.Find(line => line.ThingDef == product).CountToTransfer = 25;
+                Equal(true, deal.TryExecute(out _), "purchase can be paid entirely from shelf silver");
+                Equal(475, silver.stackCount, "purchase deducts only its payment from shelf silver");
+                Equal(475, deal.CurrencyTradeable.CountHeldBy(Transactor.Colony), "refreshed currency row shows remaining shelf silver");
+                Equal(25, f.Trader.Goods.Where(item => item.def == ThingDefOf.Silver).Sum(item => item.stackCount), "merchant receives actual shelf silver");
+                f.Close(dialog);
+            }
+        }
+        finally { ThingDefOf.Silver.stackLimit = stackLimit; }
     }
 
     private static void ShelfTrading()

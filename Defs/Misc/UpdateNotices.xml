@@ -2,6 +2,137 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_7</defName>
+    <label>Version log</label>
+    <version>1.1.7</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>The Nivarian mass driver now requires basic magic storage instead of Nivarian mass driver logistics, so you can supply Nivarians through the Nivarian mass driver extractor.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_6</defName>
+    <label>Version log</label>
+    <version>1.1.6</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>The absorption range of storage receivers can now be changed. Placing stockpiles around them effectively improves how smoothly hauling runs.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Previously, vanilla workbenches could only recognize the quantity of manufactured resource items stored in Magic Storage. They can now recognize the quantity of manufactured items of every category stored in Magic Storage.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_5</defName>
+    <label>Version log</label>
+    <version>1.1.5</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Further improved material compatibility in the build menu. Force compatibility mode is now enabled by default and can be turned off in the mod settings.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Added a copy button to the recipe list.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_4</defName>
+    <label>Version log</label>
+    <version>1.1.4</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed compatibility with special crafting recipes from some mods.</li>
+          <li>Fixed corpses displaying incorrectly on restocking shelves.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Prevented items on restocking shelves from being picked up opportunistically while hauling.</li>
+          <li>You can now choose which room type a workbench counts as, such as a kitchen.</li>
+          <li>You can now use keyboard shortcuts to jump to a core or quickly activate buttons. See the settings to configure them.</li>
+          <li>Added practical tips to the tutorial.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_3</defName>
+    <label>Version log</label>
+    <version>1.1.3</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Further improved compatibility with the Nivarian cryo-forge.</li>
+          <li>Improved compatibility with Holy Washer.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>The cosmic workbench can now benefit from tool cabinets. If similar buildings from other mods cannot affect the cosmic workbench, support will not be considered, as this is due to shortcomings in those mods' implementation.</li>
+          <li>Improved the details shown when materials are insufficient.</li>
+          <li>Improved workbench page performance for a smoother experience.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;Balance adjustments&lt;/color&gt;</heading>
+        <entries>
+          <li>Workbenches are now affected by the room system.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed an issue where silver on restocking shelves was not correctly recognized during trade.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_1_2</defName>
+    <label>Version log</label>
+    <version>1.1.2</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>You can now restrict work types at individual workbenches, giving you more control over your kitchen layout.</li>
+          <li>Improved the placement destination button on the recipe page.</li>
+          <li>Added a compatibility setting that allows blueprints to be placed using all material types. Enable it only when a mod conflict prevents materials from being recognized.</li>
+          <li>Restocking shelf settings can now be saved locally.</li>
+          <li>Items in storage can now be given directly to beggars.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added support for dynamically generated sculpture recipes from the Ideology DLC.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_1_1</defName>
     <label>Version log</label>
     <version>1.1.1</version>
@@ -28,7 +159,7 @@
         </entries>
       </li>
       <li>
-        <heading>&lt;color=#FF6B6B&gt;Content update&lt;/color&gt;</heading>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
         <entries>
           <li>The restocking shelf's filter mode configuration page now includes a distinct item types option.</li>
           <li>Continuous supply now supports per-item target inventory limits, preventing excessive transfers into the destination container.</li>
@@ -42,7 +173,7 @@
     <version>1.1.0</version>
     <sections>
       <li>
-        <heading>&lt;color=#FF6B6B&gt;New content&lt;/color&gt;</heading>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
         <entries>
           <li>You can now submit suggestions and bug reports from the storage core or the mod settings.</li>
         </entries>
@@ -145,7 +276,7 @@
     <version>1.0.8</version>
     <sections>
       <li>
-        <heading>&lt;color=#FF6B6B&gt;New content&lt;/color&gt;</heading>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
         <entries>
           <li>Added the high-stack restocking shelf with 10 storage slots.</li>
         </entries>

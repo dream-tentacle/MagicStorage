@@ -45,6 +45,8 @@ namespace MagicStorage
         public bool AllowPrinterParameterChanges;
         public bool CaravanItemFilters;
         public bool TradeItemFilters;
+        public bool AllowAllMaterials;
+        public bool ForceCompatBuildMaterials = true;
         public bool TidySupplyShelf = true;
         private int overallRefreshSeconds = DefaultRefreshSeconds;
         private List<int> refreshSeconds = CreateRefreshDefaults();
@@ -85,6 +87,8 @@ namespace MagicStorage
             AllowPrinterParameterChanges = false;
             CaravanItemFilters = false;
             TradeItemFilters = false;
+            AllowAllMaterials = false;
+            ForceCompatBuildMaterials = true;
             TidySupplyShelf = true;
             SimplifiedMode = true;
             OverallRefreshSeconds = DefaultRefreshSeconds;
@@ -119,6 +123,8 @@ namespace MagicStorage
             Scribe_Values.Look(ref AllowPrinterParameterChanges, "allowPrinterParameterChanges", false);
             Scribe_Values.Look(ref CaravanItemFilters, "caravanItemFilters", false);
             Scribe_Values.Look(ref TradeItemFilters, "tradeItemFilters", false);
+            Scribe_Values.Look(ref AllowAllMaterials, "allowAllMaterials", false);
+            Scribe_Values.Look(ref ForceCompatBuildMaterials, "forceCompatBuildMaterials", true);
             Scribe_Values.Look(ref TidySupplyShelf, "tidySupplyShelf", true);
             Scribe_Values.Look(ref overallRefreshSeconds, "overallRefreshSeconds", DefaultRefreshSeconds);
             Scribe_Values.Look(ref craftingMaterialRecheckSeconds, "craftingMaterialRecheckSeconds", DefaultCraftingMaterialRecheckSeconds);

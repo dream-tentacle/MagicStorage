@@ -10,6 +10,10 @@ namespace MagicStorage
     public sealed partial class Dialog_StorageGuide : Window
     {
         private static int selectedPage;
+        private static int PracticalShelfPage => 7 + AdvancedPages.Length;
+        private static readonly string[] PracticalPageKeys = { "Shelf", "Hotkeys", "Turret", "Grouping", "FindRecipes", "ModTrade" };
+        private static bool IsPracticalPage => selectedPage >= PracticalShelfPage && selectedPage < PracticalShelfPage + PracticalPageKeys.Length;
+        private static string PracticalTextKey(string suffix) => "MS_Guide_Practical" + PracticalPageKeys[selectedPage - PracticalShelfPage] + suffix;
         private static readonly Color Caption = new Color(.67f, .70f, .73f);
         private static readonly Color Accent = new Color(.95f, .80f, .35f);
         private static readonly Color LineColor = new Color(.32f, .42f, .48f);
@@ -113,7 +117,7 @@ namespace MagicStorage
         public override void DoWindowContents(Rect rect)
         {
             if (Time.realtimeSinceStartup >= nextRefresh || Map != snapshotMap || (core != null && !ValidCore)) Refresh();
-            if (selectedPage >= 7 && SelectedAdvanced == null) selectedPage = 0;
+            if (selectedPage >= 7 && SelectedAdvanced == null && !IsPracticalPage) selectedPage = 0;
             var font = Text.Font;
             var anchor = Text.Anchor;
             bool wrap = Text.WordWrap;
@@ -139,7 +143,7 @@ namespace MagicStorage
             Label(new Rect(rect.x + 10, rect.y, rect.width - 20, 24), "MS_Guide_Basics".Translate(), Caption);
             Rect viewport = new Rect(rect.x, rect.y + 32, rect.width, Math.Max(1, rect.height - 120));
             int advancedCount = AdvancedPages.Count(p => p.Def != null);
-            float navHeight = 6 * 46 + 38 + advancedCount * 46 + 60;
+            float navHeight = 6 * 46 + 38 + advancedCount * 46 + 38 + PracticalPageKeys.Length * 46 + 60;
             Rect view = new Rect(0, 0, rect.width - 16, Math.Max(navHeight, viewport.height));
             Widgets.BeginScrollView(viewport, ref navScroll, view);
             float rowY = 0;
@@ -155,6 +159,14 @@ namespace MagicStorage
                 var page = AdvancedPages[i];
                 if (page.Def == null) continue;
                 DrawNavRow(new Rect(0, rowY, view.width, 42), i + 7, page.Def.LabelCap, page.Def);
+                rowY += 46;
+            }
+            Label(new Rect(10, rowY + 8, view.width - 20, 24), "MS_Guide_Practical".Translate(), Caption);
+            rowY += 38;
+            for (int i = 0; i < PracticalPageKeys.Length; i++)
+            {
+                string key = "MS_Guide_Practical" + PracticalPageKeys[i] + (i == 0 ? "Nav" : "Title");
+                DrawNavRow(new Rect(0, rowY, view.width, 42), PracticalShelfPage + i, key.Translate());
                 rowY += 46;
             }
             DrawNavRow(new Rect(0, rowY + 16, view.width, 42), 6, "MS_Guide_Nav6".Translate());
@@ -175,26 +187,35 @@ namespace MagicStorage
             Widgets.DrawMenuSection(rect);
             Rect inner = rect.ContractedBy(16);
             Text.Font = GameFont.Medium;
-            string title = SelectedAdvanced != null ? SelectedAdvanced.Def.LabelCap.ToString() : selectedPage == 6 ? "MS_Guide_Diagnosis".Translate().ToString() : ("MS_Guide_Step" + selectedPage).Translate().ToString();
+            string title = IsPracticalPage ? PracticalTextKey("Title").Translate().ToString() :
+                SelectedAdvanced != null ? SelectedAdvanced.Def.LabelCap.ToString() : selectedPage == 6 ? "MS_Guide_Diagnosis".Translate().ToString() : ("MS_Guide_Step" + selectedPage).Translate().ToString();
             float titleHeight = Math.Max(36, Text.CalcHeight(title, inner.width));
             Widgets.Label(new Rect(inner.x, inner.y, inner.width, titleHeight), title);
             Text.Font = GameFont.Small;
             float y = inner.y + titleHeight + 8;
-            if (selectedPage != 6)
+            if (selectedPage != 6 && !IsPracticalPage)
             {
                 float artHeight = Math.Min(184, Math.Max(0, (inner.height - titleHeight - 190) * .72f));
                 if (artHeight >= 140) { DrawDiagram(new Rect(inner.x, y, inner.width, artHeight)); y += artHeight + 14; }
             }
             Rect footer = new Rect(inner.x, inner.yMax - 36, inner.width, 36);
-            Rect viewport = new Rect(inner.x, y, inner.width, Math.Max(1, footer.y - y - 16));
+            float contentBottom = IsPracticalPage ? inner.yMax : footer.y - 16;
+            Rect viewport = new Rect(inner.x, y, inner.width, Math.Max(1, contentBottom - y));
             Rect view = new Rect(0, 0, viewport.width - 18, Math.Max(bodyHeight, viewport.height));
             Widgets.BeginScrollView(viewport, ref scroll, view);
             float cursor = 0;
-            if (selectedPage == 6) DrawDiagnosis(view.width, ref cursor);
+            if (IsPracticalPage)
+            {
+                Paragraph(view.width, ref cursor, PracticalTextKey("Body").Translate());
+                if (selectedPage == PracticalShelfPage)
+                    Paragraph(view.width, ref cursor, "MS_Guide_PracticalShelfNote".Translate(), Caption);
+            }
+            else if (selectedPage == 6) DrawDiagnosis(view.width, ref cursor);
             else if (SelectedAdvanced != null) DrawAdvanced(view.width, ref cursor);
             else DrawChapter(view.width, ref cursor);
             bodyHeight = cursor + 6;
             Widgets.EndScrollView();
+            if (IsPracticalPage) return;
             Widgets.DrawBoxSolid(new Rect(inner.x, footer.y - 9, inner.width, 1), LineColor);
             DrawActions(footer);
         }

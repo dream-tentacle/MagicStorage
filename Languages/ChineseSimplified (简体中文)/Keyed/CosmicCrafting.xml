@@ -22,6 +22,15 @@
   <MS_Craft_Title>宇宙工作台 — 制作清单</MS_Craft_Title>
   <MS_Craft_Open>制作清单</MS_Craft_Open>
   <MS_Craft_OpenDesc>管理相连宇宙工作台的制作任务、材料与工作者条件。</MS_Craft_OpenDesc>
+  <MS_Craft_LoadFailure_Title>魔法存储</MS_Craft_LoadFailure_Title>
+  <MS_Craft_LoadFailure_Text>{0}个工作清单加载失败，可能是其他模组被删除或模组更新了配方内容导致。</MS_Craft_LoadFailure_Text>
+  <MS_Craft_LoadFailure_Confirm>确认</MS_Craft_LoadFailure_Confirm>
+  <MS_Craft_AllowedWorkTypes>允许的工作类型</MS_Craft_AllowedWorkTypes>
+  <MS_Craft_AllowedWorkTypesDesc>选择这台宇宙工作台允许执行的工作类型。</MS_Craft_AllowedWorkTypesDesc>
+  <MS_Craft_AllowedWorkTypesHint>仅允许执行已勾选类型的工作。全部取消后，这台工作台将不接收制作任务。</MS_Craft_AllowedWorkTypesHint>
+  <MS_Craft_PreferredRoomRole>房间用途：{0}</MS_Craft_PreferredRoomRole>
+  <MS_Craft_PreferredRoomRoleHint>选择这台工作台的房间用途，影响房间类型判定和房间不匹配时的工作速度。房间内的其他家具也会影响最终类型。</MS_Craft_PreferredRoomRoleHint>
+  <MS_Craft_WorkTypeNotAllowed>这台工作台未允许此工作类型</MS_Craft_WorkTypeNotAllowed>
   <MS_Craft_Add>添加制作任务</MS_Craft_Add>
   <MS_Craft_Orders>已添加的制作任务</MS_Craft_Orders>
   <MS_Craft_DragToSort>左/右键拖拽以排序</MS_Craft_DragToSort>
@@ -66,7 +75,16 @@
   <MS_Craft_Locked>尚未解锁</MS_Craft_Locked>
   <MS_Craft_Satisfied>次数已用完、达到目标或等待恢复</MS_Craft_Satisfied>
   <MS_Craft_Assigned>执行中：{0}</MS_Craft_Assigned>
-  <MS_Craft_MissingMaterials>材料不足或已被预留</MS_Craft_MissingMaterials>
+  <MS_Craft_MissingMaterials>材料不足，悬停查看详情</MS_Craft_MissingMaterials>
+  <MS_Craft_MaterialShortage>材料不足</MS_Craft_MaterialShortage>
+  <MS_Craft_MaterialCount>{0}：可用 {1}／需要 {2}</MS_Craft_MaterialCount>
+  <MS_Craft_MaterialAvailable>{0}：可用 {1}</MS_Craft_MaterialAvailable>
+  <MS_Craft_MaterialReserved>（已预留 {0}）</MS_Craft_MaterialReserved>
+  <MS_Craft_MaterialProgress>{0}：合计满足 {1}</MS_Craft_MaterialProgress>
+  <MS_Craft_MaterialAbsent>无可用库存；需求：{0}</MS_Craft_MaterialAbsent>
+  <MS_Craft_MaterialWholeStackUnit> 整堆</MS_Craft_MaterialWholeStackUnit>
+  <MS_Craft_MaterialLastCheck>以上为上次材料检查的结果。</MS_Craft_MaterialLastCheck>
+  <MS_Craft_MaterialRecheck>游戏每过 {0} 秒检查一次</MS_Craft_MaterialRecheck>
   <MS_Craft_NoWorker>没有符合条件且启用对应工作的工作者</MS_Craft_NoWorker>
   <MS_Craft_NoBench>没有可到达且未被占用的工作台</MS_Craft_NoBench>
   <MS_Craft_NoOrdersForWorkType>此人没有可工作的配方</MS_Craft_NoOrdersForWorkType>
@@ -75,6 +93,7 @@
   <MS_Craft_Resume>恢复</MS_Craft_Resume>
   <MS_Craft_Pause>暂停</MS_Craft_Pause>
   <MS_Craft_Delete>删除</MS_Craft_Delete>
+  <MS_Craft_Duplicate>复制此制作任务，包含数量、重复模式、材料筛选、产物去向与工作者条件，副本排在原任务之后。</MS_Craft_Duplicate>
   <MS_Craft_Mode_TargetCount>维持 X 个</MS_Craft_Mode_TargetCount>
   <MS_Craft_WorkTypes>工作类型：{0}</MS_Craft_WorkTypes>
   <MS_Craft_RepeatCount>剩余次数</MS_Craft_RepeatCount>

@@ -61,6 +61,7 @@ namespace MagicStorage
         CraftingOrder ICraftingExecutor.Order => Order;
         bool ICraftingExecutor.AssignmentActive => !ended && pawn?.jobs?.curDriver == this && pawn.CurJob == job;
         bool ICraftingExecutor.Allows(CraftingOrder order) => job.workGiverDef != null &&
+            Bench?.AllowsWorkType(job.workGiverDef.workType) == true &&
             CraftingServices.Workers.Allows(order, pawn, job.workGiverDef.workType);
         bool ICraftingExecutor.CanContinue() => CanContinue();
         void ICraftingExecutor.CancelAssignment()
@@ -70,7 +71,7 @@ namespace MagicStorage
             CraftingServices.Production.WorkSpeed(recipe, pawn, Bench) * MagicStorageMod.Settings.CosmicWorkbenchWorkSpeedFactor;
         void ICraftingExecutor.Learn(RecipeDef recipe, int ticks) => CraftingServices.Production.Learn(recipe, pawn, ticks);
         IEnumerable<Thing> ICraftingExecutor.MakeProducts(RecipeDef recipe, List<Thing> ingredients, Thing dominant) =>
-            CraftingServices.Production.MakeProducts(recipe, pawn, ingredients, dominant);
+            CraftingServices.Production.MakeProducts(recipe, pawn, ingredients, dominant, Order.Precept, Bench);
         void ICraftingExecutor.NotifyCompleted(List<Thing> products) => CraftingServices.Production.NotifyCompleted(pawn, products);
 
         public override bool? IsSameJobAs(Job other) => other != null && job.def == other.def &&
@@ -84,7 +85,8 @@ namespace MagicStorage
             if (recipe == null) return base.GetReport();
             var product = recipe.specialProducts == null && recipe.products?.Count == 1
                 ? recipe.products[0].thingDef : null;
-            return "MS_Craft_WorkReport".Translate(product?.label ?? CraftingRecipeCatalog.Label(recipe));
+            return "MS_Craft_WorkReport".Translate(Order.Precept != null
+                ? CraftingRecipeCatalog.Label(recipe, Order.Precept) : product?.label ?? CraftingRecipeCatalog.Label(recipe));
         }
 
         private void RegisterFinish()
@@ -94,7 +96,7 @@ namespace MagicStorage
             RegisterFinish();
             if (Core == null || job.workGiverDef == null) return false;
             pawn.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
-            if (!MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network)) return false;
+            if (!MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network, job.workGiverDef.workType)) return false;
             if (!pawn.Reserve(Bench, job, 1, -1, null, errorOnFailed) ||
                 !pawn.ReserveSittableOrSpot(Bench.InteractionCell, job, errorOnFailed)) return false;
             // Ordered jobs first run this on Job.GetCachedDriver, then StartJob
@@ -109,7 +111,7 @@ namespace MagicStorage
             if (claimedOrder != null && claimedOrder.Batch != null && dispatcher?.IsAssigned(claimedOrder, this) == true)
                 return claimedOrder.Batch.Valid(claimedOrder);
             if (pawn.Map == null || Core == null || job.workGiverDef == null ||
-                !MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network)) return false;
+                !MapComponent_CosmicCrafting.CanUseBench(pawn, Bench, Core.Network, job.workGiverDef.workType)) return false;
             dispatcher = pawn.Map.GetComponent<MapComponent_CosmicCrafting>();
             if (!dispatcher.TryClaim(this)) return false;
             claimedOrder = Order; revision = claimedOrder.Revision;
@@ -131,7 +133,8 @@ namespace MagicStorage
             if (Core == null || !Core.Spawned || Bench == null || !Bench.Spawned || Order == null ||
                 Bench.IsForbidden(pawn) || Bench.IsBurning() || Bench.Network != Core.Network ||
                 Bench.Faction != pawn.Faction || Core.Faction != pawn.Faction ||
-                Bench.InteractionCell.IsForbidden(pawn) || job.workGiverDef == null || !Core.CanWork) return false;
+                Bench.InteractionCell.IsForbidden(pawn) || job.workGiverDef == null || !Core.CanWork ||
+                !Bench.AllowsWorkType(job.workGiverDef.workType)) return false;
             if (!EnsureAssignment() || Order != claimedOrder || claimedOrder.Revision != revision) return false;
             if (!policyTimer.IsDue(StorageRefreshTask.CraftingPolicy, Find.TickManager.TicksGame)) return policyAllowed;
             policyAllowed = dispatcher.CanRun(Core, claimedOrder) &&

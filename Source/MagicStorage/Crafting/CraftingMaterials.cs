@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using RimWorld;
 using Verse;
@@ -8,11 +9,13 @@ namespace MagicStorage
 {
     internal interface ICraftingMaterialPolicy
     {
-        bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations);
+        bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations,
+            List<string> missing = null);
     }
     internal sealed class NetworkCraftingMaterialPolicy : ICraftingMaterialPolicy
     {
-        public bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations)
+        public bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations,
+            List<string> missing = null)
         {
             allocations = null;
             if (network == null || !network.CanWork) return false;
@@ -39,10 +42,14 @@ namespace MagicStorage
             // the network alone can satisfy this batch. Keep network stacks first.
             things.Clear();
             StorageMaterialSources.GetShelfStacks(network, d => bill.IsFixedOrAllowedIngredient(d) &&
-                recipe.ingredients.Any(i => i.filter.Allows(d)), things);
+                recipe.ingredients.Any(i => i.filter.Allows(d)), things, includeReserved: missing != null);
             stocks.AddRange(Stocks(network, order, bill, things));
-            return CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
-                recipe.ignoreIngredientCountTakeEntireStacks, out allocations);
+            stocks = stocks.OrderBy(s => s.Count > 0 ? 0 : 1).ToList();
+            var shortages = missing == null ? null : new List<CraftingMaterialShortage>();
+            bool complete = CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
+                recipe.ignoreIngredientCountTakeEntireStacks, out allocations, shortages);
+            if (!complete && missing != null) DescribeShortages(recipe, bill, shortages, missing);
+            return complete;
         }
 
         private static List<CraftingMaterialStock<Thing>> Stocks(StorageNetwork network, CraftingOrder order,
@@ -50,14 +57,65 @@ namespace MagicStorage
         {
             var recipe = order.Recipe;
             return things.Where(t => Allows(order, bill, t))
-                .Select(t => new CraftingMaterialStock<Thing> { Item = t, Kind = t.def,
-                    Count = Available(network, t), Value = recipe.IngredientValueGetter.ValuePerUnitOf(t.def) })
-                .Where(s => s.Count > 0 && (recipe.allowMixingIngredients ||
-                    !recipe.ignoreIngredientCountTakeEntireStacks || s.Count == s.Item.stackCount))
-                .OrderBy(s => recipe.allowMixingIngredients ? s.Value : 0d)
+                .Select(t =>
+                {
+                    int count = Available(network, t);
+                    return new CraftingMaterialStock<Thing> { Item = t, Kind = t.def,
+                        Count = !recipe.allowMixingIngredients && recipe.ignoreIngredientCountTakeEntireStacks &&
+                            count != t.stackCount ? 0 : count,
+                        Reserved = Math.Max(0, t.stackCount - count),
+                        Value = recipe.IngredientValueGetter.ValuePerUnitOf(t.def) };
+                })
+                // Keep unavailable stacks last so their kinds cannot change the
+                // original encounter order used when choosing a material.
+                .OrderBy(s => s.Count > 0 ? 0 : 1)
+                .ThenBy(s => recipe.allowMixingIngredients ? s.Value : 0d)
                 .ThenBy(s => s.Item.PositionHeld.DistanceToSquared(network.Core.Position))
                 .ThenBy(s => s.Item.thingIDNumber).ToList();
         }
+
+        private static void DescribeShortages(RecipeDef recipe, Bill_Production bill,
+            List<CraftingMaterialShortage> shortages, List<string> missing)
+        {
+            bool wholeStacks = !recipe.allowMixingIngredients && recipe.ignoreIngredientCountTakeEntireStacks;
+            foreach (var shortage in shortages)
+            {
+                var ingredient = recipe.ingredients[shortage.NeedIndex];
+                string label = ingredient.filter.Summary.CapitalizeFirst();
+                var alternatives = shortage.Alternatives;
+                bool mixed = recipe.allowMixingIngredients && !ingredient.IsFixedIngredient;
+                if (mixed)
+                    missing.Add("MS_Craft_MaterialProgress".Translate(label,
+                        // Do not round an incomplete requirement up to 100%.
+                        (Math.Floor(shortage.Available / shortage.Required * 1000) / 1000)
+                            .ToString("P1", CultureInfo.CurrentCulture)));
+                else if (!ingredient.IsFixedIngredient && alternatives.Count > 0)
+                    missing.Add(label + ":");
+
+                if (alternatives.Count == 0)
+                {
+                    if (ingredient.IsFixedIngredient)
+                        missing.Add("MS_Craft_MaterialCount".Translate(label, "0",
+                            Number(wholeStacks ? 1 : ingredient.CountRequiredOfFor(ingredient.FixedIngredient, recipe, bill))) +
+                            (wholeStacks ? "MS_Craft_MaterialWholeStackUnit".Translate().ToString() : ""));
+                    else
+                        missing.Add("MS_Craft_MaterialAbsent".Translate(ingredient.SummaryFor(recipe)));
+                    continue;
+                }
+                foreach (var alternative in alternatives)
+                {
+                    string material = ((ThingDef)alternative.Kind).label.CapitalizeFirst();
+                    string line = mixed ? "MS_Craft_MaterialAvailable".Translate(material, Number(alternative.Available)).ToString()
+                        : "MS_Craft_MaterialCount".Translate(material, Number(alternative.Available), Number(alternative.Required)).ToString();
+                    if (wholeStacks) line += "MS_Craft_MaterialWholeStackUnit".Translate();
+                    if (alternative.Reserved > 0)
+                        line += "MS_Craft_MaterialReserved".Translate(Number(alternative.Reserved));
+                    missing.Add((ingredient.IsFixedIngredient ? "" : "  • ") + line);
+                }
+            }
+        }
+
+        private static string Number(double value) => value.ToString("0.##", CultureInfo.CurrentCulture);
 
         internal static bool Allows(CraftingOrder order, Bill_Production bill, Thing t) =>
             t != null && !t.Destroyed && bill.IsFixedOrAllowedIngredient(t) &&

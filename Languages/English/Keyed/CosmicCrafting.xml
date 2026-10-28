@@ -22,6 +22,15 @@
   <MS_Craft_Title>Cosmic workbench — production orders</MS_Craft_Title>
   <MS_Craft_Open>Production orders</MS_Craft_Open>
   <MS_Craft_OpenDesc>Manage recipes, ingredients and workers for connected cosmic workbenches.</MS_Craft_OpenDesc>
+  <MS_Craft_LoadFailure_Title>Magic Storage</MS_Craft_LoadFailure_Title>
+  <MS_Craft_LoadFailure_Text>{0} production order(s) failed to load. Another mod may have been removed, or a mod update changed its recipes.</MS_Craft_LoadFailure_Text>
+  <MS_Craft_LoadFailure_Confirm>Confirm</MS_Craft_LoadFailure_Confirm>
+  <MS_Craft_AllowedWorkTypes>Allowed work types</MS_Craft_AllowedWorkTypes>
+  <MS_Craft_AllowedWorkTypesDesc>Choose which work types this cosmic workbench can perform.</MS_Craft_AllowedWorkTypesDesc>
+  <MS_Craft_AllowedWorkTypesHint>Only checked work types are allowed. Uncheck every type to stop this workbench from accepting production jobs.</MS_Craft_AllowedWorkTypesHint>
+  <MS_Craft_PreferredRoomRole>Room purpose: {0}</MS_Craft_PreferredRoomRole>
+  <MS_Craft_PreferredRoomRoleHint>Choose the room purpose of this workbench. This affects room classification and the work speed penalty for an unsuitable room. Other furniture also affects the final room type.</MS_Craft_PreferredRoomRoleHint>
+  <MS_Craft_WorkTypeNotAllowed>This workbench does not allow this work type</MS_Craft_WorkTypeNotAllowed>
   <MS_Craft_Add>Add production order</MS_Craft_Add>
   <MS_Craft_Orders>Production orders</MS_Craft_Orders>
   <MS_Craft_DragToSort>Left/right-drag to reorder</MS_Craft_DragToSort>
@@ -66,7 +75,16 @@
   <MS_Craft_Locked>Not unlocked</MS_Craft_Locked>
   <MS_Craft_Satisfied>No repeats remaining, target met or waiting to resume</MS_Craft_Satisfied>
   <MS_Craft_Assigned>Assigned to {0}</MS_Craft_Assigned>
-  <MS_Craft_MissingMaterials>Ingredients unavailable or reserved</MS_Craft_MissingMaterials>
+  <MS_Craft_MissingMaterials>Missing materials; hover for details</MS_Craft_MissingMaterials>
+  <MS_Craft_MaterialShortage>Missing materials</MS_Craft_MaterialShortage>
+  <MS_Craft_MaterialCount>{0}: available {1} / required {2}</MS_Craft_MaterialCount>
+  <MS_Craft_MaterialAvailable>{0}: available {1}</MS_Craft_MaterialAvailable>
+  <MS_Craft_MaterialReserved> ({0} reserved)</MS_Craft_MaterialReserved>
+  <MS_Craft_MaterialProgress>{0}: {1} of requirement met in total</MS_Craft_MaterialProgress>
+  <MS_Craft_MaterialAbsent>No available stock; required: {0}</MS_Craft_MaterialAbsent>
+  <MS_Craft_MaterialWholeStackUnit> whole stacks</MS_Craft_MaterialWholeStackUnit>
+  <MS_Craft_MaterialLastCheck>Results from the last material check.</MS_Craft_MaterialLastCheck>
+  <MS_Craft_MaterialRecheck>Materials are checked every {0} seconds of game time.</MS_Craft_MaterialRecheck>
   <MS_Craft_NoWorker>No eligible worker with the work type enabled</MS_Craft_NoWorker>
   <MS_Craft_NoBench>No reachable, available workbench</MS_Craft_NoBench>
   <MS_Craft_NoOrdersForWorkType>This pawn has no eligible recipes</MS_Craft_NoOrdersForWorkType>
@@ -75,6 +93,7 @@
   <MS_Craft_Resume>Resume</MS_Craft_Resume>
   <MS_Craft_Pause>Suspend</MS_Craft_Pause>
   <MS_Craft_Delete>Delete</MS_Craft_Delete>
+  <MS_Craft_Duplicate>Duplicate this order, including counts, repeat mode, ingredient filter, product delivery and worker conditions. The copy is placed directly after it.</MS_Craft_Duplicate>
   <MS_Craft_Mode_TargetCount>Do until X</MS_Craft_Mode_TargetCount>
   <MS_Craft_WorkTypes>Work types: {0}</MS_Craft_WorkTypes>
   <MS_Craft_RepeatCount>Remaining repeats</MS_Craft_RepeatCount>

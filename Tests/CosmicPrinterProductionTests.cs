@@ -36,6 +36,10 @@ internal static class CosmicPrinterProductionTests
             Check(products.Count == 3 && products.All(p => p is MinifiedThing), "furniture yield creates distinct minified products");
             Check(products.Cast<MinifiedThing>().All(p => p.InnerThing.stackCount == 1), "minification cannot discard efficiency output");
             Check(products.Cast<MinifiedThing>().All(p => p.InnerThing.StyleDef == Faction.OfPlayer.ideos.PrimaryIdeo.Style), "player style applies before minification");
+            var precept = new Precept_ThingStyle();
+            products = PrinterCraftingProduction.MakeProducts(printer, recipe, input, material, precept).ToList();
+            Check(products.Cast<MinifiedThing>().All(p => p.InnerThing.StyleSourcePrecept == precept),
+                "cultural precept is bound to the inner product before minification");
 
             recipe.products.Clear(); recipe.autoStripCorpses = true;
             recipe.specialProducts = new List<SpecialProductType> { SpecialProductType.Butchery };

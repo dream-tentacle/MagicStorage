@@ -68,7 +68,7 @@ namespace MagicStorage
             return result;
         }
 
-        private static string CollectSteamId()
+        internal static string CollectSteamId()
         {
             try
             {

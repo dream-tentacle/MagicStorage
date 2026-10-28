@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Guide_Title>Storage guide</MS_Guide_Title>
+  <MS_Guide_FirstCoreTitle>Required tutorial reminder</MS_Guide_FirstCoreTitle>
+  <MS_Guide_FirstCoreText>Please complete the basic and advanced sections of the tutorial at the core. These sections are mandatory.</MS_Guide_FirstCoreText>
   <MS_Guide_Description>Learn to store and withdraw items, check this network, and find out why items are not being stored.</MS_Guide_Description>
   <MS_Guide_ChooseCore>Choose a control core on this map</MS_Guide_ChooseCore>
   <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
@@ -17,8 +19,8 @@
   <MS_Guide_Body0>Each storage network needs exactly one control core. It manages inventory, storage filters and priority. Separate networks if more than one core is connected.</MS_Guide_Body0>
   <MS_Guide_Step1>2. Connect a storage unit</MS_Guide_Step1>
   <MS_Guide_Body1>Connect at least one storage unit to hold items. Use storage conduits to link buildings and check their network status. Storage conduits are separate from the power grid and do not transmit power.</MS_Guide_Body1>
-  <MS_Guide_Step2>3. Connect at least three receivers</MS_Guide_Step2>
-  <MS_Guide_Body2>Hauling reserves storage receivers. Connect at least three to the same network so every receiver is less likely to be occupied at once, delaying further hauling. Fewer than three still work.</MS_Guide_Body2>
+  <MS_Guide_Step2>3. Connect storage receivers</MS_Guide_Step2>
+  <MS_Guide_Body2>Hauling reserves storage receivers. Connect at least three to the same network so every receiver is less likely to be occupied at once, delaying further hauling. Fewer than three still work.\n\nYou can also select a storage receiver to change its absorption range, and draw a stockpile zone next to it.</MS_Guide_Body2>
   <MS_Guide_Receivers>Receivers connected to this network: {0} / 3 (recommended)</MS_Guide_Receivers>
   <MS_Guide_Step3>4. Set storage rules</MS_Guide_Step3>
   <MS_Guide_Body3>A new core accepts nothing. Open its storage settings, allow the items you want and set a suitable priority. Connected receivers share these rules. This step checks whether at least one item type is allowed; individual items must still pass all filter conditions.</MS_Guide_Body3>
@@ -50,7 +52,7 @@
   <MS_Guide_Reabsorb>Withdrawn items being stored again? Receivers absorb allowed items on their surface. Avoid placing receivers directly beside the core; leave room for withdrawn items.</MS_Guide_Reabsorb>
   <MS_Guide_Nav0>1. Control core</MS_Guide_Nav0>
   <MS_Guide_Nav1>2. Storage units</MS_Guide_Nav1>
-  <MS_Guide_Nav2>3. Three receivers</MS_Guide_Nav2>
+  <MS_Guide_Nav2>3. Connect receivers</MS_Guide_Nav2>
   <MS_Guide_Nav3>4. Storage rules</MS_Guide_Nav3>
   <MS_Guide_Nav4>5. Store items</MS_Guide_Nav4>
   <MS_Guide_Nav5>6. Withdraw items</MS_Guide_Nav5>
@@ -69,6 +71,19 @@
   <MS_Guide_OpenFilterShort>Storage settings</MS_Guide_OpenFilterShort>
   <MS_Guide_OpenInventoryShort>Inventory / withdraw</MS_Guide_OpenInventoryShort>
   <MS_Guide_Advanced>Advanced</MS_Guide_Advanced>
+  <MS_Guide_Practical>Practical tips</MS_Guide_Practical>
+  <MS_Guide_PracticalShelfNav>Restock a variety</MS_Guide_PracticalShelfNav>
+  <MS_Guide_PracticalShelfTitle>Restock a variety of food and medicine</MS_Guide_PracticalShelfTitle>
+  <MS_Guide_PracticalShelfBody>Switch the restocking shelf to Filter mode and allow the item categories you want to supply. There is no need to assign an item to each slot.\n\nTo supply several different item types at once, enable Distinct item types. When filling an empty slot, the shelf skips item types already present and chooses another type from network stock that meets the filter conditions. This lets a limited number of slots supply a wider variety of food or medicine, especially with mods that add many item types.</MS_Guide_PracticalShelfBody>
+  <MS_Guide_PracticalShelfNote>This option does not remove existing duplicates. Different materials or qualities of the same item still count as one type.</MS_Guide_PracticalShelfNote>
+  <MS_Guide_PracticalHotkeysTitle>Keyboard shortcuts</MS_Guide_PracticalHotkeysTitle>
+  <MS_Guide_PracticalTurretTitle>Resupplying turrets</MS_Guide_PracticalTurretTitle>
+  <MS_Guide_PracticalTurretBody>Most modded turrets that replenish ammunition using reinforced barrels or steel actually use the fuel system. You can try using a fuel supplier to resupply these turrets, but compatibility is not guaranteed.</MS_Guide_PracticalTurretBody>
+  <MS_Guide_PracticalGroupingTitle>Grouping recipes</MS_Guide_PracticalGroupingTitle>
+  <MS_Guide_PracticalGroupingBody>Use the grouping toggle above the recipe list to enable groups. Groups higher in the list still take priority over those below them.\n\nDrag entries to quickly change their grouping. You can also drag entire groups.</MS_Guide_PracticalGroupingBody>
+  <MS_Guide_PracticalFindRecipesTitle>Finding recipes</MS_Guide_PracticalFindRecipesTitle>
+  <MS_Guide_PracticalFindRecipesBody>To find workbenches or recipes from a particular mod, use the mod filter at the top.\n\nYou can also favorite frequently used workbenches or move less-used workbenches to the bottom, making your usual workbenches easier to find.</MS_Guide_PracticalFindRecipesBody>
+  <MS_Guide_PracticalHotkeysBody>You can configure this mod's keyboard shortcuts under Options - Controls to quickly jump to a storage control core, open production orders, view items, and more.</MS_Guide_PracticalHotkeysBody>
   <MS_Guide_AdvancedTips>Usage tips</MS_Guide_AdvancedTips>
   <MS_Guide_AdvancedBuilt>Built on this map: {0}</MS_Guide_AdvancedBuilt>
   <MS_Guide_AdvancedConnected>Connected to the selected core: {0}</MS_Guide_AdvancedConnected>
@@ -99,4 +114,6 @@
   <MS_Guide_AdvancedTransportBody>The material supplier feeds a transporter or refuelable building directly in front of it, so orientation matters.\n\nManual mode: move items into the supplier using its transfer window, then let it deliver them. Continuous mode: select up to three item types, supplied directly from the network in top-to-bottom priority order without internal storage. If an item is unavailable or rejected, the next choice is tried.\n\nTransporters and generic containers are topped up to each item limit (default 75; 0 pauses). Excess stock is not reclaimed. Immediate supply obeys the same limits. Fuel devices keep their own target fuel level; 0 also pauses that fuel.</MS_Guide_AdvancedTransportBody>
   <MS_Guide_AdvancedTransportTips>Empty the supplier's own inventory before switching modes. Use its building commands to configure items or deliver immediately.\n\nFor transport pods, create a launch group before selecting cargo.\n\nGeneric container supply targets containers exposed by other buildings; choose a target if several are available. This improves compatibility but does not guarantee that the other mod recognizes the delivered items. Transporters and fuel devices use dedicated rules first.</MS_Guide_AdvancedTransportTips>
   <MS_Guide_AdvancedCaravanBody>Connect the caravan teleporter, open its caravan formation window and choose members and supplies from the network.\n\nOn confirmation, supplies move into the members' inventories and the members immediately form a caravan on the world map. There is no need to withdraw those items manually and wait for normal loading.</MS_Guide_AdvancedCaravanBody>
+  <MS_Guide_PracticalModTradeTitle>Mod trading</MS_Guide_PracticalModTradeTitle>
+  <MS_Guide_PracticalModTradeBody>For performance, items kept in storage are never rendered on the map (rendering them would cause heavy lag). This can leave some mods unable to see supplies held in magic storage.\n\nFor mods that only need the player to supply silver or a single product, there are two workarounds:\n\n1. Ask the mod author to respect and call the vanilla TradeUtility.AllLaunchableThingsForTrade and TradeUtility.LaunchThingsOfType APIs.\n\n2. Use a supply shelf with a high restock limit to place more silver on the map so it renders there. A stack size mod can raise the limit of a single stack further.</MS_Guide_PracticalModTradeBody>
 </LanguageData>

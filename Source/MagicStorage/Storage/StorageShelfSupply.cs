@@ -13,11 +13,6 @@ namespace MagicStorage
 
         internal static void Process(Building_StorageSupplyShelf shelf)
         {
-            using (StorageFloorContext.Enter(shelf)) ProcessOnFloor(shelf);
-        }
-
-        private static void ProcessOnFloor(Building_StorageSupplyShelf shelf)
-        {
             shelf.ClearRestockFailures();
             if (!shelf.Spawned || shelf.Faction != Faction.OfPlayer ||
                 shelf.IsForbidden(Faction.OfPlayer)) return;
@@ -194,15 +189,16 @@ namespace MagicStorage
                 { couldMergeIntoAnotherSlot = true; break; }
             if (!couldMergeIntoAnotherSlot)
             {
-                if (!StorageFloorContext.TryDrop(holder, received, shelf, out Thing placed)) return false;
+                if (!holder.TryDrop(received, shelf.Position, shelf.Map, ThingPlaceMode.Direct,
+                    out Thing placed, playDropSound: false)) return false;
                 stock = placed;
                 return true;
             }
             // Native direct dropping merges into the first compatible stack in the cell.
             // Duplicate selections need an exact destination or a distinct physical stack.
             if (stock != null) return stock.TryAbsorbStack(received, true);
-            stock = StorageFloorContext.SpawnDistinct(holder, received, shelf);
-            return stock != null && stock.Spawned && StorageFloorContext.SameFloor(stock, shelf);
+            stock = GenSpawn.Spawn(received, shelf.Position, shelf.Map, Rot4.North);
+            return stock != null && stock.Spawned;
         }
     }
 }

@@ -51,7 +51,9 @@ namespace MagicStorage
                 return true;
             }
             var unit = item.holdingOwner?.Owner as Building_StorageUnit;
-            var request = new Request { Item = item, Source = item.holdingOwner, Network = network,
+            // Ground items may belong to the map's spawned-things container. Their
+            // rollback destination is the original cell, not a storage container.
+            var request = new Request { Item = item, Source = network == null ? null : item.holdingOwner, Network = network,
                 Endpoint = endpoint, Count = count, Cell = unit == null ? item.Position : unit.Position };
             if (Available(request) < count) return false;
             requests.Add(request); byItem.Add(item, request);
@@ -60,7 +62,7 @@ namespace MagicStorage
 
         internal static bool GroundAvailable(Map map, Thing item, bool respectReservations = true) =>
             item != null && !item.Destroyed && item.Spawned && item.Map == map && item.stackCount > 0 &&
-            item.holdingOwner == null && (!respectReservations ||
+            (item.holdingOwner == null || ReferenceEquals(item.holdingOwner.Owner, map)) && (!respectReservations ||
                 (!map.reservationManager.IsReservedByAnyoneOf(item, Faction.OfPlayer) &&
                  !map.physicalInteractionReservationManager.IsReserved(item)));
 

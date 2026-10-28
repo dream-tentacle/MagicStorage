@@ -1,5 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_1_7.label>版本日志</MS_UpdateNotice_1_1_7.label>
+  <MS_UpdateNotice_1_1_7.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_7.sections.0.heading>
+  <MS_UpdateNotice_1_1_7.sections.0.entries.0>让涅瓦莲质量驱动器科技移动到基础魔法存储。这样你可以通过涅瓦莲质量驱动器提取口来给涅瓦莲供货了。</MS_UpdateNotice_1_1_7.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_6.label>版本日志</MS_UpdateNotice_1_1_6.label>
+  <MS_UpdateNotice_1_1_6.sections.0.heading>&lt;color=#BB88FF&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_1_6.sections.0.heading>
+  <MS_UpdateNotice_1_1_6.sections.0.entries.0>现在可以修改存入口的吸收范围。在旁边放存储区可以有效提高搬运顺畅度。</MS_UpdateNotice_1_1_6.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_6.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_6.sections.1.heading>
+  <MS_UpdateNotice_1_1_6.sections.1.entries.0>原本，原版工作台只能识别魔法存储中资源类的已制造物品数量；现在原版工作台能识别魔法存储中所有类别的已制造物品数量</MS_UpdateNotice_1_1_6.sections.1.entries.0>
+  <MS_UpdateNotice_1_1_5.label>版本日志</MS_UpdateNotice_1_1_5.label>
+  <MS_UpdateNotice_1_1_5.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_5.sections.0.heading>
+  <MS_UpdateNotice_1_1_5.sections.0.entries.0>进一步优化建筑菜单材质兼容性，现在默认开启强制兼容模式，在mod选项可关闭</MS_UpdateNotice_1_1_5.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_5.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_5.sections.1.heading>
+  <MS_UpdateNotice_1_1_5.sections.1.entries.0>配方菜单加入复制按钮</MS_UpdateNotice_1_1_5.sections.1.entries.0>
+  <MS_UpdateNotice_1_1_4.label>版本日志</MS_UpdateNotice_1_1_4.label>
+  <MS_UpdateNotice_1_1_4.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_1_4.sections.0.heading>
+  <MS_UpdateNotice_1_1_4.sections.0.entries.0>修复部分mod中特殊的制造配方的适配问题</MS_UpdateNotice_1_1_4.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_4.sections.0.entries.1>修复补货架上尸体的显示错误</MS_UpdateNotice_1_1_4.sections.0.entries.1>
+  <MS_UpdateNotice_1_1_4.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_4.sections.1.heading>
+  <MS_UpdateNotice_1_1_4.sections.1.entries.0>避免补货架上的物品被顺道搬运</MS_UpdateNotice_1_1_4.sections.1.entries.0>
+  <MS_UpdateNotice_1_1_4.sections.1.entries.1>现在允许设置工作台视为哪一种房间类型，例如厨房</MS_UpdateNotice_1_1_4.sections.1.entries.1>
+  <MS_UpdateNotice_1_1_4.sections.1.entries.2>现在可以通过快捷键跳转到核心或者快速选择按钮，需要在设置中查看</MS_UpdateNotice_1_1_4.sections.1.entries.2>
+  <MS_UpdateNotice_1_1_4.sections.1.entries.3>在教程中增加了一些实用技巧</MS_UpdateNotice_1_1_4.sections.1.entries.3>
+  <MS_UpdateNotice_1_1_3.label>版本日志</MS_UpdateNotice_1_1_3.label>
+  <MS_UpdateNotice_1_1_3.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_3.sections.0.heading>
+  <MS_UpdateNotice_1_1_3.sections.0.entries.0>与涅瓦莲的龙霜锻炉进一步兼容优化</MS_UpdateNotice_1_1_3.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_3.sections.0.entries.1>与Holy Washer兼容优化</MS_UpdateNotice_1_1_3.sections.0.entries.1>
+  <MS_UpdateNotice_1_1_3.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_3.sections.1.heading>
+  <MS_UpdateNotice_1_1_3.sections.1.entries.0>宇宙工作台可以被工具柜加成。如果其他模组有相似建筑且无法影响宇宙工作台，不会考虑支持，因为这是其他模组的写法不够好。</MS_UpdateNotice_1_1_3.sections.1.entries.0>
+  <MS_UpdateNotice_1_1_3.sections.1.entries.1>优化材料不足时的提示详情</MS_UpdateNotice_1_1_3.sections.1.entries.1>
+  <MS_UpdateNotice_1_1_3.sections.1.entries.2>优化工作台页面的性能，现在更流畅了</MS_UpdateNotice_1_1_3.sections.1.entries.2>
+  <MS_UpdateNotice_1_1_3.sections.2.heading>&lt;color=#BB88FF&gt;平衡性调整&lt;/color&gt;</MS_UpdateNotice_1_1_3.sections.2.heading>
+  <MS_UpdateNotice_1_1_3.sections.2.entries.0>工作台现在受到房间系统影响</MS_UpdateNotice_1_1_3.sections.2.entries.0>
+  <MS_UpdateNotice_1_1_3.sections.3.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_1_3.sections.3.heading>
+  <MS_UpdateNotice_1_1_3.sections.3.entries.0>修复供货架上的白银无法被正常识别的问题</MS_UpdateNotice_1_1_3.sections.3.entries.0>
+  <MS_UpdateNotice_1_1_2.label>版本日志</MS_UpdateNotice_1_1_2.label>
+  <MS_UpdateNotice_1_1_2.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_1_2.sections.0.heading>
+  <MS_UpdateNotice_1_1_2.sections.0.entries.0>允许在工作台调整工作类型限制，因此现在你可以更好地设计厨房了</MS_UpdateNotice_1_1_2.sections.0.entries.0>
+  <MS_UpdateNotice_1_1_2.sections.0.entries.1>优化配方页面放置位置按钮</MS_UpdateNotice_1_1_2.sections.0.entries.1>
+  <MS_UpdateNotice_1_1_2.sections.0.entries.2>新增兼容性设置，可以开启全部类型材料材质放置蓝图，仅当发生了mod冲突导致无法识别材料时才需要打开它</MS_UpdateNotice_1_1_2.sections.0.entries.2>
+  <MS_UpdateNotice_1_1_2.sections.0.entries.3>允许将补货架的设置保存在本地</MS_UpdateNotice_1_1_2.sections.0.entries.3>
+  <MS_UpdateNotice_1_1_2.sections.0.entries.4>允许直接将库存给予乞丐</MS_UpdateNotice_1_1_2.sections.0.entries.4>
+  <MS_UpdateNotice_1_1_2.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_2.sections.1.heading>
+  <MS_UpdateNotice_1_1_2.sections.1.entries.0>兼容文化DLC中动态生成的雕塑配方</MS_UpdateNotice_1_1_2.sections.1.entries.0>
   <MS_UpdateNotice_1_1_1.label>版本日志</MS_UpdateNotice_1_1_1.label>
   <MS_UpdateNotice_1_1_1.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.0.heading>
   <MS_UpdateNotice_1_1_1.sections.0.entries.0>修复卸载存储口后的报错</MS_UpdateNotice_1_1_1.sections.0.entries.0>
@@ -10,11 +53,11 @@
   <MS_UpdateNotice_1_1_1.sections.2.entries.0>研究完基础魔法存储后，弹出魔法存储交易须知</MS_UpdateNotice_1_1_1.sections.2.entries.0>
   <MS_UpdateNotice_1_1_1.sections.2.entries.1>将魔法存储交易选项排在最前</MS_UpdateNotice_1_1_1.sections.2.entries.1>
   <MS_UpdateNotice_1_1_1.sections.2.entries.2>新增教学提示</MS_UpdateNotice_1_1_1.sections.2.entries.2>
-  <MS_UpdateNotice_1_1_1.sections.3.heading>&lt;color=#FF6B6B&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.3.heading>
+  <MS_UpdateNotice_1_1_1.sections.3.heading>&lt;color=#BB88FF&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_1_1.sections.3.heading>
   <MS_UpdateNotice_1_1_1.sections.3.entries.0>补货架筛选模式的配置页面可以开启互不相同选项</MS_UpdateNotice_1_1_1.sections.3.entries.0>
   <MS_UpdateNotice_1_1_1.sections.3.entries.1>持续供给模式新增各物品的目标库存上限，避免向目标容器过量输送物资</MS_UpdateNotice_1_1_1.sections.3.entries.1>
   <MS_UpdateNotice_1_1_0.label>版本日志</MS_UpdateNotice_1_1_0.label>
-  <MS_UpdateNotice_1_1_0.sections.0.heading>&lt;color=#FF6B6B&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_1_0.sections.0.heading>
+  <MS_UpdateNotice_1_1_0.sections.0.heading>&lt;color=#BB88FF&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_1_0.sections.0.heading>
   <MS_UpdateNotice_1_1_0.sections.0.entries.0>现在可以在核心或者mod选项中反馈意见和bug</MS_UpdateNotice_1_1_0.sections.0.entries.0>
   <MS_UpdateNotice_1_1_0.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_0.sections.1.heading>
   <MS_UpdateNotice_1_1_0.sections.1.entries.0>允许技能范围无限制</MS_UpdateNotice_1_1_0.sections.1.entries.0>
@@ -41,7 +84,7 @@
   <MS_UpdateNotice_1_0_9.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_0_9.sections.0.heading>
   <MS_UpdateNotice_1_0_9.sections.0.entries.0>现在两种补货架都可以承担营养膏机的料斗的功能</MS_UpdateNotice_1_0_9.sections.0.entries.0>
   <MS_UpdateNotice_1_0_8.label>版本日志</MS_UpdateNotice_1_0_8.label>
-  <MS_UpdateNotice_1_0_8.sections.0.heading>&lt;color=#FF6B6B&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.0.heading>
+  <MS_UpdateNotice_1_0_8.sections.0.heading>&lt;color=#BB88FF&gt;新增内容&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.0.heading>
   <MS_UpdateNotice_1_0_8.sections.0.entries.0>新增高堆叠补货架，容量10格</MS_UpdateNotice_1_0_8.sections.0.entries.0>
   <MS_UpdateNotice_1_0_8.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_0_8.sections.1.heading>
   <MS_UpdateNotice_1_0_8.sections.1.entries.0>兼容渡鸦赠礼系统</MS_UpdateNotice_1_0_8.sections.1.entries.0>

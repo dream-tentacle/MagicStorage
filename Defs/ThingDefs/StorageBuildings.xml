@@ -117,7 +117,11 @@
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
-    <building><isMealSource>true</isMealSource></building>
+    <building>
+      <isMealSource>true</isMealSource>
+      <workTableRoomRole>Workshop</workTableRoomRole>
+      <workTableNotInRoomRoleFactor>0.8</workTableNotInRoomRoleFactor>
+    </building>
     <size>(3,1)</size>
     <rotatable>true</rotatable>
     <hasInteractionCell>true</hasInteractionCell>
@@ -133,7 +137,15 @@
       <allowFlip>false</allowFlip>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
-    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <comps>
+      <li Class="MagicStorage.CompProperties_StorageNode" />
+      <li Class="CompProperties_ReportWorkSpeed" />
+      <li Class="CompProperties_AffectedByFacilities">
+        <linkableFacilities>
+          <li>ToolCabinet</li>
+        </linkableFacilities>
+      </li>
+    </comps>
     <placeWorkers><li>PlaceWorker_PreventInteractionSpotOverlap</li></placeWorkers>
     <costList><Steel>100</Steel><ComponentIndustrial>4</ComponentIndustrial></costList>
     <uiOrder>3105</uiOrder>

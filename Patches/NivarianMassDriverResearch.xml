@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Nivarian Race</li>
+    </mods>
+    <match Class="PatchOperationReplace">
+      <xpath>Defs/ThingDef[defName="Nivarian_ItemCannon"]/researchPrerequisites</xpath>
+      <value>
+        <researchPrerequisites>
+          <li>MS_BasicMagicStorage</li>
+        </researchPrerequisites>
+      </value>
+    </match>
+  </Operation>
+</Patch>

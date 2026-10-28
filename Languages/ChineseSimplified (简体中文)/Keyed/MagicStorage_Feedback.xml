@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_FeedbackTitle>发送反馈</MS_FeedbackTitle>
-  <MS_FeedbackPrivacy>点击上传将发送问题描述、当前游戏日志、已启用模组列表、版本信息及 Steam ID，仅管理员可查看。日志可能包含本机路径，请确认后上传。</MS_FeedbackPrivacy>
+  <MS_FeedbackPrivacy>点击上传将发送问题描述、当前游戏日志、已启用模组列表、版本信息及 Steam ID。问题与讨论可按 Steam ID 查询；日志和模组列表仅管理员可查看。日志可能包含本机路径，请确认后上传。</MS_FeedbackPrivacy>
   <MS_FeedbackVersions>游戏：{0}　魔法存储：{1}</MS_FeedbackVersions>
   <MS_FeedbackCollected>已启用 {0} 个模组，日志约 {1} KB</MS_FeedbackCollected>
   <MS_FeedbackShowMods>查看模组列表</MS_FeedbackShowMods>
@@ -10,6 +10,29 @@
   <MS_FeedbackDescription>问题描述与复现步骤（至少 10 个字符）</MS_FeedbackDescription>
   <MS_FeedbackClose>关闭</MS_FeedbackClose>
   <MS_FeedbackSend>上传反馈</MS_FeedbackSend>
+  <MS_FeedbackShowMine>显示我的已反馈问题</MS_FeedbackShowMine>
+  <MS_FeedbackMyTitle>我的已反馈问题</MS_FeedbackMyTitle>
+  <MS_FeedbackLoading>正在请求反馈站点，请稍候……</MS_FeedbackLoading>
+  <MS_FeedbackRefresh>刷新</MS_FeedbackRefresh>
+  <MS_FeedbackBack>返回列表</MS_FeedbackBack>
+  <MS_FeedbackLoadMore>加载更多</MS_FeedbackLoadMore>
+  <MS_FeedbackEmpty>当前 Steam ID 尚未通过游戏提交过魔法存储反馈。</MS_FeedbackEmpty>
+  <MS_FeedbackNeedSteam>未获取到 Steam ID。请确认 Steam 已启动并登录，然后刷新。</MS_FeedbackNeedSteam>
+  <MS_FeedbackQueryFailed>查询失败，请确认能连接 ChatGPT 反馈站点后重试。</MS_FeedbackQueryFailed>
+  <MS_FeedbackQueryRateLimited>查询过于频繁，请稍后刷新。</MS_FeedbackQueryRateLimited>
+  <MS_FeedbackNotFound>未找到属于当前 Steam ID 的这条反馈，请刷新列表。</MS_FeedbackNotFound>
+  <MS_FeedbackDates>提交：{0}　更新：{1}</MS_FeedbackDates>
+  <MS_FeedbackMerged>此问题已合并至 {0}。</MS_FeedbackMerged>
+  <MS_FeedbackDiscussion>讨论与进展</MS_FeedbackDiscussion>
+  <MS_FeedbackNoReplies>暂无讨论内容。</MS_FeedbackNoReplies>
+  <MS_FeedbackSystem>处理记录</MS_FeedbackSystem>
+  <MS_FeedbackAuthor>作者</MS_FeedbackAuthor>
+  <MS_FeedbackStatus_pending>待处理</MS_FeedbackStatus_pending>
+  <MS_FeedbackStatus_confirmed>已确认</MS_FeedbackStatus_confirmed>
+  <MS_FeedbackStatus_working>处理中</MS_FeedbackStatus_working>
+  <MS_FeedbackStatus_resolved>已解决</MS_FeedbackStatus_resolved>
+  <MS_FeedbackStatus_needs_info>需要补充</MS_FeedbackStatus_needs_info>
+  <MS_FeedbackStatus_declined>暂不处理</MS_FeedbackStatus_declined>
   <MS_FeedbackNetworkHint>需要能连接ChatGPT</MS_FeedbackNetworkHint>
   <MS_FeedbackUploading>正在上传，请稍候……</MS_FeedbackUploading>
   <MS_FeedbackSuccess>反馈已上传，编号：{0}</MS_FeedbackSuccess>

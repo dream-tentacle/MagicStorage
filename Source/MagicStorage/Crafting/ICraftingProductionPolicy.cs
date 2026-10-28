@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RimWorld;
 using Verse;
 
 namespace MagicStorage
@@ -9,7 +10,8 @@ namespace MagicStorage
         float WorkRequired(RecipeDef recipe, Thing dominant);
         float WorkSpeed(RecipeDef recipe, Pawn worker, Building_CosmicWorkbench bench);
         void Learn(RecipeDef recipe, Pawn worker, int ticks);
-        IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> ingredients, Thing dominant);
+        IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> ingredients, Thing dominant,
+            Precept_ThingStyle precept = null, IBillGiver billGiver = null);
         void Consume(RecipeDef recipe, Thing ingredient, Map map);
         void NotifyCompleted(Pawn worker, List<Thing> products);
     }

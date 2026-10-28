@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <KeyBindingCategoryDef>
+    <defName>MS_MagicStorage</defName>
+    <label>Magic Storage</label>
+    <description>Keyboard shortcuts for Magic Storage.</description>
+    <isGameUniversal>true</isGameUniversal>
+    <checkForConflicts>
+      <li>Game</li>
+      <li>Development</li>
+      <li>GameMapCamera</li>
+      <li>SelectionMisc</li>
+      <li>MainTabs</li>
+    </checkForConflicts>
+  </KeyBindingCategoryDef>
+  <KeyBindingDef>
+    <defName>MS_JumpToStorageCore</defName>
+    <label>jump to storage control core</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+  <KeyBindingDef>
+    <defName>MS_ViewItems</defName>
+    <label>View items</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+  <KeyBindingDef>
+    <defName>MS_ProductionOrders</defName>
+    <label>Production orders</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+  <KeyBindingDef>
+    <defName>MS_ShelfCopyPreset</defName>
+    <label>Copy preset</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+  <KeyBindingDef>
+    <defName>MS_ShelfPastePreset</defName>
+    <label>Paste preset</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+  <KeyBindingDef>
+    <defName>MS_ShelfLocalPresets</defName>
+    <label>Local presets</label>
+    <category>MS_MagicStorage</category>
+    <defaultKeyCodeA>None</defaultKeyCodeA>
+    <defaultKeyCodeB>None</defaultKeyCodeB>
+  </KeyBindingDef>
+</Defs>

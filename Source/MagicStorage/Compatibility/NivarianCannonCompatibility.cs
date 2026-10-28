@@ -13,6 +13,7 @@ namespace MagicStorage
             new ConditionalWeakTable<Map, HashSet<Building_NivarianCannonExtractor>>();
         private static NivarianCannonApi api;
         private static bool reportedFailure;
+        private static bool reportedSnapshotFailure;
         internal static bool Ready => api != null;
         public string PackageId => "keeptpa.NivarianRace";
 
@@ -20,7 +21,58 @@ namespace MagicStorage
         {
             var resolved = new NivarianCannonApi();
             harmony.Patch(resolved.Dispatch, prefix: new HarmonyMethod(typeof(NivarianCannonCompatibility), nameof(DispatchPrefix)));
+            harmony.Patch(resolved.CaptureSnapshot, postfix: new HarmonyMethod(typeof(NivarianCannonCompatibility), nameof(CaptureSnapshotPostfix)));
             api = resolved;
+        }
+
+        // Bills must see deliverable inventory before they choose a recipe and create demands.
+        // Use the native snapshot entries so ingredient filters, radii and cheapest-def selection
+        // keep their original behavior. Capturing stock does not reserve or move any items.
+        private static void CaptureSnapshotPostfix(Map __0, Thing __1, object __result)
+        {
+            if (api == null || __0 == null || __result == null || __1 == null || !__1.Spawned ||
+                __1.Destroyed || __1.Map != __0 || __1.Faction != Faction.OfPlayer ||
+                !ports.TryGetValue(__0, out var set) || set.Count == 0) return;
+            try
+            {
+                var manager = __0.GetComponent<MapComponent_StorageNetworks>();
+                manager.EnsureCurrent();
+                object network = api.NetworkFor(__0);
+                if (network == null) return;
+                object destination = api.Covering(network, __1);
+                if (destination == null) return;
+                var sources = new HashSet<StorageNetwork>();
+                foreach (var port in set)
+                {
+                    if (!port.CanWork || port.Map != __0 || sources.Contains(port.Network)) continue;
+                    foreach (object source in api.Adjacent(port))
+                    {
+                        Thing parent = api.Parent(source);
+                        if (!api.Operational(source) || !parent.Spawned || parent.Destroyed || parent.Map != __0 ||
+                            parent.Faction != Faction.OfPlayer || api.Hops(network, source, destination) == int.MaxValue) continue;
+                        sources.Add(port.Network);
+                        break;
+                    }
+                }
+                var stacks = new List<Thing>();
+                foreach (StorageNetwork source in sources)
+                {
+                    stacks.Clear(); source.GetAllStacks(stacks);
+                    foreach (Thing item in stacks)
+                    {
+                        int count = source.AvailableToWithdraw(item);
+                        if (count <= 0 || !(item.holdingOwner?.Owner is Building_StorageUnit unit) ||
+                            !unit.Spawned || unit.Destroyed || unit.Map != __0 || unit.Faction != Faction.OfPlayer) continue;
+                        api.AddSnapshotStock(__result, item.def, count, unit.Position.DistanceToSquared(__1.Position));
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                if (reportedSnapshotFailure) return;
+                reportedSnapshotFailure = true;
+                Log.Error("[MagicStorage] Nivarian bill inventory snapshot failed: " + exception);
+            }
         }
         internal static void Register(Building_NivarianCannonExtractor port)
         { if (port.Map != null) ports.GetOrCreateValue(port.Map).Add(port); }

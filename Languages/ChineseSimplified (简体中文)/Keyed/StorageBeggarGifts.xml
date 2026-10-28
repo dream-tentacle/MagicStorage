@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_Beggar_Give>通过魔法存储将{0}x {1}赠与{RECEIVER_nameDef}</MS_Beggar_Give>
+  <MS_Beggar_Insufficient>库存不足（可用{0}，需要{1}）</MS_Beggar_Insufficient>
+  <MS_Beggar_Unavailable>无法通过魔法存储完成给予：物资或任务状态已变化。</MS_Beggar_Unavailable>
+</LanguageData>

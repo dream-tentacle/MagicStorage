@@ -17,6 +17,8 @@
   <MS_Shelf_Empty>No item selected</MS_Shelf_Empty>
   <MS_Shelf_Select>Select item</MS_Shelf_Select>
   <MS_Shelf_Clear>Clear</MS_Shelf_Clear>
+  <MS_Shelf_Recall>Recall</MS_Shelf_Recall>
+  <MS_Shelf_RecallTip>Return every item on this shelf to the storage network now. Items that cannot be returned stay on the shelf and are handled by normal restocking and cleanup.</MS_Shelf_RecallTip>
   <MS_Shelf_Stock>Stock: {0} / {1}</MS_Shelf_Stock>
   <MS_Shelf_Contents>Shelf contents: {0} / {1} stacks</MS_Shelf_Contents>
   <MS_Shelf_Use>Colonists can take items directly. Restocks automatically; does not accept normal hauling.</MS_Shelf_Use>
@@ -55,4 +57,19 @@
   <MS_Shelf_SharedLimitTip>Controls only this slot. The item's own stack limit also applies. Set to 0 to pause restocking. Lowering the limit keeps existing stock.</MS_Shelf_SharedLimitTip>
   <MS_Shelf_ModeBlockedTitle>Cannot switch shelf mode</MS_Shelf_ModeBlockedTitle>
   <MS_Shelf_ModeBlocked>Some shelf contents could not be returned to the core. The current mode is unchanged. Check the network connection, core storage filter and remaining capacity, and ensure the items are not forbidden or reserved.</MS_Shelf_ModeBlocked>
+  <MS_Shelf_LocalPresets>Local presets</MS_Shelf_LocalPresets>
+  <MS_Shelf_LocalPresetsDesc>Save shelf settings locally, or load and delete saved presets. Presets remain available after restarting the game or changing saves.</MS_Shelf_LocalPresetsDesc>
+  <MS_Shelf_LocalPresetsHint>Enter a name to save this shelf's settings. Loading replaces the current settings. Saving an existing name asks before overwriting.</MS_Shelf_LocalPresetsHint>
+  <MS_Shelf_SavePreset>Save preset</MS_Shelf_SavePreset>
+  <MS_Shelf_LoadPreset>Load</MS_Shelf_LoadPreset>
+  <MS_Shelf_DeletePreset>Delete</MS_Shelf_DeletePreset>
+  <MS_Shelf_NoLocalPresets>No local presets saved yet.</MS_Shelf_NoLocalPresets>
+  <MS_Shelf_PresetFolder>Saved in: {0}</MS_Shelf_PresetFolder>
+  <MS_Shelf_DeletePresetConfirm>Delete local preset "{0}"?</MS_Shelf_DeletePresetConfirm>
+  <MS_Shelf_OverwritePresetConfirm>A preset named "{0}" already exists. Replace it with this shelf's current settings?</MS_Shelf_OverwritePresetConfirm>
+  <MS_Shelf_MissingPresetItems>Some items in this preset are not available in the currently loaded game and mods. The loaded settings may differ from your expectations.</MS_Shelf_MissingPresetItems>
+  <MS_Shelf_PresetConfirm>Confirm</MS_Shelf_PresetConfirm>
+  <MS_Shelf_ViewMissingPresetItems>View unavailable items</MS_Shelf_ViewMissingPresetItems>
+  <MS_Shelf_MissingPresetItemsTitle>Unavailable items (DefName)</MS_Shelf_MissingPresetItemsTitle>
+  <MS_Shelf_PresetFileError>Unable to read or write the local preset file: {0}</MS_Shelf_PresetFileError>
 </LanguageData>

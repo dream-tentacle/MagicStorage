@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Trade_RadioCommand>Magic storage trade</MS_Trade_RadioCommand>
   <MS_Payment_Unavailable>Cannot complete this payment: not enough available resources, or the storage network is unavailable.</MS_Payment_Unavailable>
   <MS_Trade_Command>Trade with {0} through magic storage</MS_Trade_Command>
   <MS_Trade_CeleTechUnavailable>The trade shuttle is no longer available for trade</MS_Trade_CeleTechUnavailable>

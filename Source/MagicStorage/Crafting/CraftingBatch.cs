@@ -103,7 +103,7 @@ namespace MagicStorage
                         // saved with the order, and products are never regenerated on retry.
                         var generatedProducts = executor != null
                             ? executor.MakeProducts(order.Recipe, input, dominant)
-                            : CraftingServices.Production.MakeProducts(order.Recipe, worker, input, dominant);
+                            : CraftingServices.Production.MakeProducts(order.Recipe, worker, input, dominant, order.Precept);
                         foreach (var product in generatedProducts)
                         {
                             if (product == null || product.Destroyed) continue;

@@ -50,8 +50,17 @@
   <MS_UI_QuantityTip>向右箭头增加取出数量，向左箭头减少数量。按住左键拖过多行箭头可批量调整，每行在同一次拖拽中只触发一次。</MS_UI_QuantityTip>
   <MS_ReceiverCapacity>接收暂存：{0} / {1} 堆</MS_ReceiverCapacity>
   <MS_ReceiverUse>接收类型与优先级由相连的核心统一设置，表面符合条件的物品自动存入单元。</MS_ReceiverUse>
+  <MS_ReceiverRange>吸收范围：{0}</MS_ReceiverRange>
+  <MS_ReceiverRangeDesc>修改此存储接收器的吸收范围，可以在周围放上存储区方便搬运。</MS_ReceiverRangeDesc>
+  <MS_ReceiverRange_This>此格</MS_ReceiverRange_This>
+  <MS_ReceiverRange_Within>{0}格内</MS_ReceiverRange_Within>
   <MS_SettingsCategory>[DR] 魔法存储</MS_SettingsCategory>
   <MS_SettingsTabGeneral>通用</MS_SettingsTabGeneral>
+  <MS_SettingsTabCompatibility>兼容性</MS_SettingsTabCompatibility>
+  <MS_SettingsAllowAllMaterials>允许全部材料</MS_SettingsAllowAllMaterials>
+  <MS_SettingsAllowAllMaterialsHelp>如果开启后仍然无法识别全部材质，则必定发生了mod冲突，请自我检查已安装mod列表是否有建筑UI或逻辑mod</MS_SettingsAllowAllMaterialsHelp>
+  <MS_SettingsForceCompatBuildMaterials>强行兼容：建造材料识别</MS_SettingsForceCompatBuildMaterials>
+  <MS_SettingsForceCompatBuildMaterialsHelp>由本mod自己接管建造菜单的材质选择，直接统计地图上的材料与魔法存储内的库存，不再依赖会被其他mod破坏的代码替换式补丁。默认开启；只有在你明确想让任何建筑都能选择任意材质时，才改用上面的"允许全部材料"。</MS_SettingsForceCompatBuildMaterialsHelp>
   <MS_SettingsTabAccessibility>易用性</MS_SettingsTabAccessibility>
   <MS_SettingsAccessibilityNotice>以下选项修改了原版代码，如果开启后报错或者没有生效，说明和其他mod冲突，本mod和其他mod均修改了原版代码。</MS_SettingsAccessibilityNotice>
   <MS_SettingsCaravanItemFilters>远行队物品过滤器</MS_SettingsCaravanItemFilters>

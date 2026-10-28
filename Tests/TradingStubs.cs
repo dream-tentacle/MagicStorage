@@ -248,6 +248,8 @@ namespace RimWorld
             TradeSession.giftMode = false; TradeSession.deal = new TradeDeal();
             ConstructorHook?.Invoke();
         }
+        public Dialog_Trade(Pawn negotiator, ITrader trader, bool giftsOnly) : this(negotiator, trader)
+        { this.giftsOnly = giftsOnly; }
         public void FlashSilver() { Flashes++; }
         [MethodImpl(MethodImplOptions.NoInlining)]
         public override void PostOpen() { if (giftsOnly) TradeSession.giftMode = true; }

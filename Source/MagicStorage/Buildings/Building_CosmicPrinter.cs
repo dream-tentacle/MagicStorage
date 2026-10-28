@@ -30,7 +30,7 @@ namespace MagicStorage
         float ICraftingExecutor.WorkSpeed(RecipeDef recipe) => Settings.WorkSpeed;
         void ICraftingExecutor.Learn(RecipeDef recipe, int ticks) { }
         IEnumerable<Thing> ICraftingExecutor.MakeProducts(RecipeDef recipe, List<Thing> input, Thing dominant) =>
-            PrinterCraftingProduction.MakeProducts(this, recipe, input, dominant);
+            PrinterCraftingProduction.MakeProducts(this, recipe, input, dominant, order.Precept);
         void ICraftingExecutor.NotifyCompleted(List<Thing> products) { }
 
         private bool Allows(CraftingOrder candidate)
@@ -128,6 +128,7 @@ namespace MagicStorage
             yield return new Command_Action
             {
                 defaultLabel = "MS_Craft_Open".Translate(),
+                hotKey = StorageKeyBindingDefOf.MS_ProductionOrders,
                 defaultDesc = "MS_Craft_OpenDesc".Translate(),
                 icon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/CraftingList"),
                 action = () =>
@@ -142,7 +143,7 @@ namespace MagicStorage
         public override string GetInspectString()
         {
             string status = order != null
-                ? "MS_Printer_Working".Translate(CraftingRecipeCatalog.Label(order.Recipe), order.Progress.ToString("P0")).ToString()
+                ? "MS_Printer_Working".Translate(CraftingRecipeCatalog.Label(order.Recipe, order.Precept), order.Progress.ToString("P0")).ToString()
                 : (CanWork ? "MS_Printer_Idle" : "MS_Printer_Paused").Translate().ToString();
             return (base.GetInspectString() + "\n" + status).Trim();
         }

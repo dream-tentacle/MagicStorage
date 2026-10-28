@@ -23,7 +23,7 @@
       <li Class="CompProperties_Power"><compClass>CompPowerTrader</compClass><basePowerConsumption>50</basePowerConsumption></li>
       <li Class="CompProperties_Flickable" />
     </comps>
-    <researchPrerequisites><li>Nivarian_ItemCannonLogistics</li></researchPrerequisites>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
     <uiOrder>3110</uiOrder>
   </ThingDef>

@@ -9,12 +9,14 @@ using Verse;
 namespace Verse
 {
     public partial class Thing { public string LabelShort => "trade shuttle"; }
-    public enum MenuOptionPriority { InitiateSocial }
+    public enum MenuOptionPriority { InitiateSocial, SummonThreat }
     public class FloatMenuOption
     {
         public string Label;
         public Action action;
-        public FloatMenuOption(string label, Action action, MenuOptionPriority priority = MenuOptionPriority.InitiateSocial)
+        public Thing revalidateClickTarget;
+        public FloatMenuOption(string label, Action action, MenuOptionPriority priority = MenuOptionPriority.InitiateSocial,
+            int orderInPriority = 0)
         { Label = label; this.action = action; }
     }
     public static class FloatMenuUtility

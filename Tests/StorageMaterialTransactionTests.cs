@@ -37,8 +37,38 @@ internal static class StorageMaterialTransactionTests
 
     internal static int Run()
     {
-        MergeAndConsume(); CompletePrecheck(); DeliveryReceipts(); FailedAndPartialDelivery(); UnavailableSource();
+        GroundOwnershipAndRestoration(); MergeAndConsume(); CompletePrecheck(); DeliveryReceipts(); FailedAndPartialDelivery(); UnavailableSource();
         return checks;
+    }
+
+    private static void GroundOwnershipAndRestoration()
+    {
+        foreach (bool mapOwned in new[] { true, false })
+        foreach (int count in new[] { 3, 10 })
+        {
+            var f = new Fixture(); var cell = new IntVec3(2, 0);
+            var ground = new Thing { def = f.Def, stackCount = 10, Spawned = true, Map = f.Map, Position = cell };
+            var mapContainer = new ThingOwner<Thing>(f.Map);
+            if (mapOwned) Equal(true, mapContainer.TryAdd(ground, false), "map owns its spawned material");
+            f.Map.Ground.Add(ground);
+            Equal(true, StorageMaterialTransaction.GroundAvailable(f.Map, ground), "spawned ground material is available with either map ownership model");
+            using (var tx = f.Open())
+            {
+                Equal(true, tx.Add(ground, count), "ground material can be planned");
+                Equal(null, tx.Requests[0].Source, "map container is not recorded as a storage source");
+                Equal(true, tx.TryStage(), "ground material can be staged");
+                Equal(false, tx.Deliver(tx.Requests[0], item => false), "unaccepted delivery remains available for restoration");
+            }
+            Equal(10, f.Map.Ground.Where(item => item.def == f.Def && item.Position == cell).Sum(item => item.stackCount), "failed partial or full extraction restores all material to its original cell");
+            var holders = new System.Collections.Generic.List<IThingHolder>();
+            f.Manager.GetChildHolders(holders);
+            Equal(0, holders.Count, "restored ground material leaves no recovery stacks");
+            Equal(20L, f.Network.GetTotalCount(f.Def), "ground rollback never moves materials into network storage");
+        }
+        var other = new Fixture();
+        var held = new Thing { def = other.Def, Spawned = true, Map = other.Map };
+        new ThingOwner<Thing>(other.Unit).TryAdd(held, false);
+        Equal(false, StorageMaterialTransaction.GroundAvailable(other.Map, held), "non-map containers cannot be used as ground sources");
     }
 
     private static void MergeAndConsume()

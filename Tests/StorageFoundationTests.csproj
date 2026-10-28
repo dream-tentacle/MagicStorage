@@ -4,14 +4,14 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <LangVersion>7.3</LangVersion>
-    <OutputPath>bin\</OutputPath>
-    <AssemblyName>StorageFoundationTests</AssemblyName>
+    <OutputPath Condition="'$(OutputPath)' == ''">bin\</OutputPath>
+    <AssemblyName Condition="'$(AssemblyName)' == ''">StorageFoundationTests</AssemblyName>
     <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;WORKBENCH_UNLOCK_TESTS;CONSTRUCTION_REPAIR_TESTS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" /><Reference Include="System.Core" />
     <Reference Include="0Harmony">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\1.6\Assemblies\0Harmony.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -41,8 +41,6 @@
     <Compile Include="..\Source\MagicStorage\Apparel\JobDriver_TakeStorageApparel.cs" />
     <Compile Include="ConstructionStubs.cs" />
     <Compile Include="ConstructionSupplyTests.cs" />
-    <Compile Include="LogicalFloorsCompatibilityTests.cs" />
-    <Compile Include="..\Source\MagicStorage\Compatibility\LogicalFloorsCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ConstructionSupplyUnit.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Construction\MapComponent_ConstructionRepair.cs" />
@@ -51,6 +49,7 @@
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSite.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_CosmicWorkbench.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingBatch.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\ICraftingExecutor.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CosmicPrinterSettings.cs" />
@@ -82,7 +81,6 @@
     <Compile Include="StorageResourceCounterTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
-    <Compile Include="..\Source\MagicStorage\Storage\StorageFloorContext.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfFilter.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfRestockFailure.cs" />

@@ -8,7 +8,7 @@ namespace MagicStorage
     internal static class PrinterCraftingProduction
     {
         internal static IEnumerable<Thing> MakeProducts(Building_CosmicPrinter printer, RecipeDef recipe,
-            List<Thing> ingredients, Thing dominant)
+            List<Thing> ingredients, Thing dominant, Precept_ThingStyle precept = null)
         {
             if (recipe.autoStripCorpses)
                 foreach (var ingredient in ingredients)
@@ -33,7 +33,7 @@ namespace MagicStorage
                             foreach (var ingredient in ingredients) registered.RegisterIngredient(ingredient.def);
                         // Pawn production callbacks include cooking competence and
                         // infections and cannot be called with a machine/null pawn.
-                        yield return Finish(product, printer);
+                        yield return Finish(product, printer, precept);
                     }
                 }
             if (recipe.specialProducts == null) yield break;
@@ -54,16 +54,18 @@ namespace MagicStorage
                         case SpecialProductType.StoneBlocks: output = ingredient.StoneBlockProducts(null, efficiency); break;
                         default: throw new InvalidOperationException("Unsupported printer special product: " + special);
                     }
-                    foreach (var product in output) yield return Finish(product, printer);
+                    foreach (var product in output) yield return Finish(product, printer, precept);
                 }
         }
 
-        private static Thing Finish(Thing product, Building_CosmicPrinter printer)
+        private static Thing Finish(Thing product, Building_CosmicPrinter printer, Precept_ThingStyle precept)
         {
             product.TryGetComp<CompQuality>()?.SetQuality(printer.Settings.GenerateQuality(), ArtGenerationContext.Colony);
             if (ModsConfig.IdeologyActive)
                 product.StyleDef = Faction.OfPlayer.ideos?.PrimaryIdeo?.GetStyleFor(product.def);
-            if (product.StyleDef == null && !product.def.randomStyle.NullOrEmpty() && Rand.Chance(product.def.randomStyleChance))
+            if (precept != null)
+                product.StyleSourcePrecept = precept;
+            else if (product.StyleDef == null && !product.def.randomStyle.NullOrEmpty() && Rand.Chance(product.def.randomStyleChance))
                 product.SetStyleDef(product.def.randomStyle.RandomElementByWeight(x => x.Chance).StyleDef);
             return product.def.Minifiable ? product.MakeMinified() : product;
         }

@@ -25,8 +25,6 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageRefreshTimer.cs" />
     <Compile Include="StorageFoundationTests.cs" />
     <Compile Include="CraftingOrderGroupTests.cs" />
-    <Compile Include="LogicalFloorsCompatibilityTests.cs" />
-    <Compile Include="..\Source\MagicStorage\Compatibility\LogicalFloorsCompatibility.cs" />
     <Compile Include="StorageRefreshTests.cs" />
     <Compile Include="CoreContainerStubs.cs" />
     <Compile Include="ApparelStubs.cs" />
@@ -43,6 +41,7 @@
     <Compile Include="..\Source\MagicStorage\Construction\ConstructionSite.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageCore.cs" />
     <Compile Include="CraftingStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Buildings\Building_CosmicWorkbench.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CraftingBatch.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\ICraftingExecutor.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\CosmicPrinterSettings.cs" />
@@ -74,7 +73,6 @@
     <Compile Include="StorageResourceCounterTests.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
-    <Compile Include="..\Source\MagicStorage\Storage\StorageFloorContext.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfFilter.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfRestockFailure.cs" />
@@ -109,6 +107,9 @@
     <Compile Include="OrbitalTradeStubs.cs" />
     <Compile Include="..\Source\MagicStorage\Trading\FloatMenuOptionProvider_StorageOrbitalTrade.cs" />
     <Compile Include="RavenGiftStubs.cs" />
+    <Compile Include="RatkinRadioStubs.cs" />
+    <Compile Include="RatkinRadioTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\RatkinRadioCompatibility.cs" />
     <Compile Include="RavenGiftTests.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Compatibility\DynamicTradeInterfaceCompatibility.cs" />

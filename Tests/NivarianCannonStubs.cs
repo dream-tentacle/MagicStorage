@@ -53,6 +53,8 @@ namespace Nivarian_Race.Code.Logistics
 {
     public class CannonNetworkMapComponent
     {
+        public static readonly Dictionary<Map, CannonNetworkMapComponent> Networks = new Dictionary<Map, CannonNetworkMapComponent>();
+        public static CannonNetworkMapComponent For(Map map) => Networks.TryGetValue(map, out var network) ? network : null;
         public object Destination;
         public int GetHopDistance(CompCannonNode source, CompCannonNode dest) => source.Distance;
         public int AssignmentLoad(CompCannonNode source, int plannedExtra = 0) => source.Load + plannedExtra;
@@ -70,6 +72,37 @@ namespace Nivarian_Race.Code.Logistics
                     Math.Abs(node.parent.Position.z - port.Position.z) <= 1 && node.parent.Position != port.Position)
                     result.Add(node);
         }
+    }
+}
+namespace Verse
+{
+    public partial class ThingDef { public float BaseMarketValue; }
+}
+namespace Nivarian
+{
+    // Foreign snapshot boundary: retain its private entry shape and native query semantics.
+    public sealed class BillHaulSnapshot
+    {
+        private struct Stack { public int count; public float distSq; }
+        private readonly Dictionary<ThingDef, List<Stack>> _onMap = new Dictionary<ThingDef, List<Stack>>();
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static BillHaulSnapshot Capture(Map map, Thing building)
+        {
+            var result = new BillHaulSnapshot();
+            foreach (Thing item in map.Ground)
+                result.AddGround(item.def, item.stackCount, item.Position.DistanceToSquared(building.Position));
+            return result;
+        }
+        public void AddGround(ThingDef def, int count, float distance)
+        {
+            if (!_onMap.TryGetValue(def, out var list)) _onMap[def] = list = new List<Stack>();
+            list.Add(new Stack { count = count, distSq = distance });
+        }
+        public int CountMatching(Predicate<ThingDef> allows, float radius = float.MaxValue) =>
+            _onMap.Where(pair => allows(pair.Key)).Sum(pair => pair.Value.Where(stack => stack.distSq <= radius * radius).Sum(stack => stack.count));
+        public ThingDef CheapestOnMap(Predicate<ThingDef> allows, float radius = float.MaxValue) =>
+            _onMap.Where(pair => allows(pair.Key) && pair.Value.Any(stack => stack.distSq <= radius * radius))
+                .OrderBy(pair => pair.Key.BaseMarketValue).Select(pair => pair.Key).FirstOrDefault();
     }
 }
 namespace Nivarian_Race.Code.Logistics.Orders

@@ -18,11 +18,13 @@ internal static class CosmicCraftingTests
         try
         {
         OrderReordering(); FilteredOrderReordering(); Modes(); Ingredients(); WorkerRules(); AssignmentLifecycle(); ProductCounts(); AdditionalProductCounts(); MissingAdditionalCounts(); ProductFilterApplicability(); LoadAndBuildings();
-        ProductionCompletion(); ConfigurableWorkSpeed(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
+        ProductionCompletion(); CulturalSculptureProduction(); ConfigurableWorkSpeed(); ProductionOverflow(); ProductionFloorDelivery(); ProductionCancellationAndFailure();
         PreparedMaterialsSurviveSourceLoss();
         ShelfFallbackPreparation(); PreparationRollback(); LegacyWalkingJobPreparation(); AssignmentCleanupIsolation();
         CoreContainerSelection();
         BenchSelectionAndPriority();
+        WorkbenchWorkTypes();
+        WorkbenchBillGiver();
         OrderedJobPreflight();
         GroupedProductionPriority();
         WorkerFailurePrecedesOccupation();
@@ -31,11 +33,40 @@ internal static class CosmicCraftingTests
         VanillaMaterialSelection();
         IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
         RefreshDoesNotChangeWork();
-        MaterialRetryCaching(); EarlyWorkerEligibility();
+        MaterialRetryCaching(); MaterialFailureDetails(); EarlyWorkerEligibility();
         PrinterWorkerRules(); UnlimitedSkillRange(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
         return checks;
         }
         finally { MagicStorageMod.Settings.NewWorkbenchOrdersFirst = previousPlacement; }
+    }
+
+    private static void WorkbenchBillGiver()
+    {
+        foreach (var mode in new[] { CraftingRepeatMode.RepeatCount, CraftingRepeatMode.Forever })
+        {
+            var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1, 3);
+            order.Mode = mode; order.RepeatCount = 2;
+            IBillGiver giver = a.Item2;
+            Equal(a.Item2.Map, giver.Map, "recipe callbacks see the actual workbench map");
+            Equal(a.Item2.LabelShort, giver.LabelShort, "recipe callbacks see the actual workbench label");
+            Equal(a.Item2, giver.BillStack.billGiver, "compatibility bill stack belongs to the actual workbench");
+            Equal(giver.BillStack, giver.BillStack, "bill readers receive a stable stack instance");
+            Equal(0, giver.BillStack.Count, "core orders are not added to the vanilla bill stack");
+            Equal(false, giver.CurrentlyUsableForBills(), "vanilla bill work is disabled");
+            Equal(false, giver.UsableForBillsAfterFueling(), "vanilla refueling cannot enable bill work");
+            Equal(true, giver.IngredientStackCells.Contains(a.Item2.Position), "ingredient cells use the actual bench location");
+            var policy = (TestProductionPolicy)CraftingServices.Production; policy.Required = 1;
+            for (int iteration = 0; iteration < 2; iteration++)
+            {
+                var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+                driver.TestToils.Last().tickIntervalAction(1);
+                Equal(JobCondition.Succeeded, driver.EndCondition.Value, "production succeeds for " + mode);
+                Equal(a.Item2, policy.LastBillGiver, "production passes the actual bench for " + mode);
+                Equal(0, giver.BillStack.Count, "production never creates a vanilla bill");
+                Equal(false, order.Suspended, "valid bill giver does not suspend the order");
+            }
+            Equal(mode == CraftingRepeatMode.RepeatCount ? 0 : 2, order.RepeatCount, "bill context preserves repeat mode semantics");
+        }
     }
 
     private static void PrinterWorkerRules()
@@ -267,8 +298,9 @@ internal static class CosmicCraftingTests
     {
         internal int Calls;
         internal readonly ICraftingMaterialPolicy Inner = new NetworkCraftingMaterialPolicy();
-        public bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations)
-        { Calls++; return Inner.TryPlan(network, order, out allocations); }
+        public bool TryPlan(StorageNetwork network, CraftingOrder order, out Dictionary<Thing, int> allocations,
+            List<string> missing = null)
+        { Calls++; return Inner.TryPlan(network, order, out allocations, missing); }
     }
 
     private static void MaterialRetryCaching()
@@ -344,6 +376,101 @@ internal static class CosmicCraftingTests
         {
             CraftingServices.Materials = previousPolicy; Find.TickManager.TicksGame = previousTick;
             FloatMenuMakerMap.makingFor = previousMenuPawn; MagicStorageMod.Settings.RestoreDefaults();
+        }
+    }
+
+    private static void MaterialFailureDetails()
+    {
+        var previousTranslations = new Dictionary<string, string>(Translation.Values);
+        var previousPolicy = CraftingServices.Materials;
+        int previousTick = Find.TickManager.TicksGame;
+        try
+        {
+            Translation.Values["MS_Craft_MaterialShortage"] = "Missing materials";
+            Translation.Values["MS_Craft_MaterialCount"] = "{0}: {1}/{2}";
+            Translation.Values["MS_Craft_MaterialAvailable"] = "{0}: {1}";
+            Translation.Values["MS_Craft_MaterialReserved"] = " (reserved {0})";
+            Translation.Values["MS_Craft_MaterialProgress"] = "{0}: {1}";
+            Translation.Values["MS_Craft_MaterialAbsent"] = "No stock; need {0}";
+            Translation.Values["MS_Craft_MaterialRecheck"] = "Check every {0}s";
+            MagicStorageMod.Settings.RestoreDefaults(); Find.TickManager.TicksGame = 10000;
+            var f = new Fixture(); f.Material.label = "Steel";
+            var a = f.Core(0); var order = f.Order(a.Item1, 20);
+            var unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner;
+            var wood = new ThingDef { label = "Wood" };
+            order.Recipe.fixedIngredientFilter.Allowed.Add(wood); order.Ingredients.Allowed.Add(wood);
+            order.Recipe.ingredients[0].filter.Allowed.Add(wood);
+            order.Recipe.IngredientValueGetter.Values[wood] = 2;
+            unit.SlotCapacity = 10;
+            unit.Inventory.Contents.TryAdd(new Thing { def = wood, stackCount = 3 });
+            var claim = new object();
+            Equal(2, a.Item1.Network.ReserveOutgoing(claim, a.Item3, 2), "reserve a subset for diagnostics");
+            var policy = new CountingMaterialPolicy(); CraftingServices.Materials = policy;
+            Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "each non-mixed material kind is insufficient");
+            string saved = order.LastMaterialFailureDetails;
+            Equal(true, saved.Contains("Steel: 8/20 (reserved 2)"), "snapshot reports actual unreserved units and reserved subset");
+            Equal(true, saved.Contains("Wood: 3/10"), "all stocked alternatives use their own required count");
+            string compact = f.Dispatch.Status(a.Item1, order);
+            Equal("MS_Craft_MissingMaterials", compact, "compact status stays separate from details");
+            string tooltip = MapComponent_CosmicCrafting.StatusDetails(order, compact);
+            Equal(true, tooltip.Contains("Check every 30s"), "tooltip shows the configured retry interval");
+            Find.TickManager.TicksGame = 10900;
+            Equal(tooltip, MapComponent_CosmicCrafting.StatusDetails(order, compact), "time passing does not change the tooltip text");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 60;
+            Equal(true, MapComponent_CosmicCrafting.StatusDetails(order, compact).Contains("Check every 60s"), "tooltip reads the existing retry setting");
+            MagicStorageMod.Settings.CraftingMaterialRecheckSeconds = 30;
+            a.Item1.Network.ReleaseOutgoing(claim);
+            unit.Inventory.Contents.TryAdd(new Thing { def = f.Material, stackCount = 30 });
+            for (int i = 0; i < 10; i++) MapComponent_CosmicCrafting.StatusDetails(order, compact);
+            Equal(saved, order.LastMaterialFailureDetails, "hover retains snapshot after inventory and reservation changes");
+            Equal(1, policy.Calls, "repeated tooltip and status queries do not rescan during retry interval");
+            Equal((int?)10000, order.LastMaterialFailureTick, "hover never slides retry deadline");
+            Equal(true, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true) != null, "manual query immediately sees new stock");
+            Equal(2, policy.Calls, "manual query performs one new check");
+            Equal(null, order.LastMaterialFailureDetails, "success clears old diagnostic snapshot");
+
+            f = new Fixture(); f.Material.label = "Steel"; a = f.Core(0); order = f.Order(a.Item1, 40);
+            unit = (Building_StorageUnit)a.Item3.holdingOwner.Owner; unit.SlotCapacity = 10;
+            order.Recipe.fixedIngredientFilter.Allowed.Add(wood); order.Ingredients.Allowed.Add(wood);
+            order.Recipe.ingredients[0].filter.Allowed.Add(wood);
+            order.Recipe.IngredientValueGetter.Values[wood] = 2;
+            unit.Inventory.Contents.TryAdd(new Thing { def = wood, stackCount = 3 });
+            claim = new object(); a.Item1.Network.ReserveOutgoing(claim, a.Item3, 2);
+            order.Recipe.allowMixingIngredients = true;
+            var missing = new List<string>();
+            Equal(false, policy.Inner.TryPlan(a.Item1.Network, order, out _, missing), "mixed material shortage");
+            Equal(true, missing[0].Contains((14d / 40).ToString("P1")), "mixed progress uses recipe values instead of summing raw units");
+            Equal(true, missing.Any(s => s.Contains("Steel: 8 (reserved 2)")), "mixed detail retains raw units and reservations");
+            Equal(true, missing.Any(s => s.Contains("Wood: 3")), "mixed detail lists each stocked kind");
+            order.Recipe.ingredients[0].count = 14.01f; missing.Clear();
+            Equal(false, policy.Inner.TryPlan(a.Item1.Network, order, out _, missing), "nearly satisfied mixed recipe is still missing materials");
+            Equal(true, missing[0].Contains(.999d.ToString("P1")), "incomplete mixed requirement never displays 100 percent");
+
+            order.Recipe.allowMixingIngredients = false; order.Recipe.ingredients[0].count = 20;
+            var overlap = new IngredientCount { count = 5 }; overlap.filter.Allowed.Add(f.Material);
+            order.Recipe.ingredients.Add(overlap); missing.Clear();
+            Equal(false, policy.Inner.TryPlan(a.Item1.Network, order, out _, missing), "multiple ingredient shortages");
+            Equal(true, missing.Any(s => s.Contains("Steel: 0/5")), "later ingredient cannot count stock consumed by earlier diagnostic allocation");
+            a.Item1.Network.ReleaseOutgoing(claim);
+            foreach (var item in unit.Inventory.Contents.ToList()) unit.Inventory.Contents.Remove(item);
+            missing.Clear();
+            Equal(false, policy.Inner.TryPlan(a.Item1.Network, order, out _, missing), "empty inventory diagnostic");
+            Equal(true, missing.Any(s => s.StartsWith("No stock; need ")), "empty alternative category reports requirement without expanding unstocked kinds");
+
+            var shelfStock = f.ShelfStock(3, 7, out _);
+            f.Map.reservationManager.Reserved.Add(shelfStock); missing.Clear();
+            Equal(false, policy.Inner.TryPlan(a.Item1.Network, order, out _, missing), "fully reserved shelf cannot supply materials");
+            Equal(true, missing.Any(s => s.Contains("Steel: 0/20 (reserved 7)")), "fully reserved shelf remains visible in diagnostics");
+            shelfStock.forbidden = true; missing.Clear();
+            policy.Inner.TryPlan(a.Item1.Network, order, out _, missing);
+            Equal(false, missing.Any(s => s.Contains("reserved 7")), "forbidden stock is not mislabeled as reserved");
+        }
+        finally
+        {
+            Translation.Values.Clear();
+            foreach (var pair in previousTranslations) Translation.Values.Add(pair.Key, pair.Value);
+            CraftingServices.Materials = previousPolicy; Find.TickManager.TicksGame = previousTick;
+            MagicStorageMod.Settings.RestoreDefaults();
         }
     }
 
@@ -754,6 +881,8 @@ internal static class CosmicCraftingTests
     private static void BenchSelectionAndPriority()
     {
         var f = new Fixture(); var a = f.Core(0); var b = f.Core(10);
+        var otherGiver = new WorkGiverDef { workType = new WorkTypeDef() };
+        CraftingRecipeCatalog.WorkTypes.Add(otherGiver.workType);
         var first = f.Order(a.Item1); var second = f.Order(a.Item1, 4); f.Order(b.Item1);
         var extraBench = new Building_CosmicWorkbench(); f.Register(extraBench, 3); f.Dispatch.Register(extraBench);
         var scanner = new WorkGiver_CosmicCrafting { def = f.Giver };
@@ -767,7 +896,6 @@ internal static class CosmicCraftingTests
         first.Suspended = true;
         Equal(second.Id, scanner.JobOnThing(f.Pawn, extraBench, true).count, "suspended earlier order is skipped");
         first.Suspended = false;
-        var otherGiver = new WorkGiverDef { workType = new WorkTypeDef() };
         second.Recipe.route = otherGiver;
         var otherScanner = new WorkGiver_CosmicCrafting { def = otherGiver };
         var otherJob = otherScanner.JobOnThing(f.Pawn, extraBench, true);
@@ -807,9 +935,8 @@ internal static class CosmicCraftingTests
         Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work respects mandatory recipe skill");
         first.Recipe.minimumSkill = 0; first.Batch.Cancel(); first.Batch = null; a.Item3.stackCount = 0;
         Equal(null, scanner.JobOnThing(f.Pawn, extraBench, true), "forced work requires available materials");
-        Equal("MS_Craft_MissingMaterials", JobFailReason.Reason, "missing ingredients explain unavailable work");
-        Equal(null, new WorkGiver_CosmicCrafting { def = new WorkGiverDef { workType = new WorkTypeDef() } }
-            .JobOnThing(f.Pawn, extraBench, true), "missing category offers no executable job");
+        Equal(true, JobFailReason.Reason.StartsWith("MS_Craft_MaterialShortage"), "missing ingredients explain unavailable work with detailed reason");
+        Equal(null, otherScanner.JobOnThing(f.Pawn, extraBench, true), "missing category offers no executable job");
         Equal("MS_Craft_NoOrdersForWorkType", JobFailReason.Reason, "missing category supplies menu failure reason");
 
         Job JobFor(CraftingOrder order)
@@ -819,6 +946,85 @@ internal static class CosmicCraftingTests
             return job;
         }
     }
+    private static void WorkbenchWorkTypes()
+    {
+        var f = new Fixture();
+        var otherType = new WorkTypeDef(); CraftingRecipeCatalog.WorkTypes.Add(otherType);
+        var a = f.Core(0); var order = f.Order(a.Item1);
+        var nearest = a.Item2;
+        var farther = new Building_CosmicWorkbench(); f.Register(farther, 3); f.Dispatch.Register(farther);
+        Equal(true, nearest.AllowsWorkType(f.Type), "unconfigured bench allows the primary type");
+        Equal(true, nearest.AllowsWorkType(otherType), "unconfigured bench initializes every supported type");
+        nearest.SetWorkTypeAllowed(f.Type, false);
+        Equal(true, nearest.AllowsWorkType(otherType), "disabling one type preserves the other selection");
+        Equal(true, farther.AllowsWorkType(f.Type), "work type selections belong to individual benches");
+        Equal(farther, f.Dispatch.FindJob(f.Pawn, f.Giver).targetA, "automatic work skips a nearer bench that disallows its type");
+        Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, nearest, true), "forced menu work respects the selected bench's types");
+        Equal("MS_Craft_WorkTypeNotAllowed", JobFailReason.Reason, "menu explains a disallowed work type");
+        f.Pawn.mindState.priorityWork.Set(nearest.Position, f.Giver);
+        Equal(null, new WorkGiver_CosmicCrafting { def = f.Giver }.NonScanJob(f.Pawn), "prioritized work cannot bypass the bench restriction");
+        f.Pawn.mindState.priorityWork.Clear();
+        farther.SetWorkTypeAllowed(f.Type, false);
+        Equal(null, f.Dispatch.FindJob(f.Pawn, f.Giver), "no job when every bench disallows its work type");
+        Equal("MS_Craft_NoBench", f.Dispatch.Status(a.Item1, order), "status respects work type restrictions");
+        farther.SetWorkTypeAllowed(f.Type, true);
+        Equal("MS_Craft_Ready", f.Dispatch.Status(a.Item1, order), "reenabling a work type makes the task ready");
+
+        var preview = f.Dispatch.FindJob(f.Pawn, f.Giver);
+        farther.SetWorkTypeAllowed(f.Type, false);
+        Equal(false, new JobDriver_CosmicCrafting { pawn = f.Pawn, job = preview }.TryMakePreToilReservations(false),
+            "a job selected before settings changed cannot reserve a disallowed bench");
+        farther.SetWorkTypeAllowed(f.Type, true);
+        var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        driver.TestToils.Last().tickIntervalAction(20);
+        var batch = order.Batch; float progress = order.Progress;
+        farther.SetWorkTypeAllowed(f.Type, false);
+        Equal(false, driver.CanContinue(), "running work immediately notices its type was disabled");
+        Equal(false, ((ICraftingExecutor)driver).Allows(order), "claiming an order also checks bench work types");
+        f.Dispatch.MapComponentTick();
+        Equal(true, driver.ended, "maintenance interrupts a disallowed worker");
+        Equal(null, f.Dispatch.AssignedWorker(order), "interruption releases the order for another bench");
+        Equal(batch, order.Batch, "work type changes preserve the prepared batch");
+        Equal(progress, order.Progress, "work type changes preserve progress");
+        nearest.SetWorkTypeAllowed(f.Type, true);
+        var resumed = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        Equal(nearest, resumed.Bench, "a permitted bench can resume interrupted work");
+        Equal(batch, order.Batch, "resumption uses the same materials");
+        Equal(4, a.Item3.stackCount, "resumption does not take materials twice");
+        resumed.EndJobWith(JobCondition.InterruptForced);
+
+        nearest.SetWorkTypeAllowed(f.Type, false); nearest.SetWorkTypeAllowed(otherType, false);
+        Equal(false, nearest.AllowsWorkType(f.Type), "explicitly selecting nothing does not reset defaults");
+        var previousBoundary = Scribe_Collections.Boundary;
+        var previousMode = Scribe.mode;
+        List<WorkTypeDef> saved = null;
+        try
+        {
+            Scribe_Collections.Boundary = (key, value, mode) =>
+            {
+                if (key == "allowedWorkTypes") saved = new List<WorkTypeDef>((List<WorkTypeDef>)value);
+                return value;
+            };
+            nearest.ExposeData();
+            Equal(0, saved.Count, "an explicit empty selection is serialized as an empty list");
+            Scribe_Collections.Boundary = (key, value, mode) => key == "allowedWorkTypes" ? new List<WorkTypeDef>(saved) : value;
+            var loaded = new Building_CosmicWorkbench(); Scribe.mode = LoadSaveMode.PostLoadInit; loaded.ExposeData();
+            Equal(false, loaded.AllowsWorkType(f.Type), "loading an empty selection keeps the bench disabled");
+            Equal(false, loaded.AllowsWorkType(otherType), "loading empty selections does not repopulate any type");
+            Scribe_Collections.Boundary = (key, value, mode) => key == "allowedWorkTypes" ? null : value;
+            loaded = new Building_CosmicWorkbench(); loaded.ExposeData();
+            Equal(true, loaded.AllowsWorkType(f.Type), "loading null initializes defaults");
+            Equal(true, loaded.AllowsWorkType(otherType), "loading null initializes all supported types");
+        }
+        finally { Scribe_Collections.Boundary = previousBoundary; Scribe.mode = previousMode; }
+
+        var unconnected = new Building_CosmicWorkbench { Spawned = true, Map = f.Map, Faction = Faction.OfPlayer };
+        var gizmo = unconnected.GetGizmos().OfType<Command_Action>().Single();
+        Equal("MS_Craft_AllowedWorkTypes", gizmo.defaultLabel, "an unconnected bench still offers work type settings");
+        gizmo.action();
+        Equal(true, Find.WindowStack.Windows.Last() is Dialog_CosmicWorkbenchWorkTypes, "settings command opens its selection window");
+    }
+
     private static void CoreContainerSelection()
     {
         var core = new Building_StorageCore();
@@ -1090,6 +1296,10 @@ internal static class CosmicCraftingTests
         Equal(false, CraftingMaterialPlanner.TryPlan(stocks, needs, true, false, out plan, shortages), "mixed shortage");
         Equal(15d, shortages[0].Available, "mixed quantity uses ingredient values");
         Equal(20d, shortages[0].Required, "mixed required value retained");
+        shortages.Clear(); needs[0].CountRequired = _ => 999;
+        CraftingMaterialPlanner.TryPlan(stocks, needs, true, false, out _, shortages);
+        Equal(20d, shortages[0].Alternatives.Single(a => Equals(a.Kind, "wood")).Required,
+            "mixed diagnostics follow value-based demand rather than the no-mix count override");
     }
     private static void WorkerRules()
     {
@@ -1140,6 +1350,7 @@ internal static class CosmicCraftingTests
             Map.component = new MapComponent_StorageNetworks(Map);
             Pawn = new Pawn { Spawned=true, Map=Map, Faction=Faction.OfPlayer };
             Giver = new WorkGiverDef { workType=Type };
+            CraftingRecipeCatalog.WorkTypes.Clear(); CraftingRecipeCatalog.WorkTypes.Add(Type);
             Map.mapPawns.AllPawnsSpawned.Add(Pawn);
             CraftingServices.Products = new TestProductCounter();
             CraftingServices.Production = new TestProductionPolicy();
@@ -1558,6 +1769,7 @@ internal static class CosmicCraftingTests
         Equal(1,order.RepeatCount,"one completed iteration decrements one repeat");
         Equal(4L,a.Item1.Network.GetTotalCount(policy.Product),"product enters current network");
         Equal(1,policy.MakeCalls,"one generation call"); Equal(1,policy.ConsumeCalls,"one ingredient consumption");
+        Equal(resumed.Bench,policy.LastBillGiver,"resumed work passes its current bench to product callbacks");
         Equal(1,policy.NotifyCalls,"one completion notification");
         Equal(0.2f,f.Pawn.CraftingXp,"first worker receives only own contribution");
         Equal(0.3f,replacement.CraftingXp,"replacement receives only own contribution");
@@ -1566,6 +1778,35 @@ internal static class CosmicCraftingTests
         Equal(4L,a.Item1.Network.GetTotalCount(policy.Product),"completion retry cannot duplicate output");
         Equal(1,policy.MakeCalls,"completion retry cannot regenerate products");
         Equal(0,batch.Ingredients.Count,"consumed inputs leave no dangling holder entries");
+    }
+
+    private static void CulturalSculptureProduction()
+    {
+        var f = new Fixture(); var a = f.Core(0); var template = f.Order(a.Item1, 3);
+        a.Item1.Crafting.Remove(template);
+        var precept = new Precept_ThingStyle();
+        var order = a.Item1.Crafting.Add(template.Recipe, precept);
+        Equal(precept, order.Precept, "adding a cultural option binds that exact precept to the order");
+        var policy = (TestProductionPolicy)CraftingServices.Production; policy.Required = 10;
+        var driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        driver.TestToils.Last().tickIntervalAction(5);
+        Equal(.5f, order.Progress, "cultural order keeps the ordinary batch progress");
+        driver.EndJobWith(JobCondition.InterruptForced);
+        driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        Equal(.5f, order.Progress, "resuming a cultural order retains progress");
+        driver.TestToils.Last().tickIntervalAction(5);
+        Equal(JobCondition.Succeeded, driver.EndCondition.Value, "cultural order finishes through the usual executor");
+        Equal(precept, policy.LastPrecept, "completion passes the stored precept without reselecting a culture");
+        Equal(1, policy.MakeCalls, "cultural production generates only once");
+        Equal(false, order.Suspended, "cultural orders gain no special suspension rule");
+
+        var direct = a.Item1.Crafting.Add(template.Recipe, precept);
+        driver = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        direct.Batch.Work(direct, f.Pawn, a.Item2, 10);
+        policy.LastPrecept = null;
+        Equal(true, direct.Batch.Complete(direct, f.Pawn), "direct batch completion succeeds");
+        Equal(precept, policy.LastPrecept, "direct completion also passes the stored precept");
+        driver.EndJobWith(JobCondition.InterruptForced);
     }
 
     private static void ProductionOverflow()

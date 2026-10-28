@@ -17,6 +17,8 @@
   <MS_Shelf_Empty>未指定物品</MS_Shelf_Empty>
   <MS_Shelf_Select>选择物品</MS_Shelf_Select>
   <MS_Shelf_Clear>清空</MS_Shelf_Clear>
+  <MS_Shelf_Recall>收回</MS_Shelf_Recall>
+  <MS_Shelf_RecallTip>立即将架上物品全部退回存储网络。无法退回的物品留在货架上，之后按正常补货与清理规则处理。</MS_Shelf_RecallTip>
   <MS_Shelf_Stock>库存：{0} / {1}</MS_Shelf_Stock>
   <MS_Shelf_Contents>货架库存：{0} / {1} 堆</MS_Shelf_Contents>
   <MS_Shelf_Use>殖民者可直接领取。仅自动补货，不接收普通搬运。</MS_Shelf_Use>
@@ -55,4 +57,19 @@
   <MS_Shelf_SharedLimitTip>仅控制此格的补货数量，实际数量不超过物品自身的堆叠上限。0表示暂停补货；调低上限不会移走已有库存。</MS_Shelf_SharedLimitTip>
   <MS_Shelf_ModeBlockedTitle>无法切换补货架模式</MS_Shelf_ModeBlockedTitle>
   <MS_Shelf_ModeBlocked>无法将架上物品全部退回核心，补货架保持当前模式。请检查网络连接、核心储存筛选和剩余空间，并确保物品未被禁用或预留。</MS_Shelf_ModeBlocked>
+  <MS_Shelf_LocalPresets>本地预设</MS_Shelf_LocalPresets>
+  <MS_Shelf_LocalPresetsDesc>将补货架配置保存到本地，或加载、删除已保存的预设。重启游戏或更换存档后仍可使用。</MS_Shelf_LocalPresetsDesc>
+  <MS_Shelf_LocalPresetsHint>输入名称以保存当前货架配置。加载会覆盖当前配置；同名保存会询问是否覆盖。</MS_Shelf_LocalPresetsHint>
+  <MS_Shelf_SavePreset>保存预设</MS_Shelf_SavePreset>
+  <MS_Shelf_LoadPreset>加载</MS_Shelf_LoadPreset>
+  <MS_Shelf_DeletePreset>删除</MS_Shelf_DeletePreset>
+  <MS_Shelf_NoLocalPresets>尚未保存本地预设。</MS_Shelf_NoLocalPresets>
+  <MS_Shelf_PresetFolder>保存位置：{0}</MS_Shelf_PresetFolder>
+  <MS_Shelf_DeletePresetConfirm>确定删除本地预设“{0}”？</MS_Shelf_DeletePresetConfirm>
+  <MS_Shelf_OverwritePresetConfirm>已存在名为“{0}”的预设。是否用当前货架配置覆盖？</MS_Shelf_OverwritePresetConfirm>
+  <MS_Shelf_MissingPresetItems>有以下物品预设不在当前游戏 mod 中，可能存在预期不符。</MS_Shelf_MissingPresetItems>
+  <MS_Shelf_PresetConfirm>确认</MS_Shelf_PresetConfirm>
+  <MS_Shelf_ViewMissingPresetItems>查看无法加载物品列表</MS_Shelf_ViewMissingPresetItems>
+  <MS_Shelf_MissingPresetItemsTitle>无法加载的物品（DefName）</MS_Shelf_MissingPresetItemsTitle>
+  <MS_Shelf_PresetFileError>无法读写本地预设文件：{0}</MS_Shelf_PresetFileError>
 </LanguageData>

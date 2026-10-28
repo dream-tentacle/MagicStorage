@@ -58,6 +58,7 @@ namespace RimWorld
 }
 namespace MagicStorage
 {
+    public class Dialog_StorageShelfPresets { public Dialog_StorageShelfPresets(Building_StorageSupplyShelf shelf) { } }
     public class Dialog_StorageSupplyShelf { public Dialog_StorageSupplyShelf(Building_StorageSupplyShelf shelf) { } }
     public class Dialog_StorageShelfSharedFilter { public Dialog_StorageShelfSharedFilter(Building_StorageSupplyShelf shelf) { } }
 }

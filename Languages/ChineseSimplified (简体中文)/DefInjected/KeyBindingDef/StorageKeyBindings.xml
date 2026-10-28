@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <MS_JumpToStorageCore.label>跳转到存储控制核心</MS_JumpToStorageCore.label>
+  <MS_ViewItems.label>查看物品</MS_ViewItems.label>
+  <MS_ProductionOrders.label>制作清单</MS_ProductionOrders.label>
+  <MS_ShelfCopyPreset.label>复制预设</MS_ShelfCopyPreset.label>
+  <MS_ShelfPastePreset.label>粘贴预设</MS_ShelfPastePreset.label>
+  <MS_ShelfLocalPresets.label>本地预设</MS_ShelfLocalPresets.label>
+</LanguageData>

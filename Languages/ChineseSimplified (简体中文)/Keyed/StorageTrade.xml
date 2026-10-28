@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Trade_RadioCommand>魔法存储交易</MS_Trade_RadioCommand>
   <MS_Payment_Unavailable>无法完成付款：可用资源不足，或存储网络已不可用。</MS_Payment_Unavailable>
   <MS_Trade_Command>通过魔法存储与{0}交易</MS_Trade_Command>
   <MS_Trade_CeleTechUnavailable>贸易无人机已无法交易</MS_Trade_CeleTechUnavailable>

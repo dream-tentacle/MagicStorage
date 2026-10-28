@@ -15,6 +15,7 @@ namespace MagicStorage
 
         public int Id;
         public RecipeDef Recipe;
+        public Precept_ThingStyle Precept;
         public string GroupId;
         public CraftingRepeatMode Mode;
         public int RepeatCount = 1, TargetCount = 10, UnpauseAt = 5;
@@ -32,19 +33,49 @@ namespace MagicStorage
         public CraftingBatch Batch;
         // Runtime-only failure cache; no background refresh or inventory invalidation.
         internal int? LastMaterialFailureTick;
+        internal string LastMaterialFailureDetails;
         public float Progress => Batch?.Progress ?? 0f;
         // A paused order only needs to distinguish counts above its resume threshold.
         internal long ProductCountLimit => PauseWhenSatisfied && Paused
             ? Math.Min((long)TargetCount, (long)UnpauseAt + 1) : TargetCount;
 
         public CraftingOrder() { }
-        public CraftingOrder(int id, RecipeDef recipe)
+        public CraftingOrder(int id, RecipeDef recipe, Precept_ThingStyle precept = null)
         {
-            Id = id; Recipe = recipe;
+            Id = id; Recipe = recipe; Precept = precept;
             Ingredients.CopyAllowancesFrom(recipe.defaultIngredientFilter ?? recipe.fixedIngredientFilter);
         }
 
         public void Changed() { Revision++; }
+        // Every saved setting is copied, except the identity and the unfinished batch:
+        // a copy prepares its own materials instead of taking over another order's batch.
+        // Filters are deep-copied so editing one order never edits the other.
+        internal CraftingOrder Duplicate(int id)
+        {
+            var copy = new CraftingOrder(id, Recipe, Precept)
+            {
+                GroupId = GroupId,
+                Mode = Mode,
+                RepeatCount = RepeatCount,
+                TargetCount = TargetCount,
+                UnpauseAt = UnpauseAt,
+                Suspended = Suspended,
+                PauseWhenSatisfied = PauseWhenSatisfied,
+                Paused = Paused,
+                DropProductsOnFloor = DropProductsOnFloor,
+                Worker = Worker,
+                WorkerKind = WorkerKind,
+                SkillRange = SkillRange,
+                IncludeEquipped = IncludeEquipped,
+                IncludeTainted = IncludeTainted,
+                LimitToAllowedStuff = LimitToAllowedStuff,
+                HitPoints = HitPoints,
+                Quality = Quality
+            };
+            copy.Ingredients.CopyAllowancesFrom(Ingredients);
+            copy.AdditionalCounts.CopyAllowancesFrom(AdditionalCounts);
+            return copy;
+        }
         internal bool AllowsSkillLevel(int level) => level >= SkillRange.min &&
             (SkillRange.max == UnlimitedSkillLevel || level <= SkillRange.max);
         internal bool ShouldRun(long products) => CraftingRunPolicy.ShouldRun(Mode, Suspended,
@@ -54,6 +85,7 @@ namespace MagicStorage
         {
             Scribe_Values.Look(ref Id, "id");
             Scribe_Defs.Look(ref Recipe, "recipe");
+            Scribe_References.Look(ref Precept, "precept");
             Scribe_Values.Look(ref GroupId, "groupId");
             Scribe_Deep.Look(ref Batch, "batch");
             Scribe_Values.Look(ref Mode, "mode");
@@ -199,14 +231,29 @@ namespace MagicStorage
                 groups.RemoveAt(i);
             }
         }
-        public CraftingOrder Add(RecipeDef recipe)
+        public CraftingOrder Add(RecipeDef recipe, Precept_ThingStyle precept = null)
         {
             var display = DisplayGroups();
-            var order = new CraftingOrder(nextId++, recipe);
+            var order = new CraftingOrder(nextId++, recipe, precept);
             if (MagicStorageMod.Settings.NewWorkbenchOrdersFirst) orders.Insert(0, order);
             else orders.Add(order);
             SetGroupOrder(display);
             return order;
+        }
+        // The copy stays in the source's group and sits directly after it, so the
+        // new-order placement setting never separates a task from its duplicate.
+        internal CraftingOrder Duplicate(CraftingOrder source)
+        {
+            if (source == null || source.Recipe == null || !orders.Contains(source)) return null;
+            // Never reuse a loaded id: jobs address their order by it.
+            int id = nextId;
+            while (orders.Exists(order => order.Id == id)) id++;
+            nextId = id + 1;
+            var display = DisplayGroups();
+            var copy = source.Duplicate(id);
+            orders.Insert(orders.IndexOf(source) + 1, copy);
+            SetGroupOrder(display);
+            return copy;
         }
         public CraftingOrder Find(int id) => orders.Find(order => order.Id == id);
         public void Remove(CraftingOrder order)
@@ -276,6 +323,9 @@ namespace MagicStorage
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (orders == null) orders = new List<CraftingOrder>();
+                // Report before pruning: a task whose recipe can no longer be resolved
+                // is unusable, but its removal must not look like the list lost data.
+                CraftingOrderLoadNotice.Report(orders.Count(order => order?.Recipe == null));
                 orders.RemoveAll(o => o?.Recipe == null);
                 var ids = new HashSet<string>();
                 groups.RemoveAll(group => group == null || string.IsNullOrEmpty(group.Id) || !ids.Add(group.Id));

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Guide_Title>存储指南</MS_Guide_Title>
+  <MS_Guide_FirstCoreTitle>新手教程必做提醒</MS_Guide_FirstCoreTitle>
+  <MS_Guide_FirstCoreText>请在核心做完新手教程中的基础、进阶内容，此内容为必做选项</MS_Guide_FirstCoreText>
   <MS_Guide_Description>学习基础存取，检查当前网络配置，并排查物品无法入库的原因。</MS_Guide_Description>
   <MS_Guide_ChooseCore>选择当前地图的控制核心</MS_Guide_ChooseCore>
   <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
@@ -17,8 +19,8 @@
   <MS_Guide_Body0>每个存储网络只能有一个控制核心。核心负责管理库存、存储筛选和优先级。多个核心连接在一起时，需要分开网络。</MS_Guide_Body0>
   <MS_Guide_Step1>2. 接入存储单元</MS_Guide_Step1>
   <MS_Guide_Body1>至少接入一个存储单元来保存物品。用存储线连接建筑，并检查其网络状态。存储线独立于电网，不传输电力。</MS_Guide_Body1>
-  <MS_Guide_Step2>3. 接入至少三个存储接收器</MS_Guide_Step2>
-  <MS_Guide_Body2>搬运过程中会占用存储接收器。建议在同一网络接入至少三个，避免接收器全部被占用，影响后续搬运。少于三个仍可工作。</MS_Guide_Body2>
+  <MS_Guide_Step2>3. 接入存储接收器</MS_Guide_Step2>
+  <MS_Guide_Body2>搬运过程中会占用存储接收器。建议在同一网络接入至少三个，避免接收器全部被占用，影响后续搬运。少于三个仍可工作。\n\n也可以选中存储接收器修改吸收范围，并在旁边画出存储区。</MS_Guide_Body2>
   <MS_Guide_Receivers>同一网络已接入接收器：{0} / 3 个（推荐）</MS_Guide_Receivers>
   <MS_Guide_Step3>4. 设置接收规则</MS_Guide_Step3>
   <MS_Guide_Body3>核心默认不接收任何物品。打开核心的存储设置，允许需要存入的物品，并设置合适的优先级。同一网络的接收器共用这些规则。此步检查是否已允许至少一种物品；具体物品能否入库仍取决于完整筛选条件。</MS_Guide_Body3>
@@ -50,7 +52,7 @@
   <MS_Guide_Reabsorb>手动取出的物品又被吸回去了？接收器会吸入其表面符合筛选的物品。建议不要紧贴控制核心放置接收器，给取出的物品留出空间。</MS_Guide_Reabsorb>
   <MS_Guide_Nav0>1. 控制核心</MS_Guide_Nav0>
   <MS_Guide_Nav1>2. 存储单元</MS_Guide_Nav1>
-  <MS_Guide_Nav2>3. 三个接收器</MS_Guide_Nav2>
+  <MS_Guide_Nav2>3. 接入接收器</MS_Guide_Nav2>
   <MS_Guide_Nav3>4. 接收规则</MS_Guide_Nav3>
   <MS_Guide_Nav4>5. 存入物品</MS_Guide_Nav4>
   <MS_Guide_Nav5>6. 取出物品</MS_Guide_Nav5>
@@ -69,6 +71,21 @@
   <MS_Guide_OpenFilterShort>存储设置</MS_Guide_OpenFilterShort>
   <MS_Guide_OpenInventoryShort>库存与取出</MS_Guide_OpenInventoryShort>
   <MS_Guide_Advanced>进阶</MS_Guide_Advanced>
+  <MS_Guide_Practical>实用方法</MS_Guide_Practical>
+  <MS_Guide_PracticalShelfNav>多品种补货</MS_Guide_PracticalShelfNav>
+  <MS_Guide_PracticalShelfTitle>多品种食物与药品补货</MS_Guide_PracticalShelfTitle>
+  <MS_Guide_PracticalShelfBody>可以将补货架切换为“筛选模式”，允许需要供应的物品类别，无需逐格指定物品。\n\n如果希望同时供应多个种类的物品，可以开启“互不相同”。空格补货时会跳过货架上已有的物品类型，从网络库存中选择其他符合条件的品种。这样可以在有限的格子里供应多种食物或药品，尤其适合增加了大量物品种类的模组。</MS_Guide_PracticalShelfBody>
+  <MS_Guide_PracticalShelfNote>此选项不会自动清走已有的重复物品；同种物品的不同材质或品质也不算不同品种。</MS_Guide_PracticalShelfNote>
+  <MS_Guide_PracticalHotkeysTitle>快捷键</MS_Guide_PracticalHotkeysTitle>
+  <MS_Guide_PracticalTurretTitle>炮塔补充</MS_Guide_PracticalTurretTitle>
+  <MS_Guide_PracticalTurretBody>大部分mod炮塔通过加固炮管或者钢铁补充的弹药实际上是“燃料”机制。你可以尝试通过燃料补给器给这些炮塔补充，不过不保证一定可用。</MS_Guide_PracticalTurretBody>
+  <MS_Guide_PracticalGroupingTitle>配方分组</MS_Guide_PracticalGroupingTitle>
+  <MS_Guide_PracticalGroupingBody>在配方列表上方，有一个分组开关，打开后，配方列表就可以分组了。在上面的组仍然会更加优先于下面的组。\n\n可以通过拖拽来快速修改分组。分组也可以整体拖拽。</MS_Guide_PracticalGroupingBody>
+  <MS_Guide_PracticalFindRecipesTitle>查找配方</MS_Guide_PracticalFindRecipesTitle>
+  <MS_Guide_PracticalFindRecipesBody>想要查找mod特定的工作台或者配方，可以使用上方的mod筛选，找起来更方便。\n\n你也可以收藏常用工作台，或将不常用的工作台置底，让常用工作台更容易找到。</MS_Guide_PracticalFindRecipesBody>
+  <MS_Guide_PracticalModTradeTitle>Mod交易</MS_Guide_PracticalModTradeTitle>
+  <MS_Guide_PracticalModTradeBody>为了保证性能良好，存储中的物体不会被渲染在地图上（否则会很卡）。这可能会让一些mod无法识别本mod存储中的物资。\n\n对于那些只需要玩家提供白银或单一产物的mod，有以下两种解决方法：\n\n1. 联系此mod作者，让其改为尊重并调用原版的TradeUtility.AllLaunchableThingsForTrade和TradeUtility.LaunchThingsOfType接口。\n\n2. 通过高堆叠补货架摆出较多白银，从而渲染在地图上。可以搭配修改堆叠的mod，把它改成更大的单个堆叠。</MS_Guide_PracticalModTradeBody>
+  <MS_Guide_PracticalHotkeysBody>你可以在选项-控制中，设置本mod使用的快捷键，可以快速跳转到控制核心、打开制作清单、查看物品等。</MS_Guide_PracticalHotkeysBody>
   <MS_Guide_AdvancedTips>使用提示</MS_Guide_AdvancedTips>
   <MS_Guide_AdvancedBuilt>当前地图已建造：{0} 个</MS_Guide_AdvancedBuilt>
   <MS_Guide_AdvancedConnected>已接入所选核心的网络：{0} 个</MS_Guide_AdvancedConnected>

@@ -33,11 +33,19 @@ internal static class StorageFoundationTests
     {
         try
         {
+#if !LOGICAL_FLOORS_COMPATIBILITY_TESTS
+            Equal<Type>(null, typeof(StorageNetwork).Assembly.GetType("LogicalFloors.API.FloorApi"), "ordinary test assembly contains no floor API");
+#endif
             TenUnitCounts(); CapacityAndRollback(); Topology();
             assertions += CosmicCraftingTests.Run();
+#if COSMIC_ROOM_ROLE_TESTS
+            assertions += CosmicWorkbenchRoomRoleTests.Run();
+#endif
             assertions += CraftingOrderGroupTests.Run();
             assertions += ConstructionSupplyTests.Run();
+#if LOGICAL_FLOORS_COMPATIBILITY_TESTS
             assertions += LogicalFloorsCompatibilityTests.Run();
+#endif
             assertions += StorageReservationTests.Run();
             assertions += StorageUnitTransferTests.Run();
             assertions += StorageTradeTests.Run();

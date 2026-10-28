@@ -21,6 +21,7 @@ namespace Verse
     }
     public static class Translation
     {
+        public static string CapitalizeFirst(this string text) => string.IsNullOrEmpty(text) ? text : char.ToUpper(text[0]) + text.Substring(1);
         public static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
         public static string Translate(this string text, params object[] args) =>
             Values.TryGetValue(text, out string format) ? string.Format(format, args) : text;
@@ -177,7 +178,6 @@ namespace MagicStorage
 {
     using Verse;
     public class CompStorageNode { public Thing parent; public StorageNetwork Network; }
-    public class Building_StorageConduit : Verse.Building { }
     public class Building_StorageUnit : Thing, IThingHolder
     {
         private int? slotCapacityOverride;

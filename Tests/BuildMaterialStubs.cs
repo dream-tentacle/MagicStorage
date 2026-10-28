@@ -12,6 +12,7 @@ namespace Verse
     public sealed class StaticConstructorOnStartupAttribute : Attribute { }
     public static class Find { public static Map CurrentMap; }
     public static class DebugSettings { public static bool godMode; }
+    public static class DefDatabase<T> { public static readonly List<T> AllDefsListForReading = new List<T>(); }
     public static class Log { public static readonly List<string> Errors = new List<string>(); public static void Error(string text) => Errors.Add(text); }
     public sealed class Faction { public static readonly Faction OfPlayer = new Faction(); }
     public sealed class StuffProperties
@@ -32,9 +33,10 @@ namespace Verse
     public sealed class ListerThings
     {
         public readonly Dictionary<ThingDef, List<Thing>> ByDef = new Dictionary<ThingDef, List<Thing>>();
+        public int Queries;
         private readonly List<Thing> empty = new List<Thing>();
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public List<Thing> ThingsOfDef(ThingDef def) => ByDef.TryGetValue(def, out var list) ? list : empty;
+        public List<Thing> ThingsOfDef(ThingDef def) { Queries++; return ByDef.TryGetValue(def, out var list) ? list : empty; }
     }
     public struct IntVec3
     {
@@ -52,6 +54,8 @@ namespace Verse
 namespace MagicStorage
 {
     using Verse;
+    internal static class MagicStorageMod { internal static readonly MagicStorageSettings Settings = new MagicStorageSettings(); }
+    internal sealed class MagicStorageSettings { public bool AllowAllMaterials; }
     public sealed class MapComponent_StorageNetworks
     { public readonly List<Building_StorageUnit> StorageUnits = new List<Building_StorageUnit>(); }
     public sealed class Building_StorageUnit

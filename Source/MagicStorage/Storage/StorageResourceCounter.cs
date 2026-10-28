@@ -28,12 +28,9 @@ namespace MagicStorage
             manager.EnsureCurrent();
             var counts = __instance.AllCountedAmounts;
             List<Thing> stacks = null;
-            // Only working networks expose their stored resources. Reservations do not
-            // subtract owned stock; spawned output shelves are counted by vanilla.
             foreach (Building_StorageUnit unit in manager.StorageUnits)
             {
-                if (!unit.Spawned || unit.Destroyed || unit.Map != ___map || unit.Faction != Faction.OfPlayer ||
-                    unit.Position.Fogged(___map) || unit.Network?.CanWork != true) continue;
+                if (!IsCounted(unit, ___map)) continue;
                 foreach (ThingDef def in unit.Inventory.IndexedDefs)
                 {
                     bool minified = def.thingClass != null && typeof(MinifiedThing).IsAssignableFrom(def.thingClass);
@@ -60,6 +57,13 @@ namespace MagicStorage
                 }
             }
         }
+
+        // The readout and the bill target count must agree on which stock exists, so both use
+        // this rule. Only working networks expose their stored resources. Reservations do not
+        // subtract owned stock; spawned output shelves are counted by vanilla.
+        internal static bool IsCounted(Building_StorageUnit unit, Map map) =>
+            unit.Spawned && !unit.Destroyed && unit.Map == map && unit.Faction == Faction.OfPlayer &&
+            !unit.Position.Fogged(map) && unit.Network?.CanWork == true;
 
         private static void AddCount(Dictionary<ThingDef, int> counts, ThingDef def, long amount)
         {

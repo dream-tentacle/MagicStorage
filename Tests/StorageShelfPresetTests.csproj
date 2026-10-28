@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>obj\ShelfPresets\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputPath>bin\ShelfPresets\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ShelfPresetStubs.cs" />
+    <Compile Include="StorageShelfPresetTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Storage\StorageShelfPresets.cs" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

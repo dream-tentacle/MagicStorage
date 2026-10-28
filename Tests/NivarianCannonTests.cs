@@ -36,6 +36,7 @@ internal static class NivarianCannonTests
             Port.SpawnSetup(Map, false); Manager.EnsureCurrent();
             Target = new Thing { Map = Map, Spawned = true, Faction = Faction.OfPlayer, Position = new IntVec3(20, 0) };
             Cannon = AddCannon(3, 0); CannonNetwork.Destination = Cannon;
+            CannonNetworkMapComponent.Networks[Map] = CannonNetwork;
         }
         internal void Register(Thing thing, int x)
         {
@@ -72,7 +73,71 @@ internal static class NivarianCannonTests
         new NivarianCannonCompatibility().Apply(new Harmony("mjcg.magicstorage.tests.nivarian"));
         BasicAndRemainder(); CapacityAndRouting(); ReservationsAndFailures(); LifecycleAndSources(); FuelOrderAndNativeReservations();
         AcceptanceBoundaries();
+        BillInventoryBeforeOrders(); BillInventoryEligibility();
         return assertions;
+    }
+
+    private static void BillInventoryBeforeOrders()
+    {
+        var f = new Fixture(); f.Store(40);
+        var snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(0, f.Map.Ground.Count, "regression starts with no ground materials");
+        Equal(40, snapshot.CountMatching(def => def == f.Steel), "bill feasibility sees stored materials before an order exists");
+        Equal(f.Steel, snapshot.CheapestOnMap(def => def == f.Steel), "bill selects stored ingredient for its demand");
+        Equal(0, f.Ledger.Orders.Count, "snapshot does not create orders");
+        Equal(40L, f.Network.GetTotalCount(f.Steel), "snapshot does not withdraw inventory");
+        if (snapshot.CountMatching(def => def == f.Steel) >= 30) f.Match(30);
+        Equal(30, f.Cargo, "storage-only recipe passes feasibility then reaches existing dispatch");
+        snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(10, snapshot.CountMatching(def => def == f.Steel), "cargo already extracted is not counted as stored stock again");
+
+        f = new Fixture(); f.Steel.BaseMarketValue = 8; f.Store(20);
+        var cheaper = new ThingDef { BaseMarketValue = 2, stackLimit = 1000 }; f.Store(15, cheaper);
+        snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(cheaper, snapshot.CheapestOnMap(def => true), "flexible recipe chooses cheaper available stored ingredient");
+        Equal(f.Steel, snapshot.CheapestOnMap(def => def != cheaper), "bill filter excludes cheaper ingredient");
+        Equal(0, snapshot.CountMatching(def => true, 18), "bill radius excludes storage outside its search range");
+        Equal(35, snapshot.CountMatching(def => true, 19), "stock distance uses its storage unit position");
+        f.Map.Ground.Add(new Thing { def = f.Steel, stackCount = 3, Position = f.Target.Position });
+        snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(23, snapshot.CountMatching(def => def == f.Steel), "ground and stored materials both remain visible");
+        Equal(3, snapshot.CountMatching(def => def == f.Steel, 1), "native ground radius remains intact");
+
+        var second = new Building_NivarianCannonExtractor(); f.Register(second, 2); second.Position = new IntVec3(2, 1);
+        second.TestComps.Add(new CompPowerTrader()); second.SpawnSetup(f.Map, false);
+        snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(38, snapshot.CountMatching(def => true), "two extractors on one network do not double-count stock");
+        var reserved = new object(); var item = f.Store(12);
+        f.Network.ReserveOutgoing(reserved, item, 7);
+        snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+        Equal(28, snapshot.CountMatching(def => def == f.Steel), "other tasks' reserved materials are excluded");
+    }
+
+    private static void BillInventoryEligibility()
+    {
+        Action<Fixture>[] disable = {
+            f => f.Port.GetComp<CompPowerTrader>().PowerOn = false,
+            f => f.Port.GetComp<CompFlickable>().SwitchIsOn = false,
+            f => f.Port.Faction = new Faction(),
+            f => f.Cannon.Powered = false,
+            f => f.Cannon.parent.Faction = new Faction(),
+            f => f.Cannon.Distance = int.MaxValue,
+            f => f.Cannon.parent.Position = new IntVec3(4, 0),
+            f => f.CannonNetwork.Destination = null,
+            f => CannonNetworkMapComponent.Networks.Remove(f.Map),
+            f => f.Target.Faction = new Faction(),
+            f => f.Port.DeSpawn(),
+            f => { f.Manager.Unregister(f.Core.node); f.Core.Spawned = false; }
+        };
+        foreach (var change in disable)
+        {
+            var f = new Fixture(); f.Store(60); change(f);
+            var snapshot = Nivarian.BillHaulSnapshot.Capture(f.Map, f.Target);
+            Equal(0, snapshot.CountMatching(def => true), "inaccessible storage cannot make a bill appear fulfillable");
+        }
+        var full = new Fixture(); full.Store(60); full.Cannon.CapacityLimit = 0;
+        Equal(60, Nivarian.BillHaulSnapshot.Capture(full.Map, full.Target).CountMatching(def => true),
+            "temporary full cannon keeps pending recipe demand visible");
     }
     private static void BasicAndRemainder()
     {

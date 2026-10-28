@@ -104,6 +104,7 @@ namespace MagicStorage
                 yield return new Command_Action
                 {
                     defaultLabel = "MS_Craft_Open".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ProductionOrders,
                     defaultDesc = "MS_Craft_OpenDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/CraftingList"),
                     action = () => Find.WindowStack.Add(new Dialog_CosmicCrafting(this))
@@ -112,6 +113,7 @@ namespace MagicStorage
                 yield return new Command_Action
                 {
                     defaultLabel = "MS_UI_Open".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ViewItems,
                     defaultDesc = "MS_UI_OpenDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/Inventory"),
                     action = () => Find.WindowStack.Add(new Dialog_StorageInventory(this))

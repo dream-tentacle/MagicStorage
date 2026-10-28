@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,11 @@ namespace MagicStorage
         private readonly Building_StorageCore core;
         private readonly CosmicCraftingListFilter listFilter = new CosmicCraftingListFilter();
         private Vector2 scroll, workbenchScroll;
+        private readonly Dictionary<ThingDef, HashSet<WorkTypeDef>> availableWorkbenchTypes;
+        private List<ThingDef> filteredWorkbenches;
+        private readonly List<Rect> workbenchRows = new List<Rect>();
+        private float workbenchViewWidth = -1f, workbenchViewHeight;
+        private bool workbenchLayoutCompact;
         private readonly GameComponent_CosmicCraftingUI uiState;
         private bool CompactMode
         {
@@ -42,6 +47,7 @@ namespace MagicStorage
         {
             this.core = core;
             uiState = Current.Game.GetComponent<GameComponent_CosmicCraftingUI>();
+            availableWorkbenchTypes = CraftingRecipeCatalog.SnapshotWorkbenchTypes();
             forcePause = false; absorbInputAroundWindow = true; doCloseX = true; doCloseButton = true;
             draggable = true;
         }
@@ -58,6 +64,12 @@ namespace MagicStorage
         public override void DoWindowContents(Rect rect)
         {
             if (!core.Spawned) { Close(); return; }
+            if (Find.WindowStack.GetsInput(this) && StorageKeyBindingDefOf.MS_ProductionOrders.KeyDownEvent)
+            {
+                Event.current.Use();
+                Close();
+                return;
+            }
             core.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             if (Time.realtimeSinceStartup >= refreshAt)
             {
@@ -74,7 +86,7 @@ namespace MagicStorage
             float filterY = tabsY + tabsHeight + 8;
             float allRecipesWidth = Math.Min(136f, rect.width * 0.35f);
             listFilter.DrawSharedSourceButton(new Rect(0, filterY, rect.width - allRecipesWidth - 8, 32),
-                CraftingRecipeCatalog.AvailableWorkbenches(), core.Crafting.Orders.Select(order => order.Recipe), SharedFilterChanged);
+                availableWorkbenchTypes.Keys, core.Crafting.Orders.Select(order => order.Recipe), SharedFilterChanged);
             if (Widgets.ButtonText(new Rect(rect.xMax - allRecipesWidth, filterY, allRecipesWidth, 32), "MS_Craft_AllRecipes".Translate()))
                 OpenRecipePicker();
             float leftWidth = rect.width * 0.46f;
@@ -158,6 +170,7 @@ namespace MagicStorage
         }
         private void SharedFilterChanged()
         {
+            filteredWorkbenches = null;
             groupedDrag = null;
             scroll = Vector2.zero;
             workbenchScroll = Vector2.zero;
@@ -178,24 +191,49 @@ namespace MagicStorage
         private void DrawWorkbenches(Rect outer)
         {
             Widgets.DrawMenuSection(outer);
-            var tables = CraftingRecipeCatalog.AvailableWorkbenches(listFilter.WorkType)
-                .Where(listFilter.MatchesWorkbench).OrderBy(uiState.WorkbenchSortGroup)
-                .ThenBy(uiState.WorkbenchFavoriteOrder).ToList();
+            if (filteredWorkbenches == null)
+            {
+                filteredWorkbenches = availableWorkbenchTypes
+                    .Where(pair => listFilter.WorkType == null || pair.Value.Contains(listFilter.WorkType))
+                    .Select(pair => pair.Key).Where(listFilter.MatchesWorkbench)
+                    .OrderBy(uiState.WorkbenchSortGroup).ThenBy(uiState.WorkbenchFavoriteOrder)
+                    .ThenBy(table => table.label).ToList();
+                workbenchViewWidth = -1f;
+            }
+            var tables = filteredWorkbenches;
             if (tables.Count == 0)
             { Widgets.Label(outer.ContractedBy(8), "MS_Craft_NoMatchingWorkbenches".Translate()); return; }
             float viewWidth = outer.width - 18;
-            var heights = tables.Select(table => CompactMode
-                ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 136f) + 8f) : 64f).ToList();
-            var view = new Rect(0, 0, viewWidth, heights.Sum());
+            if (workbenchViewWidth != viewWidth || workbenchLayoutCompact != CompactMode)
+            {
+                workbenchRows.Clear();
+                workbenchViewHeight = 0;
+                foreach (var table in tables)
+                {
+                    float height = CompactMode
+                        ? Math.Max(32f, Text.CalcHeight(table.LabelCap, viewWidth - 136f) + 8f) : 64f;
+                    workbenchRows.Add(new Rect(4, workbenchViewHeight, viewWidth - 8, height - (CompactMode ? 0f : 4f)));
+                    workbenchViewHeight += height;
+                }
+                workbenchViewWidth = viewWidth;
+                workbenchLayoutCompact = CompactMode;
+            }
+            var view = new Rect(0, 0, viewWidth, workbenchViewHeight);
+            workbenchScroll.y = Mathf.Clamp(workbenchScroll.y, 0f, Math.Max(0f, view.height - outer.height));
             Widgets.BeginScrollView(outer, ref workbenchScroll, view);
-            float y = 0;
             bool orderingChanged = false;
-            for (int index = 0; index < tables.Count; index++)
+            int first = 0, end = workbenchRows.Count;
+            while (first < end)
+            {
+                int middle = first + (end - first) / 2;
+                if (workbenchRows[middle].yMax < workbenchScroll.y) first = middle + 1;
+                else end = middle;
+            }
+            for (int index = first; index < tables.Count; index++)
             {
                 var table = tables[index];
-                var row = new Rect(4, y, view.width - 8, heights[index] - (CompactMode ? 0f : 4f));
-                y += heights[index];
-                if (row.yMax < workbenchScroll.y || row.y > workbenchScroll.y + outer.height) continue;
+                var row = workbenchRows[index];
+                if (row.y > workbenchScroll.y + outer.height) break;
                 bool locked = !CraftingWorkbenchUnlocks.IsUnlocked(table);
                 if (locked) Widgets.DrawBoxSolid(row, new Color(1f, 0.9f, 0.45f, 0.18f));
                 Widgets.DrawHighlightIfMouseover(row);
@@ -244,7 +282,7 @@ namespace MagicStorage
                     OpenRecipePicker(table);
             }
             Widgets.EndScrollView();
-            if (orderingChanged) workbenchScroll = Vector2.zero;
+            if (orderingChanged) { filteredWorkbenches = null; workbenchScroll = Vector2.zero; }
         }
         private void OpenRecipePicker(ThingDef table = null)
         {
@@ -253,10 +291,10 @@ namespace MagicStorage
                 Find.WindowStack.Add(new Dialog_WorkbenchUnlock(core, table, () => OpenRecipePicker(table)));
                 return;
             }
-            Find.WindowStack.Add(new Dialog_CosmicRecipePicker(core, table, recipe =>
+            Find.WindowStack.Add(new Dialog_CosmicRecipePicker(core, table, (recipe, precept) =>
             {
                 if (!CraftingRecipeCatalog.CanAdd(recipe)) return;
-                core.Crafting.Add(recipe);
+                core.Crafting.Add(recipe, precept);
                 scroll = Vector2.zero; refreshAt = 0;
             }));
         }
@@ -336,7 +374,7 @@ namespace MagicStorage
                                     content.xMin += 30f;
                                 }
                                 var icon = new Rect(content.x + 4, content.y + 6, 46, 46);
-                                var title = new Rect(content.x + 58, content.y + 2, content.width - 120, 26);
+                                var title = new Rect(content.x + 58, content.y + 2, content.width - 176, 26);
                                 DrawOrderRow(content, icon, title, order);
                             }
                             // Register hidden rows too; headers never participate in task dragging.
@@ -462,16 +500,30 @@ namespace MagicStorage
             Dialog_CosmicRecipePicker.DrawPreviewIcon(icon, order.Recipe.ProducedThingDef);
             Color previousColor = GUI.color;
             GUI.color = order.Suspended ? ColoredText.SubtleGrayColor : previousColor;
-            Widgets.Label(title, CraftingRecipeCatalog.Label(order.Recipe).CapitalizeFirst().Truncate(title.width));
+            Widgets.Label(title, CraftingRecipeCatalog.Label(order.Recipe, order.Precept).CapitalizeFirst().Truncate(title.width));
             GUI.color = previousColor;
             var delete = new Rect(row.xMax - 26, row.y + 2, 22, 22);
             var suspend = new Rect(delete.x - 28, delete.y, 22, 22);
+            var productDestination = new Rect(suspend.x - 28, suspend.y, 22, 22);
+            var duplicate = new Rect(productDestination.x - 28, productDestination.y, 22, 22);
             TooltipHandler.TipRegion(delete, "MS_Craft_Delete".Translate());
+            TooltipHandler.TipRegion(duplicate, "MS_Craft_Duplicate".Translate());
             TooltipHandler.TipRegion(suspend, (order.Suspended ? "MS_Craft_Resume" : "MS_Craft_Pause").Translate());
+            TooltipHandler.TipRegion(productDestination,
+                (order.DropProductsOnFloor ? "MS_Craft_DropProductsOnFloor" : "MS_Craft_StoreProductsInNetwork").Translate());
             if (Widgets.ButtonImage(delete, TexButton.Delete) && !IsDragging)
             { core.Crafting.Remove(order); refreshAt = 0; return; }
+            if (Widgets.ButtonImage(duplicate, TexButton.Copy) && !IsDragging)
+            {
+                // The visible list is a snapshot taken this frame, so the copy appears on the next one.
+                core.Crafting.Duplicate(order);
+                refreshAt = 0;
+                return;
+            }
             if (Widgets.ButtonImage(suspend, order.Suspended ? TexButton.SpeedButtonTextures[1] : TexButton.Suspend) && !IsDragging)
             { order.Suspended = !order.Suspended; OrderChanged(order); }
+            if (Widgets.ButtonImage(productDestination, order.DropProductsOnFloor ? TexButton.Drop : TexButton.Ingest) && !IsDragging)
+            { order.DropProductsOnFloor = !order.DropProductsOnFloor; OrderChanged(order); }
             float controlsY = row.y + 32;
             var details = new Rect(row.xMax - 72, controlsY, 68, 25);
             string modeLabel = ModeLabel(order.Mode);
@@ -515,10 +567,11 @@ namespace MagicStorage
             }
             var statusBar = new Rect(row.x + 4, row.yMax - 11, row.width - 8, 6);
             Widgets.FillableBar(statusBar, order.Progress);
-            TooltipHandler.TipRegion(statusBar, status);
-            string tooltip = CraftingRecipeCatalog.Label(order.Recipe).CapitalizeFirst() + "\n" + quantity + "\n" +
+            string statusDetails = MapComponent_CosmicCrafting.StatusDetails(order, status);
+            TooltipHandler.TipRegion(statusBar, statusDetails);
+            string tooltip = CraftingRecipeCatalog.Label(order.Recipe, order.Precept).CapitalizeFirst() + "\n" + quantity + "\n" +
                 "MS_Craft_Progress".Translate(order.Progress.ToString("P0")) + "\n" +
-                status + "\n" + "MS_Craft_DragOrder".Translate();
+                statusDetails + "\n" + "MS_Craft_DragOrder".Translate();
             TooltipHandler.TipRegion(title, tooltip);
             TooltipHandler.TipRegion(icon, tooltip);
             TooltipHandler.TipRegion(progress, tooltip);
@@ -582,7 +635,10 @@ namespace MagicStorage
             this.core = core; selected = order; this.changed = changed;
             description = RecipeDescription(order.Recipe);
             forcePause = true; absorbInputAroundWindow = true; doCloseX = true; doCloseButton = true;
-            draggable = true;
+            // The IMGUI drag test only checks that the press started inside the window, so a whole
+            // window drag handle would also move the window while the ingredient filter is dragged.
+            // Drag from the title row only; DoWindowContents opens that handle.
+            draggable = false;
             closeOnClickedOutside = true;
         }
         protected override void SetInitialSizeAndPosition()
@@ -593,10 +649,12 @@ namespace MagicStorage
         public override void DoWindowContents(Rect rect)
         {
             if (!core.Spawned || !core.Crafting.Orders.Contains(selected)) { Close(); return; }
+            // Title row only, so dragging the ingredient filter or a scrollbar never moves the window.
+            GUI.DragWindow(new Rect(0f, 0f, rect.width, 36f));
             core.Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             Widgets.DefIcon(new Rect(0, 0, 30, 30), selected.Recipe);
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(40, 0, rect.width - 70, 36), CraftingRecipeCatalog.Label(selected.Recipe).CapitalizeFirst());
+            Widgets.Label(new Rect(40, 0, rect.width - 70, 36), CraftingRecipeCatalog.Label(selected.Recipe, selected.Precept).CapitalizeFirst());
             Text.Font = GameFont.Small;
             float width = (rect.width - 34f) / 3f;
             float height = rect.height - 110f;
@@ -972,7 +1030,7 @@ namespace MagicStorage
         private static readonly Texture2D CategoryModeIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/CategoryMode");
         private static Vector2? lastClosedPosition;
         private readonly Building_StorageCore core;
-        private readonly Action<RecipeDef> add;
+        private readonly Action<RecipeDef, Precept_ThingStyle> add;
         private readonly GameComponent_CosmicCraftingUI uiState;
         private bool CompactMode
         {
@@ -980,19 +1038,30 @@ namespace MagicStorage
             set => uiState.CompactRecipes = value;
         }
         private readonly ThingDef workbench;
-        private readonly Dictionary<RecipeDef, RecipePreview> previews = new Dictionary<RecipeDef, RecipePreview>();
+        private readonly Dictionary<(RecipeDef, Precept_ThingStyle), RecipePreview> previews =
+            new Dictionary<(RecipeDef, Precept_ThingStyle), RecipePreview>();
+        private readonly Dictionary<RecipeDef, List<IngredientPreview>> ingredientPreviews =
+            new Dictionary<RecipeDef, List<IngredientPreview>>();
+        private readonly List<RecipeDef> recipes;
+        private readonly List<RecipePreview> allPreviews;
+        private List<RecipePreview> visible;
+        private readonly List<RecipeListRow> rows = new List<RecipeListRow>();
+        private bool filterDirty = true, rowsDirty = true, layoutDirty = true;
+        private bool rowsCategorized, layoutCompact;
+        private float layoutWidth = -1f, totalHeight;
         private readonly CosmicCraftingListFilter listFilter = new CosmicCraftingListFilter();
         private readonly HashSet<ThingCategoryDef> collapsedCategories = new HashSet<ThingCategoryDef>();
         private bool otherRecipesCollapsed;
-        private List<RecipeDef> categorizedRecipes;
         private List<CraftingRecipeCategory> categoryTree;
         private string search = "";
         private Vector2 scroll;
         public override Vector2 InitialSize => new Vector2(Math.Min(750, UI.screenWidth), Math.Min(750, UI.screenHeight));
-        internal Dialog_CosmicRecipePicker(Building_StorageCore core, ThingDef workbench, Action<RecipeDef> add)
+        internal Dialog_CosmicRecipePicker(Building_StorageCore core, ThingDef workbench, Action<RecipeDef, Precept_ThingStyle> add)
         {
             this.core = core; this.add = add; this.workbench = workbench;
             uiState = Current.Game.GetComponent<GameComponent_CosmicCraftingUI>();
+            recipes = AvailableRecipes().ToList();
+            allPreviews = recipes.SelectMany(Previews).ToList();
             forcePause = true; doCloseX = true; doCloseButton = true; absorbInputAroundWindow = true;
             closeOnClickedOutside = true;
             draggable = true;
@@ -1026,35 +1095,78 @@ namespace MagicStorage
                 uiState.CategorizedRecipes, (uiState.CategorizedRecipes ? "MS_Craft_CategoryModeOn" : "MS_Craft_CategoryModeOff").Translate()))
             {
                 uiState.CategorizedRecipes = !uiState.CategorizedRecipes;
+                rowsDirty = true;
                 scroll = Vector2.zero;
             }
             string previousSearch = search;
             search = Widgets.TextField(new Rect(0, 38, rect.width, 30), search);
-            if (search != previousSearch) scroll = Vector2.zero;
-            float tabsHeight = listFilter.DrawTabs(new Rect(0, 80, rect.width, 32), () => scroll = Vector2.zero);
-            var recipes = AvailableRecipes().ToList();
-            var visible = recipes.Where(r => listFilter.Matches(r) &&
-                CraftingRecipeCatalog.MatchesSearch(r, search)).ToList();
+            if (search != previousSearch) FilterChanged();
+            float tabsHeight = listFilter.DrawTabs(new Rect(0, 80, rect.width, 32), FilterChanged);
             float sourceY = 80 + tabsHeight + 8;
-            listFilter.DrawSourceButton(new Rect(0, sourceY, rect.width, 32), recipes, () => scroll = Vector2.zero);
+            listFilter.DrawSourceButton(new Rect(0, sourceY, rect.width, 32), recipes, FilterChanged);
             float listY = sourceY + 40;
             var outer = new Rect(0, listY, rect.width, rect.height - listY - 60);
             Widgets.DrawMenuSection(outer);
+            float viewWidth = outer.width - 18;
+            EnsureRecipeRows(viewWidth);
             if (visible.Count == 0)
             {
                 Widgets.Label(outer.ContractedBy(8), "MS_Craft_NoMatchingRecipes".Translate());
                 return;
             }
-            float viewWidth = outer.width - 18;
-            var rows = new List<RecipeListRow>();
-            if (uiState.CategorizedRecipes)
+            var view = new Rect(0, 0, viewWidth, totalHeight);
+            scroll.y = Mathf.Clamp(scroll.y, 0f, Math.Max(0f, totalHeight - outer.height));
+            Widgets.BeginScrollView(outer, ref scroll, view);
+            // Row positions are monotonic. Find the viewport without walking all preceding recipes.
+            int first = 0, end = rows.Count;
+            while (first < end)
             {
-                if (categorizedRecipes == null || !categorizedRecipes.SequenceEqual(visible))
-                { categorizedRecipes = visible; categoryTree = CraftingRecipeCategories.Build(visible); }
-                AppendCategoryRows(categoryTree, rows, 0);
+                int middle = first + (end - first) / 2;
+                if (rows[middle].Rect.yMax < scroll.y) first = middle + 1;
+                else end = middle;
             }
-            else rows.AddRange(visible.Select(recipe => new RecipeListRow { Recipe = Preview(recipe) }));
-            float totalHeight = 0;
+            for (int index = first; index < rows.Count; index++)
+            {
+                var entry = rows[index];
+                var row = entry.Rect;
+                if (row.y > scroll.y + outer.height) break;
+                if (entry.Category != null) DrawCategoryRow(row, entry.Category);
+                else DrawRecipeRow(row, entry.Recipe, entry.IngredientColumns);
+            }
+            Widgets.EndScrollView();
+        }
+        private void FilterChanged()
+        {
+            filterDirty = true;
+            scroll = Vector2.zero;
+        }
+        private void EnsureRecipeRows(float viewWidth)
+        {
+            if (filterDirty)
+            {
+                visible = allPreviews.Where(entry => listFilter.Matches(entry.Recipe) &&
+                    (workbench == null || CraftingRecipeCatalog.HasWorkbenchType(workbench, entry.Recipe, listFilter.WorkType)) &&
+                    entry.Label.IndexOf(search, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
+                categoryTree = null;
+                filterDirty = false;
+                rowsDirty = true;
+            }
+            if (rowsDirty || rowsCategorized != uiState.CategorizedRecipes)
+            {
+                rows.Clear();
+                if (uiState.CategorizedRecipes)
+                {
+                    if (categoryTree == null)
+                        categoryTree = CraftingRecipeCategories.Build(visible.Select(entry => entry.Recipe));
+                    AppendCategoryRows(categoryTree, rows, 0, visible.ToLookup(entry => entry.Recipe));
+                }
+                else rows.AddRange(visible.Select(entry => new RecipeListRow { Recipe = entry }));
+                rowsCategorized = uiState.CategorizedRecipes;
+                rowsDirty = false;
+                layoutDirty = true;
+            }
+            if (!layoutDirty && layoutWidth == viewWidth && layoutCompact == CompactMode) return;
+            totalHeight = 0;
             foreach (var entry in rows)
             {
                 float indent = Math.Min(entry.Depth * 12f, viewWidth * 0.3f);
@@ -1065,27 +1177,23 @@ namespace MagicStorage
                 entry.Rect = new Rect(indent, totalHeight, width, height);
                 totalHeight += height;
             }
-            var view = new Rect(0, 0, viewWidth, totalHeight);
-            Widgets.BeginScrollView(outer, ref scroll, view);
-            foreach (var entry in rows)
-            {
-                var row = entry.Rect;
-                if (row.yMax < scroll.y || row.y > scroll.y + outer.height) continue;
-                if (entry.Category != null) DrawCategoryRow(row, entry.Category);
-                else DrawRecipeRow(row, entry.Recipe, entry.IngredientColumns);
-            }
-            Widgets.EndScrollView();
+            layoutWidth = viewWidth;
+            layoutCompact = CompactMode;
+            layoutDirty = false;
         }
         private bool CategoryExpanded(CraftingRecipeCategory category) => category.Category == null
             ? !otherRecipesCollapsed : !collapsedCategories.Contains(category.Category);
-        private void AppendCategoryRows(IEnumerable<CraftingRecipeCategory> nodes, List<RecipeListRow> rows, int depth)
+        private void AppendCategoryRows(IEnumerable<CraftingRecipeCategory> nodes, List<RecipeListRow> rows, int depth,
+            ILookup<RecipeDef, RecipePreview> entries)
         {
             foreach (var node in nodes)
             {
                 rows.Add(new RecipeListRow { Category = node, Depth = depth });
                 if (!CategoryExpanded(node)) continue;
-                AppendCategoryRows(node.Children, rows, depth + 1);
-                rows.AddRange(node.Recipes.Select(recipe => new RecipeListRow { Recipe = Preview(recipe), Depth = depth + 1 }));
+                AppendCategoryRows(node.Children, rows, depth + 1, entries);
+                rows.AddRange(node.Recipes.SelectMany(recipe => entries[recipe])
+                    .OrderBy(entry => entry.Label, StringComparer.CurrentCultureIgnoreCase)
+                    .Select(entry => new RecipeListRow { Recipe = entry, Depth = depth + 1 }));
             }
         }
         private void DrawCategoryRow(Rect row, CraftingRecipeCategory category)
@@ -1104,20 +1212,38 @@ namespace MagicStorage
             if (category.Category == null) otherRecipesCollapsed = expanded;
             else if (expanded) collapsedCategories.Add(category.Category);
             else collapsedCategories.Remove(category.Category);
+            rowsDirty = true;
         }
         private IEnumerable<RecipeDef> AvailableRecipes() => workbench == null
             ? CraftingRecipeCatalog.Available
             : CraftingRecipeCatalog.AvailableForWorkbench(workbench, listFilter.WorkType);
-        private RecipePreview Preview(RecipeDef recipe)
+        private IEnumerable<RecipePreview> Previews(RecipeDef recipe)
         {
-            if (previews.TryGetValue(recipe, out var cached)) return cached;
+            yield return Preview(recipe, null);
+            foreach (var precept in CraftingRecipeCatalog.PreceptsFor(recipe)) yield return Preview(recipe, precept);
+        }
+        private RecipePreview Preview(RecipeDef recipe, Precept_ThingStyle precept)
+        {
+            var key = (recipe, precept);
+            if (previews.TryGetValue(key, out var cached)) return cached;
             var entry = new RecipePreview
             {
                 Recipe = recipe,
+                Precept = precept,
                 Product = recipe.ProducedThingDef,
-                Label = CraftingRecipeCatalog.Label(recipe).CapitalizeFirst(),
-                Tooltip = CraftingRecipeCatalog.WorkLabels(recipe) + "\n\n" + recipe.description
+                Label = CraftingRecipeCatalog.Label(recipe, precept).CapitalizeFirst()
             };
+            previews.Add(key, entry);
+            return entry;
+        }
+        private void EnsurePreviewDetails(RecipePreview entry)
+        {
+            if (entry.Ingredients != null) return;
+            var recipe = entry.Recipe;
+            entry.Tooltip = CraftingRecipeCatalog.WorkLabels(recipe) + "\n\n" + recipe.description;
+            if (ingredientPreviews.TryGetValue(recipe, out var cached))
+            { entry.Ingredients = cached; return; }
+            var ingredients = new List<IngredientPreview>();
             foreach (var ingredient in recipe.ingredients)
             {
                 // Use an ordinary-volume material first, as vanilla's ingredient summary does.
@@ -1134,21 +1260,22 @@ namespace MagicStorage
                 string tooltip = recipe.IngredientValueGetter.BillRequirementsDescription(recipe, ingredient);
                 if (representative != null)
                     tooltip += "\n" + "MS_Craft_IngredientPreview".Translate(representative.LabelCap, amount, ingredient.filter.Summary);
-                entry.Ingredients.Add(new IngredientPreview { Def = representative, Amount = amount, Tooltip = tooltip });
+                ingredients.Add(new IngredientPreview { Def = representative, Amount = amount, Tooltip = tooltip });
             }
-            previews.Add(recipe, entry);
-            return entry;
+            ingredientPreviews.Add(recipe, ingredients);
+            entry.Ingredients = ingredients;
         }
-        private float IngredientWidth(RecipePreview entry, int columns) => Math.Min(columns, entry.Ingredients.Count) * (CompactMode ? 26f : 42f);
+        private float IngredientWidth(RecipePreview entry, int columns) => Math.Min(columns, entry.Recipe.ingredients.Count) * (CompactMode ? 26f : 42f);
         private float RowHeight(RecipePreview entry, float width, int columns)
         {
             float textWidth = width - (CompactMode ? 80f : 94f) - IngredientWidth(entry, columns);
             float textHeight = Text.CalcHeight(entry.Label, textWidth) + (CompactMode ? 8f : 12f);
-            float ingredientHeight = Mathf.CeilToInt((float)entry.Ingredients.Count / columns) * (CompactMode ? 24f : 50f) + 8f;
+            float ingredientHeight = Mathf.CeilToInt((float)entry.Recipe.ingredients.Count / columns) * (CompactMode ? 24f : 50f) + 8f;
             return Math.Max(CompactMode ? 32f : 58f, Math.Max(textHeight, ingredientHeight));
         }
         private void DrawRecipeRow(Rect row, RecipePreview entry, int columns)
         {
+            EnsurePreviewDetails(entry);
             Widgets.DrawHighlightIfMouseover(row);
             float iconSize = CompactMode ? 24f : 38f;
             var iconRect = new Rect(row.x + 5, row.y + (row.height - iconSize) / 2f, iconSize, iconSize);
@@ -1181,12 +1308,12 @@ namespace MagicStorage
                 }
                 TooltipHandler.TipRegion(cell, ingredient.Tooltip);
             }
-            Widgets.InfoCardButton(row.xMax - 28, row.y + (row.height - 24) / 2, entry.Recipe);
+            Widgets.InfoCardButton(row.xMax - 28, row.y + (row.height - 24) / 2, entry.Recipe, entry.Precept);
             Widgets.DrawLineHorizontal(row.x + 4, row.yMax - 1, row.width - 8, new Color(1f, 1f, 1f, 0.25f));
             if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, row.height)))
             {
                 if (!AvailableRecipes().Contains(entry.Recipe)) return;
-                add(entry.Recipe);
+                add(entry.Recipe, entry.Precept);
                 Close();
             }
         }
@@ -1198,9 +1325,10 @@ namespace MagicStorage
         private sealed class RecipePreview
         {
             internal RecipeDef Recipe;
+            internal Precept_ThingStyle Precept;
             internal ThingDef Product;
             internal string Label, Tooltip;
-            internal readonly List<IngredientPreview> Ingredients = new List<IngredientPreview>();
+            internal List<IngredientPreview> Ingredients;
         }
         private sealed class IngredientPreview
         {

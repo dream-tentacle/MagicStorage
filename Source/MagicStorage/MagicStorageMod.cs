@@ -13,7 +13,7 @@ namespace MagicStorage
         private readonly string[] refreshBuffers = new string[(int)StorageRefreshTask.Count];
         private Vector2 settingsScroll;
         private float settingsHeight;
-        private enum SettingsTab { General, Performance, Accessibility }
+        private enum SettingsTab { General, Performance, Accessibility, Compatibility }
         private SettingsTab settingsTab;
 
         public MagicStorageMod(ModContentPack content) : base(content)
@@ -41,7 +41,8 @@ namespace MagicStorage
             {
                 new TabRecord("MS_SettingsTabGeneral".Translate(), () => SelectSettingsTab(SettingsTab.General), settingsTab == SettingsTab.General),
                 new TabRecord("MS_SettingsTabPerformance".Translate(), () => SelectSettingsTab(SettingsTab.Performance), settingsTab == SettingsTab.Performance),
-                new TabRecord("MS_SettingsTabAccessibility".Translate(), () => SelectSettingsTab(SettingsTab.Accessibility), settingsTab == SettingsTab.Accessibility)
+                new TabRecord("MS_SettingsTabAccessibility".Translate(), () => SelectSettingsTab(SettingsTab.Accessibility), settingsTab == SettingsTab.Accessibility),
+                new TabRecord("MS_SettingsTabCompatibility".Translate(), () => SelectSettingsTab(SettingsTab.Compatibility), settingsTab == SettingsTab.Compatibility)
             });
             var viewport = new Rect(body.x + 12f, body.y + 12f, body.width - 24f, Mathf.Max(0f, body.height - 24f));
             var view = new Rect(0, 0, viewport.width - 20, Mathf.Max(viewport.height, settingsHeight));
@@ -50,6 +51,7 @@ namespace MagicStorage
             listing.Begin(view);
             if (settingsTab == SettingsTab.Accessibility) DrawAccessibilitySettings(listing);
             else if (settingsTab == SettingsTab.Performance) DrawPerformanceSettings(listing);
+            else if (settingsTab == SettingsTab.Compatibility) DrawCompatibilitySettings(listing);
             else DrawGeneralSettings(listing);
             listing.Gap();
             if (listing.ButtonText("MS_SettingsRestoreDefaults".Translate()))
@@ -130,6 +132,15 @@ namespace MagicStorage
             listing.Gap();
             listing.CheckboxLabeled("MS_SettingsTidySupplyShelf".Translate(), ref Settings.TidySupplyShelf,
                 "MS_SettingsTidySupplyShelfHelp".Translate());
+        }
+
+        private void DrawCompatibilitySettings(Listing_Standard listing)
+        {
+            listing.CheckboxLabeled("MS_SettingsAllowAllMaterials".Translate(), ref Settings.AllowAllMaterials,
+                "MS_SettingsAllowAllMaterialsHelp".Translate());
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsForceCompatBuildMaterials".Translate(), ref Settings.ForceCompatBuildMaterials,
+                "MS_SettingsForceCompatBuildMaterialsHelp".Translate());
         }
 
         private void DrawPerformanceSettings(Listing_Standard listing)

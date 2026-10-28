@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace MagicStorage
@@ -8,12 +9,16 @@ namespace MagicStorage
     // The ten stacks remain spawned until the completed placement is processed later.
     public sealed class Building_StorageReceiver : Building, ISlotGroupParent
     {
+        private const int MaxAbsorbRadius = 3;
         private readonly SlotGroup slotGroup;
         private List<IntVec3> cells;
         private readonly StorageSettings disabledSettings;
         private StorageSettings observedSettings;
         private StoragePriority observedPriority;
         private StorageRefreshTimer refreshTimer;
+        // 0 = its own cell only. The range widens absorption only: the slot group must stay a
+        // single cell, or it would fight the stockpile zones the player puts around it.
+        private int absorbRadius;
 
         public Building_StorageReceiver()
         {
@@ -36,6 +41,7 @@ namespace MagicStorage
         public string SlotYielderLabel() => LabelCap;
         public IEnumerable<IntVec3> AllSlotCells() => AllSlotCellsList();
         public List<IntVec3> AllSlotCellsList() => cells ?? (cells = new List<IntVec3> { Position });
+        public int AbsorbRadius => absorbRadius;
 
         public StorageSettings GetStoreSettings() => CanWork ? Network.Core.Settings : disabledSettings;
 
@@ -66,15 +72,96 @@ namespace MagicStorage
             }
             if (!CanWork) return;
             // Retry waiting stacks, including native merges which do not spawn a new Thing.
-            var items = new List<Thing>(slotGroup.HeldThings);
+            List<Thing> items = CollectAbsorbable();
             foreach (Thing item in items)
             {
                 if (!CanWork) break;
-                if (!item.Spawned || item.Map != Map || item.Position != Position ||
+                if (!item.Spawned || item.Map != Map || !InAbsorbRange(item.Position) ||
                     item.IsForbidden(Faction) || Map.reservationManager.IsReservedByAnyoneOf(item, Faction)) continue;
-                var result = StorageReception.Transfer(Network, item, Map, Position);
+                var result = StorageReception.Transfer(Network, item, Map, item.Position);
                 if (result.Transferred > 0) Network.Core?.GetComp<CompStorageGuide>()?.Complete(4);
             }
+        }
+
+        // Its own cell keeps the native slot-group semantics. A wider range is a plain map
+        // scan, so surrounding stockpile zones stay independent haul destinations.
+        private List<Thing> CollectAbsorbable()
+        {
+            List<Thing> result = new List<Thing>();
+            if (absorbRadius <= 0) { result.AddRange(slotGroup.HeldThings); return result; }
+            Map map = Map;
+            List<IntVec3> scan = RangeCells();
+            for (int c = 0; c < scan.Count; c++)
+            {
+                List<Thing> things = map.thingGrid.ThingsListAt(scan[c]);
+                for (int i = 0; i < things.Count; i++)
+                    if (things[i].def.EverStorable(false)) result.Add(things[i]);
+            }
+            return result;
+        }
+
+        private List<IntVec3> RangeCells()
+        {
+            List<IntVec3> result = new List<IntVec3>();
+            IntVec3 origin = Position;
+            for (int x = origin.x - absorbRadius; x <= origin.x + absorbRadius; x++)
+                for (int z = origin.z - absorbRadius; z <= origin.z + absorbRadius; z++)
+                {
+                    IntVec3 cell = new IntVec3(x, origin.y, z);
+                    if (cell.InBounds(Map)) result.Add(cell);
+                }
+            return result;
+        }
+
+        private bool InAbsorbRange(IntVec3 cell) =>
+            absorbRadius <= 0 ? cell == Position :
+            cell.y == Position.y && Mathf.Abs(cell.x - Position.x) <= absorbRadius &&
+            Mathf.Abs(cell.z - Position.z) <= absorbRadius;
+
+        private static string RangeOptionLabel(int radius) =>
+            radius <= 0 ? "MS_ReceiverRange_This".Translate().ToString()
+                        : "MS_ReceiverRange_Within".Translate(radius).ToString();
+
+        private void ChooseAbsorbRange()
+        {
+            var options = new List<FloatMenuOption>();
+            for (int radius = 0; radius <= MaxAbsorbRadius; radius++)
+            {
+                int chosen = radius;
+                var option = FloatMenuOption.CheckboxLabeled(RangeOptionLabel(radius),
+                    () => { absorbRadius = chosen; }, chosen == absorbRadius);
+                option.tooltip = "MS_ReceiverRangeDesc".Translate();
+                options.Add(option);
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        public override IEnumerable<Gizmo> GetGizmos()
+        {
+            foreach (Gizmo gizmo in base.GetGizmos()) yield return gizmo;
+            if (!Spawned || Faction != Faction.OfPlayer) yield break;
+            yield return new Command_Action
+            {
+                defaultLabel = "MS_ReceiverRange".Translate(RangeOptionLabel(absorbRadius)),
+                defaultDesc = "MS_ReceiverRangeDesc".Translate(),
+                icon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/ReceiverRange"),
+                action = ChooseAbsorbRange
+            };
+        }
+
+        public override void DrawExtraSelectionOverlays()
+        {
+            base.DrawExtraSelectionOverlays();
+            if (!Spawned || absorbRadius <= 0) return;
+            GenDraw.DrawFieldEdges(RangeCells(), new Color(0.45f, 1f, 0.45f, 0.6f));
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref absorbRadius, "absorbRadius", 0);
+            if (absorbRadius < 0) absorbRadius = 0;
+            else if (absorbRadius > MaxAbsorbRadius) absorbRadius = MaxAbsorbRadius;
         }
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)

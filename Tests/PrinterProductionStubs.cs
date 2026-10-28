@@ -41,6 +41,7 @@ namespace Verse
         public ThingDef def, Stuff;
         public int stackCount = 1, DrawColor = 17;
         public ThingStyleDef StyleDef;
+        public Precept_ThingStyle StyleSourcePrecept;
         public CompQuality Quality;
         public CompIngredients Ingredients = new CompIngredients();
         public float LastEfficiency;
@@ -84,6 +85,7 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public sealed class Precept_ThingStyle { }
     public enum QualityCategory { Awful, Poor, Normal, Good, Excellent, Masterwork, Legendary }
     public enum ArtGenerationContext { Colony }
     public sealed class ThingStyleDef { }

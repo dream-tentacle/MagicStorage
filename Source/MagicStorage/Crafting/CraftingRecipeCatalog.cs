@@ -10,12 +10,14 @@ namespace MagicStorage
     {
         private static Dictionary<RecipeDef, List<WorkGiverDef>> routes;
         private static Dictionary<RecipeDef, List<ThingDef>> workbenches;
+        private static Dictionary<ThingDef, Dictionary<RecipeDef, HashSet<WorkTypeDef>>> tableRecipes;
         private static List<WorkTypeDef> workTypes;
         private static void EnsureLoaded()
         {
             if (routes != null) return;
             routes = new Dictionary<RecipeDef, List<WorkGiverDef>>();
             workbenches = new Dictionary<RecipeDef, List<ThingDef>>();
+            tableRecipes = new Dictionary<ThingDef, Dictionary<RecipeDef, HashSet<WorkTypeDef>>>();
             workTypes = DefDatabase<WorkGiverDef>.AllDefsListForReading
                 .Where(w => w.giverClass == typeof(WorkGiver_CosmicCrafting) && w.workType != null)
                 .Select(w => w.workType).Distinct().OrderByDescending(t => t.naturalPriority).ToList();
@@ -37,6 +39,11 @@ namespace MagicStorage
                         if (!list.Contains(giver)) list.Add(giver);
                         if (!workbenches.TryGetValue(recipe, out var tables)) workbenches.Add(recipe, tables = new List<ThingDef>());
                         if (!tables.Contains(table)) tables.Add(table);
+                        if (!tableRecipes.TryGetValue(table, out var recipes))
+                            tableRecipes.Add(table, recipes = new Dictionary<RecipeDef, HashSet<WorkTypeDef>>());
+                        if (!recipes.TryGetValue(recipe, out var recipeTypes))
+                            recipes.Add(recipe, recipeTypes = new HashSet<WorkTypeDef>());
+                        recipeTypes.Add(giver.workType);
                     }
                 }
             }
@@ -48,17 +55,46 @@ namespace MagicStorage
             EnsureLoaded();
             if (table == null || !table.IsResearchFinished || (!includeLocked && !CraftingWorkbenchUnlocks.IsUnlocked(table)))
                 return Enumerable.Empty<RecipeDef>();
-            return table.AllRecipes.Where(recipe => recipe.AvailableNow && Workbenches(recipe).Contains(table) &&
-                Routes(recipe).Any(giver => (type == null || giver.workType == type) &&
-                    giver.fixedBillGiverDefs.Contains(table) &&
-                    (recipe.requiredGiverWorkType == null || recipe.requiredGiverWorkType == giver.workType)))
-                .Distinct().OrderBy(Label);
+            return RecipesForWorkbench(table, type).Where(recipe => recipe.AvailableNow).OrderBy(Label);
         }
         internal static IEnumerable<ThingDef> AvailableWorkbenches(WorkTypeDef type = null)
         {
             EnsureLoaded();
-            return workbenches.Values.SelectMany(tables => tables).Distinct()
-                .Where(table => AvailableForWorkbench(table, type, includeLocked: true).Any()).OrderBy(table => table.label);
+            return tableRecipes.Keys.Where(table => table.IsResearchFinished &&
+                RecipesForWorkbench(table, type).Any(recipe => recipe.AvailableNow)).OrderBy(table => table.label);
+        }
+        private static IEnumerable<RecipeDef> RecipesForWorkbench(ThingDef table, WorkTypeDef type)
+            => tableRecipes.TryGetValue(table, out var recipes)
+                ? recipes.Where(pair => type == null || pair.Value.Contains(type)).Select(pair => pair.Key)
+                : Enumerable.Empty<RecipeDef>();
+
+        internal static bool HasWorkbenchType(ThingDef table, RecipeDef recipe, WorkTypeDef type)
+        {
+            EnsureLoaded();
+            return tableRecipes.TryGetValue(table, out var recipes) && recipes.TryGetValue(recipe, out var types) &&
+                (type == null || types.Contains(type));
+        }
+
+        // A browser takes this snapshot once. Research changes are picked up when it is reopened.
+        // Locked tables remain visible so the player can unlock them from the browser.
+        internal static Dictionary<ThingDef, HashSet<WorkTypeDef>> SnapshotWorkbenchTypes()
+        {
+            EnsureLoaded();
+            var result = new Dictionary<ThingDef, HashSet<WorkTypeDef>>();
+            var availability = new Dictionary<RecipeDef, bool>();
+            foreach (var table in tableRecipes)
+            {
+                if (!table.Key.IsResearchFinished) continue;
+                var types = new HashSet<WorkTypeDef>();
+                foreach (var recipe in table.Value)
+                {
+                    if (!availability.TryGetValue(recipe.Key, out bool available))
+                        availability.Add(recipe.Key, available = recipe.Key.AvailableNow);
+                    if (available) types.UnionWith(recipe.Value);
+                }
+                if (types.Count > 0) result.Add(table.Key, types);
+            }
+            return result;
         }
         internal static string Label(RecipeDef recipe)
         {
@@ -69,6 +105,15 @@ namespace MagicStorage
             string productLabel = !string.IsNullOrWhiteSpace(product.label) ? product.label : product.defName;
             return "RecipeMake".Translate(productLabel).ToString();
         }
+        // ITab_Bills adds these beside the ordinary recipe, without creating new defs.
+        internal static IEnumerable<Precept_ThingStyle> PreceptsFor(RecipeDef recipe)
+        {
+            foreach (var ideo in Faction.OfPlayer.ideos.AllIdeos)
+                foreach (var precept in ideo.cachedPossibleBuildings)
+                    if (precept.ThingDef == recipe.ProducedThingDef) yield return precept;
+        }
+        internal static string Label(RecipeDef recipe, Precept_ThingStyle precept) => precept != null
+            ? "RecipeMake".Translate(precept.LabelCap).CapitalizeFirst().ToString() : Label(recipe);
         internal static bool MatchesSearch(RecipeDef recipe, string search) => recipe != null &&
             Label(recipe).IndexOf(search ?? string.Empty, StringComparison.CurrentCultureIgnoreCase) >= 0;
         // This gate only controls adding orders; existing orders keep their execution rules.

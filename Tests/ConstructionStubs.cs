@@ -33,7 +33,7 @@ namespace Verse
     public class Graphic { }
     public class Graphic_Random : Graphic { }
     public class TerrainDef { }
-    public class BuildingProperties { public bool isAttachment, isPowerConduit, repairable = true; public int maxItemsInCell = 1; public RimWorld.StorageSettings fixedStorageSettings; }
+    public partial class BuildingProperties { public bool isAttachment, isPowerConduit, repairable = true; public int maxItemsInCell = 1; public RimWorld.StorageSettings fixedStorageSettings; }
     public partial class ThingDef
     {
         public object entityDefToBuild;
@@ -63,6 +63,7 @@ namespace Verse
     }
     public class PlaceWorker
     { public virtual void DrawGhost(ThingDef def, IntVec3 center, Rot4 rot, UnityEngine.Color ghostCol, Thing thing = null) { } }
+    public enum WipeMode { Vanish, FullRefund, VanishOrMoveAside }
     public static class GenSpawn
     {
         // Controlled conduit replacement boundary; other native wipe rules are not modeled.
@@ -79,7 +80,8 @@ namespace Verse
                     thing.DeSpawn(); thing.Destroy(); map.listerThings.Things.Remove(thing);
                 }
         }
-        public static Thing Spawn(Thing thing, IntVec3 position, Map map, Rot4 rotation)
+        public static Thing Spawn(Thing thing, IntVec3 position, Map map, Rot4 rotation,
+            WipeMode wipeMode = WipeMode.Vanish, bool respawningAfterLoad = false, bool forbidLeavings = false)
         {
             thing.holdingOwner?.Remove(thing);
             thing.Position = position; thing.Map = map; thing.Rotation = rotation; thing.Spawned = true;

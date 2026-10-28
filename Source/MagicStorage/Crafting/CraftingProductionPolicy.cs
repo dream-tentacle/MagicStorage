@@ -34,18 +34,19 @@ namespace MagicStorage
             if (recipe.workSkill != null && worker.skills != null)
                 worker.skills.Learn(recipe.workSkill, 0.1f * recipe.workSkillLearnFactor * ticks);
         }
-        public IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> ingredients, Thing dominant)
+        public IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> ingredients, Thing dominant,
+            Precept_ThingStyle precept = null, IBillGiver billGiver = null)
         {
             // The core remains the holder, giving stripping callbacks a valid map/position.
             if (recipe.autoStripCorpses)
                 foreach (var ingredient in ingredients)
                     if (ingredient is IStrippable strippable && strippable.AnythingToStrip()) strippable.Strip();
-            // GenRecipe is the product rule utility, not the vanilla worktable execution
-            // pipeline. A null bill giver supplies the normal 1x table yield factor.
+            // Supply the actual bench for mod recipe callbacks. It remains a Building,
+            // so vanilla Building_WorkTable yield multipliers do not apply.
             ThingStyleDef style = null;
             if (ModsConfig.IdeologyActive && recipe.products.Count == 1)
                 style = Faction.OfPlayer.ideos.PrimaryIdeo.style.StyleForThingDef(recipe.ProducedThingDef)?.styleDef;
-            return GenRecipe.MakeRecipeProducts(recipe, worker, ingredients, dominant, null, style: style);
+            return GenRecipe.MakeRecipeProducts(recipe, worker, ingredients, dominant, billGiver, precept, style);
         }
         public void Consume(RecipeDef recipe, Thing ingredient, Map map) => recipe.Worker.ConsumeIngredient(ingredient, recipe, map);
         public void NotifyCompleted(Pawn worker, List<Thing> products)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_FeedbackTitle>Send feedback</MS_FeedbackTitle>
-  <MS_FeedbackPrivacy>Uploading sends your description, current game log, active mod list, version information and Steam ID. Only administrators can view this data. Logs may contain local file paths. Review before uploading.</MS_FeedbackPrivacy>
+  <MS_FeedbackPrivacy>Uploading sends your description, current game log, active mod list, version information and Steam ID. Issues and discussions can be looked up by Steam ID; logs and mod lists are visible only to administrators. Logs may contain local file paths. Review before uploading.</MS_FeedbackPrivacy>
   <MS_FeedbackVersions>Game: {0}   Magic Storage: {1}</MS_FeedbackVersions>
   <MS_FeedbackCollected>{0} active mods; about {1} KB of log data</MS_FeedbackCollected>
   <MS_FeedbackShowMods>View mod list</MS_FeedbackShowMods>
@@ -10,6 +10,29 @@
   <MS_FeedbackDescription>Description and steps to reproduce (at least 10 characters)</MS_FeedbackDescription>
   <MS_FeedbackClose>Close</MS_FeedbackClose>
   <MS_FeedbackSend>Upload feedback</MS_FeedbackSend>
+  <MS_FeedbackShowMine>Show my reported issues</MS_FeedbackShowMine>
+  <MS_FeedbackMyTitle>My reported issues</MS_FeedbackMyTitle>
+  <MS_FeedbackLoading>Loading from the feedback site…</MS_FeedbackLoading>
+  <MS_FeedbackRefresh>Refresh</MS_FeedbackRefresh>
+  <MS_FeedbackBack>Back to list</MS_FeedbackBack>
+  <MS_FeedbackLoadMore>Load more</MS_FeedbackLoadMore>
+  <MS_FeedbackEmpty>No Magic Storage feedback has been submitted in game with this Steam ID.</MS_FeedbackEmpty>
+  <MS_FeedbackNeedSteam>Steam ID unavailable. Make sure Steam is running and signed in, then refresh.</MS_FeedbackNeedSteam>
+  <MS_FeedbackQueryFailed>Could not load feedback. Check your connection to the ChatGPT feedback site and try again.</MS_FeedbackQueryFailed>
+  <MS_FeedbackQueryRateLimited>Too many queries. Please refresh later.</MS_FeedbackQueryRateLimited>
+  <MS_FeedbackNotFound>This feedback was not found for your Steam ID. Refresh the list.</MS_FeedbackNotFound>
+  <MS_FeedbackDates>Submitted: {0}　Updated: {1}</MS_FeedbackDates>
+  <MS_FeedbackMerged>This issue was merged into {0}.</MS_FeedbackMerged>
+  <MS_FeedbackDiscussion>Discussion and progress</MS_FeedbackDiscussion>
+  <MS_FeedbackNoReplies>No discussion yet.</MS_FeedbackNoReplies>
+  <MS_FeedbackSystem>Status update</MS_FeedbackSystem>
+  <MS_FeedbackAuthor>Author</MS_FeedbackAuthor>
+  <MS_FeedbackStatus_pending>Pending</MS_FeedbackStatus_pending>
+  <MS_FeedbackStatus_confirmed>Confirmed</MS_FeedbackStatus_confirmed>
+  <MS_FeedbackStatus_working>In progress</MS_FeedbackStatus_working>
+  <MS_FeedbackStatus_resolved>Resolved</MS_FeedbackStatus_resolved>
+  <MS_FeedbackStatus_needs_info>Needs information</MS_FeedbackStatus_needs_info>
+  <MS_FeedbackStatus_declined>Deferred</MS_FeedbackStatus_declined>
   <MS_FeedbackNetworkHint></MS_FeedbackNetworkHint>
   <MS_FeedbackUploading>Uploading feedback…</MS_FeedbackUploading>
   <MS_FeedbackSuccess>Feedback uploaded. Reference: {0}</MS_FeedbackSuccess>

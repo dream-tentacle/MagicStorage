@@ -177,10 +177,18 @@ internal static class StorageRefreshTests
         Equal("MS_SettingsTidySupplyShelf", Listing_Standard.Events[3], "accessibility tab exposes tidy shelf toggle");
         Equal(false, Listing_Standard.Events.Contains("MS_SettingsTidySupplyShelfHelp"), "tidy shelf description is no longer a persistent label");
         Equal(0, Listing_Standard.NumericLabels.Count, "accessibility tab has no performance or storage numeric settings");
+        Equal(false, MagicStorageMod.Settings.AllowAllMaterials, "all materials defaults off");
+        TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabCompatibility").clickedAction();
+        Listing_Standard.Events.Clear();
+        mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal(true, Listing_Standard.Events.Contains("MS_SettingsAllowAllMaterials"), "compatibility tab exposes all-materials toggle");
+        Equal(false, Listing_Standard.Events.Contains("MS_SettingsCaravanItemFilters"), "compatibility tab keeps accessibility options separate");
+        MagicStorageMod.Settings.AllowAllMaterials = true;
         MagicStorageMod.Settings.CaravanItemFilters = true;
         MagicStorageMod.Settings.TradeItemFilters = true;
         MagicStorageMod.Settings.TidySupplyShelf = false;
         MagicStorageMod.Settings.RestoreDefaults();
+        Equal(false, MagicStorageMod.Settings.AllowAllMaterials, "restore defaults disables all materials");
         Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "restore defaults disables caravan filter hook");
         Equal(false, MagicStorageMod.Settings.TradeItemFilters, "restore defaults disables trade filter hook");
         Equal(true, MagicStorageMod.Settings.TidySupplyShelf, "restore defaults enables tidy shelves");

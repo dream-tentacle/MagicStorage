@@ -7,7 +7,7 @@ using Verse.AI;
 namespace Verse
 {
     public class DefModExtension { }
-    public static class DefDatabase<T> where T : class
+    public static partial class DefDatabase<T> where T : class
     {
         public static T GetNamedSilentFail(string name) => name == "MS_Mote_ConstructionSupplyBeam" ? SupplyBeam as T :
             name == "MS_Mote_ConstructionRepairBeam" ? RepairBeam as T :
@@ -19,7 +19,8 @@ namespace Verse
         {
             if (!values.TryGetValue(name, out var value))
             {
-                if (name == "MealLavish") value = new ThingDef() as T;
+                if (name == "Kitchen" && typeof(T) == typeof(RoomRoleDef)) value = new RoomRoleDef { defName = name, label = "kitchen" } as T;
+                else if (name == "MealLavish") value = new ThingDef() as T;
                 else
                 {
                     if (name != "MS_CosmicCrafting" && name != "MS_TakeStorageApparel" && name != "MS_TradeWithStorageCeleTech") throw new Exception("Unknown fixture def: " + name);

@@ -11,19 +11,32 @@ namespace MagicStorage
     internal sealed class NivarianCannonApi
     {
         private const string Root = "Nivarian_Race.Code.";
-        private readonly Type nodeType, lineType, lineListType;
+        private readonly Type nodeType, lineType, lineListType, snapshotStackType, snapshotListType;
+        private readonly MethodInfo networkFor;
+        private readonly FieldInfo snapshotOnMap, snapshotCount, snapshotDistance;
         private readonly MethodInfo adjacent, covering, hops, load, fresh, reserved, group, place, cancel, rebuild, enqueue;
         private readonly PropertyInfo operational, capacity, maxPerShot;
         private readonly FieldInfo needKey, priority, keyTarget, keyDef, keySink, keyFuelIndex;
         private readonly FieldInfo lineDef, lineCount, lineOriginalCount, lineSink, lineFuelIndex, orderId;
         private readonly object failureReason;
         internal readonly MethodInfo Dispatch;
+        internal readonly MethodInfo CaptureSnapshot;
 
         internal NivarianCannonApi()
         {
             nodeType = RequireType("Comps.BuildingComps.CompCannonNode");
             Type inputType = RequireType("Comps.BuildingComps.CompCannonInput");
             Type network = RequireType("Logistics.CannonNetworkMapComponent");
+            networkFor = Method(network, "For", typeof(Map));
+            Type snapshot = AccessTools.TypeByName("Nivarian.BillHaulSnapshot") ??
+                throw new TypeLoadException("Nivarian.BillHaulSnapshot");
+            snapshotStackType = snapshot.GetNestedType("Stack", BindingFlags.NonPublic) ??
+                throw new TypeLoadException("Nivarian.BillHaulSnapshot+Stack");
+            snapshotListType = typeof(List<>).MakeGenericType(snapshotStackType);
+            CaptureSnapshot = Method(snapshot, "Capture", typeof(Map), typeof(Thing));
+            snapshotOnMap = Field(snapshot, "_onMap", typeof(Dictionary<,>).MakeGenericType(typeof(ThingDef), snapshotListType));
+            snapshotCount = Field(snapshotStackType, "count", typeof(int));
+            snapshotDistance = Field(snapshotStackType, "distSq", typeof(float));
             Type ledger = RequireType("Logistics.Orders.CannonOrderLedger");
             Type entry = RequireType("Logistics.Orders.OrderDemandCalculator+NeedEntry");
             Type key = RequireType("Logistics.Orders.ResKey");
@@ -89,6 +102,17 @@ namespace MagicStorage
         internal object Covering(object network, Thing target) => covering.Invoke(network, new object[] { target, null });
         internal int Hops(object network, object source, object dest) => (int)hops.Invoke(network, new[] { source, dest });
         internal int Load(object network, object source) => (int)load.Invoke(network, new object[] { source, 0 });
+        internal object NetworkFor(Map map) => networkFor.Invoke(null, new object[] { map });
+        internal void AddSnapshotStock(object snapshot, ThingDef def, int count, float distanceSquared)
+        {
+            var stocks = (IDictionary)snapshotOnMap.GetValue(snapshot);
+            var list = (IList)stocks[def];
+            if (list == null) stocks[def] = list = (IList)Activator.CreateInstance(snapshotListType);
+            object stack = Activator.CreateInstance(snapshotStackType);
+            snapshotCount.SetValue(stack, count);
+            snapshotDistance.SetValue(stack, distanceSquared);
+            list.Add(stack);
+        }
         internal int Group(object ledger) => (int)group.Invoke(ledger, null);
         internal int AvailableDemand(object ledger, Demand demand) => Math.Max(0,
             (int)fresh.Invoke(ledger, new object[] { demand.Target, demand.Def, demand.Sink, demand.FuelIndex }) -

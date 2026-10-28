@@ -91,6 +91,9 @@ namespace MagicStorage
             Widgets.Label(new Rect(0, y, width, height), steamId);
             y += height + 10f;
             int logKb = Encoding.UTF8.GetByteCount(capture.Log ?? string.Empty) / 1024;
+            if (Widgets.ButtonText(new Rect(0, y, Mathf.Min(width, 260f), 32f), "MS_FeedbackShowMine".Translate()))
+                Dialog_MyFeedback.Open();
+            y += 42f;
             Widgets.Label(new Rect(0, y, width, 28f), "MS_FeedbackCollected".Translate(capture.Mods.Count, logKb));
             y += 30f;
             if (Widgets.ButtonText(new Rect(0, y, 150f, 28f), (showMods ? "MS_FeedbackHideMods" : "MS_FeedbackShowMods").Translate()))

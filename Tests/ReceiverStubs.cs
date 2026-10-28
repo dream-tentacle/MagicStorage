@@ -21,6 +21,7 @@ namespace RimWorld
         public static ThingFilter CreateOnlyEverStorableThingFilter() => new ThingFilter();
         public readonly HashSet<ThingDef> Allowed = new HashSet<ThingDef>();
         public IEnumerable<ThingDef> AllowedThingDefs => Allowed;
+        public string Summary => string.Join(", ", Allowed.Select(d => d.label));
         public bool Allows(ThingDef def) => Allowed.Contains(def);
         public QualityRange AllowedQualityLevels = QualityRange.All;
         public FloatRange AllowedHitPointsPercents = new FloatRange(0f, 1f);
@@ -75,8 +76,7 @@ namespace RimWorld
                 var building = (Building)parent;
                 if (!building.Spawned) throw new System.NullReferenceException("Despawned slot group parent has no map.");
                 return building.Map.Ground.Where(t => t.Spawned && t.Map == building.Map &&
-                    parent.AllSlotCellsList().Contains(t.Position) && t.def.category == ThingCategory.Item &&
-                    MagicStorage.StorageFloorContext.SameFloor(t, building));
+                    parent.AllSlotCellsList().Contains(t.Position) && t.def.category == ThingCategory.Item);
             }
         }
         public int HeldThingsCount => HeldThings.Count();

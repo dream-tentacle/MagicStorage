@@ -43,7 +43,7 @@ internal static class StorageBuildMaterialTests
         {
             RuntimeHelpers.RunClassConstructor(typeof(StorageBuildMaterialPatches).TypeHandle);
             Equal(0, Log.Errors.Count, "production patch matched the native-shaped call site");
-            StoredAndGround(); Eligibility(); NativeRules(); GuardedRewrite();
+            StoredAndGround(); Eligibility(); NativeRules(); AllMaterials(); GuardedRewrite();
             Console.WriteLine("PASS: " + checks + " build material assertions (production Harmony transpiler executed; game UI and inventory boundaries stubbed).");
             return 0;
         }
@@ -121,30 +121,80 @@ internal static class StorageBuildMaterialTests
         finally { DebugSettings.godMode = false; }
     }
 
+    private static void AllMaterials()
+    {
+        var f = new Fixture();
+        Equal(false, MagicStorageMod.Settings.AllowAllMaterials, "all materials defaults off");
+        var uncounted = new ThingDef { BaseMarketValue = 100 };
+        var incompatible = new ThingDef(); incompatible.stuffProps.Category = "Fabric";
+        var notStuff = new ThingDef { IsStuff = false };
+        DefDatabase<ThingDef>.AllDefsListForReading.AddRange(new[] { uncounted, incompatible, notStuff, f.Material });
+        try
+        {
+            MagicStorageMod.Settings.AllowAllMaterials = true;
+            Equal(true, f.Open().Options.SequenceEqual(new[] { f.Material, uncounted }),
+                "enabled menu includes absent and uncounted legal materials in native order");
+            Equal(0, f.Map.listerThings.Queries, "enabled menu never queries ground items");
+            Equal(0, f.Unit.Inventory.CountQueries, "enabled menu never queries inventory");
+            f.Map.Manager = null;
+            Equal(2, f.Open().Options.Count, "enabled menu needs no storage manager");
+            var blocked = new Designator_Build { CanInteract = false }; blocked.ProcessInput(new UnityEngine.Event());
+            Equal(0, blocked.Options.Count, "enabled menu preserves interaction restrictions");
+            var fixedMaterial = new Designator_Build(); fixedMaterial.Building.MadeFromStuff = false;
+            fixedMaterial.ProcessInput(new UnityEngine.Event());
+            Equal(1, fixedMaterial.NonStuffInputs, "enabled mode preserves fixed-material building input");
+            MagicStorageMod.Settings.AllowAllMaterials = false;
+            Equal(1, f.Open().Rejections, "disabling immediately restores stock requirement");
+            f.Map.Manager = new MapComponent_StorageNetworks(); f.Map.Manager.StorageUnits.Add(f.Unit);
+            f.Store(f.Unit, f.Material);
+            Equal(f.Material, f.Open().Options.Single(), "disabling restores stored-material recognition");
+        }
+        finally
+        {
+            MagicStorageMod.Settings.AllowAllMaterials = false;
+            DefDatabase<ThingDef>.AllDefsListForReading.Clear();
+        }
+    }
+
     private static void GuardedRewrite()
     {
         var query = AccessTools.Method(typeof(ListerThings), nameof(ListerThings.ThingsOfDef));
         var count = AccessTools.PropertyGetter(typeof(List<Thing>), nameof(List<Thing>.Count));
+        var keys = AccessTools.PropertyGetter(typeof(Dictionary<ThingDef, int>), nameof(Dictionary<ThingDef, int>.Keys));
         var label = new DynamicMethod("labels", typeof(void), Type.EmptyTypes).GetILGenerator().DefineLabel();
         var call = new CodeInstruction(OpCodes.Callvirt, query); call.labels.Add(label);
         call.blocks.Add(new ExceptionBlock(ExceptionBlockType.BeginExceptionBlock));
-        var code = new[] { call, new CodeInstruction(OpCodes.Nop), new CodeInstruction(OpCodes.Callvirt, count) };
+        var countCall = new CodeInstruction(OpCodes.Callvirt, count); countCall.labels.Add(label);
+        var code = new[] { call, new CodeInstruction(OpCodes.Nop), countCall, new CodeInstruction(OpCodes.Callvirt, keys) };
         var rewritten = StorageBuildMaterialPatches.IncludeStoredMaterials(code).ToList();
-        Equal(3, rewritten.Count, "replacement inserts no instructions or branches");
+        Equal(4, rewritten.Count, "replacement inserts no instructions or branches");
         Equal(OpCodes.Call, rewritten[0].opcode, "instance call becomes stack-compatible static call");
         Equal(label, rewritten[0].labels.Single(), "branch label retained");
         Equal(ExceptionBlockType.BeginExceptionBlock, rewritten[0].blocks.Single().blockType, "exception boundary retained");
+        Equal(OpCodes.Nop, rewritten[2].opcode, "count is supplied directly by replacement");
+        Equal(label, rewritten[2].labels.Single(), "count instruction retains branch labels");
+        Equal(OpCodes.Call, rewritten[3].opcode, "candidate definitions use a static helper");
         foreach (int matches in new[] { 0, 2 })
         {
             var incompatible = new List<CodeInstruction>();
+            incompatible.Add(new CodeInstruction(OpCodes.Callvirt, keys));
             for (int i = 0; i < matches; i++)
             { incompatible.Add(new CodeInstruction(OpCodes.Callvirt, query)); incompatible.Add(new CodeInstruction(OpCodes.Callvirt, count)); }
             var original = incompatible.Select(c => c.operand).ToArray();
             var unchanged = StorageBuildMaterialPatches.IncludeStoredMaterials(incompatible).ToList();
             Equal(true, unchanged.Select(c => c.operand).SequenceEqual(original), "missing or ambiguous match leaves IL unchanged");
         }
-        var wrongUse = new[] { new CodeInstruction(OpCodes.Callvirt, query), new CodeInstruction(OpCodes.Pop) };
+        var wrongUse = new[] { new CodeInstruction(OpCodes.Callvirt, query), new CodeInstruction(OpCodes.Pop), new CodeInstruction(OpCodes.Callvirt, keys) };
         Equal(query, StorageBuildMaterialPatches.IncludeStoredMaterials(wrongUse).First().operand, "query not consumed by Count remains unchanged");
-        Equal(3, Log.Errors.Count, "each incompatible call-site shape produces a diagnostic");
+        foreach (int matches in new[] { 0, 2 })
+        {
+            var incompatible = new List<CodeInstruction>
+            { new CodeInstruction(OpCodes.Callvirt, query), new CodeInstruction(OpCodes.Callvirt, count) };
+            for (int i = 0; i < matches; i++) incompatible.Add(new CodeInstruction(OpCodes.Callvirt, keys));
+            var original = incompatible.Select(c => c.operand).ToArray();
+            var unchanged = StorageBuildMaterialPatches.IncludeStoredMaterials(incompatible).ToList();
+            Equal(true, unchanged.Select(c => c.operand).SequenceEqual(original), "missing or ambiguous candidate source leaves IL unchanged");
+        }
+        Equal(5, Log.Errors.Count, "each incompatible call-site shape produces a diagnostic");
     }
 }

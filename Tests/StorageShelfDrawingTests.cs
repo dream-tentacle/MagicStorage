@@ -11,7 +11,7 @@ internal static class StorageShelfDrawingTests
     private static void Near(float a, float b, string label) => Check(Math.Abs(a-b)<0.00001f,label+": "+a+" / "+b);
     public static int Main()
     {
-        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
+        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); IconRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
         catch(Exception ex) { Console.Error.WriteLine(ex);return 1; }
     }
 
@@ -38,6 +38,123 @@ internal static class StorageShelfDrawingTests
                     "rotated graphics fit dynamic position");
             }
         }
+    }
+
+    private sealed class NoGraphicItem : Thing
+    {
+        public override Graphic Graphic { get => throw new Exception("A custom renderer has no ordinary graphic"); set { } }
+    }
+    private sealed class CustomPhaseItem : Thing
+    { public override void DynamicDrawPhaseAt(DrawPhase phase, Vector3 drawLoc, bool flip = false) { } }
+    private sealed class CustomDrawItem : Thing
+    { protected override void DrawAt(Vector3 drawLoc, bool flip = false) { } }
+    private sealed class CustomPrintItem : Thing
+    { public override void Print(SectionLayer layer) { } }
+
+    private static void IconRouting()
+    {
+        var map = new Map();
+        var shelf = new Building_StorageSupplyShelf { Map=map, Position=new IntVec3 { x=4,z=7 } };
+        map.haulDestinationManager.Parent = shelf;
+        var item = new NoGraphicItem { Map=map, Position=shelf.Position };
+        item.def.graphicData = null; item.def.drawerType = DrawerType.RealtimeOnly;
+        shelf.Selections[0] = item.def; shelf.GetSlotGroup().HeldThings.Add(item);
+        var icon = new ResolvedIcon { Texture=new RenderTexture { width=128,height=128 },
+            Proportions=new Vector2(1,4), Color=new Color(.3f,.6f,.9f) };
+        Widgets.Resolve = thing => icon;
+        Widgets.IconCalls=0; Printer_Plane.Calls.Clear(); Graphics.Calls.Clear();
+        Check(!StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(),item),"custom renderers never bake portraits into a static mesh");
+        Check(Printer_Plane.Calls.Count==0 && Widgets.IconCalls==0,"static printing neither requests an icon nor reads the missing Graphic");
+        Check(StorageShelfDrawing.DrawItem(item,DrawPhase.EnsureInitialized),"custom renderer initialization stays native");
+        Check(StorageShelfDrawing.DrawItem(item,DrawPhase.ParallelPreDraw),"custom renderer parallel preparation stays native");
+        Check(Widgets.IconCalls==0,"icon and material creation never run in the parallel draw phase");
+        Check(!StorageShelfDrawing.DrawItem(item,DrawPhase.Draw),"native icon replaces the missing world graphic");
+        Check(Graphics.Calls.Count==1,"thumbnail is drawn once");
+        var draw=Graphics.Calls[0];
+        Check(draw.Material.Request.mainTex==icon.Texture,"portrait RenderTexture is passed to the map material");
+        Check(draw.Material.Request.shader==ShaderDatabase.Transparent,"unmaterialed portraits use a map shader");
+        Near(.4f,draw.Size.x,"portrait fits the normal shelf position");
+        Near(draw.Size.x,draw.Size.y,"portrait keeps its texture aspect instead of the original body's proportions");
+        Near(.3f,draw.Material.Request.color.r,"native icon tint is retained");
+        var center=StorageShelfDrawing.Center(item,shelf,0);
+        Near(center.x,draw.Center.x,"thumbnail is centered in its assigned slot");
+        Near(center.z,draw.Center.z,"thumbnail z matches shelf layout");
+
+        icon.Texture=new RenderTexture { width=128,height=128 };
+        StorageShelfDrawing.DrawItem(item,DrawPhase.Draw);
+        Check(Graphics.Calls[1].Material.Request.mainTex==icon.Texture,"replaced portrait cache textures are picked up on the next draw");
+        shelf.Selections=new ThingDef[25];shelf.Stocks=new Thing[25];shelf.Selections[0]=item.def;
+        icon.Texture=new Texture2D { width=256,height=128 };icon.Angle=35f;icon.Scale=3f;
+        Graphics.Calls.Clear();StorageShelfDrawing.DrawItem(item,DrawPhase.Draw);draw=Graphics.Calls[0];
+        double radians=35*Math.PI/180;
+        float extent=(float)Math.Max(draw.Size.x*Math.Cos(radians)+draw.Size.y*Math.Sin(radians),
+            draw.Size.x*Math.Sin(radians)+draw.Size.y*Math.Cos(radians));
+        Near(StorageShelfLayout.ItemSizeFor(25),extent,"large rotated icons remain inside densely configured shelf positions");
+        Near(2f,draw.Size.x/draw.Size.y,"animal-style icon textures preserve aspect ratio");
+        Near(35f,draw.Angle,"native icon angle is retained");
+        icon.Angle=0;icon.Scale=.5f;Graphics.Calls.Clear();StorageShelfDrawing.DrawItem(item,DrawPhase.Draw);
+        Near(StorageShelfLayout.ItemSizeFor(25)*.5f,Graphics.Calls[0].Size.x,"smaller native icon scale is honored");
+
+        var worldShader=new Shader { Name="map masked custom" };var uiShader=new Shader { Name="UI masked custom" };
+        DefDatabase<ShaderTypeDef>.AllDefsListForReading.Add(new ShaderTypeDef { Shader=worldShader });
+        ShaderDatabase.UI.Add(worldShader,uiShader);
+        var request=new MaterialRequest(icon.Texture,uiShader,new Color(.8f,.4f,.2f))
+        { maskTex=new Texture2D(),secondaryTex=new Texture2D(),colorTwo=new Color(.6f,.2f,.4f) };
+        icon.Material=MaterialPool.MatFrom(request);icon.Color=new Color(.5f,.5f,.5f);
+        Graphics.Calls.Clear();StorageShelfDrawing.DrawItem(item,DrawPhase.Draw);draw=Graphics.Calls[0];
+        Check(draw.Material.Request.shader==worldShader,"UI shader resolves back to its original map shader");
+        Check(draw.Material.Request.maskTex==request.maskTex && draw.Material.Request.secondaryTex==request.secondaryTex,
+            "native mask and secondary textures survive shader conversion");
+        Near(.4f,draw.Material.Request.color.r,"material primary tint combines with icon tint");
+        Near(.3f,draw.Material.Request.colorTwo.r,"material secondary tint combines with icon tint");
+        Check(icon.Material.Request.shader==uiShader,"shared native UI material is never modified");
+
+        foreach(var custom in new Thing[] { new CustomPhaseItem(),new CustomDrawItem(),new CustomPrintItem() })
+        {
+            custom.Map=map;custom.Position=shelf.Position;custom.def.drawerType=DrawerType.MapMeshAndRealTime;
+            shelf.Selections=new ThingDef[3];shelf.Stocks=new Thing[3];shelf.Selections[0]=custom.def;
+            shelf.GetSlotGroup().HeldThings.Clear();shelf.GetSlotGroup().HeldThings.Add(custom);
+            Printer_Plane.Calls.Clear();Graphics.Calls.Clear();int before=Widgets.IconCalls;
+            StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(),custom);
+            Check(Printer_Plane.Calls.Count==0,"overridden draw entry points automatically select thumbnails");
+            Check(!StorageShelfDrawing.DrawItem(custom,DrawPhase.Draw) && Graphics.Calls.Count==1,
+                "hybrid custom renderers draw their thumbnail exactly once");
+            Check(Widgets.IconCalls==before+1,"arbitrary custom types use the vanilla resolver without a corpse check");
+            custom.def.drawerType=DrawerType.MapMeshOnly;Graphics.Calls.Clear();
+            StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(),custom);
+            StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(),custom);
+            Check(map.dynamicDrawManager.Drawables.Count==1 && map.dynamicDrawManager.Drawables[0]==custom,
+                "pure static custom objects enter the actual dynamic draw list exactly once");
+            Check(!StorageShelfDrawing.DrawItem(custom,DrawPhase.Draw) && Graphics.Calls.Count==1,
+                "custom mesh-only objects can use live portrait textures too");
+            typeof(StorageShelfDrawing).GetMethod("ReleaseIconDrawable",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[] { custom });
+            Check(map.dynamicDrawManager.Drawables.Count==0,"despawning removes the additional dynamic registration");
+        }
+        var ordinary=new ThingWithComps { Map=map,Position=shelf.Position };
+        ordinary.def.drawerType=DrawerType.RealtimeOnly;
+        shelf.Selections[0]=ordinary.def;shelf.Stocks=new Thing[3];
+        shelf.GetSlotGroup().HeldThings.Clear();shelf.GetSlotGroup().HeldThings.Add(ordinary);
+        int calls=Widgets.IconCalls;Graphics.Calls.Clear();
+        StorageShelfDrawing.DrawItem(ordinary,DrawPhase.Draw);
+        Check(Widgets.IconCalls==calls,"standard ThingWithComps rendering keeps the existing graphic path");
+        Check(Graphics.Calls[0].Material==ordinary.Graphic.Material,"ordinary items preserve their original map material");
+        ordinary.Graphic=BaseContent.BadGraphic;Graphics.Calls.Clear();StorageShelfDrawing.DrawItem(ordinary,DrawPhase.Draw);
+        Check(Widgets.IconCalls==calls+1 && Graphics.Calls.Count==1,"invalid ordinary graphics automatically fall back to an icon");
+        icon.Texture=BaseContent.BadTex;Graphics.Calls.Clear();
+        Check(StorageShelfDrawing.DrawItem(ordinary,DrawPhase.Draw) && Graphics.Calls.Count==0,
+            "a missing native icon falls back to the object's original renderer instead of drawing a red cross");
+        ordinary.def.drawerType=DrawerType.MapMeshOnly;
+        StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(),ordinary);
+        map.listerThings.AllThings.Add(ordinary);Find.Maps.Add(map);
+        Check(map.dynamicDrawManager.Drawables.Count==1,"mesh-only missing graphics get dynamic registration too");
+        calls=Widgets.IconCalls;MagicStorageMod.Settings.TidySupplyShelf=false;
+        StorageShelfDrawing.RefreshAll();
+        Check(map.dynamicDrawManager.Drawables.Count==0,"disabling tidy shelves releases additional registrations");
+        Check(StorageShelfDrawing.DrawItem(ordinary,DrawPhase.Draw) && Widgets.IconCalls==calls,"disabled shelf layout never resolves thumbnails");
+        MagicStorageMod.Settings.TidySupplyShelf=true;map.haulDestinationManager.Parent=new object();
+        Check(StorageShelfDrawing.DrawItem(ordinary,DrawPhase.Draw) && Widgets.IconCalls==calls,"objects outside supply shelves retain native rendering");
+        DefDatabase<ShaderTypeDef>.AllDefsListForReading.Clear();
+        Widgets.Resolve=thing=>new ResolvedIcon();
     }
 
     private static void DynamicRouting()

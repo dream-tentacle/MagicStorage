@@ -18,7 +18,17 @@ namespace Verse
         { Cell = cell; WorkGiver = giver; IsPrioritized = true; }
         public void Clear() { IsPrioritized = false; WorkGiver = null; }
     }
-    public static class Scribe_Defs { public static void Look<T>(ref T value, string key) { } }
+    public static class Scribe_Defs
+    {
+        public static Func<string, object, object> Boundary;
+        public static void Look<T>(ref T value, string key)
+        { if (Boundary != null) value = (T)Boundary(key, value); }
+    }
+    public partial class RoomRoleDef
+    {
+        public string defName, label;
+        public string LabelCap => label.CapitalizeFirst();
+    }
     public static class Scribe_References { public static void Look<T>(ref T value, string key) { } }
     public struct IntRange { public int min, max; public IntRange(int a, int b) { min = a; max = b; } }
     public struct FloatRange { public float min, max; public FloatRange(float a, float b) { min = a; max = b; } public bool IncludesEpsilon(float v) => v >= min && v <= max; }
@@ -54,6 +64,13 @@ namespace Verse
     {
         public RimWorld.ThingFilter filter = new RimWorld.ThingFilter();
         public bool IsFixedIngredient => filter.Allowed.Count == 1;
+        public ThingDef FixedIngredient => filter.Allowed.First();
+        public string SummaryFor(RecipeDef recipe)
+        {
+            var kind = filter.Allowed.FirstOrDefault(recipe.fixedIngredientFilter.Allows);
+            float value = kind == null ? 1 : recipe.IngredientValueGetter.ValuePerUnitOf(kind);
+            return (value == 0 ? count : count / value) + "x " + filter.Summary;
+        }
         public float count;
         public float GetBaseCount() => count;
         public int CountRequiredOfFor(ThingDef def, RecipeDef recipe, RimWorld.Bill bill = null) =>
@@ -70,7 +87,9 @@ namespace Verse
     public enum ThingRequestGroup { MinifiedThing, Blueprint, BuildingFrame, Refuelable }
     public partial struct IntVec3 { public bool Standable(Map map) => true; public bool Fogged(Map map) => map.Fog.Contains(this); }
     public enum Danger { Some, Deadly }
-    public partial class Thing { public string LabelShortCap => "test pawn"; public RimWorld.RotStage GetRotStage() => stale ? RimWorld.RotStage.Rotting : RimWorld.RotStage.Fresh; }
+    public partial class Thing { public string LabelShort => "test thing"; public string LabelShortCap => "test pawn"; public RimWorld.RotStage GetRotStage() => stale ? RimWorld.RotStage.Rotting : RimWorld.RotStage.Fresh; }
+    public static partial class GenAdj
+    { public static IEnumerable<IntVec3> CellsOccupiedBy(Thing thing) { yield return thing.Position; } }
     public partial class ThingDef
     {
         public Type thingClass = typeof(Thing);
@@ -141,6 +160,27 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public static class RoomRoleDefOf
+    {
+        public static readonly RoomRoleDef Workshop = new RoomRoleDef { defName = "Workshop", label = "workshop" };
+        public static readonly RoomRoleDef Laboratory = new RoomRoleDef { defName = "Laboratory", label = "laboratory" };
+    }
+    public interface IBillGiver
+    {
+        Map Map { get; }
+        BillStack BillStack { get; }
+        IEnumerable<IntVec3> IngredientStackCells { get; }
+        string LabelShort { get; }
+        bool CurrentlyUsableForBills();
+        bool UsableForBillsAfterFueling();
+        void Notify_BillDeleted(Bill bill);
+    }
+    public class BillStack : List<Bill>
+    {
+        public readonly IBillGiver billGiver;
+        public BillStack(IBillGiver giver) { billGiver = giver; }
+    }
+    public class Precept_ThingStyle { public string LabelCap = "Cultural sculpture"; }
     public static class QualityUtility
     {
         internal static int LastSkill;
@@ -205,11 +245,21 @@ namespace Verse.AI
 }
 namespace MagicStorage
 {
-    public class Building_CosmicWorkbench : Thing
-    { public CompStorageNode node; public StorageNetwork Network => node?.Network; public IntVec3 InteractionCell => Position; }
+#if !COSMIC_ROOM_ROLE_TESTS
+    // Room evaluation is exercised by the dedicated room-role test project.
+    internal static class CosmicWorkbenchRoomRoles
+    {
+        internal static bool Supports(RoomRoleDef role) => role != null;
+        internal static void Refresh(Building_CosmicWorkbench bench) { }
+    }
+#endif
+    internal sealed class Dialog_CosmicWorkbenchWorkTypes
+    { internal Dialog_CosmicWorkbenchWorkTypes(Building_CosmicWorkbench bench) { } }
     internal static class CraftingRecipeCatalog
     {
+        internal static readonly List<RimWorld.WorkTypeDef> WorkTypes = new List<RimWorld.WorkTypeDef>();
         internal static string Label(RecipeDef recipe) => recipe.label;
+        internal static string Label(RecipeDef recipe, RimWorld.Precept_ThingStyle precept) => precept?.LabelCap ?? recipe.label;
         internal static bool Supports(RecipeDef recipe) => recipe != null;
         internal static bool HasType(RecipeDef recipe, RimWorld.WorkTypeDef type) => recipe.route.workType == type;
         internal static IReadOnlyList<RimWorld.WorkGiverDef> Routes(RecipeDef recipe) => new[] { recipe.route };
@@ -227,6 +277,8 @@ namespace MagicStorage
     {
         internal float Required = 10000, Speed = 1;
         internal int MakeCalls, ConsumeCalls, NotifyCalls;
+        internal RimWorld.Precept_ThingStyle LastPrecept;
+        internal RimWorld.IBillGiver LastBillGiver;
         internal bool ThrowGeneration, ThrowPreparation;
         internal ThingDef Product = new ThingDef();
         internal int ProductCount = 4;
@@ -235,9 +287,12 @@ namespace MagicStorage
         { if (ThrowPreparation) throw new Exception("controlled preparation failure"); return Required; }
         public float WorkSpeed(RecipeDef recipe, Pawn pawn, Building_CosmicWorkbench bench) => Speed;
         public void Learn(RecipeDef recipe, Pawn worker, int ticks) { worker.CraftingXp += ticks * 0.1f; }
-        public IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> input, Thing dominant)
+        public IEnumerable<Thing> MakeProducts(RecipeDef recipe, Pawn worker, List<Thing> input, Thing dominant,
+            RimWorld.Precept_ThingStyle precept = null, RimWorld.IBillGiver billGiver = null)
         {
             MakeCalls++;
+            LastPrecept = precept;
+            LastBillGiver = billGiver;
             yield return new Thing { def = Product, stackCount = ProductCount };
             if (ThrowGeneration) throw new Exception("controlled generation failure");
         }

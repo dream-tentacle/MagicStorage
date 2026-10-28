@@ -16,17 +16,19 @@ namespace MagicStorage
         // Session-only clipboard; never serialized or tied to a source building.
         private static ShelfPreset copiedPreset;
 
-        private sealed class ShelfPreset
+        internal sealed class ShelfPreset
         {
-            internal readonly List<ThingDef> Selections;
-            internal readonly List<int> RestockLimits;
-            internal readonly List<StorageShelfFilter> Filters;
-            internal readonly StoragePriority Priority;
-            internal readonly bool FilterMode;
-            internal readonly bool DistinctItems;
-            internal readonly bool LowTemperatureMode;
+            internal List<ThingDef> Selections = new List<ThingDef>();
+            internal List<int> RestockLimits = new List<int>();
+            internal List<StorageShelfFilter> Filters = new List<StorageShelfFilter>();
+            internal StoragePriority Priority;
+            internal bool FilterMode;
+            internal bool DistinctItems;
+            internal bool LowTemperatureMode;
             internal readonly ThingFilter SharedFilter = new ThingFilter();
-            internal readonly List<int> FilterLimits;
+            internal List<int> FilterLimits = new List<int>();
+
+            internal ShelfPreset() { }
 
             internal ShelfPreset(Building_StorageSupplyShelf shelf)
             {
@@ -47,20 +49,25 @@ namespace MagicStorage
 
         private void PastePreset()
         {
-            if (copiedPreset == null) return;
-            if (filterMode != copiedPreset.FilterMode && !TrySetFilterMode(copiedPreset.FilterMode)) return;
+            if (copiedPreset != null) ApplyPreset(copiedPreset);
+        }
+
+        internal bool ApplyPreset(ShelfPreset preset)
+        {
+            if (filterMode != preset.FilterMode && !TrySetFilterMode(preset.FilterMode)) return false;
             // Replace all slots together so swapped selections cannot conflict.
-            selections = new List<ThingDef>(copiedPreset.Selections);
-            restockLimits = new List<int>(copiedPreset.RestockLimits);
-            filters = copiedPreset.Filters.Select(filter => filter.Clone()).ToList();
-            SharedFilter.CopyAllowancesFrom(copiedPreset.SharedFilter);
-            filterLimits = new List<int>(copiedPreset.FilterLimits);
-            DistinctItems = copiedPreset.DistinctItems;
-            lowTemperatureMode = copiedPreset.LowTemperatureMode;
+            selections = new List<ThingDef>(preset.Selections);
+            restockLimits = new List<int>(preset.RestockLimits);
+            filters = preset.Filters.Select(filter => filter.Clone()).ToList();
+            SharedFilter.CopyAllowancesFrom(preset.SharedFilter);
+            filterLimits = new List<int>(preset.FilterLimits);
+            DistinctItems = preset.DistinctItems;
+            lowTemperatureMode = preset.LowTemperatureMode;
             EnsureSlotCapacity();
-            GetStoreSettings().Priority = copiedPreset.Priority;
+            GetStoreSettings().Priority = preset.Priority;
             ClearRestockFailures();
             RefreshSettings();
+            return true;
         }
 
         private StorageRefreshTimer refreshTimer;
@@ -110,7 +117,7 @@ namespace MagicStorage
         { EnsureSlotCapacity(); return IsShelfStock(slotStocks[slot]) ? slotStocks[slot] : null; }
         internal void SetStock(int slot, Thing item) { slotStocks[slot] = item; }
         private bool IsShelfStock(Thing item) => item != null && !item.Destroyed && item.Spawned &&
-            Spawned && item.Map == Map && item.Position == Position && StorageFloorContext.SameFloor(item, this);
+            Spawned && item.Map == Map && item.Position == Position;
         internal void ResolveStockSlots(List<Thing> items)
         {
             var assigned = new HashSet<Thing>();
@@ -213,7 +220,8 @@ namespace MagicStorage
         }
 
         // Accepts describes an existing stack's storage; HaulDestinationEnabled gates new hauling.
-        public bool Accepts(Thing item) => IsShelfStock(item) && item.def.category == ThingCategory.Item;
+        public bool Accepts(Thing item) => item != null && Spawned && item.Spawned &&
+            item.Map == Map && item.Position == Position && item.def.category == ThingCategory.Item;
 
         public StorageSettings GetStoreSettings()
         {
@@ -331,6 +339,7 @@ namespace MagicStorage
                 yield return new Command_Action
                 {
                     defaultLabel = "MS_Shelf_CopyPreset".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ShelfCopyPreset,
                     defaultDesc = "MS_Shelf_CopyPresetDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/CopySettings"),
                     alsoClickIfOtherInGroupClicked = false,
@@ -339,6 +348,7 @@ namespace MagicStorage
                 var paste = new Command_Action
                 {
                     defaultLabel = "MS_Shelf_PastePreset".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ShelfPastePreset,
                     defaultDesc = "MS_Shelf_PastePresetDesc".Translate(),
                     icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/PasteSettings"),
                     alsoClickIfOtherInGroupClicked = true,
@@ -346,6 +356,15 @@ namespace MagicStorage
                 };
                 if (copiedPreset == null) paste.Disable("MS_Shelf_NeedCopiedPreset".Translate());
                 yield return paste;
+                yield return new Command_Action
+                {
+                    defaultLabel = "MS_Shelf_LocalPresets".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ShelfLocalPresets,
+                    defaultDesc = "MS_Shelf_LocalPresetsDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/CopySettings"),
+                    alsoClickIfOtherInGroupClicked = false,
+                    action = () => Find.WindowStack.Add(new Dialog_StorageShelfPresets(this))
+                };
                 yield return new Command_Toggle
                 {
                     defaultLabel = "MS_Shelf_LowTemperatureMode".Translate(),

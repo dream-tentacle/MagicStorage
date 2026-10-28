@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="StorageTradeIntegrationTests.csproj" />
+  <PropertyGroup>
+    <AssemblyName>RatkinRadioIntegrationTests</AssemblyName>
+    <OutputPath>bin\RatkinRadio\</OutputPath>
+    <IntermediateOutputPath>obj\RatkinRadio\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- This executable runs trade tests; the unrelated crafting test entry point has incomplete shared fixtures. -->
+    <Compile Remove="CosmicCraftingTests.cs" />
+    <Compile Remove="StorageFoundationTests.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <AssemblyName>CosmicWorkbenchRoomRoleTests</AssemblyName>
+    <OutputPath>bin\RoomRoles\</OutputPath>
+    <IntermediateOutputPath>obj\RoomRoles\</IntermediateOutputPath>
+    <DefineConstants>$(DefineConstants);COSMIC_ROOM_ROLE_TESTS</DefineConstants>
+  </PropertyGroup>
+  <Import Project="StorageFoundationTests.csproj" />
+  <ItemGroup>
+    <Compile Include="CosmicWorkbenchRoomRoleStubs.cs" />
+    <Compile Include="CosmicWorkbenchRoomRoleTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CosmicWorkbenchRoomRoles.cs" />
+  </ItemGroup>
+</Project>

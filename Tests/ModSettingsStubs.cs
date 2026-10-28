@@ -1,7 +1,9 @@
 // Settings persistence and GUI remain native engine boundaries.
 namespace MagicStorage
 {
+#if !LOGICAL_FLOORS_COMPATIBILITY_TESTS
     internal static class StorageShelfDrawing { internal static void RefreshAll() { } }
+#endif
     public sealed class StorageInventoryRule : Verse.IExposable { public void ExposeData() { } }
     public sealed class UpdateNoticeSettings
     {

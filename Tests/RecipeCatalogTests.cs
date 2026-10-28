@@ -81,6 +81,24 @@ internal static class RecipeCatalogTests
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(tailorShared).Contains(smithOnly), "Another table's route cannot expose a recipe with a mismatching required work type.");
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(hand).Contains(vanillaProduct), "A workbench picker excludes other workbenches' recipes.");
         Check(CraftingRecipeCatalog.AvailableForWorkbench(hand).Count(r => r == pants) == 1, "Multiple work givers must not duplicate a workbench recipe.");
+        Check(CraftingRecipeCatalog.HasWorkbenchType(tailorShared, shared, tailoring) &&
+            !CraftingRecipeCatalog.HasWorkbenchType(tailorShared, shared, smithing),
+            "Filtering a workbench snapshot must use that table's work type, not another table's route for a shared recipe.");
+        Check(!CraftingRecipeCatalog.HasWorkbenchType(tailorShared, smithOnly, tailoring) &&
+            CraftingRecipeCatalog.HasWorkbenchType(smithShared, smithOnly, smithing),
+            "The workbench index preserves a recipe's required giver work type.");
+        int tableRecipeReads = hand.AllRecipesReads;
+        CraftingRecipeCatalog.AvailableForWorkbench(hand).ToList();
+        Check(hand.AllRecipesReads == tableRecipeReads,
+            "Browsing uses the initialized table index instead of reading the table's recipe collection again.");
+        int availabilityReads = pants.AvailabilityReads;
+        var browserSnapshot = CraftingRecipeCatalog.SnapshotWorkbenchTypes();
+        Check(pants.AvailabilityReads == availabilityReads + 1,
+            "A shared recipe's availability is evaluated once per snapshot, even when multiple tables provide it.");
+        foreach (var type in new[] { null, tailoring, smithing })
+            Check(new HashSet<ThingDef>(browserSnapshot.Where(pair => type == null || pair.Value.Contains(type)).Select(pair => pair.Key))
+                .SetEquals(CraftingRecipeCatalog.AvailableWorkbenches(type)),
+                "Snapshot work type tabs expose exactly the same researched, supported tables as a fresh browser.");
         foreach (var excluded in new[] { gestating, forming, resurrection, surgery, wrongWorkType, automatic, unsupportedTable, unsupportedWorkType })
         {
             Check(!CraftingRecipeCatalog.Supports(excluded), "Unsupported production must not enter the catalog.");
@@ -88,6 +106,11 @@ internal static class RecipeCatalogTests
         }
 
         hand.IsResearchFinished = electric.IsResearchFinished = false;
+        Check(browserSnapshot.ContainsKey(hand) && browserSnapshot.ContainsKey(electric),
+            "An open browser keeps its availability snapshot when research changes.");
+        var reopenedSnapshot = CraftingRecipeCatalog.SnapshotWorkbenchTypes();
+        Check(!reopenedSnapshot.ContainsKey(hand) && !reopenedSnapshot.ContainsKey(electric),
+            "Reopening the browser reads the current research state.");
         Check(!CraftingRecipeCatalog.Available.Contains(pants), "Both workbenches locked hides clothing from addition.");
         Check(CraftingRecipeCatalog.Supports(pants), "Workbench research must not erase an existing order's route.");
         electric.IsResearchFinished = true;
@@ -96,6 +119,8 @@ internal static class RecipeCatalogTests
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(hand).Any(), "An unlocked alternative must not bypass the selected workbench's research gate.");
         Check(CraftingRecipeCatalog.AvailableForWorkbench(electric).Contains(pants), "The unlocked workbench exposes its shared recipe.");
         pants.AvailableNow = false;
+        Check(!CraftingRecipeCatalog.SnapshotWorkbenchTypes().ContainsKey(electric),
+            "A fresh snapshot excludes a researched table whose only supported recipe is unavailable.");
         Check(!CraftingRecipeCatalog.CanAdd(pants), "The recipe's own unlock conditions still apply.");
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(electric).Any(), "The workbench picker hides recipes whose own research is locked.");
         Check(!CraftingRecipeCatalog.AvailableWorkbenches().Contains(electric), "Do not offer a workbench with no unlocked supported recipes.");
@@ -108,6 +133,8 @@ internal static class RecipeCatalogTests
         Check(!CraftingRecipeCatalog.AvailableForWorkbench(hand).Any(), "A locked workbench cannot expose its recipes.");
         Check(CraftingRecipeCatalog.AvailableWorkbenches().Contains(hand), "Locked workbenches stay in the browser for unlocking.");
         Check(CraftingRecipeCatalog.AvailableWorkbenches().Contains(electric), "Every researched alternative remains available to unlock.");
+        Check(CraftingRecipeCatalog.SnapshotWorkbenchTypes().ContainsKey(hand),
+            "Paid unlock gates do not hide tables from the snapshot's unlock browser.");
         CraftingWorkbenchUnlocks.Allows = table => table != hand;
         Check(CraftingRecipeCatalog.CanAdd(pants), "One paid alternative exposes a shared recipe.");
         Check(CraftingRecipeCatalog.AvailableForWorkbench(electric).Contains(pants), "A paid workbench exposes its recipes.");
@@ -140,6 +167,27 @@ internal static class RecipeCatalogTests
         Check(CraftingRecipeCatalog.Label(unnamedNoProduct) == "NoProductRecipe", "A null product list falls back to recipe defName.");
         unnamedNoProduct.products = new List<ThingDefCountClass> { null, new ThingDefCountClass() };
         Check(CraftingRecipeCatalog.Label(unnamedNoProduct) == "NoProductRecipe", "An entirely empty product list falls back to recipe defName.");
+        var sculpture = new ThingDef { label = "Sculpture" };
+        var sculptureRecipe = new RecipeDef { label = "Make sculpture",
+            products = new List<ThingDefCountClass> { new ThingDefCountClass { thingDef = sculpture } } };
+        var primary = new Ideo(); var minor = new Ideo();
+        var primarySculpture = new Precept_Building { ThingDef = sculpture, LabelCap = "Primary monument" };
+        var minorSculpture = new Precept_Building { ThingDef = sculpture, LabelCap = "Minor monument" };
+        primary.cachedPossibleBuildings.Add(primarySculpture);
+        primary.cachedPossibleBuildings.Add(new Precept_Building { ThingDef = new ThingDef() });
+        minor.cachedPossibleBuildings.Add(minorSculpture);
+        Faction.OfPlayer.ideos.AllIdeos.AddRange(new[] { primary, minor });
+        Check(CraftingRecipeCatalog.PreceptsFor(sculptureRecipe).SequenceEqual(new[] { primarySculpture, minorSculpture }),
+            "Like ITab_Bills, expose each matching building precept from every player ideoligion.");
+        Check(CraftingRecipeCatalog.Label(sculptureRecipe, primarySculpture) == "制作Primary monument",
+            "Cultural entries use RecipeMake with the precept name.");
+        Check(CraftingRecipeCatalog.Label(sculptureRecipe, null) == "Make sculpture", "Keep the ordinary recipe option.");
+        Faction.OfPlayer.ideos.AllIdeos.Remove(minor);
+        Check(CraftingRecipeCatalog.PreceptsFor(sculptureRecipe).SequenceEqual(new[] { primarySculpture }),
+            "Reopening choices reads current faction ideoligions rather than a cached list.");
+        primary.cachedPossibleBuildings.Clear();
+        Check(!CraftingRecipeCatalog.PreceptsFor(sculptureRecipe).Any(), "Removed building precepts stop creating new options.");
+        Faction.OfPlayer.ideos.AllIdeos.Clear();
         assertions += RecipeCategoryTests.Run();
         Console.WriteLine("PASS: " + assertions + " recipe catalog and category assertions.");
     }
@@ -160,7 +208,10 @@ namespace Verse
         public string defName, label;
         public Type thingClass;
         public bool IsResearchFinished = true;
-        public List<RecipeDef> AllRecipes = new List<RecipeDef>();
+        private List<RecipeDef> allRecipes = new List<RecipeDef>();
+        public int AllRecipesReads;
+        public List<RecipeDef> AllRecipes
+        { get { AllRecipesReads++; return allRecipes; } set { allRecipes = value; } }
         public List<ThingCategoryDef> thingCategories;
     }
     public sealed class ThingCategoryDef
@@ -173,7 +224,12 @@ namespace Verse
         public string defName;
         public string label = "recipe";
         public List<ThingDefCountClass> products = new List<ThingDefCountClass>();
-        public bool AvailableNow = true, IsSurgery = false, mechResurrection = false;
+        public ThingDef ProducedThingDef => products?.FirstOrDefault(p => p?.thingDef != null)?.thingDef;
+        private bool availableNow = true;
+        public int AvailabilityReads;
+        public bool AvailableNow
+        { get { AvailabilityReads++; return availableNow; } set { availableNow = value; } }
+        public bool IsSurgery = false, mechResurrection = false;
         public int gestationCycles = 0, formingTicks = 0;
         public WorkTypeDef requiredGiverWorkType = null;
     }
@@ -181,6 +237,11 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public class Precept_ThingStyle { public string LabelCap; public ThingDef ThingDef; }
+    public sealed class Precept_Building : Precept_ThingStyle { }
+    public sealed class Ideo { public readonly List<Precept_Building> cachedPossibleBuildings = new List<Precept_Building>(); }
+    public sealed class FactionIdeos { public readonly List<Ideo> AllIdeos = new List<Ideo>(); }
+    public sealed class Faction { public static readonly Faction OfPlayer = new Faction(); public readonly FactionIdeos ideos = new FactionIdeos(); }
     public class Building_WorkTable { }
     public class Building_WorkTableAutonomous : Building_WorkTable { }
     public class WorkGiver_DoBill { }
