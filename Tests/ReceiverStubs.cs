@@ -147,6 +147,21 @@ namespace RimWorld
 }
 namespace Verse
 {
+    public static partial class GenDraw
+    {
+        public static void DrawFieldEdges(List<IntVec3> cells, UnityEngine.Color color) { }
+    }
+    public static class ReceiverTestCollectionExtensions
+    {
+        public static int Count<T>(this List<T> list, System.Predicate<T> predicate) => list.FindAll(predicate).Count;
+    }
+    public partial class ThingDef { public bool EverStorable(bool willMinifyIfPossible) => category == ThingCategory.Item; }
+    public sealed class ReceiverTestThingGrid
+    {
+        private readonly Map map;
+        public ReceiverTestThingGrid(Map map) { this.map = map; }
+        public List<Thing> ThingsListAt(IntVec3 cell) => map.Ground.FindAll(t => t.Spawned && t.Position == cell);
+    }
     public class ThingCategoryDef
     { public readonly List<ThingDef> DescendantThingDefs = new List<ThingDef>(); }
     public enum DestroyMode { Vanish, KillFinalize, Deconstruct }
@@ -170,10 +185,28 @@ namespace Verse
 #endif
         public readonly List<ThingComp> TestComps = new List<ThingComp>();
         public T GetComp<T>() where T : class => node as T ?? TestComps.Find(comp => comp is T) as T;
-        public virtual void SpawnSetup(Map map, bool respawningAfterLoad) { Map = map; Spawned = true; }
+        public virtual void SpawnSetup(Map map, bool respawningAfterLoad)
+        {
+            Map = map; Spawned = true;
+            if (!map.UseNativeStorageLifecycle) return;
+            if (this is RimWorld.ISlotGroupParent parent) map.haulDestinationManager.AddHaulDestination(parent);
+            if (node != null) map.GetComponent<MapComponent_StorageNetworks>().Register(node);
+        }
         public virtual void SetFaction(Faction faction, Pawn recruiter = null) { Faction = faction; }
         public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
         {
+            // Opt in for lifecycle regressions; older fixtures register only network nodes.
+            // Vanilla clears Spawned/Map before removing destinations, then calls comp cleanup.
+            if (Map.UseNativeStorageLifecycle)
+            {
+                Map map = Map;
+                base.DeSpawn(mode);
+                Map = null;
+                if (this is RimWorld.ISlotGroupParent nativeParent)
+                    map.haulDestinationManager.RemoveHaulDestination(nativeParent);
+                if (node != null) map.GetComponent<MapComponent_StorageNetworks>().Unregister(node);
+                return;
+            }
             if (this is RimWorld.ISlotGroupParent parent &&
                 Map.haulDestinationManager.AllGroupsListForReading.Contains(parent.GetSlotGroup()))
                 Map.haulDestinationManager.RemoveHaulDestination(parent);
@@ -188,6 +221,9 @@ namespace Verse
     }
     public partial class Map
     {
+        public bool UseNativeStorageLifecycle;
+        private ReceiverTestThingGrid receiverThingGrid;
+        public ReceiverTestThingGrid thingGrid => receiverThingGrid ?? (receiverThingGrid = new ReceiverTestThingGrid(this));
         public RimWorld.HaulDestinationManager haulDestinationManager = new RimWorld.HaulDestinationManager();
         public RimWorld.ListerHaulables listerHaulables = new RimWorld.ListerHaulables();
     }

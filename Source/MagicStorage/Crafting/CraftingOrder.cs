@@ -125,6 +125,29 @@ namespace MagicStorage
         }
     }
 
+    internal sealed class CraftingPreset
+    {
+        internal readonly List<CraftingOrder> Orders = new List<CraftingOrder>();
+        // A null entry preserves the position of the ungrouped block.
+        internal readonly List<CraftingOrderGroup> Groups = new List<CraftingOrderGroup>();
+        internal bool GroupingMode, UngroupedCollapsed;
+
+        internal static CraftingPreset Capture(CraftingOrderList list)
+        {
+            var preset = new CraftingPreset { GroupingMode = list.GroupingMode, UngroupedCollapsed = list.UngroupedCollapsed };
+            foreach (var group in list.DisplayGroups())
+                preset.Groups.Add(group == null ? null : new CraftingOrderGroup
+                { Id = group.Id, Name = group.Name, Collapsed = group.Collapsed });
+            foreach (var order in list.Orders)
+            {
+                var copy = order.Duplicate(0);
+                copy.Worker = null; copy.Paused = false;
+                preset.Orders.Add(copy);
+            }
+            return preset;
+        }
+    }
+
     public sealed class CraftingOrderList : IExposable
     {
         private List<CraftingOrder> orders = new List<CraftingOrder>();
@@ -270,6 +293,47 @@ namespace MagicStorage
                 if (order.Batch != null && !order.Batch.Cancel(tryStore)) return false;
                 order.Batch = null; order.Changed();
             }
+            return true;
+        }
+        internal bool ApplyPreset(CraftingPreset preset, bool replace)
+        {
+            if (preset == null || preset.Orders.Count == 0) return false;
+            // Prepare independent identities and filters before touching running work.
+            var importedGroups = new Dictionary<string, CraftingOrderGroup>();
+            foreach (var group in preset.Groups)
+                if (group != null) importedGroups.Add(group.Id, new CraftingOrderGroup
+                { Id = Guid.NewGuid().ToString("N"), Name = group.Name, Collapsed = group.Collapsed });
+            int id = nextId;
+            foreach (var order in orders) id = Math.Max(id, order.Id + 1);
+            var importedOrders = new List<CraftingOrder>();
+            foreach (var source in preset.Orders)
+            {
+                var copy = source.Duplicate(id++);
+                copy.GroupId = source.GroupId == null ? null : importedGroups[source.GroupId].Id;
+                copy.Worker = null; copy.Paused = false;
+                importedOrders.Add(copy);
+            }
+            if (replace && !CancelAll(true)) return false;
+            var display = replace ? new List<CraftingOrderGroup>() : DisplayGroups();
+            if (replace)
+            {
+                orders.Clear(); groups.Clear();
+                GroupingMode = preset.GroupingMode;
+                UngroupedCollapsed = preset.UngroupedCollapsed;
+            }
+            foreach (var group in preset.Groups)
+            {
+                if (group == null)
+                { if (!display.Contains(null)) display.Add(null); }
+                else
+                {
+                    var copy = importedGroups[group.Id];
+                    groups.Add(copy); display.Add(copy);
+                }
+            }
+            orders.AddRange(importedOrders);
+            nextId = id;
+            SetGroupOrder(display);
             return true;
         }
         public void Move(CraftingOrder order, int delta)

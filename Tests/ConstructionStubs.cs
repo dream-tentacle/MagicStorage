@@ -8,7 +8,7 @@ using Verse;
 namespace UnityEngine
 {
     public static class GUIUtility { public static string systemCopyBuffer; }
-    public struct Color { }
+    public struct Color { public Color(float r, float g, float b, float a = 1f) { } }
     public struct Vector3
     {
         public float x, y, z;

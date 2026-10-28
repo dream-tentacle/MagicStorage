@@ -110,6 +110,7 @@
     <Compile Include="UI\Dialog_UpdateNotice.cs" />
     <Compile Include="Compatibility\IStorageCompatibility.cs" />
     <Compile Include="Compatibility\CompatibilityManager.cs" />
+    <Compile Include="Compatibility\VehicleFrameworkCompatibility.cs" />
     <Compile Include="Compatibility\LogicalFloorsCompatibility.cs" />
     <Compile Include="Compatibility\LogicalFloorsApi.cs" />
     <Compile Include="Compatibility\LogicalFloorsStoragePatches.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Compatibility\MonolynProductionSupply.cs" />
     <Compile Include="Compatibility\DynamicTradeInterfaceCompatibility.cs" />
     <Compile Include="Compatibility\CeleTechTradeCompatibility.cs" />
+    <Compile Include="Compatibility\TraderShipsCompatibility.cs" />
     <Compile Include="Compatibility\GravshipHoverTradeCompatibility.cs" />
     <Compile Include="Compatibility\RatkinRadioCompatibility.cs" />
     <Compile Include="Compatibility\RavenGiftCompatibility.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Construction\ConstructionRepairPatches.cs" />
     <Compile Include="Construction\ConstructionSite.cs" />
     <Compile Include="Crafting\CraftingOrder.cs" />
+    <Compile Include="Crafting\CraftingPresets.cs" />
     <Compile Include="Crafting\CraftingOrderLoadNotice.cs" />
     <Compile Include="Crafting\CraftingBatch.cs" />
     <Compile Include="Crafting\ICraftingExecutor.cs" />
@@ -206,6 +209,7 @@
     <Compile Include="UI\Dialog_CosmicCrafting.cs" />
     <Compile Include="UI\Dialog_CosmicWorkbenchWorkTypes.cs" />
     <Compile Include="UI\Dialog_CraftingGroupName.cs" />
+    <Compile Include="UI\Dialog_CraftingPresets.cs" />
     <Compile Include="UI\GameComponent_CosmicCraftingUI.cs" />
     <Compile Include="Storage\StorageInventory.cs" />
     <Compile Include="Storage\StorageDebugActions.cs" />
@@ -221,6 +225,9 @@
     <Compile Include="UI\StorageInventoryEntry.cs" />
     <Compile Include="Storage\StorageTransfer.cs" />
     <Compile Include="Storage\StorageMaterialTransaction.cs" />
+    <Compile Include="Buildings\Building_ProductionOutputPort.cs" />
+    <Compile Include="Crafting\VanillaBillStorage.cs" />
+    <Compile Include="Crafting\BillStorageSupplyPlan.cs" />
     <Compile Include="Storage\StorageBeggarGifts.cs" />
     <Compile Include="Storage\StorageMaterialSources.cs" />
     <Compile Include="Storage\StorageIncomingReservations.cs" />

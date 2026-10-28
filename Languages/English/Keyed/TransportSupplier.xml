@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Transport_CopyPreset>Copy preset</MS_Transport_CopyPreset>
+  <MS_Transport_CopyPresetDesc>Copy this material supplier's supply mode, item priority order, target inventory limits and generic container supply setting.</MS_Transport_CopyPresetDesc>
+  <MS_Transport_PastePreset>Paste preset</MS_Transport_PastePreset>
+  <MS_Transport_PastePresetDesc>Apply the copied preset to the selected material suppliers, replacing their configuration. Supports multiple selections. Empty internal cargo before changing supply mode. Items and each supplier's selected target container remain in place.</MS_Transport_PastePresetDesc>
+  <MS_Transport_NeedCopiedPreset>Copy a material supplier preset first.</MS_Transport_NeedCopiedPreset>
   <MS_Transport_Open>Transfer items</MS_Transport_Open>
   <MS_Transport_OpenDesc>Transfer items between the storage network and this material supplier in either direction.</MS_Transport_OpenDesc>
   <MS_Transport_Title>Material supplier · Transfer items</MS_Transport_Title>

@@ -2,6 +2,32 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_0</defName>
+    <label>Version log</label>
+    <version>1.2.0</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Added compatibility with Trader ships. Right-click a landed trader ship to trade with it through magic storage.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>You can now claim rewards for completing the tutorial.</li>
+          <li>Increased building hit points and adjusted movement slowdown when passing through buildings.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>Added the production output port, allowing supplies in its connected storage network to be delivered directly to workbenches for production. Production jobs only.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_1_7</defName>
     <label>Version log</label>
     <version>1.1.7</version>

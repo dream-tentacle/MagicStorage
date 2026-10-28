@@ -10,6 +10,7 @@ namespace MagicStorage
         private readonly Dictionary<IntVec3, List<CompStorageNode>> grid = new Dictionary<IntVec3, List<CompStorageNode>>();
         private readonly Dictionary<CompStorageNode, List<IntVec3>> occupied = new Dictionary<CompStorageNode, List<IntVec3>>();
         private readonly HashSet<StorageNetwork> networks = new HashSet<StorageNetwork>();
+        internal IReadOnlyCollection<StorageNetwork> Networks => networks;
         private List<StorageRecoveryBatch> recovery = new List<StorageRecoveryBatch>();
         private ThingOwner<Thing> directlyHeldThings;
         private bool dirty = true;

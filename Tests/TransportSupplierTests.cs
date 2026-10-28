@@ -66,6 +66,7 @@ internal static class TransportSupplierTests
     internal static int Run()
     {
         assertions = 0;
+        PresetClipboard(); PresetModeGuard(); PresetContainerTargets();
         TwoSidedInventory(); WeightLimits(); Reservations(); ReturnRejected(); FullNetworkSwap();
         AllReturnsReservedTogether(); AutoLoadingAndDirections(); Preservation(); QuantityEditing(); MassStoppingPoints();
         ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply(); CachedPreview();
@@ -73,7 +74,91 @@ internal static class TransportSupplierTests
         TargetInventoryLimits(); TransportInventoryLimits(); TargetLimitPersistence();
         FilterGroupingAndSelections();
         GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
+        VehicleSupply();
         return assertions;
+    }
+
+    private static Vehicles.VehiclePawn VehicleTarget(Fixture f, float capacity)
+    {
+        var vehicle = new Vehicles.VehiclePawn { Spawned = true, Map = f.Map, Position = f.Supplier.FrontCell,
+            Faction = Faction.OfPlayer, Capacity = capacity };
+        vehicle.def.category = ThingCategory.Pawn;
+        f.Map.Ground.Add(vehicle);
+        return vehicle;
+    }
+
+    private static void VehicleSupply()
+    {
+        var f = new Fixture(); var def = new ThingDef { transportMass = 2f };
+        var vehicle = VehicleTarget(f, 20f); f.Cargo(def, 15);
+        f.Supplier.SupplyTransporter();
+        Equal(0, vehicle.CargoAdded, "vehicle support stays inactive before compatibility initialization");
+        new VehicleFrameworkCompatibility().Apply(null);
+        vehicle.VehicleGearMass = 2f;
+        vehicle.inventory.innerContainer.TryAdd(new Thing { def = def, stackCount = 2 });
+        vehicle.PendingCargo[def] = 10;
+        Equal(false, f.Supplier.GenericContainerSupply, "vehicle dedicated supply needs no generic toggle");
+        Equal(false, f.Supplier.GetGizmos().OfType<Command_Action>().Last().disabled, "vehicle enables immediate supply");
+        f.Supplier.GetGizmos().OfType<Command_Action>().Last().action();
+        Equal(9L, f.Count(vehicle.inventory.innerContainer, def), "manual cargo respects existing cargo and gear mass");
+        Equal(8L, f.Count(f.Supplier.Contents, def), "manual overflow stays in supplier");
+        Equal(1, vehicle.CargoAdded, "manual cargo uses native loading event");
+        Equal(3, vehicle.PendingCargo[def], "manual cargo advances native pending manifest");
+        f.Supplier.SupplyTransporter();
+        Equal(1, vehicle.CargoAdded, "full vehicle accepts no additional cargo");
+        vehicle.Capacity = 400f;
+        Equal(400f, f.Supplier.TransferCapacity, "manual transfer window uses vehicle capacity");
+
+        f = new Fixture(); vehicle = VehicleTarget(f, 100f); f.Cargo(def, 4);
+        vehicle.Position = new IntVec3(4, 0); f.Supplier.SupplyTransporter();
+        Equal(0, vehicle.CargoAdded, "vehicle beside front cell ignored");
+        vehicle.Position = f.Supplier.FrontCell; vehicle.Faction = new Faction(); f.Supplier.SupplyTransporter();
+        Equal(0, vehicle.CargoAdded, "foreign vehicle ignored");
+        vehicle.Faction = Faction.OfPlayer; vehicle.Spawned = false; f.Supplier.SupplyTransporter();
+        Equal(0, vehicle.CargoAdded, "despawned vehicle ignored");
+        vehicle.Spawned = true; vehicle.Reject = true; f.Supplier.SupplyTransporter();
+        Equal(4L, f.Count(f.Supplier.Contents, def), "rejected manual cargo is restored");
+        vehicle.Reject = false; vehicle.AcceptLimit = 2; f.Supplier.SupplyTransporter();
+        Equal(2L, f.Count(vehicle.inventory.innerContainer, def), "partial native acceptance retained");
+        Equal(2L, f.Count(f.Supplier.Contents, def), "manual partial remainder restored");
+
+        var high = new ThingDef { transportMass = 2f }; var low = new ThingDef { transportMass = 1f };
+        f = new Fixture(); vehicle = VehicleTarget(f, 14f);
+        f.Store(high, 10); f.Store(low, 10); f.Select(0, high); f.Select(1, low);
+        f.Supplier.SetTargetLimit(0, 5); f.Supplier.SetTargetLimit(1, 10); f.Supplier.TrySwitchMode();
+        vehicle.inventory.innerContainer.TryAdd(new Thing { def = high, stackCount = 2 });
+        vehicle.PendingCargo[high] = 9;
+        f.Supplier.SupplyTransporter();
+        Equal(5L, f.Count(vehicle.inventory.innerContainer, high), "continuous cargo tops up only target deficit");
+        Equal(4L, f.Count(vehicle.inventory.innerContainer, low), "lower priority uses only remaining vehicle mass");
+        Equal(7L, f.Net.GetTotalCount(high), "continuous cargo withdraws only delivered amount");
+        Equal(6, vehicle.PendingCargo[high], "continuous cargo advances manifest");
+        Equal(0, f.Supplier.Contents.Count, "continuous cargo leaves supplier buffer empty");
+
+        f = new Fixture(); vehicle = VehicleTarget(f, 100f); f.Store(def, 10); f.Select(0, def); f.Supplier.TrySwitchMode();
+        f.Supplier.SetTargetLimit(0, 0); f.Supplier.SupplyTransporter();
+        Equal(0, vehicle.CargoAdded, "zero target pauses vehicle supply");
+        f.Supplier.SetTargetLimit(0, 7); vehicle.Reject = true; f.Supplier.SupplyTransporter();
+        Equal(10L, f.Net.GetTotalCount(def), "rejected continuous cargo returns to network");
+        vehicle.Reject = false; vehicle.AcceptLimit = 2; f.Supplier.SupplyTransporter();
+        Equal(2L, f.Count(vehicle.inventory.innerContainer, def), "continuous native partial acceptance retained");
+        Equal(8L, f.Net.GetTotalCount(def), "continuous partial remainder returns to network");
+
+        // Native events can throw after acceptance; accepted cargo must never be refunded.
+        f = new Fixture(); vehicle = VehicleTarget(f, 100f); f.Store(def, 10); f.Select(0, def);
+        f.Supplier.SetTargetLimit(0, 4); f.Supplier.TrySwitchMode(); vehicle.ThrowAfterLoad = true;
+        int errors = Log.Errors.Count;
+        f.Supplier.SupplyTransporter();
+        Equal(4L, f.Count(vehicle.inventory.innerContainer, def), "throwing event preserves accepted cargo");
+        Equal(6L, f.Net.GetTotalCount(def), "throwing event cannot duplicate accepted cargo");
+        var remaining = new List<Thing>(); f.Net.GetStacks(def, remaining);
+        Equal(6, remaining.Sum(item => f.Net.AvailableToWithdraw(item)), "throwing event releases outgoing reservations");
+        Log.Errors.RemoveRange(errors, Log.Errors.Count - errors);
+
+        f = new Fixture(); vehicle = VehicleTarget(f, 100f); f.Cargo(def, 8); vehicle.ThrowAfterLoad = true;
+        f.Supplier.SupplyTransporter();
+        Equal(8L, f.Count(vehicle.inventory.innerContainer, def), "manual throwing event preserves accepted cargo");
+        Equal(0, f.Supplier.Contents.Count, "manual throwing event cannot duplicate cargo");
     }
     private sealed class GenericBuilding : ThingWithComps, IThingHolder
     {
@@ -115,6 +200,131 @@ internal static class TransportSupplierTests
         return target;
     }
     private static void ToggleGeneric(Fixture f) => f.Supplier.GetGizmos().OfType<Command_Toggle>().Single().toggleAction();
+
+    private static Command_Action PresetCommand(Fixture f, string key) =>
+        f.Supplier.GetGizmos().OfType<Command_Action>().Single(command => command.defaultLabel == key.Translate());
+
+    private static void PresetClipboard()
+    {
+        var source = new Fixture();
+        Command_Action paste = PresetCommand(source, "MS_Transport_PastePreset");
+        Equal(true, paste.disabled, "supplier paste requires its own clipboard");
+        Equal("MS_Transport_NeedCopiedPreset", paste.disabledReason, "empty clipboard explains how to enable paste");
+        paste.action();
+        Equal(false, source.Supplier.DirectSupply, "empty clipboard action leaves settings unchanged");
+        var a = new ThingDef(); var b = new ThingDef(); var c = new ThingDef();
+        source.Select(0, a); source.Select(1, b);
+        source.Supplier.SetTargetLimit(0, 12); source.Supplier.SetTargetLimit(1, 0);
+        source.Supplier.SetTargetLimit(2, int.MaxValue);
+        source.Supplier.TrySwitchMode(); ToggleGeneric(source);
+        Command_Action copy = PresetCommand(source, "MS_Transport_CopyPreset");
+        Equal(false, copy.alsoClickIfOtherInGroupClicked, "grouped copy snapshots one supplier");
+        Equal(StorageKeyBindingDefOf.MS_ShelfCopyPreset, copy.hotKey, "supplier shares copy shortcut");
+        copy.action();
+        source.Select(0, c); source.Supplier.SetTargetLimit(0, 1);
+        source.Supplier.TrySwitchMode(); ToggleGeneric(source);
+        source.Supplier.Spawned = false;
+
+        var targets = new[] { new Fixture(), new Fixture() };
+        foreach (Fixture target in targets)
+        {
+            target.Select(0, b); target.Select(1, a); target.Select(2, c);
+            paste = PresetCommand(target, "MS_Transport_PastePreset");
+            Equal(false, paste.disabled, "copied preset enables paste on other suppliers");
+            Equal(true, paste.alsoClickIfOtherInGroupClicked, "paste participates in grouped activation");
+            Equal(StorageKeyBindingDefOf.MS_ShelfPastePreset, paste.hotKey, "supplier shares paste shortcut");
+            Equal(false, paste.groupKey == 0, "supplier paste stays separate from shelf commands");
+            paste.action();
+            Equal(a, target.Supplier.SelectedDef(0), "snapshot keeps first priority after source edits");
+            Equal(b, target.Supplier.SelectedDef(1), "paste replaces swapped selections together");
+            Equal<ThingDef>(null, target.Supplier.SelectedDef(2), "empty copied slot clears old selection");
+            Equal(12, target.Supplier.TargetLimit(0), "snapshot keeps target limit after source edits");
+            Equal(0, target.Supplier.TargetLimit(1), "paused item limit is copied");
+            Equal(int.MaxValue, target.Supplier.TargetLimit(2), "large item limits are copied without clamping");
+            Equal(true, target.Supplier.DirectSupply, "supply mode is copied");
+            Equal(true, target.Supplier.GenericContainerSupply, "generic container switch is copied");
+        }
+        targets[0].Supplier.SetSelection(0, c); targets[0].Supplier.SetTargetLimit(0, 2);
+        Equal(a, targets[1].Supplier.SelectedDef(0), "pasted selection lists are independent");
+        Equal(12, targets[1].Supplier.TargetLimit(0), "pasted limit lists are independent");
+        PresetCommand(targets[0], "MS_Transport_PastePreset").action();
+        Equal(a, targets[0].Supplier.SelectedDef(0), "clipboard remains reusable after target edits");
+        Equal(12, targets[0].Supplier.TargetLimit(0), "repeated paste restores copied limit");
+
+        var empty = new Fixture();
+        PresetCommand(empty, "MS_Transport_CopyPreset").action();
+        PresetCommand(targets[0], "MS_Transport_PastePreset").action();
+        Equal(true, Enumerable.Range(0, 3).All(i => targets[0].Supplier.SelectedDef(i) == null), "empty preset clears all selections");
+        Equal(false, targets[0].Supplier.DirectSupply, "manual supply mode is copied");
+        Equal(false, targets[0].Supplier.GenericContainerSupply, "disabled generic supply is copied");
+    }
+
+    private static void PresetModeGuard()
+    {
+        var source = new Fixture(); var a = new ThingDef(); var b = new ThingDef();
+        source.Select(0, a); source.Supplier.SetTargetLimit(0, 8);
+        source.Supplier.TrySwitchMode(); ToggleGeneric(source);
+        PresetCommand(source, "MS_Transport_CopyPreset").action();
+        var target = new Fixture(); target.Select(0, b); target.Supplier.SetTargetLimit(0, 3);
+        Thing cargo = target.Cargo(b, 5);
+        Command_Action paste = PresetCommand(target, "MS_Transport_PastePreset");
+        Equal(true, paste.disabled, "loaded supplier blocks paste that changes mode");
+        Equal("MS_Transport_ModeBlocked", paste.disabledReason, "blocked paste explains cargo requirement");
+        paste.action();
+        Equal(false, target.Supplier.DirectSupply, "blocked paste preserves supply mode");
+        Equal(false, target.Supplier.GenericContainerSupply, "blocked paste preserves generic supply setting");
+        Equal(b, target.Supplier.SelectedDef(0), "blocked paste preserves item selection");
+        Equal(3, target.Supplier.TargetLimit(0), "blocked paste preserves target limit");
+        Equal(cargo, target.Supplier.Contents.Single(), "blocked paste preserves cargo identity");
+        Equal(5, cargo.stackCount, "blocked paste preserves cargo count");
+        target.Supplier.Contents.Remove(cargo);
+        Equal(false, PresetCommand(target, "MS_Transport_PastePreset").disabled, "emptying cargo enables mode-changing paste");
+        paste.action();
+        Equal(true, target.Supplier.DirectSupply, "previously blocked preset applies after cargo is removed");
+        Equal(a, target.Supplier.SelectedDef(0), "previously blocked preset retains copied selection");
+
+        source.Supplier.TrySwitchMode();
+        PresetCommand(source, "MS_Transport_CopyPreset").action();
+        var loaded = new Fixture(); loaded.Cargo(b, 7);
+        paste = PresetCommand(loaded, "MS_Transport_PastePreset");
+        Equal(false, paste.disabled, "loaded supplier accepts paste within the same mode");
+        paste.action();
+        Equal(a, loaded.Supplier.SelectedDef(0), "same-mode paste updates settings");
+        Equal(7L, loaded.Count(loaded.Supplier.Contents, b), "same-mode paste leaves cargo untouched");
+
+        // A command collected before cargo arrives must still guard its action.
+        source.Supplier.TrySwitchMode(); PresetCommand(source, "MS_Transport_CopyPreset").action();
+        var changed = new Fixture(); paste = PresetCommand(changed, "MS_Transport_PastePreset");
+        Equal(false, paste.disabled, "empty supplier initially allows paste");
+        changed.Cargo(b, 1); paste.action();
+        Equal(false, changed.Supplier.DirectSupply, "late cargo prevents stale command from changing mode");
+        Equal<ThingDef>(null, changed.Supplier.SelectedDef(0), "late cargo prevents partial preset application");
+    }
+
+    private static void PresetContainerTargets()
+    {
+        var source = new Fixture(); var itemDef = new ThingDef();
+        source.Select(0, itemDef); source.Supplier.SetTargetLimit(0, 4);
+        source.Supplier.TrySwitchMode(); ToggleGeneric(source);
+        var sourceTarget = GenericTarget(source);
+        var sourceComp = new GenericComp(); sourceComp.parent = sourceTarget; sourceTarget.AllComps.Add(sourceComp);
+        source.Supplier.SelectGenericContainer(sourceTarget, 1);
+        PresetCommand(source, "MS_Transport_CopyPreset").action();
+
+        var target = new Fixture(); ToggleGeneric(target);
+        var building = GenericTarget(target);
+        var comp = new GenericComp(); comp.parent = building; building.AllComps.Add(comp);
+        target.Supplier.SelectGenericContainer(building, 1);
+        target.Store(itemDef, 10);
+        PresetCommand(target, "MS_Transport_PastePreset").action();
+        Equal(10L, target.Net.GetTotalCount(itemDef), "pasting does not withdraw stock immediately");
+        Equal(0, comp.Container.Count, "pasting does not deliver items immediately");
+        target.Supplier.SupplyTransporter();
+        Equal(4L, target.Count(comp.Container, itemDef), "paste preserves this supplier's selected container");
+        Equal(0, building.Container.Count, "paste does not choose another local container");
+        Equal(0, sourceComp.Container.Count, "paste does not transfer to source supplier's target");
+    }
+
     private static void GenericManualSupply()
     {
         var f = new Fixture(); var def = new ThingDef(); var other = new ThingDef();

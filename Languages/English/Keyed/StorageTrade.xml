@@ -4,6 +4,8 @@
   <MS_Payment_Unavailable>Cannot complete this payment: not enough available resources, or the storage network is unavailable.</MS_Payment_Unavailable>
   <MS_Trade_Command>Trade with {0} through magic storage</MS_Trade_Command>
   <MS_Trade_CeleTechUnavailable>The trade shuttle is no longer available for trade</MS_Trade_CeleTechUnavailable>
+  <MS_Trade_TraderShipUnavailable>The trader ship is no longer available for trade</MS_Trade_TraderShipUnavailable>
+  <MS_Trade_TraderShipHostile>The trader ship's faction is hostile to the negotiator and will not trade</MS_Trade_TraderShipHostile>
   <MS_Trade_InventoryNotice>Magic storage trade: goods and silver from networks and connected restocking shelves. Purchases are delivered on the ground.</MS_Trade_InventoryNotice>
   <MS_Trade_Unavailable>Cannot complete this trade: goods or silver in the network or connected restocking shelves are unavailable, or the trader can no longer trade. Check the quantities or reset the list.</MS_Trade_Unavailable>
   <MS_Trade_Failed>Cannot complete this trade: {0}</MS_Trade_Failed>

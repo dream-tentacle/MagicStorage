@@ -2,7 +2,17 @@
 <LanguageData>
   <MS_Guide_Title>存储指南</MS_Guide_Title>
   <MS_Guide_FirstCoreTitle>新手教程必做提醒</MS_Guide_FirstCoreTitle>
-  <MS_Guide_FirstCoreText>请在核心做完新手教程中的基础、进阶内容，此内容为必做选项</MS_Guide_FirstCoreText>
+  <MS_Guide_FirstCoreText>请在核心做完新手教程中的基础、进阶内容，此内容为必做选项\n\n完成基础和进阶教程后，分别可获得一次奖励。</MS_Guide_FirstCoreText>
+  <MS_Guide_BasicsCompleteTitle>新手教程完成一半了！</MS_Guide_BasicsCompleteTitle>
+  <MS_Guide_BasicsCompleteText>恭喜你完成了新手教程的基础内容！奖励已经发放，接下来请继续完成进阶内容。</MS_Guide_BasicsCompleteText>
+  <MS_Guide_AdvancedCompleteTitle>新手教程完成了！</MS_Guide_AdvancedCompleteTitle>
+  <MS_Guide_AdvancedCompleteText>恭喜你完成了新手教程的全部内容。接下来可以自己看看实用技巧。</MS_Guide_AdvancedCompleteText>
+  <MS_Guide_StageBasics>基础学习中</MS_Guide_StageBasics>
+  <MS_Guide_StageAdvanced>基础已完成</MS_Guide_StageAdvanced>
+  <MS_Guide_StageCompleted>全部已完成</MS_Guide_StageCompleted>
+  <MS_Guide_RewardBasics>完成基础教程可获：100钢铁、5零部件、建筑供给单元×1、自动补货架×1。</MS_Guide_RewardBasics>
+  <MS_Guide_RewardAdvanced>完成进阶教程可获：200钢铁、10零部件、宇宙工作台×3、高堆叠补货架×1。</MS_Guide_RewardAdvanced>
+  <MS_Guide_RewardCompleted>两个阶段的教程奖励均已发放，可以继续浏览实用技巧。</MS_Guide_RewardCompleted>
   <MS_Guide_Description>学习基础存取，检查当前网络配置，并排查物品无法入库的原因。</MS_Guide_Description>
   <MS_Guide_ChooseCore>选择当前地图的控制核心</MS_Guide_ChooseCore>
   <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
@@ -10,8 +20,8 @@
   <MS_Guide_Diagnosis>为什么没有存进去？</MS_Guide_Diagnosis>
   <MS_Guide_NoMap>载入殖民地后，可以检查网络状态并使用操作按钮。</MS_Guide_NoMap>
   <MS_Guide_NoCore>请先建造或选择当前地图的控制核心。检查只针对所选核心的网络，其他网络的建筑不计入。</MS_Guide_NoCore>
-  <MS_Guide_Progress>此核心的教学进度：{0} / {1}</MS_Guide_Progress>
-  <MS_Guide_ProgressHelp>基础步骤记录学习进度，已学会后保持完成。进阶建筑均需建造并接入所选核心网络，按当前连接状态计入进度；缺少对应DLC的章节不计入。</MS_Guide_ProgressHelp>
+  <MS_Guide_Progress>全局教学进度：{0} / {1}（{2}）</MS_Guide_Progress>
+  <MS_Guide_ProgressHelp>教学进度与完成阶段在本存档内全局共享，更换或新建核心无需重做。基础步骤学会后保持完成。进阶建筑建造并接入所选核心网络后记录为已学会，此后保持完成；缺少对应DLC的章节不计入。基础与进阶阶段完成后各获得一次奖励。当前网络配置仍单独检查。</MS_Guide_ProgressHelp>
   <MS_Guide_Current>当前配置：{0}</MS_Guide_Current>
   <MS_Guide_Met>已满足</MS_Guide_Met>
   <MS_Guide_Unmet>未满足</MS_Guide_Unmet>
@@ -101,6 +111,8 @@
   <MS_Guide_Enabled>开启</MS_Guide_Enabled>
   <MS_Guide_Disabled>关闭</MS_Guide_Disabled>
   <MS_Guide_AdvancedStatusScope>网络已连接不代表可以开始培育；机械师和任务条件仍需在培育器上检查。</MS_Guide_AdvancedStatusScope>
+  <MS_Guide_AdvancedProductionOutputBody>只需要制造一个，即可全图供料。\n\n将生产输出口接入存储网络，该网络的材料便可直接供给全图工作台，无需搬运，也无需给工作台接线。</MS_Guide_AdvancedProductionOutputBody>
+  <MS_Guide_AdvancedProductionOutputTips>仅限生产任务。请确保网络可用、材料充足，且生产任务允许使用这些材料。</MS_Guide_AdvancedProductionOutputTips>
   <MS_Guide_AdvancedWorkbenchBody>直接使用魔法存储中的材料生产。</MS_Guide_AdvancedWorkbenchBody>
   <MS_Guide_AdvancedWorkbenchTips>模组设置中的工作台解锁模式开启后，需要消耗建造材料解锁对应工作台的配方；解锁记录在当前存档中共享。</MS_Guide_AdvancedWorkbenchTips>
   <MS_Guide_AdvancedGestatorBody>宇宙机械体培育器需要启用生物科技。将它接入存储网络，并在这台培育器自己的任务清单中添加机械体配方。\n\n机械师开始制造时，材料直接从网络送入培育器，无需殖民者搬运。每台培育器的任务独立管理，培育过程继续遵循机械体制造的相关条件。</MS_Guide_AdvancedGestatorBody>

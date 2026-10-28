@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="MS_StorageBuildingBase">
+    <defName>MS_ProductionOutputPort</defName>
+    <label>production output port</label>
+    <description>Supplies ingredients from its connected magic storage network to production workbenches.\n\nMaterials are delivered when a production job begins; no ingredient hauling is required. Does not supply surgery or autonomous workbenches.</description>
+    <thingClass>MagicStorage.Building_ProductionOutputPort</thingClass>
+    <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories><li>BuildingsMisc</li></thingCategories>
+    <graphicData>
+      <texPath>Things/Building/StorageReceiver/StorageReceiver</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1.125,1.125)</drawSize>
+      <drawRotated>false</drawRotated>
+    </graphicData>
+    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
+    <uiOrder>3106</uiOrder>
+  </ThingDef>
+</Defs>

@@ -36,7 +36,7 @@ internal static class StorageFoundationTests
 #if !LOGICAL_FLOORS_COMPATIBILITY_TESTS
             Equal<Type>(null, typeof(StorageNetwork).Assembly.GetType("LogicalFloors.API.FloorApi"), "ordinary test assembly contains no floor API");
 #endif
-            TenUnitCounts(); CapacityAndRollback(); Topology();
+            TenUnitCounts(); CapacityAndRollback(); Topology(); ProductionOutputTopology();
             assertions += CosmicCraftingTests.Run();
 #if COSMIC_ROOM_ROLE_TESTS
             assertions += CosmicWorkbenchRoomRoleTests.Run();
@@ -80,6 +80,51 @@ internal static class StorageFoundationTests
             return 0;
         }
         catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+    }
+
+    private static void ProductionOutputTopology()
+    {
+        var map = NewMap();
+        var manager = map.GetComponent<MapComponent_StorageNetworks>();
+        var core = Register(map, new Building_StorageCore(), 0);
+        Register(map, new Building_StorageUnit(), 1);
+        manager.EnsureCurrent();
+        Equal(false, core.Network.HasProductionOutputPort, "network initially has no production output");
+        var first = Register(map, new Building_ProductionOutputPort(), 0, 1);
+        var second = Register(map, new Building_ProductionOutputPort(), 1, 1);
+        manager.EnsureCurrent();
+        Equal(true, core.Network.HasProductionOutputPort, "incrementally adding output ports enables network");
+        var previous = core.Network;
+        manager.Unregister(first); first.parent.Spawned = false;
+        Equal(false, previous.HasProductionOutputPort, "invalidated topology cannot advertise stale production access");
+        manager.EnsureCurrent();
+        Equal(true, core.Network.HasProductionOutputPort, "removing one of two ports retains production access");
+        manager.Unregister(second); second.parent.Spawned = false;
+        manager.EnsureCurrent();
+        Equal(false, core.Network.HasProductionOutputPort, "removing last output disables production access");
+        var island = Register(map, new Building_ProductionOutputPort(), 4);
+        manager.EnsureCurrent();
+        Equal(true, island.Network.HasProductionOutputPort, "isolated component records its own port presence");
+        Equal(false, island.Network.CanWork, "port presence does not bypass missing core");
+        Equal(false, core.Network.HasProductionOutputPort, "disconnected port does not enable another component");
+        var islandBeforeMerge = island.Network;
+        var bridge = Register(map, new Thing(), 2);
+        Register(map, new Thing(), 3);
+        manager.EnsureCurrent();
+        Equal(true, core.Network.HasProductionOutputPort, "component merge carries output presence to merged network");
+        Equal(false, islandBeforeMerge.HasProductionOutputPort, "absorbed component cannot retain stale output flag");
+        manager.Unregister(bridge); bridge.parent.Spawned = false;
+        manager.EnsureCurrent();
+        Equal(false, core.Network.HasProductionOutputPort, "split component without port loses access");
+        Equal(true, island.Network.HasProductionOutputPort, "split component with port keeps presence flag");
+        Register(map, new Thing(), 2);
+        manager.EnsureCurrent();
+        Equal(true, core.Network.HasProductionOutputPort, "reconnection restores output access");
+        island.parent.Faction = new Faction();
+        manager.NotifyFactionChanged(island.parent);
+        manager.EnsureCurrent();
+        Equal(false, core.Network.HasProductionOutputPort, "faction change moves port out of original network");
+        Equal(true, island.Network.HasProductionOutputPort, "new faction component owns its presence flag");
     }
 
     private static void TenUnitCounts()

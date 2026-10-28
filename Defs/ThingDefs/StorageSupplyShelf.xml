@@ -6,6 +6,7 @@
     <label>auto-restocking shelf</label>
     <description>A small shelf that automatically restocks from its connected storage network, providing small quantities of food, medicine and other everyday supplies. Can directly replace a nutrient paste dispenser's hopper.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.\n\nUse the buttons below the selected building to enable filter mode and choose multiple item types.</description>
     <thingClass>MagicStorage.Building_StorageSupplyShelf</thingClass>
+    <pathCost>10</pathCost>
     <tickerType>Normal</tickerType>
     <size>(1,1)</size>
     <rotatable>false</rotatable>

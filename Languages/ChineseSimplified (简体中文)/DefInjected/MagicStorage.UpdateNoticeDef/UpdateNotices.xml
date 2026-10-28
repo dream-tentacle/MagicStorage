@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_2_0.label>版本日志</MS_UpdateNotice_1_2_0.label>
+  <MS_UpdateNotice_1_2_0.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_2_0.sections.0.heading>
+  <MS_UpdateNotice_1_2_0.sections.0.entries.0>与贸易飞船兼容。现在可以右键落地贸易飞船，通过魔法存储与它交易。</MS_UpdateNotice_1_2_0.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_0.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_0.sections.1.heading>
+  <MS_UpdateNotice_1_2_0.sections.1.entries.1>增大了建筑的血量，调整通行减速。</MS_UpdateNotice_1_2_0.sections.1.entries.1>
+  <MS_UpdateNotice_1_2_0.sections.1.entries.0>现在完成教程可以领取奖励。哦，我对上帝发誓，如果你还不打算做完教程的话，我要用隔壁马修叔叔的靴子狠狠地踢你的屁股！</MS_UpdateNotice_1_2_0.sections.1.entries.0>
+  <MS_UpdateNotice_1_2_0.sections.2.heading>&lt;color=#BB88FF&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_2_0.sections.2.heading>
+  <MS_UpdateNotice_1_2_0.sections.2.entries.0>新增生产输出口，能让当前存储网络中的物资直接供给工作台进行生产。仅限生产任务。</MS_UpdateNotice_1_2_0.sections.2.entries.0>
   <MS_UpdateNotice_1_1_7.label>版本日志</MS_UpdateNotice_1_1_7.label>
   <MS_UpdateNotice_1_1_7.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_1_7.sections.0.heading>
   <MS_UpdateNotice_1_1_7.sections.0.entries.0>让涅瓦莲质量驱动器科技移动到基础魔法存储。这样你可以通过涅瓦莲质量驱动器提取口来给涅瓦莲供货了。</MS_UpdateNotice_1_1_7.sections.0.entries.0>

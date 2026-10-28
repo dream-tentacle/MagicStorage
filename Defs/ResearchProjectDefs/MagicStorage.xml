@@ -17,7 +17,7 @@
     <defName>MS_MaterialSupplyTechnology</defName>
     <label>material supply technology</label>
     <description>Build material suppliers and fuel suppliers to deliver supplies directly from the magic storage network to transporters and fuel-powered buildings.</description>
-    <baseCost>100</baseCost>
+    <baseCost>10</baseCost>
     <techLevel>Industrial</techLevel>
     <tab>MS_MagicStorage</tab>
     <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
@@ -29,7 +29,7 @@
     <defName>MS_WarpTechnology</defName>
     <label>warp technology</label>
     <description>Build caravan teleporters to form caravans directly on the world map, supplied by the magic storage network.</description>
-    <baseCost>100</baseCost>
+    <baseCost>10</baseCost>
     <techLevel>Industrial</techLevel>
     <tab>MS_MagicStorage</tab>
     <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>
@@ -41,7 +41,7 @@
     <defName>MS_MagicDrive</defName>
     <label>magic drive</label>
     <description>Unlock portable facilities powered by magic.</description>
-    <baseCost>100</baseCost>
+    <baseCost>10</baseCost>
     <techLevel>Industrial</techLevel>
     <tab>MS_MagicStorage</tab>
     <prerequisites><li>MS_BasicMagicStorage</li></prerequisites>

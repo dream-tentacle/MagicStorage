@@ -38,11 +38,12 @@ namespace Verse
     public class TickManager { public int TicksGame = 1; }
     public partial struct IntVec3 : IEquatable<IntVec3>
     {
-        public int x, z;
+        public int x, y, z;
         public static readonly IntVec3 Invalid = new IntVec3(-1000, -1000);
-        public IntVec3(int x, int z) { this.x = x; this.z = z; }
-        public static IntVec3 operator +(IntVec3 a, IntVec3 b) => new IntVec3(a.x + b.x, a.z + b.z);
-        public bool Equals(IntVec3 b) => x == b.x && z == b.z;
+        public IntVec3(int x, int z) { this.x = x; y = 0; this.z = z; }
+        public IntVec3(int x, int y, int z) { this.x = x; this.y = y; this.z = z; }
+        public static IntVec3 operator +(IntVec3 a, IntVec3 b) => new IntVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+        public bool Equals(IntVec3 b) => x == b.x && y == b.y && z == b.z;
         public override bool Equals(object b) => b is IntVec3 value && Equals(value);
         public override int GetHashCode() => x * 397 ^ z;
         public int DistanceToSquared(IntVec3 b) => (x-b.x)*(x-b.x)+(z-b.z)*(z-b.z);
@@ -178,6 +179,7 @@ namespace MagicStorage
 {
     using Verse;
     public class CompStorageNode { public Thing parent; public StorageNetwork Network; }
+    public sealed class Building_ProductionOutputPort : Thing { }
     public class Building_StorageUnit : Thing, IThingHolder
     {
         private int? slotCapacityOverride;

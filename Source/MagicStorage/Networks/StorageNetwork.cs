@@ -34,6 +34,8 @@ namespace MagicStorage
             cores.Count == 0 ? StorageNetworkStatus.NoCore :
             cores.Count > 1 ? StorageNetworkStatus.MultipleCores : StorageNetworkStatus.Ready;
         public bool CanWork => Status == StorageNetworkStatus.Ready;
+        // Derived from topology, so bill queries never have to scan output ports.
+        public bool HasProductionOutputPort { get; private set; }
         public Building_StorageCore Core => cores.Count == 1 ? cores[0] : null;
         public int UnitCount => units.Count;
         public long Revision { get; private set; }
@@ -51,6 +53,7 @@ namespace MagicStorage
             if (!nodes.Add(node.parent)) return;
             members.Add(node);
             node.Network = this;
+            if (node.parent is Building_ProductionOutputPort) HasProductionOutputPort = true;
             if (node.parent is Building_StorageCore core) { cores.Add(core); incoming.Clear(); }
             if (node.parent is Building_StorageUnit unit)
             {
@@ -74,7 +77,7 @@ namespace MagicStorage
             foreach (var node in other.members) AddNode(node);
         }
 
-        internal void Invalidate() { current = false; incoming.Clear(); Revision++; }
+        internal void Invalidate() { current = false; HasProductionOutputPort = false; incoming.Clear(); Revision++; }
 
         internal void GetMatchingStacks(Predicate<ThingDef> filter, List<Thing> result)
         {

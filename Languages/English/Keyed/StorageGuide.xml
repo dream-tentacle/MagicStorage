@@ -2,7 +2,17 @@
 <LanguageData>
   <MS_Guide_Title>Storage guide</MS_Guide_Title>
   <MS_Guide_FirstCoreTitle>Required tutorial reminder</MS_Guide_FirstCoreTitle>
-  <MS_Guide_FirstCoreText>Please complete the basic and advanced sections of the tutorial at the core. These sections are mandatory.</MS_Guide_FirstCoreText>
+  <MS_Guide_FirstCoreText>Please complete the basic and advanced sections of the tutorial at the core. These sections are mandatory.\n\nCompleting each section grants a reward.</MS_Guide_FirstCoreText>
+  <MS_Guide_BasicsCompleteTitle>Halfway through the beginner tutorial!</MS_Guide_BasicsCompleteTitle>
+  <MS_Guide_BasicsCompleteText>Congratulations on completing the basics of the beginner tutorial. Please continue with the advanced section.</MS_Guide_BasicsCompleteText>
+  <MS_Guide_AdvancedCompleteTitle>Beginner tutorial complete!</MS_Guide_AdvancedCompleteTitle>
+  <MS_Guide_AdvancedCompleteText>Congratulations on completing the entire beginner tutorial. You can now explore the practical tips on your own.</MS_Guide_AdvancedCompleteText>
+  <MS_Guide_StageBasics>Learning basics</MS_Guide_StageBasics>
+  <MS_Guide_StageAdvanced>Basics complete</MS_Guide_StageAdvanced>
+  <MS_Guide_StageCompleted>All complete</MS_Guide_StageCompleted>
+  <MS_Guide_RewardBasics>Complete the basics to receive: 100 steel, 5 components, 1 construction supply unit and 1 auto-restocking shelf.</MS_Guide_RewardBasics>
+  <MS_Guide_RewardAdvanced>Complete the advanced section to receive: 200 steel, 10 components, 3 cosmic workbenches and 1 high-stack restocking shelf.</MS_Guide_RewardAdvanced>
+  <MS_Guide_RewardCompleted>Both tutorial rewards have been granted. You can continue browsing the practical tips.</MS_Guide_RewardCompleted>
   <MS_Guide_Description>Learn to store and withdraw items, check this network, and find out why items are not being stored.</MS_Guide_Description>
   <MS_Guide_ChooseCore>Choose a control core on this map</MS_Guide_ChooseCore>
   <MS_Guide_CoreAt>{0} · {1}</MS_Guide_CoreAt>
@@ -10,8 +20,8 @@
   <MS_Guide_Diagnosis>Why are items not being stored?</MS_Guide_Diagnosis>
   <MS_Guide_NoMap>Load a colony to check a network and use the action buttons.</MS_Guide_NoMap>
   <MS_Guide_NoCore>Build or choose a control core on this map. Checks apply only to that core's network; buildings in other networks do not count.</MS_Guide_NoCore>
-  <MS_Guide_Progress>This core's learning progress: {0} / {1}</MS_Guide_Progress>
-  <MS_Guide_ProgressHelp>Basic steps record learning progress and remain complete once learned. Every advanced building must be built and connected to the selected core; progress reflects its current connection. Chapters unavailable without their DLC are excluded.</MS_Guide_ProgressHelp>
+  <MS_Guide_Progress>Global progress: {0} / {1} ({2})</MS_Guide_Progress>
+  <MS_Guide_ProgressHelp>Tutorial progress and stages are shared across this save. Switching or building cores does not reset learning. Basic steps remain complete once learned. Advanced buildings are recorded as learned when built and connected to the selected core, and remain complete afterward. Chapters unavailable without their DLC are excluded. Completing the basic and advanced stages each grants a reward. Current network settings are still checked separately.</MS_Guide_ProgressHelp>
   <MS_Guide_Current>Current setup: {0}</MS_Guide_Current>
   <MS_Guide_Met>ready</MS_Guide_Met>
   <MS_Guide_Unmet>not ready</MS_Guide_Unmet>
@@ -99,6 +109,8 @@
   <MS_Guide_Enabled>Enabled</MS_Guide_Enabled>
   <MS_Guide_Disabled>Disabled</MS_Guide_Disabled>
   <MS_Guide_AdvancedStatusScope>A network connection alone does not make a gestation bill ready. Check mechanitor and bill requirements at the gestator.</MS_Guide_AdvancedStatusScope>
+  <MS_Guide_AdvancedProductionOutputBody>Build just one to supply the entire map.\n\nConnect a production output port to a storage network. Its materials can then go directly to workbenches across the map, with no hauling or storage lines to the workbenches.</MS_Guide_AdvancedProductionOutputBody>
+  <MS_Guide_AdvancedProductionOutputTips>Production jobs only. Ensure the network is working, enough materials are stocked, and the bill allows those ingredients.</MS_Guide_AdvancedProductionOutputTips>
   <MS_Guide_AdvancedWorkbenchBody>Produces items directly using materials in magic storage.</MS_Guide_AdvancedWorkbenchBody>
   <MS_Guide_AdvancedWorkbenchTips>With workbench unlock mode enabled in mod settings, spend construction materials to unlock a workbench's recipes. Unlocks are shared within the save.</MS_Guide_AdvancedWorkbenchTips>
   <MS_Guide_AdvancedGestatorBody>The cosmic mech gestator requires Biotech. Connect it to the storage network and add mech recipes to that gestator's own bill list.\n\nWhen a mechanitor starts work, ingredients move directly from the network into the gestator without hauling. Each gestator has independent bills, and mech production still follows the applicable gestation requirements.</MS_Guide_AdvancedGestatorBody>

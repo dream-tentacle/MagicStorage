@@ -146,6 +146,10 @@ namespace Verse.AI
     }
     public static class Toils_Haul
     {
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public static Toil CheckForGetOpportunityDuplicate(Toil getHaulTargetToil, TargetIndex haulableInd,
+            TargetIndex storeCellInd, bool takeFromValidStorage = false, Predicate<Thing> extraValidator = null) => new Toil();
+
         public static int PickupCalls;
         public static Toil StartCarryThing(TargetIndex index, bool canTakeFromInventory = false)
         {

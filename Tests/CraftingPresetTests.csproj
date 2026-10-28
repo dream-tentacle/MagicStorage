@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup><BaseIntermediateOutputPath>obj\CraftingPresets\</BaseIntermediateOutputPath></PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems><OutputPath>bin\CraftingPresets\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CraftingPresetStubs.cs" /><Compile Include="CraftingPresetTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingPresets.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingOrder.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\CraftingRunPolicy.cs" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

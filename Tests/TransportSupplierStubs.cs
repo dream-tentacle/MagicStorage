@@ -18,8 +18,11 @@ namespace Verse
     public sealed class FloatMenuOption
     {
         public string Label;
+        public string tooltip;
         public System.Action action;
         public FloatMenuOption(string label, System.Action action) { Label = label; this.action = action; }
+        public static FloatMenuOption CheckboxLabeled(string label, System.Action action, bool checkOn) =>
+            new FloatMenuOption(label, action);
     }
     public sealed class FloatMenu
     {

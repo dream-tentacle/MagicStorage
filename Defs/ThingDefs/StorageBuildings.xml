@@ -21,7 +21,7 @@
       </relatedBuildCommands>
     </building>
     <statBases>
-      <MaxHitPoints>200</MaxHitPoints>
+      <MaxHitPoints>2000</MaxHitPoints>
       <WorkToBuild>1200</WorkToBuild>
       <Flammability>0.5</Flammability>
       <Mass>20</Mass>
@@ -34,6 +34,9 @@
     <label>storage control core</label>
     <description>The control core of magic storage, coordinating operations within the network. Each network supports only one control core.</description>
     <thingClass>MagicStorage.Building_StorageCore</thingClass>
+    <statBases>
+      <MaxHitPoints>5000</MaxHitPoints>
+    </statBases>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
     <size>(2,2)</size>
@@ -62,6 +65,7 @@
     <label>storage unit</label>
     <description>A storage unit following normal stacking rules. It provides 64 stack slots by default, adjustable from 1 to 10000 in the mod settings. Stored food does not rot.</description>
     <thingClass>MagicStorage.Building_StorageUnit</thingClass>
+    <pathCost>10</pathCost>
     <size>(1,2)</size>
     <rotatable>true</rotatable>
     <minifiedDef>MinifiedThing</minifiedDef>
@@ -86,6 +90,7 @@
     <label>storage receiver</label>
     <description>Receives items hauled by colonists for storage in units by the connected control core. Haulers only select the receiver when its network has space for the item.\n\n(It absorbs all items on its surface that match the storage filter, so placing it directly next to the core is not recommended; otherwise, manually withdrawn items may be absorbed back into storage.)</description>
     <thingClass>MagicStorage.Building_StorageReceiver</thingClass>
+    <pathCost>10</pathCost>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
     <size>(1,1)</size>
@@ -243,7 +248,7 @@
     <constructEffect>ConstructMetal</constructEffect>
     <repairEffect>Repair</repairEffect>
     <costList><Steel>1</Steel></costList>
-    <statBases><MaxHitPoints>80</MaxHitPoints><WorkToBuild>35</WorkToBuild><Flammability>0.5</Flammability></statBases>
+    <statBases><MaxHitPoints>800</MaxHitPoints><WorkToBuild>35</WorkToBuild><Flammability>0.5</Flammability></statBases>
     <uiOrder>3102</uiOrder>
   </ThingDef>
 
@@ -256,7 +261,7 @@
       <shaderType>Transparent</shaderType>
     </graphicData>
     <statBases>
-      <MaxHitPoints>100</MaxHitPoints>
+      <MaxHitPoints>1000</MaxHitPoints>
       <WorkToBuild>280</WorkToBuild>
       <Flammability>0</Flammability>
       <Beauty>0</Beauty>

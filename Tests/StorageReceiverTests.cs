@@ -57,6 +57,7 @@ internal static class StorageReceiverTests
         RuntimeHelpers.RunClassConstructor(typeof(StorageReceiverHaulingPatches).TypeHandle);
         NativeBoundary(); PrioritySortLifecycle(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
         CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks(); GodModeMapIntake();
+        assertions += ReceiverRemovalTests.Run();
         return assertions;
     }
 

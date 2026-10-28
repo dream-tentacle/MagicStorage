@@ -27,7 +27,7 @@
     <uiIconPath>Things/Building/CosmicMechGestator/CosmicMechGestator_MenuIcon</uiIconPath>
     <uiIconScale>1</uiIconScale>
     <statBases>
-      <MaxHitPoints>350</MaxHitPoints>
+      <MaxHitPoints>3500</MaxHitPoints>
       <WorkToBuild>16000</WorkToBuild>
       <Mass>35</Mass>
       <Flammability>0.5</Flammability>

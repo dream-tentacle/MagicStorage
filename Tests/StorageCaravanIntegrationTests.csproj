@@ -93,6 +93,8 @@
     <Compile Include="PlacementStubs.cs" />
     <Compile Include="WithdrawalStubs.cs" />
     <Compile Include="TransportSupplierStubs.cs" />
+    <Compile Include="VehicleFrameworkStubs.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\VehicleFrameworkCompatibility.cs" />
     <Compile Include="TransportSupplierTests.cs" />
     <Compile Include="FuelSupplierTests.cs" />
     <Compile Include="NivarianCannonStubs.cs" />

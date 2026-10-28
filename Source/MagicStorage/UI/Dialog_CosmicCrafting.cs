@@ -78,8 +78,16 @@ namespace MagicStorage
                 refreshAt = Time.realtimeSinceStartup + 0.5f;
             }
             Text.Font = GameFont.Medium;
-            Widgets.Label(new Rect(0, 0, rect.width - 30, 35), "MS_Craft_Title".Translate());
+            float presetsWidth = Math.Min(136f, rect.width * .35f);
+            Widgets.Label(new Rect(0, 0, rect.width - presetsWidth - 42, 35), "MS_Craft_Title".Translate());
             Text.Font = GameFont.Small;
+            if (Widgets.ButtonText(new Rect(rect.width - presetsWidth - 32, 0, presetsWidth, 32), "MS_Craft_PresetsTitle".Translate()))
+                Find.WindowStack.Add(new Dialog_CraftingPresets(core, () =>
+                {
+                    selectingGroup = false; groupSelection.Clear(); orderDragButton = -1;
+                    statuses.Clear(); productCounts.Clear(); refreshAt = 0;
+                    SharedFilterChanged();
+                }));
             Widgets.Label(new Rect(0, 40, rect.width, 50), "MS_Craft_ProductionNotice".Translate());
             const float tabsY = 95f;
             float tabsHeight = listFilter.DrawTabs(new Rect(0, tabsY, rect.width, 32), SharedFilterChanged);

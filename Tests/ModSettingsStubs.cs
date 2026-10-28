@@ -33,7 +33,11 @@ namespace UnityEngine
         public Vector2(float x, float y) { this.x = x; this.y = y; }
         public static Vector2 zero => default(Vector2);
     }
-    public static class Mathf { public static float Max(float a, float b) => System.Math.Max(a, b); }
+    public static class Mathf
+    {
+        public static float Max(float a, float b) => System.Math.Max(a, b);
+        public static int Abs(int value) => System.Math.Abs(value);
+    }
 }
 namespace Verse
 {

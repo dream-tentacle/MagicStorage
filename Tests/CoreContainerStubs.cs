@@ -19,6 +19,8 @@ namespace Verse
     {
         public string defaultLabel, defaultDesc;
         public object icon;
+        public object hotKey;
+        public int groupKey;
         public System.Action action;
     }
     public sealed class Command_Toggle : Gizmo
@@ -37,6 +39,14 @@ namespace Verse
 }
 namespace MagicStorage
 {
+    public static class StorageKeyBindingDefOf
+    {
+        public static readonly object MS_ViewItems = new object();
+        public static readonly object MS_ProductionOrders = new object();
+        public static readonly object MS_ShelfCopyPreset = new object();
+        public static readonly object MS_ShelfPastePreset = new object();
+        public static readonly object MS_ShelfLocalPresets = new object();
+    }
     public sealed class CompStorageGuide : Verse.ThingComp { internal void Complete(int step) { } }
     public sealed class Dialog_StorageGuide { public Dialog_StorageGuide(Building_StorageCore core = null) { } }
     public class Dialog_CosmicCrafting { public Dialog_CosmicCrafting(Building_StorageCore core) { } }

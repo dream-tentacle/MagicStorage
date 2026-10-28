@@ -3,4 +3,5 @@
   <MS_TradeWithStorage.reportString>Trading with TargetA through magic storage.</MS_TradeWithStorage.reportString>
   <MS_TradeWithStorageOrbital.reportString>Trading with an orbital ship through magic storage.</MS_TradeWithStorageOrbital.reportString>
   <MS_TradeWithStorageCeleTech.reportString>Trading with TargetA through magic storage.</MS_TradeWithStorageCeleTech.reportString>
+  <MS_TradeWithStorageTraderShip.reportString>Trading with TargetA through magic storage.</MS_TradeWithStorageTraderShip.reportString>
 </LanguageData>

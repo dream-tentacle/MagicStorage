@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Craft_PresetsTitle>Local lists</MS_Craft_PresetsTitle>
+  <MS_Craft_PresetsHint>Save the core's full production queue, order, groups and settings for use at other cores or in other saves. Work progress, prepared materials and assigned colonists are not saved.</MS_Craft_PresetsHint>
+  <MS_Craft_PresetSave>Save list</MS_Craft_PresetSave>
+  <MS_Craft_PresetAppend>Append</MS_Craft_PresetAppend>
+  <MS_Craft_PresetReplace>Replace</MS_Craft_PresetReplace>
+  <MS_Craft_PresetDelete>Delete</MS_Craft_PresetDelete>
+  <MS_Craft_PresetsEmpty>No local production lists saved yet.</MS_Craft_PresetsEmpty>
+  <MS_Craft_PresetFolder>Saved in: {0}</MS_Craft_PresetFolder>
+  <MS_Craft_PresetOverwriteConfirm>A local list named "{0}" already exists. Overwrite it?</MS_Craft_PresetOverwriteConfirm>
+  <MS_Craft_PresetDeleteConfirm>Delete the local list "{0}"?</MS_Craft_PresetDeleteConfirm>
+  <MS_Craft_PresetReplaceConfirm>Replace all production orders at this core with "{0}"? Existing orders will be cancelled. Prepared materials will return to storage, with any remainder placed near the core.</MS_Craft_PresetReplaceConfirm>
+  <MS_Craft_PresetMissing>The following recipes, ideology types or filter items are unavailable in this save. Unavailable recipes and ideology-specific orders will be skipped, and missing filter items ignored. Continue loading the remaining content?</MS_Craft_PresetMissing>
+  <MS_Craft_PresetNoUsableOrders>This list has no usable production orders. The current queue has not changed.</MS_Craft_PresetNoUsableOrders>
+  <MS_Craft_PresetReturnFailed>Some order materials could not be returned. The production list was not replaced. Please try again later.</MS_Craft_PresetReturnFailed>
+  <MS_Craft_PresetError>Could not read or write the local production list: {0}</MS_Craft_PresetError>
   <MS_Craft_WorkbenchLockedHint>Locked. Click to spend construction materials and unlock this workbench.</MS_Craft_WorkbenchLockedHint>
   <MS_Craft_UnlockWorkbench>Unlock workbench</MS_Craft_UnlockWorkbench>
   <MS_Craft_UnlockWorkbenchQuestion>Spend the following materials to unlock {0}? Materials are taken from the current storage network and its connected auto-restocking shelves.</MS_Craft_UnlockWorkbenchQuestion>

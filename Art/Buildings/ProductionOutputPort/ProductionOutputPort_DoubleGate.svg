@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288">
+  <title>魔法存储 · 生产输出口 · 双瓣闸门 · 尖角朝上</title>
+  <defs>
+    <path id="shell-shape" d="M42 134A102 102 0 0 1 246 134V148A102 102 0 0 1 42 148Z"/>
+    <mask id="outside-only" maskUnits="userSpaceOnUse" x="0" y="0" width="288" height="288" style="mask-type:luminance">
+      <rect width="288" height="288" fill="#ffffff"/>
+      <use href="#shell-shape" fill="#000000"/>
+    </mask>
+    <clipPath id="gate-disc"><circle cx="144" cy="134" r="73"/></clipPath>
+    <path id="gate-sector" d="M147 61A73 73 0 0 1 208 169L157 141L145 120Z"/>
+  </defs>
+  <g id="round-shell">
+    <use href="#shell-shape" fill="#637782"/>
+    <circle cx="144" cy="134" r="102" fill="#d8dfe3"/>
+    <path d="M42 134A102 102 0 0 1 246 134H238A94 94 0 0 0 50 134Z" fill="#e6e9e8"/>
+    <path d="M238 134A94 94 0 0 1 77 200L71 206A102 102 0 0 0 246 134Z" fill="#acb8bf"/>
+  </g>
+  <g id="gate-frame">
+    <circle cx="144" cy="138" r="81" fill="#637782"/>
+    <circle cx="144" cy="134" r="78" fill="#304553"/>
+  </g>
+  <g id="two-leaf-gate" clip-path="url(#gate-disc)" transform="rotate(-90 144 134)">
+    <path d="M60 50H140V124L152 136L140 148V218H60Z" fill="#d8dfe3"/>
+    <path d="M148 50H228V218H148V151L160 136L148 121Z" fill="#acb8bf"/>
+    <path d="M144 64V122L156 136L144 150V204" fill="none" stroke="#c5e5f5" stroke-width="3"/>
+  </g>
+  <g id="outer-only-outline" mask="url(#outside-only)">
+    <use href="#shell-shape" fill="none" stroke="#000000" stroke-width="20.2772277228" stroke-linejoin="round"/>
+  </g>
+</svg>

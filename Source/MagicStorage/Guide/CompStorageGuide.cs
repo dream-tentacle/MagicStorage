@@ -9,18 +9,12 @@ namespace MagicStorage
         public CompProperties_StorageGuide() { compClass = typeof(CompStorageGuide); }
     }
 
-    // Learning belongs to this core and survives network rebuilds and minification.
+    // Cores expose the shared tutorial; learning belongs to the current save.
     public sealed class CompStorageGuide : ThingComp
     {
-        private int learned;
-        internal bool Learned(int step) => (learned & (1 << step)) != 0;
-        internal void Complete(int step) { learned |= 1 << step; }
-
-        public override void PostExposeData()
-        {
-            base.PostExposeData();
-            Scribe_Values.Look(ref learned, "storageGuideLearned", 0);
-        }
+        private GameComponent_StorageGuideNotice Progress => Current.Game?.GetComponent<GameComponent_StorageGuideNotice>();
+        internal bool Learned(int step) => Progress?.Learned(step) == true;
+        internal void Complete(int step) => Progress?.Complete(step, parent as Building_StorageCore);
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {

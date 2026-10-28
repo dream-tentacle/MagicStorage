@@ -4,6 +4,8 @@
   <MS_Payment_Unavailable>无法完成付款：可用资源不足，或存储网络已不可用。</MS_Payment_Unavailable>
   <MS_Trade_Command>通过魔法存储与{0}交易</MS_Trade_Command>
   <MS_Trade_CeleTechUnavailable>贸易无人机已无法交易</MS_Trade_CeleTechUnavailable>
+  <MS_Trade_TraderShipUnavailable>贸易飞船已离开或不再接受交易</MS_Trade_TraderShipUnavailable>
+  <MS_Trade_TraderShipHostile>贸易飞船所属派系与谈判者敌对，无法交易</MS_Trade_TraderShipHostile>
   <MS_Trade_InventoryNotice>魔法存储交易：使用核心网络及相连补货架上的物品和白银，买入物品放在地面。</MS_Trade_InventoryNotice>
   <MS_Trade_Unavailable>无法完成交易：网络或补货架上的物品、白银已不可用，或商人已无法交易。请检查数量或重置清单。</MS_Trade_Unavailable>
   <MS_Trade_Failed>无法完成交易：{0}</MS_Trade_Failed>

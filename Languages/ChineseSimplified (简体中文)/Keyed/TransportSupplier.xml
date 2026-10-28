@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Transport_CopyPreset>复制预设</MS_Transport_CopyPreset>
+  <MS_Transport_CopyPresetDesc>复制此物资补给器的供给模式、物品优先顺序、各物品目标库存上限和通用容器供给开关。</MS_Transport_CopyPresetDesc>
+  <MS_Transport_PastePreset>粘贴预设</MS_Transport_PastePreset>
+  <MS_Transport_PastePresetDesc>将已复制的预设应用到选中的物资补给器，覆盖现有配置。支持多选。切换供给模式前必须清空内部存货；不转移物品，也不更改各补给器选择的目标容器。</MS_Transport_PastePresetDesc>
+  <MS_Transport_NeedCopiedPreset>需要先复制物资补给器预设</MS_Transport_NeedCopiedPreset>
   <MS_Transport_Open>转移物品</MS_Transport_Open>
   <MS_Transport_OpenDesc>在存储网络与物资补给器之间双向转移物品。</MS_Transport_OpenDesc>
   <MS_Transport_Title>物资补给器 · 转移物品</MS_Transport_Title>

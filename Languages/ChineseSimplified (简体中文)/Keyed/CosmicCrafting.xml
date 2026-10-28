@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_Craft_PresetsTitle>本地清单</MS_Craft_PresetsTitle>
+  <MS_Craft_PresetsHint>将核心的全部制作任务、顺序、分组和设置保存为本地清单，可在其他核心或存档中载入。不保存制作进度、已备材料和指定殖民者。</MS_Craft_PresetsHint>
+  <MS_Craft_PresetSave>保存清单</MS_Craft_PresetSave>
+  <MS_Craft_PresetAppend>追加</MS_Craft_PresetAppend>
+  <MS_Craft_PresetReplace>替换</MS_Craft_PresetReplace>
+  <MS_Craft_PresetDelete>删除</MS_Craft_PresetDelete>
+  <MS_Craft_PresetsEmpty>尚未保存本地清单。</MS_Craft_PresetsEmpty>
+  <MS_Craft_PresetFolder>保存位置：{0}</MS_Craft_PresetFolder>
+  <MS_Craft_PresetOverwriteConfirm>已存在名为“{0}”的本地清单，要覆盖吗？</MS_Craft_PresetOverwriteConfirm>
+  <MS_Craft_PresetDeleteConfirm>要删除本地清单“{0}”吗？</MS_Craft_PresetDeleteConfirm>
+  <MS_Craft_PresetReplaceConfirm>用“{0}”替换当前核心的全部制作任务？旧任务将被取消，已备材料会退回网络，无法入库的物品放在核心附近。</MS_Craft_PresetReplaceConfirm>
+  <MS_Craft_PresetMissing>以下配方、意识形态类型或筛选项目在当前存档中不可用。不可用的配方和专属样式任务将跳过，缺失的筛选项目将忽略。是否继续载入其余内容？</MS_Craft_PresetMissing>
+  <MS_Craft_PresetNoUsableOrders>这份清单没有可载入的制作任务，当前任务未改变。</MS_Craft_PresetNoUsableOrders>
+  <MS_Craft_PresetReturnFailed>无法返还部分任务的材料，未替换制作清单。请稍后重试。</MS_Craft_PresetReturnFailed>
+  <MS_Craft_PresetError>无法读写本地制作清单：{0}</MS_Craft_PresetError>
   <MS_Craft_WorkbenchLockedHint>尚未解锁。点击消耗建造材料解锁此工作台。</MS_Craft_WorkbenchLockedHint>
   <MS_Craft_UnlockWorkbench>解锁工作台</MS_Craft_UnlockWorkbench>
   <MS_Craft_UnlockWorkbenchQuestion>是否消耗以下材料解锁{0}？材料从当前存储网络及相连的自动补货架中取用。</MS_Craft_UnlockWorkbenchQuestion>

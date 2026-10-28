@@ -17,6 +17,43 @@ namespace MagicStorage
         private int genericContainerIndex = -1;
         private List<ThingDef> selections = new List<ThingDef> { null, null, null };
         private List<int> targetLimits = new List<int> { DefaultTargetLimit, DefaultTargetLimit, DefaultTargetLimit };
+        // Session-only snapshot, independent of both the source and pasted suppliers.
+        private static SupplierPreset copiedPreset;
+
+        private sealed class SupplierPreset
+        {
+            internal readonly bool DirectSupply;
+            internal readonly bool GenericContainerSupply;
+            internal readonly List<ThingDef> Selections;
+            internal readonly List<int> TargetLimits;
+
+            internal SupplierPreset(Building_TransportSupplier supplier)
+            {
+                DirectSupply = supplier.directSupply;
+                GenericContainerSupply = supplier.genericContainerSupply;
+                Selections = new List<ThingDef>(supplier.selections);
+                TargetLimits = new List<int>(supplier.targetLimits);
+            }
+        }
+
+        private void CopyPreset() => copiedPreset = new SupplierPreset(this);
+
+        private void PastePreset()
+        {
+            SupplierPreset preset = copiedPreset;
+            if (preset == null) return;
+            if (directSupply != preset.DirectSupply && !TrySwitchMode())
+            {
+                Find.WindowStack.Add(new Dialog_MessageBox("MS_Transport_ModeBlocked".Translate(),
+                    title: "MS_Transport_PastePreset".Translate()));
+                return;
+            }
+            // Replace all slots together so swapped selections cannot conflict.
+            selections = new List<ThingDef>(preset.Selections);
+            targetLimits = new List<int>(preset.TargetLimits);
+            genericContainerSupply = preset.GenericContainerSupply;
+        }
+
         public int TargetLimit(int slot) => targetLimits[slot];
         public void SetTargetLimit(int slot, int value)
         {
@@ -25,7 +62,7 @@ namespace MagicStorage
 
         // Recount the real destination before each transfer, including stock from other suppliers.
         // Subtract with a wide accumulator so large modded stacks cannot overflow into free space.
-        private int TargetDeficit(ThingOwner target, int slot)
+        internal int TargetDeficit(ThingOwner target, int slot)
         {
             long remaining = TargetLimit(slot);
             if (remaining <= 0 || selections[slot] == null) return 0;
@@ -86,7 +123,9 @@ namespace MagicStorage
             get
             {
                 CompTransporter target = FrontTransporter();
-                return Math.Max(150f, target == null ? 150f : StorageTransportGroups.Capacity(target));
+                if (target != null) return Math.Max(150f, StorageTransportGroups.Capacity(target));
+                Pawn vehicle = VehicleFrameworkCompatibility.FrontVehicle(this);
+                return vehicle == null ? 150f : Math.Max(150f, VehicleFrameworkCompatibility.Capacity(vehicle));
             }
         }
         internal double StoredMass => StorageTransportExchange.ContainerMass(Contents);
@@ -241,6 +280,8 @@ namespace MagicStorage
             CompTransporter transporter = FrontTransporter();
             if (transporter == null)
             {
+                Pawn vehicle = VehicleFrameworkCompatibility.FrontVehicle(this);
+                if (vehicle != null) { VehicleFrameworkCompatibility.Supply(this, vehicle); return; }
                 CompRefuelable fuel = FrontRefuelable();
                 if (fuel != null) SupplyFuel(fuel, immediate);
                 else SupplyGenericContainer();
@@ -386,7 +427,7 @@ namespace MagicStorage
                         icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/TransferItems"),
                         action = ChooseGenericContainer
                     };
-                    if (FrontTransporter() != null || FrontRefuelable() != null)
+                    if (FrontTransporter() != null || FrontRefuelable() != null || VehicleFrameworkCompatibility.FrontVehicle(this) != null)
                         choose.Disable("MS_Transport_SpecializedTarget".Translate());
                     else if (FrontGenericTarget(out _) == null) choose.Disable("MS_Transport_NoGenericTarget".Translate());
                     yield return choose;
@@ -404,6 +445,31 @@ namespace MagicStorage
                         else Find.WindowStack.Add(new Dialog_TransportSupplier(this));
                     }
                 };
+                yield return new Command_Action
+                {
+                    defaultLabel = "MS_Transport_CopyPreset".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ShelfCopyPreset,
+                    defaultDesc = "MS_Transport_CopyPresetDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/CopySettings"),
+                    // Keep supplier commands separate from shelf commands in mixed selections.
+                    groupKey = 0x4D535443,
+                    alsoClickIfOtherInGroupClicked = false,
+                    action = CopyPreset
+                };
+                var paste = new Command_Action
+                {
+                    defaultLabel = "MS_Transport_PastePreset".Translate(),
+                    hotKey = StorageKeyBindingDefOf.MS_ShelfPastePreset,
+                    defaultDesc = "MS_Transport_PastePresetDesc".Translate(),
+                    icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Commands/PasteSettings"),
+                    groupKey = 0x4D535450,
+                    alsoClickIfOtherInGroupClicked = true,
+                    action = PastePreset
+                };
+                if (copiedPreset == null) paste.Disable("MS_Transport_NeedCopiedPreset".Translate());
+                else if (directSupply != copiedPreset.DirectSupply && Contents.Count > 0)
+                    paste.Disable("MS_Transport_ModeBlocked".Translate());
+                yield return paste;
                 var immediate = new Command_Action
                 {
                     defaultLabel = "MS_FuelSupply_Immediate".Translate(),
@@ -413,7 +479,7 @@ namespace MagicStorage
                 };
                 if (directSupply && !CanWork) immediate.Disable(StorageNetwork.StatusLabel(Network));
                 else if (!directSupply && Contents.Count == 0) immediate.Disable("MS_Transport_ImmediateEmpty".Translate());
-                else if (FrontTransporter() == null && FrontRefuelable() == null)
+                else if (FrontTransporter() == null && FrontRefuelable() == null && VehicleFrameworkCompatibility.FrontVehicle(this) == null)
                 {
                     Thing generic = FrontGenericTarget(out var containers);
                     if (generic == null) immediate.Disable((genericContainerSupply ? "MS_Transport_NoGenericTarget" : "MS_Transport_NoTarget").Translate());
@@ -438,8 +504,11 @@ namespace MagicStorage
                 status += "\n" + "MS_Transport_GroupMass".Translate(usage.ToString("0.##"), capacity.ToString("0.##"));
             if (target == null)
             {
+                Pawn vehicle = VehicleFrameworkCompatibility.FrontVehicle(this);
                 CompRefuelable fuel = FrontRefuelable();
-                if (fuel != null) status = "MS_Transport_FuelTarget".Translate(fuel.parent.LabelCap,
+                if (vehicle != null) status = "MS_Transport_Target".Translate(vehicle.LabelCap,
+                    VehicleFrameworkCompatibility.Usage(vehicle).ToString("0.##"), VehicleFrameworkCompatibility.Capacity(vehicle).ToString("0.##"));
+                else if (fuel != null) status = "MS_Transport_FuelTarget".Translate(fuel.parent.LabelCap,
                     fuel.Fuel.ToString("0.##"), fuel.TargetFuelLevel.ToString("0.##"));
                 else if (genericContainerSupply)
                 {

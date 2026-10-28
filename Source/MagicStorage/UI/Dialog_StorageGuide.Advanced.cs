@@ -25,7 +25,8 @@ namespace MagicStorage
             new AdvancedPage("Apparel", "MS_StorageApparelAdapter"),
             new AdvancedPage("Fuel", "MS_FuelSupplier"),
             new AdvancedPage("Transport", "MS_TransportSupplier"),
-            new AdvancedPage("Caravan", "MS_CaravanTeleporter")
+            new AdvancedPage("Caravan", "MS_CaravanTeleporter"),
+            new AdvancedPage("ProductionOutput", "MS_ProductionOutputPort")
         };
         private AdvancedPage SelectedAdvanced => selectedPage >= 7 && selectedPage < 7 + AdvancedPages.Length &&
             AdvancedPages[selectedPage - 7].Def != null ? AdvancedPages[selectedPage - 7] : null;
@@ -41,6 +42,10 @@ namespace MagicStorage
                 if (def == null) continue;
                 advancedBuildings[page.DefName] = Map.listerThings.ThingsOfDef(def)
                     .Where(t => t.Spawned && !t.Destroyed && t.Faction == Faction.OfPlayer).ToList();
+                if (page.Key == "ProductionOutput" ? AdvancedBuildings(page).Count > 0 :
+                    AdvancedBuildings(page).Any(InSelectedNetwork))
+                    Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.CompleteAdvanced(
+                        System.Array.IndexOf(GameComponent_StorageGuideNotice.AdvancedDefNames, page.DefName), core);
             }
         }
 
@@ -54,7 +59,8 @@ namespace MagicStorage
             thing.TryGetComp<CompStorageNode>()?.Network == core.Network;
 
         private bool AdvancedComplete(AdvancedPage page) =>
-            page.Def != null && AdvancedBuildings(page).Any(InSelectedNetwork);
+            page.Def != null && Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.AdvancedLearned(
+                System.Array.IndexOf(GameComponent_StorageGuideNotice.AdvancedDefNames, page.DefName)) == true;
 
         private void DrawNavRow(Rect row, int page, string title, ThingDef def = null)
         {
@@ -78,6 +84,7 @@ namespace MagicStorage
         {
             var page = SelectedAdvanced;
             Paragraph(width, ref y, ("MS_Guide_Advanced" + page.Key + "Body").Translate());
+            DrawCheck(width, ref y, new CheckLine((AdvancedComplete(page) ? "MS_Guide_Learned" : "MS_Guide_NotLearned").Translate(), AdvancedComplete(page)));
             if (Map == null)
                 DrawCheck(width, ref y, new CheckLine("MS_Guide_NoMap".Translate()));
             else

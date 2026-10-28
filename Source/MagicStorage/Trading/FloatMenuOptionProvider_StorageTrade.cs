@@ -40,6 +40,7 @@ namespace MagicStorage
     {
         public static JobDef MS_TradeWithStorage = null;
         public static JobDef MS_TradeWithStorageOrbital = null;
+        public static JobDef MS_TradeWithStorageTraderShip = null;
         static StorageTradeDefOf() { DefOfHelper.EnsureInitializedInCtor(typeof(StorageTradeDefOf)); }
     }
 

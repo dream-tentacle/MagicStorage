@@ -15,4 +15,9 @@
     <driverClass>MagicStorage.JobDriver_StorageCeleTechTrade</driverClass>
     <reportString>正在通过魔法存储与TargetA交易。</reportString>
   </JobDef>
+  <JobDef>
+    <defName>MS_TradeWithStorageTraderShip</defName>
+    <driverClass>MagicStorage.JobDriver_StorageTraderShipTrade</driverClass>
+    <reportString>正在通过魔法存储与TargetA交易。</reportString>
+  </JobDef>
 </Defs>

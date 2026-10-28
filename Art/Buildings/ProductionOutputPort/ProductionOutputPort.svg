@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288">
+  <title>魔法存储 · 生产输出口 · 近俯视供料盘</title>
+  <desc>平放地面的圆形供料盘，近俯视角。出料通道与物料顶面平铺，仅下沿保留极薄厚度。</desc>
+  <defs>
+    <path id="shell-shape" d="M42 136A102 102 0 0 1 246 136V142A102 102 0 0 1 42 142Z"/>
+    <mask id="outside-only" maskUnits="userSpaceOnUse" x="0" y="0" width="288" height="288" style="mask-type:luminance">
+      <rect width="288" height="288" fill="#ffffff"/>
+      <use href="#shell-shape" fill="#000000"/>
+    </mask>
+    <g id="material-top">
+      <path d="M5 0H49L54 5V28H0V5Z" fill="#637782"/>
+      <path d="M5 0H49L54 5V24H0V5Z" fill="#acb8bf"/>
+      <path d="M7 3H47L51 7V20H3V7Z" fill="#d8dfe3"/>
+      <path d="M7 3H47L44 6H8L6 8V18H3V7Z" fill="#e6e9e8"/>
+    </g>
+  </defs>
+  <g id="low-round-base">
+    <use href="#shell-shape" fill="#637782"/>
+    <circle cx="144" cy="136" r="102" fill="#d8dfe3"/>
+    <path d="M42 136A102 102 0 0 1 246 136H240A96 96 0 0 0 48 136Z" fill="#e6e9e8"/>
+    <path d="M240 136A96 96 0 0 1 77 205L73 209A102 102 0 0 0 246 136Z" fill="#acb8bf"/>
+  </g>
+  <g id="flat-output-channel">
+    <path d="M114 68H174L189 83V189L174 204H114L99 189V83Z" fill="#637782"/>
+    <path d="M117 74H171L183 86V186L171 198H117L105 186V86Z" fill="#304553"/>
+    <path d="M105 91H183V95H105ZM105 134H183V138H105ZM105 177H183V181H105Z" fill="#637782"/>
+    <path d="M103 87H110V185H103Z" fill="#93a3ad"/>
+    <path d="M178 87H185V185H178Z" fill="#acb8bf"/>
+    <path d="M144 77L154 87H134Z" fill="#c5e5f5"/>
+  </g>
+  <g id="outgoing-materials-top-view">
+    <use href="#material-top" transform="translate(117 99)"/>
+    <use href="#material-top" transform="translate(117 145)"/>
+  </g>
+  <g id="outer-only-outline" mask="url(#outside-only)">
+    <use href="#shell-shape" fill="none" stroke="#000000" stroke-width="20.2772277228" stroke-linejoin="round"/>
+  </g>
+</svg>

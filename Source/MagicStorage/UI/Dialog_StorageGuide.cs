@@ -85,11 +85,11 @@ namespace MagicStorage
             current[1] = ready && network.UnitCount > 0;
             current[2] = ready && receivers.Count >= 3;
             current[3] = ready && core.Settings.filter.AllowedDefCount > 0;
-            var progress = core?.GetComp<CompStorageGuide>();
+            var progress = Current.Game?.GetComponent<GameComponent_StorageGuideNotice>();
             completed = 0;
             for (int i = 0; i < learned.Length; i++)
             {
-                if (i < 4 && current[i]) progress?.Complete(i);
+                if (i < 4 && current[i]) progress?.Complete(i, core);
                 learned[i] = progress?.Learned(i) == true;
                 if (learned[i]) completed++;
             }
@@ -129,11 +129,17 @@ namespace MagicStorage
                 Widgets.Label(new Rect(0, 0, rect.width * .5f, 36), "MS_Guide_Title".Translate());
                 Text.Font = GameFont.Small;
                 Rect progressRect = new Rect(rect.width * .5f, 5, rect.width * .5f - 28, 28);
-                Label(progressRect, "MS_Guide_Progress".Translate(completed + AdvancedPages.Count(AdvancedComplete), 6 + AdvancedPages.Count(p => p.Def != null)), Caption, TextAnchor.MiddleRight);
+                var stage = Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.Stage ?? StorageGuideStage.Basics;
+                Label(progressRect, "MS_Guide_Progress".Translate(completed + AdvancedPages.Count(AdvancedComplete),
+                    6 + AdvancedPages.Count(p => p.Def != null), ("MS_Guide_Stage" + stage).Translate()), Caption, TextAnchor.MiddleRight);
                 TooltipHandler.TipRegion(progressRect, "MS_Guide_ProgressHelp".Translate());
+                string rewardText = ("MS_Guide_Reward" + stage).Translate();
+                float rewardHeight = Text.CalcHeight(rewardText, rect.width);
+                Label(new Rect(0, 40, rect.width, rewardHeight), rewardText, Accent);
+                float contentTop = 40 + rewardHeight + 12;
                 float navWidth = Math.Min(220, rect.width * .28f);
-                DrawNavigation(new Rect(0, 48, navWidth, rect.height - 48));
-                DrawPage(new Rect(navWidth + 14, 48, rect.width - navWidth - 14, rect.height - 48));
+                DrawNavigation(new Rect(0, contentTop, navWidth, rect.height - contentTop));
+                DrawPage(new Rect(navWidth + 14, contentTop, rect.width - navWidth - 14, rect.height - contentTop));
             }
             finally { GUI.color = color; Text.Font = font; Text.Anchor = anchor; Text.WordWrap = wrap; }
         }
