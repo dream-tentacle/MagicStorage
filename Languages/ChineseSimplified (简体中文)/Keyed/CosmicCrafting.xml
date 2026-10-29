@@ -81,6 +81,7 @@
   <MS_Craft_All>全部</MS_Craft_All>
   <MS_Craft_HaulingTabHint>原版的火化炉任务是搬运类型，很神奇吧？</MS_Craft_HaulingTabHint>
   <MS_Craft_AllRecipes>全部配方</MS_Craft_AllRecipes>
+  <MS_Craft_ContinuousAddHint>按住Ctrl可连续添加任务</MS_Craft_ContinuousAddHint>
   <MS_Craft_ModFilter>Mod：{0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>工作台：{0}</MS_Craft_WorkbenchFilter>
   <MS_Craft_SourceFilter>来源：{0}</MS_Craft_SourceFilter>

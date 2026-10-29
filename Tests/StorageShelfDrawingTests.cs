@@ -1,5 +1,9 @@
 using System;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Linq;
+using System.Collections.Generic;
+using HarmonyLib;
 using MagicStorage;
 using UnityEngine;
 using Verse;
@@ -11,7 +15,7 @@ internal static class StorageShelfDrawingTests
     private static void Near(float a, float b, string label) => Check(Math.Abs(a-b)<0.00001f,label+": "+a+" / "+b);
     public static int Main()
     {
-        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); IconRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
+        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); IconRouting(); HiddenShelfRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
         catch(Exception ex) { Console.Error.WriteLine(ex);return 1; }
     }
 
@@ -40,7 +44,7 @@ internal static class StorageShelfDrawingTests
         }
     }
 
-    private sealed class NoGraphicItem : Thing
+    private class NoGraphicItem : Thing
     {
         public override Graphic Graphic { get => throw new Exception("A custom renderer has no ordinary graphic"); set { } }
     }
@@ -50,6 +54,62 @@ internal static class StorageShelfDrawingTests
     { protected override void DrawAt(Vector3 drawLoc, bool flip = false) { } }
     private sealed class CustomPrintItem : Thing
     { public override void Print(SectionLayer layer) { } }
+
+    private sealed class HiddenItem : NoGraphicItem
+    { public override void DrawGUIOverlay() { throw new Exception("Hidden custom overlay must never run"); } }
+
+    private static void HiddenShelfRouting()
+    {
+        var map = new Map();
+        var shelf = new Building_StorageSupplyShelf { Map = map, Position = new IntVec3 { x = 4, z = 7 },
+            Selections = new ThingDef[100], Stocks = new Thing[100] };
+        shelf.def.category = ThingCategory.Building;
+        shelf.def.modExtensions.Add(new StorageShelfProperties { hideStoredItems = true });
+        map.haulDestinationManager.Parent = shelf;
+        var item = new HiddenItem { Map = map, Position = shelf.Position };
+        shelf.GetSlotGroup().HeldThings.Add(item);
+        foreach (bool tidy in new[] { true, false })
+        {
+            MagicStorageMod.Settings.TidySupplyShelf = tidy;
+            Check(StorageShelfVisibility.IsHidden(item), "hidden shelf ignores tidy toggle");
+            Check(!StorageShelfVisibility.IsHidden(shelf), "shelf graphic itself stays visible");
+            Check(StorageShelfDrawing.TryGetShelf(item, out _, out int slot) && slot == -1,
+                "hidden items bypass stock lookup and layout assignment");
+            foreach (DrawerType drawer in new[] { DrawerType.MapMeshOnly, DrawerType.RealtimeOnly, DrawerType.MapMeshAndRealTime })
+            {
+                item.def.drawerType = drawer;
+                Printer_Plane.Calls.Clear(); Graphics.Calls.Clear(); int iconCalls = Widgets.IconCalls;
+                Check(!StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item), "hidden static mesh never prints");
+                foreach (DrawPhase phase in new[] { DrawPhase.EnsureInitialized, DrawPhase.ParallelPreDraw, DrawPhase.Draw })
+                    Check(!StorageShelfDrawing.DrawItem(item, phase), "hidden item skips every dynamic phase");
+                Check(Printer_Plane.Calls.Count == 0 && Graphics.Calls.Count == 0 && Widgets.IconCalls == iconCalls,
+                    "hidden item neither renders nor requests graphics and thumbnails");
+                Check(map.dynamicDrawManager.Drawables.Count == 0, "hidden static items never register icon drawables");
+            }
+            StorageShelfVisibility.DrawGUIOverlay(item);
+            Check(item.OverlayCalls == 0, "hidden custom overlay is skipped before virtual dispatch");
+            var queue = typeof(StorageShelfDrawing).GetMethod("QueueOverlay", BindingFlags.Static | BindingFlags.NonPublic);
+            Check(!(bool)queue.Invoke(null, new object[] { item }), "hidden state icons are not queued");
+            map.haulDestinationManager.Parent = new object();
+            Check(!StorageShelfVisibility.IsHidden(item) && (bool)queue.Invoke(null, new object[] { item }),
+                "taking an item off the shelf immediately restores native rendering");
+            map.haulDestinationManager.Parent = shelf;
+        }
+        var call = new CodeInstruction(OpCodes.Callvirt, typeof(Thing).GetMethod("DrawGUIOverlay"));
+        var filter = typeof(StorageShelfDrawing).GetMethod("FilterGUIOverlays", BindingFlags.Static | BindingFlags.NonPublic);
+        var instructions = ((IEnumerable<CodeInstruction>)filter.Invoke(null,
+            new object[] { new[] { call, new CodeInstruction(OpCodes.Ret) } })).ToList();
+        Check(instructions[0] == call && call.opcode == OpCodes.Call &&
+            ((MethodInfo)call.operand).DeclaringType == typeof(StorageShelfVisibility),
+            "native overlay loop routes virtual item draws through visibility gate");
+        ((MethodInfo)call.operand).Invoke(null, new object[] { item });
+        var floorItem = new Thing { Map = map, Position = shelf.Position, Spawned = false };
+        StorageShelfVisibility.DrawGUIOverlay(floorItem);
+        Check(floorItem.OverlayCalls == 1, "ordinary item overlays retain native behavior");
+        shelf.def.modExtensions.Clear();
+        Check(!StorageShelfVisibility.IsHidden(item), "ordinary supply shelves do not hide their contents");
+        MagicStorageMod.Settings.TidySupplyShelf = true;
+    }
 
     private static void IconRouting()
     {

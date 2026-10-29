@@ -88,10 +88,10 @@ namespace MagicStorage
             }
             Widgets.EndScrollView();
             // Manual recall sits beside the native bottom-centred close button without moving it.
-            // The close button is centred on the window rect, while this content rect is inset by
-            // the window margin, so its centre is shifted right by that margin here.
-            float closeX = rect.width / 2f + 18f - Window.CloseButSize.x / 2f;
-            Rect recallRect = new Rect(closeX - 130f, rect.height - Window.CloseButSize.y, 120f, Window.CloseButSize.y);
+            // Convert the native button position into the content group's coordinates.
+            float closeX = (rect.width - Window.CloseButSize.x) / 2f;
+            float closeY = windowRect.height - 55f - Margin;
+            Rect recallRect = new Rect(closeX - 130f, closeY, 120f, Window.CloseButSize.y);
             // Failures are deliberately silent: the shelf keeps whatever could not be returned
             // and the normal restock/removal ticks take it from there.
             if (Widgets.ButtonText(recallRect, "MS_Shelf_Recall".Translate()))

@@ -11,8 +11,15 @@ namespace HarmonyLib
     public class Harmony
     {
         public Harmony(string id) { }
-        public void Patch(MethodInfo method, HarmonyMethod prefix)
+        public void Patch(MethodInfo method, HarmonyMethod prefix = null, HarmonyMethod transpiler = null)
         { if (method == null) throw new Exception("Missing patch target"); }
+    }
+    public class CodeInstruction
+    {
+        public System.Reflection.Emit.OpCode opcode;
+        public object operand;
+        public CodeInstruction(System.Reflection.Emit.OpCode opcode, object operand = null)
+        { this.opcode = opcode; this.operand = operand; }
     }
     public static class AccessTools
     {
@@ -59,7 +66,11 @@ namespace UnityEngine
             Calls.Add(new DrawCommand { Center=pos,Size=mesh.Size,Angle=rot.Angle,Flip=mesh.Flip,Material=mat });
     }
 }
-namespace RimWorld { public static class MapMeshFlagDefOf { public static ulong Things=1; } }
+namespace RimWorld
+{
+    public static class MapMeshFlagDefOf { public static ulong Things=1; }
+    public class OverlayDrawer { public void DrawOverlay(Verse.Thing t) { } }
+}
 namespace Verse
 {
     [AttributeUsage(AttributeTargets.Class)] public class StaticConstructorOnStartupAttribute : Attribute { }
@@ -86,14 +97,21 @@ namespace Verse
     }
     public class ThingDef
     {
+        public readonly List<DefModExtension> modExtensions = new List<DefModExtension>();
+        public T GetModExtension<T>() where T : DefModExtension
+        { foreach (var extension in modExtensions) if (extension is T match) return match; return null; }
         public ThingCategory category; public float Altitude; public bool dontPrint; public DrawerType drawerType;
         public GraphicData graphicData = new GraphicData();
     }
+    public class DefModExtension { }
+    public class ThingOverlays { public void ThingOverlaysOnGUI() { } }
     public class Thing
     {
         public ThingDef def=new ThingDef(); public bool Spawned=true; public Map Map;
         public IntVec3 Position; public int thingIDNumber=1; public Rot4 Rotation;
         public virtual Graphic Graphic { get; set; } = new Graphic(); public int stackCount=1;
+        public int OverlayCalls;
+        public virtual void DrawGUIOverlay() { OverlayCalls++; }
         public void DynamicDrawPhase(DrawPhase phase) { }
         public virtual void DeSpawn() { }
         public virtual void DynamicDrawPhaseAt(DrawPhase phase, Vector3 drawLoc, bool flip = false) { }

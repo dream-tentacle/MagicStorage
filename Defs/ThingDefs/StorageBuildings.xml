@@ -229,6 +229,7 @@
     <building>
       <isEdifice>false</isEdifice>
       <isInert>true</isInert>
+      <canLandGravshipOn>true</canLandGravshipOn>
       <ai_chillDestination>false</ai_chillDestination>
       <canConstructInCorner>true</canConstructInCorner>
       <blueprintGraphicData>

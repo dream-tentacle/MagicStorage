@@ -6,14 +6,17 @@ namespace MagicStorage
 {
     internal static class PrinterCraftingWorkerPolicy
     {
-        internal static bool Allows(CraftingOrder order, int skillLevel)
+        internal static bool Allows(CraftingOrder order, int skillLevel, Pawn boundPawn = null, bool printersOnly = false)
         {
             if (order?.Recipe == null || order.Worker != null ||
                 (order.WorkerKind != CraftingWorkerKind.Anyone && order.WorkerKind != CraftingWorkerKind.Printers)) return false;
+            if (printersOnly && order.WorkerKind != CraftingWorkerKind.Printers) return false;
             var recipe = order.Recipe;
             if (ModsConfig.BiotechActive && recipe.mechanitorOnlyRecipe) return false;
+            if (boundPawn != null) skillLevel = PrinterPawnBinding.RecipeSkillLevel(boundPawn, recipe);
             if (recipe.workSkill != null && !order.AllowsSkillLevel(skillLevel)) return false;
-            return recipe.skillRequirements == null || recipe.skillRequirements.All(r => skillLevel >= r.minLevel);
+            return recipe.skillRequirements == null || recipe.skillRequirements.All(r =>
+                (boundPawn == null ? skillLevel : PrinterPawnBinding.RecipeSkillLevel(boundPawn, recipe, r.skill)) >= r.minLevel);
         }
     }
 

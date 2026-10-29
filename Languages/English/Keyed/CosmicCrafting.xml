@@ -81,6 +81,7 @@
   <MS_Craft_All>All</MS_Craft_All>
   <MS_Craft_HaulingTabHint>Vanilla crematorium bills are hauling work. Surprising, right?</MS_Craft_HaulingTabHint>
   <MS_Craft_AllRecipes>All recipes</MS_Craft_AllRecipes>
+  <MS_Craft_ContinuousAddHint>Hold Ctrl to add tasks continuously</MS_Craft_ContinuousAddHint>
   <MS_Craft_ModFilter>Mod: {0}</MS_Craft_ModFilter>
   <MS_Craft_WorkbenchFilter>Workbench: {0}</MS_Craft_WorkbenchFilter>
   <MS_Craft_SourceFilter>Source: {0}</MS_Craft_SourceFilter>

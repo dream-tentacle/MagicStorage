@@ -48,6 +48,16 @@ namespace MagicStorage
         public bool AllowAllMaterials;
         public bool ForceCompatBuildMaterials = true;
         public bool TidySupplyShelf = true;
+        public bool ModifySilverStackLimit;
+        public const int DefaultSilverStackLimit = 5000;
+        public const int MinSilverStackLimit = 500;
+        public const int MaxSilverStackLimit = 1000000;
+        private int silverStackLimit = DefaultSilverStackLimit;
+        public int SilverStackLimit
+        {
+            get => silverStackLimit;
+            set => silverStackLimit = Math.Max(MinSilverStackLimit, Math.Min(MaxSilverStackLimit, value));
+        }
         private int overallRefreshSeconds = DefaultRefreshSeconds;
         private List<int> refreshSeconds = CreateRefreshDefaults();
         public const int DefaultCraftingMaterialRecheckSeconds = 30;
@@ -90,6 +100,8 @@ namespace MagicStorage
             AllowAllMaterials = false;
             ForceCompatBuildMaterials = true;
             TidySupplyShelf = true;
+            ModifySilverStackLimit = false;
+            SilverStackLimit = DefaultSilverStackLimit;
             SimplifiedMode = true;
             OverallRefreshSeconds = DefaultRefreshSeconds;
             refreshSeconds = CreateRefreshDefaults();
@@ -126,6 +138,9 @@ namespace MagicStorage
             Scribe_Values.Look(ref AllowAllMaterials, "allowAllMaterials", false);
             Scribe_Values.Look(ref ForceCompatBuildMaterials, "forceCompatBuildMaterials", true);
             Scribe_Values.Look(ref TidySupplyShelf, "tidySupplyShelf", true);
+            Scribe_Values.Look(ref ModifySilverStackLimit, "modifySilverStackLimit", false);
+            Scribe_Values.Look(ref silverStackLimit, "silverStackLimit", DefaultSilverStackLimit);
+            SilverStackLimit = silverStackLimit;
             Scribe_Values.Look(ref overallRefreshSeconds, "overallRefreshSeconds", DefaultRefreshSeconds);
             Scribe_Values.Look(ref craftingMaterialRecheckSeconds, "craftingMaterialRecheckSeconds", DefaultCraftingMaterialRecheckSeconds);
             CraftingMaterialRecheckSeconds = craftingMaterialRecheckSeconds;

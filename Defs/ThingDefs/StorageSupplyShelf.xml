@@ -24,8 +24,7 @@
         <filter>
           <disallowNotEverStorable>true</disallowNotEverStorable>
           <categories><li>Root</li></categories>
-          <disallowedCategories><li>Chunks</li><li>Plants</li><li>Buildings</li></disallowedCategories>
-          <disallowedThingDefs><li MayRequire="Ludeon.RimWorld.Biotech">Wastepack</li></disallowedThingDefs>
+          <disallowedCategories><li>Plants</li><li>Buildings</li></disallowedCategories>
         </filter>
       </fixedStorageSettings>
     </building>
@@ -50,5 +49,23 @@
     </building>
     <costList Inherit="False"><Steel>120</Steel><ComponentIndustrial>6</ComponentIndustrial></costList>
     <uiOrder>3108</uiOrder>
+  </ThingDef>
+  <ThingDef ParentName="MS_StorageSupplyShelfBase">
+    <defName>MS_PerformanceSupplyShelf</defName>
+    <label>performance-melting restocking shelf</label>
+    <description>If you're confident in your computer, come and challenge me. Stores 100 stacks at once. Items on top are not rendered; filter mode is recommended.\n\nStoring 100 stacks on one shelf affects performance.\n\nIf you only want to store silver, go to Mod options - Accessibility and raise the silver stack limit instead.</description>
+    <building>
+      <maxItemsInCell>100</maxItemsInCell>
+    </building>
+    <graphicData>
+      <texPath>Things/Building/PerformanceSupplyShelf/PerformanceSupplyShelf</texPath>
+    </graphicData>
+    <modExtensions>
+      <li Class="MagicStorage.StorageShelfProperties">
+        <hideStoredItems>true</hideStoredItems>
+      </li>
+    </modExtensions>
+    <costList Inherit="False"><Steel>120</Steel><ComponentIndustrial>6</ComponentIndustrial></costList>
+    <uiOrder>3109</uiOrder>
   </ThingDef>
 </Defs>

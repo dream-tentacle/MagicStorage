@@ -15,6 +15,7 @@ internal static class CosmicPrinterProductionTests
         try
         {
             ParameterConfirmation();
+            BoundColonistParameters();
             var printer = new Building_CosmicPrinter();
             printer.Settings.Efficiency = 2.5f; printer.Settings.QualityOffset = 1;
             var material = new Thing { def = new ThingDef(), DrawColor = 31 };
@@ -90,6 +91,69 @@ internal static class CosmicPrinterProductionTests
             "confirmed parameters are normalized before applying");
         Check(draft.SkillLevel == 99 && float.IsNaN(draft.Efficiency), "normalization does not mutate the draft object");
     }
+    private static void BoundColonistParameters()
+    {
+        var map = new Map();
+        var pawn = new Pawn { Spawned = true, Map = map, Faction = Faction.OfPlayer };
+        var crafting = new SkillDef();
+        var art = new SkillDef();
+        var smithing = new WorkTypeDef();
+        var artistic = new WorkTypeDef();
+        var speed = new StatDef();
+        var yield = new StatDef();
+        pawn.skills.Records[crafting] = new SkillRecord { Level = 17 };
+        pawn.skills.Records[art] = new SkillRecord { Level = 4 };
+        pawn.Stats[speed] = 1.75f; pawn.Stats[yield] = 2.5f;
+        var recipe = new RecipeDef { workSkill = crafting, workSpeedStat = speed, efficiencyStat = yield };
+        recipe.Routes.Add(new WorkGiverDef { workType = smithing });
+        var artRecipe = new RecipeDef { workSkill = art };
+        artRecipe.Routes.Add(new WorkGiverDef { workType = artistic });
+        Check(PrinterPawnBinding.IsAvailable(pawn, map), "living colonist on this map is available");
+        Check(!PrinterPawnBinding.IsAvailable(pawn, new Map()), "binding cannot operate across maps");
+        pawn.Dead = true;
+        Check(!PrinterPawnBinding.IsAvailable(pawn, map), "dead binding pauses printing");
+        pawn.Dead = false; pawn.Spawned = false;
+        Check(!PrinterPawnBinding.IsAvailable(pawn, map), "despawned binding pauses printing");
+        pawn.Spawned = true;
+        Check(PrinterPawnBinding.WorkSpeed(pawn, recipe, 9) == 1.75f, "speed uses bound colonist's recipe stat");
+        Check(PrinterPawnBinding.Efficiency(pawn, recipe, 9) == 2.5f, "yield uses bound colonist's recipe stat");
+        Check(PrinterPawnBinding.WorkSpeed(pawn, artRecipe, 9) == 1 &&
+            PrinterPawnBinding.Efficiency(pawn, artRecipe, 9) == 1, "stat-free recipes use vanilla unit factors");
+        Check(PrinterPawnBinding.WorkSpeed(null, recipe, 9) == 9 &&
+            PrinterPawnBinding.Efficiency(null, recipe, 8) == 8, "unbinding restores manual factors");
+        Check(PrinterPawnBinding.RecipeSkillLevel(pawn, recipe) == 17 &&
+            PrinterPawnBinding.RecipeSkillLevel(pawn, artRecipe) == 4, "each recipe uses its own work skill");
+
+        var printer = new Building_CosmicPrinter { BoundPawn = pawn };
+        printer.Settings.Efficiency = 10; printer.Settings.SkillLevel = 1;
+        printer.Settings.InspirationChance = printer.Settings.FailureChance = 0;
+        recipe.products.Add(new ThingDefCountClass { thingDef = new ThingDef { Quality = true }, count = 2 });
+        var output = PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList();
+        Check(output.Sum(product => product.stackCount) == 5, "bound production uses colonist yield instead of manual multiplier");
+        Check(QualityUtility.LastSkill == 17, "actual product quality uses the recipe skill");
+        Check(printer.Settings.Efficiency == 10 && printer.Settings.SkillLevel == 1,
+            "bound production preserves manual settings for later unbinding");
+        var otherSkillPreview = printer.Settings.QualityProbabilities(4);
+        var normal = new CosmicPrinterSettings { SkillLevel = 4, InspirationChance = 0, FailureChance = 0 };
+        Check(otherSkillPreview.SequenceEqual(normal.QualityProbabilities()), "preview accepts selected work skill without changing manual skill");
+
+        pawn.DisabledWork.Add(smithing);
+        Check(PrinterPawnBinding.SkillLevel(pawn, crafting, smithing) == 0 &&
+            PrinterPawnBinding.RecipeSkillLevel(pawn, recipe) == 0, "disabled work type counts as zero in preview and production");
+        PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList();
+        Check(QualityUtility.LastSkill == 0, "disabled work type produces using skill zero");
+        Check(PrinterPawnBinding.RecipeSkillLevel(pawn, artRecipe) == 4, "disabling one work type preserves other work skills");
+        recipe.Routes.Add(new WorkGiverDef { workType = artistic });
+        Check(PrinterPawnBinding.RecipeSkillLevel(pawn, recipe) == 17, "multi-route recipe can use an enabled work type");
+        pawn.skills.Records[crafting].TotallyDisabled = true;
+        Check(PrinterPawnBinding.RecipeSkillLevel(pawn, recipe) == 0, "disabled skill counts as zero even with an enabled route");
+        Check(PrinterPawnBinding.SkillLevel(pawn, null, artistic) == 0, "work without a skill previews level zero");
+        printer.BoundPawn = null;
+        output = PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList();
+        Check(output.Sum(product => product.stackCount) == 20 && QualityUtility.LastSkill == 1,
+            "unbinding restores manual yield and quality together");
+    }
+
     private sealed class SpecialIngredient : Thing
     {
         public override IEnumerable<Thing> ButcherProducts(object pawn, float efficiency)

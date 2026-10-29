@@ -11,7 +11,7 @@
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
     <graphicData>
-      <texPath>Things/Building/StorageReceiver/StorageReceiver</texPath>
+      <texPath>Things/Building/ProductionOutputPort/ProductionOutputPort</texPath>
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(1.125,1.125)</drawSize>
       <drawRotated>false</drawRotated>

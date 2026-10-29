@@ -133,6 +133,7 @@
     <Compile Include="Storage\StorageSelectionPatches.cs" />
     <Compile Include="Storage\StorageShelfLayout.cs" />
     <Compile Include="Storage\StorageShelfDrawing.cs" />
+    <Compile Include="Storage\StorageShelfVisibility.cs" />
     <Compile Include="Storage\StorageRefreshTimer.cs" />
     <Compile Include="Storage\StorageCaravanWorldGizmos.cs" />
     <Compile Include="Storage\StorageCaravanTransfer.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="Crafting\CraftingBatch.cs" />
     <Compile Include="Crafting\ICraftingExecutor.cs" />
     <Compile Include="Crafting\CosmicPrinterSettings.cs" />
+    <Compile Include="Crafting\PrinterPawnBinding.cs" />
     <Compile Include="Crafting\PrinterCraftingProduction.cs" />
     <Compile Include="Buildings\Building_CosmicPrinter.cs" />
     <Compile Include="UI\Dialog_CosmicPrinter.cs" />

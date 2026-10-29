@@ -71,6 +71,18 @@ internal static class StorageSelectionTests
             Equal(true, ThingSelectionUtility.MultiSelectableThingsInScreenRectDistinct(default(UnityEngine.Rect))
                 .Contains(stock), "other rectangle queries retain shelf stock");
         }
+        var hiddenStock = Enumerable.Range(0, 100).Select(_ =>
+            new Thing { Spawned = true, Map = map, Position = cell }).ToList();
+        selector.Candidates.Clear();
+        selector.Candidates.AddRange(hiddenStock.Cast<object>());
+        selector.Candidates.Add(shelf);
+        Equal(shelf, selector.QueryUnderMouse().Single(), "one hundred shelf stacks never enter click selection");
+        ThingSelectionUtility.Candidates.Clear();
+        ThingSelectionUtility.Candidates.AddRange(hiddenStock);
+        ThingSelectionUtility.Candidates.Add(shelf);
+        UnityEngine.Event.current = new UnityEngine.Event { rawType = UnityEngine.EventType.MouseUp, button = 0 };
+        Equal(shelf, ThingSelectionUtility.MultiSelectableThingsInScreenRectDistinct(default(UnityEngine.Rect)).Single(),
+            "one hundred shelf stacks never enter box selection");
         UnityEngine.Event.current = null;
     }
 

@@ -45,10 +45,10 @@ namespace MagicStorage
         internal int ApplyQuality(int quality, bool inspired, bool failed) =>
             Math.Max(0, Math.Min(6, quality + QualityOffset + (inspired ? 1 : 0) - (failed ? 1 : 0)));
 
-        internal QualityCategory GenerateQuality()
+        internal QualityCategory GenerateQuality(int? skillLevel = null)
         {
             // These are two independent draws, even at the minimum/maximum quality.
-            int quality = (int)QualityUtility.GenerateQualityCreatedByPawn(SkillLevel, false);
+            int quality = (int)QualityUtility.GenerateQualityCreatedByPawn(skillLevel ?? SkillLevel, false);
             bool inspired = Rand.Value < InspirationChance;
             bool failed = Rand.Value < FailureChance;
             return (QualityCategory)ApplyQuality(quality, inspired, failed);
@@ -56,11 +56,11 @@ namespace MagicStorage
 
         // Integrate vanilla's asymmetric Gaussian and its 50% masterwork reroll.
         // No game random numbers are consumed when opening or drawing the preview.
-        internal double[] QualityProbabilities()
+        internal double[] QualityProbabilities(int? skillLevel = null)
         {
             double[] centers = { .7, 1.1, 1.5, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 2.95,
                 3.1, 3.25, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4, 4.1, 4.2 };
-            double center = centers[Math.Max(0, Math.Min(20, SkillLevel))];
+            double center = centers[Math.Max(0, Math.Min(20, skillLevel ?? SkillLevel))];
             double[] first = Distribution(center, .8), second = Distribution(center, .95);
             double reroll = first[5] * .5;
             first[5] -= reroll;

@@ -177,6 +177,15 @@ internal static class StorageRefreshTests
         Equal("MS_SettingsTidySupplyShelf", Listing_Standard.Events[3], "accessibility tab exposes tidy shelf toggle");
         Equal(false, Listing_Standard.Events.Contains("MS_SettingsTidySupplyShelfHelp"), "tidy shelf description is no longer a persistent label");
         Equal(0, Listing_Standard.NumericLabels.Count, "accessibility tab has no performance or storage numeric settings");
+        Equal(true, Listing_Standard.Events.Contains("MS_SettingsModifySilverStackLimit"), "accessibility exposes the silver stack toggle");
+        Equal(false, Listing_Standard.Events.Any(value => value.Contains("MS_SettingsSilverStackLimitWarning")), "silver warning is hidden while disabled");
+        MagicStorageMod.Settings.ModifySilverStackLimit = true;
+        Listing_Standard.NumericLabels.Clear();
+        Listing_Standard.Events.Clear();
+        mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsSilverStackLimit"), "enabled silver feature exposes its numeric input");
+        Equal(true, Listing_Standard.Events.Contains("<color=#FF0000>MS_SettingsSilverStackLimitWarning</color>"), "enabled silver feature displays a red warning");
+        MagicStorageMod.Settings.ModifySilverStackLimit = false;
         Equal(false, MagicStorageMod.Settings.AllowAllMaterials, "all materials defaults off");
         TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabCompatibility").clickedAction();
         Listing_Standard.Events.Clear();

@@ -67,6 +67,10 @@
   <MS_SettingsTradeItemFilters>Trade window item filters</MS_SettingsTradeItemFilters>
   <MS_SettingsTidySupplyShelf>Tidy restocking shelves</MS_SettingsTidySupplyShelf>
   <MS_SettingsTidySupplyShelfHelp>Improve how items are displayed on restocking shelves.</MS_SettingsTidySupplyShelfHelp>
+  <MS_SettingsModifySilverStackLimit>Modify silver stack limit</MS_SettingsModifySilverStackLimit>
+  <MS_SettingsModifySilverStackLimitHelp>After increasing the silver stack limit, you can place silver on auto-restocking shelves to support payments made by other trading mods.</MS_SettingsModifySilverStackLimitHelp>
+  <MS_SettingsSilverStackLimit>Silver stack limit</MS_SettingsSilverStackLimit>
+  <MS_SettingsSilverStackLimitWarning>Lowering this limit during a playthrough is not recommended. Do not enable this feature if another mod already changes stack limits. Lowering the stack limit may cause existing silver to be lost.</MS_SettingsSilverStackLimitWarning>
   <MS_SettingsWorkbenchUnlockMode>Workbench unlock mode</MS_SettingsWorkbenchUnlockMode>
   <MS_SettingsNewWorkbenchOrdersFirst>Add new workbench orders first</MS_SettingsNewWorkbenchOrdersFirst>
   <MS_SettingsNewWorkbenchOrdersFirstHelp>Affects the default priority of new orders, which remain in Ungrouped. When disabled, new orders are added last.</MS_SettingsNewWorkbenchOrdersFirstHelp>

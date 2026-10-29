@@ -2,6 +2,60 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_3</defName>
+    <label>Version log</label>
+    <version>1.2.3</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Printers can now be set to process only orders whose worker setting is "Printers only".</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>Added the performance-melting restocking shelf.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_2</defName>
+    <label>Version log</label>
+    <version>1.2.2</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>Cosmic printers can now be bound to colonists, using their skill levels and work speed to calculate production.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Cosmic printer parameters can now be copied to other printers, making it easier to configure multiple printers.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_1</defName>
+    <label>Version log</label>
+    <version>1.2.1</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>You can now increase the silver stack limit in the Accessibility settings to support payments made by other trading mods.</li>
+          <li>Hold Ctrl when clicking a recipe to keep the recipe picker open and add more recipes.</li>
+          <li>Storage conduits no longer prevent gravships from landing.</li>
+          <li>Supply shelves can now store more types of objects without the restrictions of vanilla shelves.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_2_0</defName>
     <label>Version log</label>
     <version>1.2.0</version>

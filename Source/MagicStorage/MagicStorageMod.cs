@@ -10,6 +10,9 @@ namespace MagicStorage
         private string unitSlotsBuffer;
         private string overallRefreshBuffer;
         private string craftingMaterialRecheckBuffer;
+        private string silverStackLimitBuffer;
+        private ThingDef silverDef;
+        private int? originalSilverStackLimit, appliedSilverStackLimit;
         private readonly string[] refreshBuffers = new string[(int)StorageRefreshTask.Count];
         private Vector2 settingsScroll;
         private float settingsHeight;
@@ -23,7 +26,9 @@ namespace MagicStorage
             {
                 Settings = GetSettings<MagicStorageSettings>();
                 unitSlotsBuffer = Settings.StorageUnitSlots.ToString();
+                silverStackLimitBuffer = Settings.SilverStackLimit.ToString();
                 ResetRefreshBuffers();
+                ApplySilverStackLimit();
             });
             var assembly = typeof(MagicStorageMod).Assembly;
             string build = assembly.ManifestModule.ModuleVersionId.ToString("N");
@@ -35,6 +40,8 @@ namespace MagicStorage
         public override void DoSettingsWindowContents(Rect inRect)
         {
             bool tidySupplyShelf = Settings.TidySupplyShelf;
+            bool modifySilverStackLimit = Settings.ModifySilverStackLimit;
+            int silverStackLimit = Settings.SilverStackLimit;
             var body = new Rect(inRect.x, inRect.y + 32f, inRect.width, Mathf.Max(0f, inRect.height - 32f));
             Widgets.DrawMenuSection(body);
             TabDrawer.DrawTabs(body, new List<TabRecord>
@@ -58,12 +65,15 @@ namespace MagicStorage
             {
                 Settings.RestoreDefaults();
                 unitSlotsBuffer = Settings.StorageUnitSlots.ToString();
+                silverStackLimitBuffer = Settings.SilverStackLimit.ToString();
                 ResetRefreshBuffers();
             }
             settingsHeight = listing.CurHeight;
             listing.End();
             Widgets.EndScrollView();
             if (tidySupplyShelf != Settings.TidySupplyShelf) StorageShelfDrawing.RefreshAll();
+            if (modifySilverStackLimit != Settings.ModifySilverStackLimit || silverStackLimit != Settings.SilverStackLimit)
+                ApplySilverStackLimit();
         }
 
         private void SelectSettingsTab(SettingsTab tab)
@@ -132,6 +142,55 @@ namespace MagicStorage
             listing.Gap();
             listing.CheckboxLabeled("MS_SettingsTidySupplyShelf".Translate(), ref Settings.TidySupplyShelf,
                 "MS_SettingsTidySupplyShelfHelp".Translate());
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsModifySilverStackLimit".Translate(), ref Settings.ModifySilverStackLimit,
+                "MS_SettingsModifySilverStackLimitHelp".Translate());
+            if (Settings.ModifySilverStackLimit)
+            {
+                int limit = Settings.SilverStackLimit;
+                listing.TextFieldNumericLabeled("MS_SettingsSilverStackLimit".Translate(), ref limit, ref silverStackLimitBuffer,
+                    MagicStorageSettings.MinSilverStackLimit, MagicStorageSettings.MaxSilverStackLimit);
+                Settings.SilverStackLimit = limit;
+                listing.Label("<color=#FF0000>" + "MS_SettingsSilverStackLimitWarning".Translate() + "</color>");
+            }
+        }
+
+        private void ApplySilverStackLimit()
+        {
+            if (silverDef == null) silverDef = DefDatabase<ThingDef>.GetNamedSilentFail("Silver");
+            if (silverDef == null) return;
+            int previous = silverDef.stackLimit;
+            if (Settings.ModifySilverStackLimit)
+            {
+                if (!originalSilverStackLimit.HasValue) originalSilverStackLimit = previous;
+                silverDef.stackLimit = Settings.SilverStackLimit;
+                appliedSilverStackLimit = silverDef.stackLimit;
+            }
+            else
+            {
+                if (!appliedSilverStackLimit.HasValue) return;
+                // Restore the value we replaced, without undoing another mod's later change.
+                if (silverDef.stackLimit == appliedSilverStackLimit.Value)
+                    silverDef.stackLimit = originalSilverStackLimit.Value;
+                originalSilverStackLimit = appliedSilverStackLimit = null;
+            }
+            if (previous == silverDef.stackLimit) return;
+            var maps = Find.Maps;
+            if (maps == null) return;
+            // Previously full stacks may now accept more silver. Refresh only silver's
+            // partial-stack index; existing items and their quantities stay intact.
+            var stacks = new List<Thing>();
+            foreach (Map map in maps)
+            {
+                var manager = map.GetComponent<MapComponent_StorageNetworks>();
+                if (manager == null) continue;
+                foreach (Building_StorageUnit unit in manager.StorageUnits)
+                {
+                    stacks.Clear();
+                    unit.Inventory.GetStacks(silverDef, stacks);
+                    foreach (Thing item in stacks) unit.Inventory.RefreshStack(item);
+                }
+            }
         }
 
         private void DrawCompatibilitySettings(Listing_Standard listing)

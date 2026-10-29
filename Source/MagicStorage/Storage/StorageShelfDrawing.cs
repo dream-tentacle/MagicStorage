@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using RimWorld;
@@ -32,16 +33,23 @@ namespace MagicStorage
                 prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(ItemCenter)));
             harmony.Patch(AccessTools.Method(typeof(GenMapUI), nameof(GenMapUI.LabelDrawPosFor), new[] { typeof(Thing), typeof(float) }),
                 prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(LabelOffset)));
+            harmony.Patch(AccessTools.Method(typeof(ThingOverlays), nameof(ThingOverlays.ThingOverlaysOnGUI)),
+                transpiler: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(FilterGUIOverlays)));
+            harmony.Patch(AccessTools.Method(typeof(OverlayDrawer), nameof(OverlayDrawer.DrawOverlay)),
+                prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(QueueOverlay)));
         }
 
         internal static bool TryGetShelf(Thing item, out Building_StorageSupplyShelf shelf, out int slot)
         {
             shelf = null;
             slot = -1;
-            if (!MagicStorageMod.Settings.TidySupplyShelf || item == null || !item.Spawned ||
+            if (item == null || !item.Spawned ||
                 item.def.category != ThingCategory.Item) return false;
             shelf = item.Map.haulDestinationManager.SlotGroupParentAt(item.Position) as Building_StorageSupplyShelf;
             if (shelf == null) return false;
+            // Hidden shelves bypass both the tidy-storage setting and stock-slot resolution.
+            if (StorageShelfVisibility.HidesContents(shelf)) return true;
+            if (!MagicStorageMod.Settings.TidySupplyShelf) return false;
             slot = shelf.StockSlot(item);
             if (slot >= 0 && shelf.StockAt(slot) == item) return true;
             shelf.ResolveStockSlots(new System.Collections.Generic.List<Thing>(shelf.GetSlotGroup().HeldThings));
@@ -64,14 +72,32 @@ namespace MagicStorage
 
         private static bool ItemCenter(Thing t, ref Vector3 __result)
         {
-            if (!TryGetShelf(t, out var shelf, out int slot)) return true;
+            if (!TryGetShelf(t, out var shelf, out int slot) || StorageShelfVisibility.HidesContents(shelf)) return true;
             __result = Center(t, shelf, slot);
             return false;
         }
 
         private static void LabelOffset(Thing thing, ref float worldOffsetZ)
         {
-            if (TryGetShelf(thing, out var shelf, out _)) worldOffsetZ = -StorageShelfLayout.ItemSizeFor(shelf.SlotCount) / 2f;
+            if (TryGetShelf(thing, out var shelf, out _) && !StorageShelfVisibility.HidesContents(shelf))
+                worldOffsetZ = -StorageShelfLayout.ItemSizeFor(shelf.SlotCount) / 2f;
+        }
+
+        private static bool QueueOverlay(Thing t) => !StorageShelfVisibility.IsHidden(t);
+
+        private static IEnumerable<CodeInstruction> FilterGUIOverlays(IEnumerable<CodeInstruction> instructions)
+        {
+            MethodInfo original = AccessTools.Method(typeof(Thing), nameof(Thing.DrawGUIOverlay));
+            MethodInfo filtered = AccessTools.Method(typeof(StorageShelfVisibility), nameof(StorageShelfVisibility.DrawGUIOverlay));
+            foreach (CodeInstruction instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Callvirt && Equals(instruction.operand, original))
+                {
+                    instruction.opcode = OpCodes.Call;
+                    instruction.operand = filtered;
+                }
+                yield return instruction;
+            }
         }
 
         private static Graphic DisplayGraphic(Thing item)
@@ -186,6 +212,7 @@ namespace MagicStorage
         internal static bool PrintItem(SectionLayer_ThingsGeneral __instance, Thing t)
         {
             if (!TryGetShelf(t, out var shelf, out int slot)) return true;
+            if (StorageShelfVisibility.HidesContents(shelf)) return false;
             if (t.def.dontPrint) return false;
             // Resolve thumbnails only on the main draw phase. Portrait textures may
             // expire or change, so never bake them into the static section mesh.
@@ -202,7 +229,9 @@ namespace MagicStorage
 
         internal static bool DrawItem(Thing __instance, DrawPhase phase)
         {
-            if (phase != DrawPhase.Draw || !TryGetShelf(__instance, out var shelf, out int slot)) return true;
+            if (phase != DrawPhase.Draw) return !StorageShelfVisibility.IsHidden(__instance);
+            if (!TryGetShelf(__instance, out var shelf, out int slot)) return true;
+            if (StorageShelfVisibility.HidesContents(shelf)) return false;
             if (UsesIcon(__instance)) return !DrawIcon(__instance, shelf, slot);
             // MapMeshAndRealTime items already have their main graphic in the section mesh.
             if (__instance.def.drawerType == DrawerType.RealtimeOnly)

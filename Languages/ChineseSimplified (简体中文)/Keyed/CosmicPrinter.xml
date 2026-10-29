@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Craft_Worker_Printers>仅打印机</MS_Craft_Worker_Printers>
+  <MS_Printer_IgnoreNonPrinterOrders>无视非“仅打印机”配方</MS_Printer_IgnoreNonPrinterOrders>
+  <MS_Printer_IgnoreNonPrinterOrdersDesc>开启后，打印机会无视清单中选择了“仅打印机”之外的所有配方。</MS_Printer_IgnoreNonPrinterOrdersDesc>
   <MS_Printer_Settings>打印机设置</MS_Printer_Settings>
   <MS_Printer_SettingsDesc>调整这台打印机的工作速度、产出效率和品质参数。</MS_Printer_SettingsDesc>
   <MS_Printer_Title>宇宙打印机设置</MS_Printer_Title>
-  <MS_Printer_Hint>设置仅对当前打印机生效，生产进度保存在控制核心中。批次的产出和品质由最终完成它的工作者决定。</MS_Printer_Hint>
+  <MS_Printer_Hint>设置可单独保存，也可复制到本地图上的其他打印机。生产进度保存在控制核心中，批次的产出和品质由最终完成它的工作者决定。</MS_Printer_Hint>
   <MS_Printer_Speed>基础工作速度（%）</MS_Printer_Speed>
   <MS_Printer_SpeedTip>100%即为和人类普通工作相同的速度</MS_Printer_SpeedTip>
   <MS_Printer_Efficiency>基础产出效率（%）</MS_Printer_Efficiency>
@@ -19,11 +21,29 @@
   <MS_Printer_FailureTip>生产后品质降低1档的概率。与灵感独立判定，同时触发时抵消。</MS_Printer_FailureTip>
   <MS_Printer_Reset>恢复默认设置</MS_Printer_Reset>
   <MS_Printer_Confirm>确认</MS_Printer_Confirm>
+  <MS_Printer_CopyToOthers>复制到其他打印机</MS_Printer_CopyToOthers>
+  <MS_Printer_CopyToOthersTip>保存当前参数和殖民者绑定，并复制给本地图上所有其他己方宇宙打印机。手动参数仅在允许修改参数时复制。</MS_Printer_CopyToOthersTip>
+  <MS_Printer_CopiedToOthers>已保存设置，并复制到 {0} 台其他打印机。</MS_Printer_CopiedToOthers>
   <MS_Printer_Close>关闭</MS_Printer_Close>
-  <MS_Printer_EditingLocked>默认参数无法修改，需要在mod选项中开启设置</MS_Printer_EditingLocked>
-  <MS_Printer_ZeroPauses>速度或产出效率为0时，打印机无法工作。</MS_Printer_ZeroPauses>
+  <MS_Printer_EditingLocked>手动参数已在mod选项中锁定，仍可绑定或取消绑定殖民者。</MS_Printer_EditingLocked>
+  <MS_Printer_BindTo>绑定到……</MS_Printer_BindTo>
+  <MS_Printer_BoundTo>已绑定：{0}</MS_Printer_BoundTo>
+  <MS_Printer_Unbind>取消绑定</MS_Printer_Unbind>
+  <MS_Printer_FollowBoundPawn>跟随绑定殖民者的属性和技能</MS_Printer_FollowBoundPawn>
+  <MS_Printer_BindingTip>使用殖民者的属性和技能进行生产。</MS_Printer_BindingTip>
   <MS_Printer_Preview>最终品质产出概率</MS_Printer_Preview>
+  <MS_Printer_PreviewHint>此处仅阅览 实际按照配方和技能决定</MS_Printer_PreviewHint>
   <MS_Printer_Working>正在打印：{0}（{1}）</MS_Printer_Working>
   <MS_Printer_Idle>正在等待可执行的核心任务</MS_Printer_Idle>
-  <MS_Printer_Paused>打印机已停机或未连接</MS_Printer_Paused>
+  <MS_Printer_Paused>打印机已停机：{0}</MS_Printer_Paused>
+  <MS_Printer_PauseBoundDead>绑定殖民者已死亡</MS_Printer_PauseBoundDead>
+  <MS_Printer_PauseBoundUnavailable>绑定殖民者已失效</MS_Printer_PauseBoundUnavailable>
+  <MS_Printer_PauseBoundAway>绑定殖民者不在本地图</MS_Printer_PauseBoundAway>
+  <MS_Printer_PauseBoundNotColonist>绑定对象已不再是己方殖民者</MS_Printer_PauseBoundNotColonist>
+  <MS_Printer_PauseBoundNoSkills>绑定殖民者无法提供技能</MS_Printer_PauseBoundNoSkills>
+  <MS_Printer_PauseUnavailable>打印机未部署或不属于己方</MS_Printer_PauseUnavailable>
+  <MS_Printer_PauseBurning>打印机正在燃烧</MS_Printer_PauseBurning>
+  <MS_Printer_PauseDisconnected>未连接可工作的存储网络</MS_Printer_PauseDisconnected>
+  <MS_Printer_PauseZeroSpeed>工作速度为0</MS_Printer_PauseZeroSpeed>
+  <MS_Printer_PauseZeroEfficiency>产出效率为0</MS_Printer_PauseZeroEfficiency>
 </LanguageData>

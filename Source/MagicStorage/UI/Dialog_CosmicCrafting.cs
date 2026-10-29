@@ -1117,6 +1117,21 @@ namespace MagicStorage
             Widgets.DrawMenuSection(outer);
             float viewWidth = outer.width - 18;
             EnsureRecipeRows(viewWidth);
+            float closeX = (rect.width - Window.CloseButSize.x) / 2f;
+            var hintRect = new Rect(0, windowRect.height - 55f - Margin,
+                Math.Max(0f, closeX - 12f), Window.CloseButSize.y);
+            string addHint = "MS_Craft_ContinuousAddHint".Translate();
+            GameFont previousFont = Text.Font;
+            TextAnchor previousAnchor = Text.Anchor;
+            Color previousColor = GUI.color;
+            Text.Font = GameFont.Tiny;
+            Text.Anchor = TextAnchor.MiddleRight;
+            GUI.color = ColoredText.SubtleGrayColor;
+            Widgets.Label(hintRect, addHint.Truncate(hintRect.width));
+            TooltipHandler.TipRegion(hintRect, addHint);
+            GUI.color = previousColor;
+            Text.Anchor = previousAnchor;
+            Text.Font = previousFont;
             if (visible.Count == 0)
             {
                 Widgets.Label(outer.ContractedBy(8), "MS_Craft_NoMatchingRecipes".Translate());
@@ -1318,11 +1333,12 @@ namespace MagicStorage
             }
             Widgets.InfoCardButton(row.xMax - 28, row.y + (row.height - 24) / 2, entry.Recipe, entry.Precept);
             Widgets.DrawLineHorizontal(row.x + 4, row.yMax - 1, row.width - 8, new Color(1f, 1f, 1f, 0.25f));
+            bool keepOpen = Event.current.control;
             if (Widgets.ButtonInvisible(new Rect(row.x, row.y, row.width - 36, row.height)))
             {
                 if (!AvailableRecipes().Contains(entry.Recipe)) return;
                 add(entry.Recipe, entry.Precept);
-                Close();
+                if (!keepOpen) Close();
             }
         }
         internal static void DrawPreviewIcon(Rect rect, ThingDef def)

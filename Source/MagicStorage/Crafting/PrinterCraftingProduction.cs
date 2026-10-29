@@ -14,7 +14,7 @@ namespace MagicStorage
                 foreach (var ingredient in ingredients)
                     if (ingredient is IStrippable strippable && strippable.AnythingToStrip()) strippable.Strip();
 
-            float efficiency = printer.Settings.Efficiency;
+            float efficiency = PrinterPawnBinding.Efficiency(printer.BoundPawn, recipe, printer.Settings.Efficiency);
             if (recipe.products != null)
                 foreach (var entry in recipe.products)
                 {
@@ -33,7 +33,7 @@ namespace MagicStorage
                             foreach (var ingredient in ingredients) registered.RegisterIngredient(ingredient.def);
                         // Pawn production callbacks include cooking competence and
                         // infections and cannot be called with a machine/null pawn.
-                        yield return Finish(product, printer, precept);
+                        yield return Finish(product, printer, recipe, precept);
                     }
                 }
             if (recipe.specialProducts == null) yield break;
@@ -54,13 +54,14 @@ namespace MagicStorage
                         case SpecialProductType.StoneBlocks: output = ingredient.StoneBlockProducts(null, efficiency); break;
                         default: throw new InvalidOperationException("Unsupported printer special product: " + special);
                     }
-                    foreach (var product in output) yield return Finish(product, printer, precept);
+                    foreach (var product in output) yield return Finish(product, printer, recipe, precept);
                 }
         }
 
-        private static Thing Finish(Thing product, Building_CosmicPrinter printer, Precept_ThingStyle precept)
+        private static Thing Finish(Thing product, Building_CosmicPrinter printer, RecipeDef recipe, Precept_ThingStyle precept)
         {
-            product.TryGetComp<CompQuality>()?.SetQuality(printer.Settings.GenerateQuality(), ArtGenerationContext.Colony);
+            product.TryGetComp<CompQuality>()?.SetQuality(printer.Settings.GenerateQuality(printer.BoundPawn == null
+                ? (int?)null : PrinterPawnBinding.RecipeSkillLevel(printer.BoundPawn, recipe)), ArtGenerationContext.Colony);
             if (ModsConfig.IdeologyActive)
                 product.StyleDef = Faction.OfPlayer.ideos?.PrimaryIdeo?.GetStyleFor(product.def);
             if (precept != null)

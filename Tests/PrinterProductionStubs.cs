@@ -5,7 +5,10 @@ using RimWorld;
 
 namespace MagicStorage
 {
-    public sealed class Building_CosmicPrinter { public CosmicPrinterSettings Settings = new CosmicPrinterSettings(); }
+    public sealed class Building_CosmicPrinter
+    { public CosmicPrinterSettings Settings = new CosmicPrinterSettings(); public Verse.Pawn BoundPawn; }
+    internal static class CraftingRecipeCatalog
+    { internal static IReadOnlyList<WorkGiverDef> Routes(Verse.RecipeDef recipe) => recipe.Routes; }
 }
 namespace Verse
 {
@@ -21,6 +24,23 @@ namespace Verse
     }
     public interface IStrippable { bool AnythingToStrip(); void Strip(); }
     public enum SpecialProductType { Butchery, Smelted, StoneBlocks }
+    public sealed class Map { }
+    public sealed class SkillDef { }
+    public sealed class SkillRecord { public int Level; public bool TotallyDisabled; }
+    public sealed class Skills
+    {
+        public readonly Dictionary<SkillDef, SkillRecord> Records = new Dictionary<SkillDef, SkillRecord>();
+        public SkillRecord GetSkill(SkillDef skill) => Records[skill];
+    }
+    public sealed class Pawn : Thing
+    {
+        public bool Dead, IsColonist = true;
+        public Skills skills = new Skills();
+        public readonly HashSet<WorkTypeDef> DisabledWork = new HashSet<WorkTypeDef>();
+        public readonly Dictionary<StatDef, float> Stats = new Dictionary<StatDef, float>();
+        public bool WorkTypeIsDisabled(WorkTypeDef type) => DisabledWork.Contains(type);
+        public float GetStatValue(StatDef stat) => Stats[stat];
+    }
     public sealed class ThingDef
     {
         public bool MadeFromStuff, Minifiable, Quality;
@@ -32,12 +52,18 @@ namespace Verse
     public sealed class ThingDefCountClass { public ThingDef thingDef; public int count; }
     public sealed class RecipeDef
     {
+        public SkillDef workSkill;
+        public StatDef workSpeedStat, efficiencyStat;
+        public readonly List<WorkGiverDef> Routes = new List<WorkGiverDef>();
         public bool autoStripCorpses, useIngredientsForColor;
         public List<ThingDefCountClass> products = new List<ThingDefCountClass>();
         public List<SpecialProductType> specialProducts;
     }
     public class Thing
     {
+        public bool Spawned, Destroyed;
+        public Map Map;
+        public Faction Faction;
         public ThingDef def, Stuff;
         public int stackCount = 1, DrawColor = 17;
         public ThingStyleDef StyleDef;
@@ -85,6 +111,9 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public sealed class StatDef { }
+    public sealed class WorkTypeDef { }
+    public sealed class WorkGiverDef { public WorkTypeDef workType; }
     public sealed class Precept_ThingStyle { }
     public enum QualityCategory { Awful, Poor, Normal, Good, Excellent, Masterwork, Legendary }
     public enum ArtGenerationContext { Colony }
@@ -100,7 +129,11 @@ namespace RimWorld
         public void RegisterIngredient(Verse.ThingDef def) { Registered.Add(def); }
     }
     public static class QualityUtility
-    { public static QualityCategory GenerateQualityCreatedByPawn(int skill, bool inspired) => QualityCategory.Normal; }
+    {
+        public static int LastSkill;
+        public static QualityCategory GenerateQualityCreatedByPawn(int skill, bool inspired)
+        { LastSkill = skill; return QualityCategory.Normal; }
+    }
     public sealed class Ideo
     {
         public ThingStyleDef Style = new ThingStyleDef();

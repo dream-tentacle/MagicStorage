@@ -56,6 +56,7 @@ internal static class StorageSupplyShelfTests
     internal static int Run()
     {
         NativeMergeBoundary();
+        GlobalSilverStackLimit();
         PresetClipboard();
         Configuration(); Restocking(); RestockLimits(); StackVariants(); Reservations(); ConfigurationChanges(); NetworkAndPlacement(); Removal(); Filters(); Warnings(); WarningReports();
         StreamingRefill(); StreamingRollback(); StreamingNetworkChange();
@@ -63,6 +64,66 @@ internal static class StorageSupplyShelfTests
         DuplicateSlots(); SharedFilterRestocking(); DistinctFilterRestocking(); ModeSwitchReturns(); ManualRecall(); SharedFilterPresets();
         ConfigurableSlotCounts(); DifferentSizePresets();
         return assertions;
+    }
+
+    private static void GlobalSilverStackLimit()
+    {
+        var f = new Fixture();
+        f.X.stackLimit = 500;
+        Thing original = f.Store(f.X, 500);
+        var mod = new MagicStorageMod(new ModContentPack());
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        typeof(MagicStorageMod).GetField("silverDef", flags).SetValue(mod, f.X);
+        var apply = typeof(MagicStorageMod).GetMethod("ApplySilverStackLimit", flags);
+        var settings = MagicStorageMod.Settings;
+        Find.Maps.Add(f.Map);
+        try
+        {
+            Equal(false, settings.ModifySilverStackLimit, "silver stacking is opt-in");
+            apply.Invoke(mod, null);
+            Equal(500, f.X.stackLimit, "disabled setting leaves silver untouched");
+            settings.ModifySilverStackLimit = true;
+            settings.SilverStackLimit = 5000;
+            apply.Invoke(mod, null);
+            Equal(5000, f.X.stackLimit, "enabling changes the shared definition");
+            Equal(true, f.Unit.Inventory.Contents.TryAdd(new Thing { def = f.X, stackCount = 3500 }, true),
+                "previously full inventory stack accepts silver after raising limit");
+            Equal(4000, original.stackCount, "raising limit refreshes the partial-stack index");
+            f.Shelf.SetSelection(0, f.X);
+            Equal(true, f.Shelf.SetRestockLimit(0, 2000), "shelf accepts a larger silver restock target");
+            f.Tick();
+            Equal(2000, f.Stock(f.X).stackCount, "shelf exposes two thousand real silver");
+            Thing payment = f.Stock(f.X).SplitOff(1500);
+            Equal(1500, payment.stackCount, "ordinary split returns the full payment");
+            payment.Destroy();
+            f.Tick();
+            Equal(2000, f.Stock(f.X).stackCount, "shelf replenishes after ordinary payment");
+            Equal(500L, f.Core.Network.GetTotalCount(f.X), "restocking conserves the remaining silver");
+            settings.SilverStackLimit = 8000;
+            apply.Invoke(mod, null);
+            Equal(8000, f.X.stackLimit, "editing updates the global limit");
+            settings.RestoreDefaults();
+            apply.Invoke(mod, null);
+            Equal(500, f.X.stackLimit, "restore defaults restores the original definition limit");
+            f.X.stackLimit = 1000;
+            settings.ModifySilverStackLimit = true;
+            apply.Invoke(mod, null);
+            settings.ModifySilverStackLimit = false;
+            apply.Invoke(mod, null);
+            Equal(1000, f.X.stackLimit, "disabling restores an existing custom baseline instead of hardcoding five hundred");
+            settings.ModifySilverStackLimit = true;
+            apply.Invoke(mod, null);
+            f.X.stackLimit = 9000;
+            settings.ModifySilverStackLimit = false;
+            apply.Invoke(mod, null);
+            Equal(9000, f.X.stackLimit, "disabling preserves another mod's subsequent change");
+        }
+        finally
+        {
+            settings.RestoreDefaults();
+            apply.Invoke(mod, null);
+            Find.Maps.Remove(f.Map);
+        }
     }
 
     private static void NativeMergeBoundary()
@@ -119,7 +180,7 @@ internal static class StorageSupplyShelfTests
 
     private static void ConfigurableSlotCounts()
     {
-        foreach (int count in new[] { 1, 2, 4, 6, 9, 16 })
+        foreach (int count in new[] { 1, 2, 4, 6, 9, 16, 100 })
         {
             var f = new Fixture(shelfSlots: count);
             Equal(count, f.Shelf.SlotCount, "slot count follows only native building parameter");
@@ -129,14 +190,14 @@ internal static class StorageSupplyShelfTests
                 f.Shelf.SetRestockLimit(i, i + 1);
             }
             Equal(false, f.Shelf.SetSelection(count, f.X), "selection cannot exceed configured slot count");
-            int total = count * (count + 1) / 2;
+            int total = Enumerable.Range(1, count).Sum(limit => Math.Min(limit, f.X.stackLimit));
             int stored = 0;
             while (stored < total + 30) { f.Store(f.X, 75); stored += 75; }
             f.Tick();
             Equal(count, f.Shelf.GetSlotGroup().HeldThingsCount, "normal mode fills all configured positions");
-            for (int i = 0; i < count; i++) Equal(i + 1, f.Shelf.StockAt(i).stackCount, "each position has its own normal cap");
+            for (int i = 0; i < count; i++) Equal(Math.Min(i + 1, f.X.stackLimit), f.Shelf.StockAt(i).stackCount, "each position has its own normal cap");
             f.Shelf.StockAt(count - 1).SplitOff(1); f.Tick();
-            Equal(count, f.Shelf.StockAt(count - 1).stackCount, "last configured position replenishes");
+            Equal(Math.Min(count, f.X.stackLimit), f.Shelf.StockAt(count - 1).stackCount, "last configured position replenishes");
             Equal((long)stored - total - 1, f.Core.Network.GetTotalCount(f.X), "dynamic slot refill conserves inventory");
             Equal(true, f.Shelf.TrySetFilterMode(true), "mode change returns every configured position");
             Equal((long)stored - 1, f.Core.Network.GetTotalCount(f.X), "return includes positions after third");

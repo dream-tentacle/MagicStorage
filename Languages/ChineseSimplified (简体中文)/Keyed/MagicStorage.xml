@@ -67,6 +67,10 @@
   <MS_SettingsTradeItemFilters>交易页物品过滤器</MS_SettingsTradeItemFilters>
   <MS_SettingsTidySupplyShelf>补货架整洁摆放</MS_SettingsTidySupplyShelf>
   <MS_SettingsTidySupplyShelfHelp>让补货架上的物品更好地显示。</MS_SettingsTidySupplyShelfHelp>
+  <MS_SettingsModifySilverStackLimit>修改白银堆叠上限</MS_SettingsModifySilverStackLimit>
+  <MS_SettingsModifySilverStackLimitHelp>提高白银堆叠上限后，你可以把白银放在自动补货架上，这样能同时兼容其他贸易mod的支付</MS_SettingsModifySilverStackLimitHelp>
+  <MS_SettingsSilverStackLimit>白银堆叠上限</MS_SettingsSilverStackLimit>
+  <MS_SettingsSilverStackLimitWarning>不建议中途降低该堆叠数量。如果已经用其他mod修改堆叠，请勿开启此功能。如果降低堆叠，已有白银可能会丢失。</MS_SettingsSilverStackLimitWarning>
   <MS_SettingsWorkbenchUnlockMode>工作台解锁模式</MS_SettingsWorkbenchUnlockMode>
   <MS_SettingsNewWorkbenchOrdersFirst>工作台新任务加入最前</MS_SettingsNewWorkbenchOrdersFirst>
   <MS_SettingsNewWorkbenchOrdersFirstHelp>影响新任务默认优先级顺序，但仍在未分组中。关闭则放入最后。</MS_SettingsNewWorkbenchOrdersFirstHelp>

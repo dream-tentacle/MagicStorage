@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_Craft_Worker_Printers>Printers only</MS_Craft_Worker_Printers>
+  <MS_Printer_IgnoreNonPrinterOrders>Ignore non-printer-only orders</MS_Printer_IgnoreNonPrinterOrders>
+  <MS_Printer_IgnoreNonPrinterOrdersDesc>When enabled, this printer ignores all orders whose worker setting is not "Printers only".</MS_Printer_IgnoreNonPrinterOrdersDesc>
   <MS_Printer_Settings>Printer settings</MS_Printer_Settings>
   <MS_Printer_SettingsDesc>Adjust this printer's work speed, output efficiency and quality settings.</MS_Printer_SettingsDesc>
   <MS_Printer_Title>Cosmic printer settings</MS_Printer_Title>
-  <MS_Printer_Hint>Settings apply only to this printer. Production progress is stored in the control core. The worker that finishes a batch determines its output and quality.</MS_Printer_Hint>
+  <MS_Printer_Hint>Save settings for this printer or copy them to other printers on this map. Production progress is stored in the control core. The worker that finishes a batch determines its output and quality.</MS_Printer_Hint>
   <MS_Printer_Speed>Base work speed (%)</MS_Printer_Speed>
   <MS_Printer_SpeedTip>100% matches a human colonist's normal work speed.</MS_Printer_SpeedTip>
   <MS_Printer_Efficiency>Base output efficiency (%)</MS_Printer_Efficiency>
@@ -19,11 +21,29 @@
   <MS_Printer_FailureTip>Chance for a finished product to lose one quality level. Independent of inspiration; simultaneous triggers cancel out.</MS_Printer_FailureTip>
   <MS_Printer_Reset>Restore defaults</MS_Printer_Reset>
   <MS_Printer_Confirm>Confirm</MS_Printer_Confirm>
+  <MS_Printer_CopyToOthers>Copy to other printers</MS_Printer_CopyToOthers>
+  <MS_Printer_CopyToOthersTip>Save these settings and colonist binding to this printer and copy them to all other player-owned cosmic printers on this map. Manual parameters are only copied when parameter changes are enabled.</MS_Printer_CopyToOthersTip>
+  <MS_Printer_CopiedToOthers>Settings saved and copied to {0} other printers.</MS_Printer_CopiedToOthers>
   <MS_Printer_Close>Close</MS_Printer_Close>
-  <MS_Printer_EditingLocked>Default parameters cannot be changed. Enable printer parameter changes in the mod options.</MS_Printer_EditingLocked>
-  <MS_Printer_ZeroPauses>The printer cannot work if work speed or output efficiency is zero.</MS_Printer_ZeroPauses>
+  <MS_Printer_EditingLocked>Manual parameters are locked in the mod options. Colonist binding is still available.</MS_Printer_EditingLocked>
+  <MS_Printer_BindTo>Bind to...</MS_Printer_BindTo>
+  <MS_Printer_BoundTo>Bound to: {0}</MS_Printer_BoundTo>
+  <MS_Printer_Unbind>Cancel binding</MS_Printer_Unbind>
+  <MS_Printer_FollowBoundPawn>Uses bound colonist's attributes and skills</MS_Printer_FollowBoundPawn>
+  <MS_Printer_BindingTip>Produce using a colonist's attributes and skills.</MS_Printer_BindingTip>
   <MS_Printer_Preview>Final quality probabilities</MS_Printer_Preview>
+  <MS_Printer_PreviewHint>Preview only; based on recipe and skill.</MS_Printer_PreviewHint>
   <MS_Printer_Working>Printing: {0} ({1})</MS_Printer_Working>
   <MS_Printer_Idle>Waiting for an available core order</MS_Printer_Idle>
-  <MS_Printer_Paused>Printer stopped or disconnected</MS_Printer_Paused>
+  <MS_Printer_Paused>Printer stopped: {0}</MS_Printer_Paused>
+  <MS_Printer_PauseBoundDead>Bound colonist has died</MS_Printer_PauseBoundDead>
+  <MS_Printer_PauseBoundUnavailable>Bound colonist is unavailable</MS_Printer_PauseBoundUnavailable>
+  <MS_Printer_PauseBoundAway>Bound colonist is not on this map</MS_Printer_PauseBoundAway>
+  <MS_Printer_PauseBoundNotColonist>Bound pawn is no longer a player colonist</MS_Printer_PauseBoundNotColonist>
+  <MS_Printer_PauseBoundNoSkills>Bound colonist has no usable skills</MS_Printer_PauseBoundNoSkills>
+  <MS_Printer_PauseUnavailable>Printer is not an active player building</MS_Printer_PauseUnavailable>
+  <MS_Printer_PauseBurning>Printer is on fire</MS_Printer_PauseBurning>
+  <MS_Printer_PauseDisconnected>Not connected to a working storage network</MS_Printer_PauseDisconnected>
+  <MS_Printer_PauseZeroSpeed>Work speed is 0</MS_Printer_PauseZeroSpeed>
+  <MS_Printer_PauseZeroEfficiency>Output efficiency is 0</MS_Printer_PauseZeroEfficiency>
 </LanguageData>

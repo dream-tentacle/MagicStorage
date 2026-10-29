@@ -33,7 +33,7 @@ namespace Verse
     public struct IntRange { public int min, max; public IntRange(int a, int b) { min = a; max = b; } }
     public struct FloatRange { public float min, max; public FloatRange(float a, float b) { min = a; max = b; } public bool IncludesEpsilon(float v) => v >= min && v <= max; }
     public class SkillDef { public string LabelCap => "Social"; }
-    public class SkillRequirement { public int minLevel; }
+    public class SkillRequirement { public int minLevel; public SkillDef skill; }
     public static class Rand
     {
         internal static int Draws;
@@ -49,6 +49,7 @@ namespace Verse
         public IngredientValueGetter IngredientValueGetter = new IngredientValueGetter();
         public RecipeWorker Worker = new RecipeWorker();
         public SkillDef workSkill;
+        public object workSpeedStat, efficiencyStat;
         public List<SkillRequirement> skillRequirements;
         public int minimumSkill;
         public object effectWorking, soundWorking;
@@ -152,8 +153,15 @@ namespace Verse
         public HashSet<RimWorld.WorkTypeDef> Unassigned = new HashSet<RimWorld.WorkTypeDef>();
         public bool WorkIsActive(RimWorld.WorkTypeDef type) => !Disabled.Contains(type) && !Unassigned.Contains(type);
     }
-    public class Skills { public SkillRecord record = new SkillRecord(); public SkillRecord GetSkill(SkillDef def) => record; }
+    public class Skills
+    {
+        public SkillRecord record = new SkillRecord();
+        public readonly Dictionary<SkillDef, SkillRecord> Records = new Dictionary<SkillDef, SkillRecord>();
+        public SkillRecord GetSkill(SkillDef def) => def != null && Records.TryGetValue(def, out var value) ? value : record;
+    }
     public class SkillRecord { public int Level = 10; public bool TotallyDisabled; }
+    public static class PrinterStatBoundary
+    { public static float GetStatValue(this Pawn pawn, object stat) => 1f; }
     public class PawnEquipment { public List<Thing> AllEquipmentListForReading = new List<Thing>(); }
     public partial class PawnApparel { public List<RimWorld.Apparel> WornApparel = new List<RimWorld.Apparel>(); }
     public static class ModsConfig { public static bool BiotechActive = true; }

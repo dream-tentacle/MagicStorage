@@ -34,7 +34,7 @@ internal static class CosmicCraftingTests
         IndexedProductCounts(); LimitedProductCounts(); SuspendedProductChecks(); SingleProductCheckPerOrder();
         RefreshDoesNotChangeWork();
         MaterialRetryCaching(); MaterialFailureDetails(); EarlyWorkerEligibility();
-        PrinterWorkerRules(); UnlimitedSkillRange(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
+        PrinterWorkerRules(); PrinterOnlyOrderSelection(); BoundPrinterWorkerRules(); UnlimitedSkillRange(); AutomaticExecutorHandoff(); PrinterQualityProbabilities();
         return checks;
         }
         finally { MagicStorageMod.Settings.NewWorkbenchOrdersFirst = previousPlacement; }
@@ -91,6 +91,62 @@ internal static class CosmicCraftingTests
         Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 15), "printer meeting hard skill requirement can work");
     }
 
+    private static void BoundPrinterWorkerRules()
+    {
+        var f = new Fixture(); var order = f.Order(f.Core(0).Item1);
+        var primary = new SkillDef(); var secondary = new SkillDef();
+        order.Recipe.workSkill = primary;
+        f.Pawn.skills.Records[primary] = new SkillRecord { Level = 17 };
+        f.Pawn.skills.Records[secondary] = new SkillRecord { Level = 4 };
+        order.SkillRange = new IntRange(12, 20);
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 1, f.Pawn), "bound printer uses colonist skill for bill range");
+        order.Recipe.skillRequirements = new List<SkillRequirement> { new SkillRequirement { skill = secondary, minLevel = 5 } };
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "each hard requirement uses its own colonist skill");
+        f.Pawn.skills.Records[secondary].Level = 5;
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 1, f.Pawn), "bound printer meets distinct skill requirements");
+        f.Pawn.workSettings.Disabled.Add(f.Type);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "disabled work type has zero skill for bill range");
+        order.SkillRange = new IntRange(0, 20);
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "disabled work type has zero skill for hard requirements");
+        order.Recipe.skillRequirements.Clear();
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "disabled work type can print recipes requiring no skill");
+        order.Worker = f.Pawn;
+        Equal(false, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "binding does not turn printer into a named pawn worker");
+        order.Worker = null; order.WorkerKind = CraftingWorkerKind.Printers;
+        Equal(true, PrinterCraftingWorkerPolicy.Allows(order, 20, f.Pawn), "bound printer remains a printer for worker restrictions");
+    }
+
+    private static void PrinterOnlyOrderSelection()
+    {
+        var f = new Fixture(); var tuple = f.Core(0); var core = tuple.Item1;
+        var normal = f.Order(core, 3);
+        var dedicated = f.Order(core, 3); dedicated.WorkerKind = CraftingWorkerKind.Printers;
+        ((TestProductionPolicy)CraftingServices.Production).Required = 100;
+        var machine = new AutomaticExecutor(f, core);
+        Equal(normal, f.Dispatch.FindAutomaticOrder(machine), "toggle defaults off and accepts ordinary orders");
+        machine.Order = normal;
+        Equal(true, f.Dispatch.TryClaim(machine), "ordinary order can be claimed before enabling toggle");
+        normal.Batch.WorkWith(normal, machine, 10);
+        var batch = normal.Batch; float progress = normal.Progress;
+        long available = core.Network.AvailableToWithdraw(tuple.Item3);
+        machine.PrintersOnly = true;
+        Equal(false, machine.CanContinue(), "enabling toggle makes an ordinary active order ineligible");
+        machine.ReleaseAssignment();
+        Equal(batch, normal.Batch, "release retains the core-owned unfinished batch");
+        Equal(progress, normal.Progress, "release preserves production progress");
+        Equal(available, core.Network.AvailableToWithdraw(tuple.Item3), "release keeps reserved ingredients in the batch");
+        Equal(null, f.Dispatch.AssignedThing(normal), "ordinary order becomes available to other workers");
+        Equal(dedicated, f.Dispatch.FindAutomaticOrder(machine), "enabled toggle skips ordinary priority order");
+        var other = new AutomaticExecutor(f, core);
+        Equal(normal, f.Dispatch.FindAutomaticOrder(other), "each printer has an independent toggle");
+        dedicated.SkillRange = new IntRange(13, 20); dedicated.Recipe.workSkill = new SkillDef();
+        Equal(false, machine.Allows(dedicated), "printer-only mode retains skill restrictions");
+        dedicated.SkillRange = new IntRange(0, 20); dedicated.Worker = f.Pawn;
+        Equal(false, machine.Allows(dedicated), "printer-only mode cannot bypass named worker restrictions");
+        machine.PrintersOnly = false;
+        Equal(normal, f.Dispatch.FindAutomaticOrder(machine), "disabling toggle restores ordinary order selection");
+    }
+
     private static void UnlimitedSkillRange()
     {
         var type = new WorkTypeDef();
@@ -134,6 +190,7 @@ internal static class CosmicCraftingTests
         public CraftingOrder Order { get; set; }
         public bool AssignmentActive => Order != null && WorkerThing.Spawned;
         internal float Speed = 2;
+        internal bool PrintersOnly;
         internal int Made, Notified;
         internal readonly ThingDef Product = new ThingDef();
         internal AutomaticExecutor(Fixture fixture, Building_StorageCore core)
@@ -142,8 +199,8 @@ internal static class CosmicCraftingTests
             WorkerThing = new Thing { Spawned = true, Map = fixture.Map, Position = new IntVec3(8, 0), Faction = Faction.OfPlayer };
             dispatcher.RegisterAutomatic(this);
         }
-        public bool Allows(CraftingOrder order) => PrinterCraftingWorkerPolicy.Allows(order, 12);
-        public bool CanContinue() => AssignmentActive && Core.CanWork && dispatcher.IsAssigned(Order, this) && dispatcher.CanRun(Core, Order);
+        public bool Allows(CraftingOrder order) => PrinterCraftingWorkerPolicy.Allows(order, 12, printersOnly: PrintersOnly);
+        public bool CanContinue() => AssignmentActive && Allows(Order) && Core.CanWork && dispatcher.IsAssigned(Order, this) && dispatcher.CanRun(Core, Order);
         public void CancelAssignment() => ReleaseAssignment();
         public void ReleaseAssignment() { dispatcher.Release(Order, this); Order = null; }
         public float WorkSpeed(RecipeDef recipe) => Speed;
