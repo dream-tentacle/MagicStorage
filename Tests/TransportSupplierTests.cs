@@ -74,8 +74,46 @@ internal static class TransportSupplierTests
         TargetInventoryLimits(); TransportInventoryLimits(); TargetLimitPersistence();
         FilterGroupingAndSelections();
         GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
-        VehicleSupply();
+        VehicleSupply(); MultipleFuelComponents();
         return assertions;
+    }
+
+    private static void MultipleFuelComponents()
+    {
+        foreach (bool direct in new[] { false, true })
+        {
+            var f = new Fixture();
+            var fuelA = new ThingDef(); var fuelB = new ThingDef();
+            if (direct)
+            {
+                f.Supplier.TrySwitchMode(); f.Select(0, fuelA); f.Select(1, fuelB);
+                f.Store(fuelA, 40); f.Store(fuelB, 40);
+            }
+            else { f.Cargo(fuelA, 40); f.Cargo(fuelB, 40); }
+            var first = f.FuelTarget(fuelA); first.TargetFuelLevel = 10; first.Fuel = 10;
+            var second = new CompRefuelable { parent = first.parent, TargetFuelLevel = 10 };
+            second.Props.fuelFilter.SetAllow(fuelB, true);
+            ((ThingWithComps)first.parent).AllComps.Add(second);
+            var other = f.FuelTarget(fuelA); other.TargetFuelLevel = 10;
+            f.Supplier.SupplyTransporter();
+            Equal(10f, second.Fuel, "later component supplied in mode " + direct);
+            Equal(10f, other.Fuel, "second object in front cell supplied in mode " + direct);
+            Equal(30L, direct ? f.Net.GetTotalCount(fuelA) : f.Count(f.Supplier.Contents, fuelA), "first fuel consumed once");
+            Equal(30L, direct ? f.Net.GetTotalCount(fuelB) : f.Count(f.Supplier.Contents, fuelB), "component fuel filter respected");
+            first.Fuel = 0; first.allowAutoRefuel = false; second.Fuel = 5; other.Fuel = 5;
+            f.Supplier.SupplyTransporter();
+            Equal(5f, second.Fuel, "automatic threshold respected on later component");
+            Equal(5f, other.Fuel, "automatic threshold respected on later object");
+            f.Supplier.GetGizmos().OfType<Command_Action>().Single(g => g.defaultLabel == "MS_FuelSupply_Immediate").action();
+            Equal(0f, first.Fuel, "disabled component does not block other components");
+            Equal(10f, second.Fuel, "immediate command supplies later component");
+            Equal(10f, other.Fuel, "immediate command supplies later object");
+            Equal(25L, direct ? f.Net.GetTotalCount(fuelA) : f.Count(f.Supplier.Contents, fuelA), "immediate first fuel deficit exact");
+            Equal(25L, direct ? f.Net.GetTotalCount(fuelB) : f.Count(f.Supplier.Contents, fuelB), "immediate second fuel deficit exact");
+            Equal(3, f.Supplier.FrontRefuelables().Count, "all front fuel components found");
+            Equal(3, f.Supplier.GetInspectString().Split('\n').Count(line => line.Contains("MS_Transport_FuelTarget")),
+                "inspection includes each fuel component");
+        }
     }
 
     private static Vehicles.VehiclePawn VehicleTarget(Fixture f, float capacity)

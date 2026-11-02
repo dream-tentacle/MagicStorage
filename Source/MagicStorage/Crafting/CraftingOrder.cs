@@ -22,6 +22,10 @@ namespace MagicStorage
         public bool Suspended, PauseWhenSatisfied, Paused;
         public bool DropProductsOnFloor;
         public Pawn Worker;
+        public bool RestrictWorkbench;
+        public Building_CosmicWorkbench Workbench;
+        internal bool AllowsWorkbench(Building_CosmicWorkbench bench) =>
+            !RestrictWorkbench || Workbench != null && Workbench == bench;
         public CraftingWorkerKind WorkerKind;
         public IntRange SkillRange = new IntRange(0, UnlimitedSkillLevel);
         public ThingFilter Ingredients = new ThingFilter();
@@ -64,6 +68,8 @@ namespace MagicStorage
                 Paused = Paused,
                 DropProductsOnFloor = DropProductsOnFloor,
                 Worker = Worker,
+                RestrictWorkbench = RestrictWorkbench,
+                Workbench = Workbench,
                 WorkerKind = WorkerKind,
                 SkillRange = SkillRange,
                 IncludeEquipped = IncludeEquipped,
@@ -97,6 +103,8 @@ namespace MagicStorage
             Scribe_Values.Look(ref PauseWhenSatisfied, "pauseWhenSatisfied");
             Scribe_Values.Look(ref Paused, "paused");
             Scribe_References.Look(ref Worker, "worker");
+            Scribe_Values.Look(ref RestrictWorkbench, "restrictWorkbench");
+            Scribe_References.Look(ref Workbench, "workbench");
             Scribe_Values.Look(ref WorkerKind, "workerKind");
             Scribe_Values.Look(ref SkillRange, "skillRange", new IntRange(0, UnlimitedSkillLevel));
             Scribe_Deep.Look(ref Ingredients, "ingredients");
@@ -142,6 +150,7 @@ namespace MagicStorage
             {
                 var copy = order.Duplicate(0);
                 copy.Worker = null; copy.Paused = false;
+                copy.Workbench = null; copy.RestrictWorkbench = false;
                 preset.Orders.Add(copy);
             }
             return preset;
@@ -311,6 +320,7 @@ namespace MagicStorage
                 var copy = source.Duplicate(id++);
                 copy.GroupId = source.GroupId == null ? null : importedGroups[source.GroupId].Id;
                 copy.Worker = null; copy.Paused = false;
+                copy.Workbench = null; copy.RestrictWorkbench = false;
                 importedOrders.Add(copy);
             }
             if (replace && !CancelAll(true)) return false;

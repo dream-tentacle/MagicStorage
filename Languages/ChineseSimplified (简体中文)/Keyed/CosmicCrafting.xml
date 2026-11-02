@@ -144,4 +144,9 @@
   <MS_Craft_WorkDisabled>未分配此工作</MS_Craft_WorkDisabled>
   <MS_Gestation_MissingMaterials>材料不足（可获取/需求）：{0}</MS_Gestation_MissingMaterials>
   <MS_Gestation_MaterialCount>{0} {1}/{2}</MS_Gestation_MaterialCount>
+  <MS_Craft_WorkbenchOnly>加工工作台</MS_Craft_WorkbenchOnly>
+  <MS_Craft_AnyWorkbench>不限工作台</MS_Craft_AnyWorkbench>
+  <MS_Craft_MissingWorkbench>指定工作台已不存在</MS_Craft_MissingWorkbench>
+  <MS_Craft_WorkbenchFilterOn>本工作台过滤：开启。隐藏指定其他工作台、仅打印机和本工作台不允许的工作类型任务。点击显示全部任务。</MS_Craft_WorkbenchFilterOn>
+  <MS_Craft_WorkbenchFilterOff>本工作台过滤：关闭。点击隐藏指定其他工作台、仅打印机和本工作台不允许的工作类型任务。</MS_Craft_WorkbenchFilterOff>
 </LanguageData>

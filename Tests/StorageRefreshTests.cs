@@ -126,7 +126,10 @@ internal static class StorageRefreshTests
             Equal(0, LongEventHandler.Pending.Count, "settings callback completes without requeuing");
             Listing_Standard.NumericLabels.Clear();
             mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
-            Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "general settings UI initializes after deferred loading");
+            Equal(false, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "general tab leaves capacity in balance settings");
+            TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabBalance").clickedAction();
+            mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+            Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "balance settings initialize after deferred loading");
         }
         finally
         {
@@ -140,12 +143,16 @@ internal static class StorageRefreshTests
         var mod = new MagicStorageMod(new ModContentPack());
         Listing_Standard.Events.Clear();
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
-        Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsAllowPrinterParameterChanges"),
-            "general tab exposes a single printer editing checkbox without an extra description");
+        Equal(false, Listing_Standard.Events.Contains("MS_SettingsAllowPrinterParameterChanges"), "printer balance control leaves general tab");
         Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsNewWorkbenchOrdersFirst"),
             "general settings exposes the new-order priority checkbox");
-        Equal(1, Listing_Standard.NumericLabels.Count, "general tab only contains the unit slot numeric setting");
-        Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "general tab shows slot capacity");
+        Equal(0, Listing_Standard.NumericLabels.Count, "general tab has no balance numeric settings");
+        TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabBalance").clickedAction();
+        Listing_Standard.Events.Clear();
+        mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal(1, Listing_Standard.Events.Count(value => value == "MS_SettingsAllowPrinterParameterChanges"), "balance tab exposes printer parameter toggle");
+        Equal(1, Listing_Standard.NumericLabels.Count, "balance tab contains unit capacity");
+        Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsUnitSlots"), "balance tab shows slot capacity");
         Equal(false, Listing_Standard.NumericLabels.Contains("MS_SettingsOverallRefresh"), "general tab hides performance fields");
         TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabPerformance").clickedAction();
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
@@ -162,7 +169,7 @@ internal static class StorageRefreshTests
             Equal(true, Listing_Standard.NumericLabels.Contains("MS_SettingsRefresh_" + (StorageRefreshTask)i), "detailed field visible");
         TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabGeneral").clickedAction();
         Listing_Standard.NumericLabels.Clear(); mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
-        Equal(1, Listing_Standard.NumericLabels.Count, "returning to general hides the detailed intervals");
+        Equal(0, Listing_Standard.NumericLabels.Count, "returning to general hides the detailed intervals");
         Equal(false, MagicStorageMod.Settings.SimplifiedMode, "switching tabs preserves performance settings");
         Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "caravan item filters default off");
         Equal(false, MagicStorageMod.Settings.TradeItemFilters, "trade item filters default off");
@@ -172,12 +179,18 @@ internal static class StorageRefreshTests
         Listing_Standard.NumericLabels.Clear();
         mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
         Equal("MS_SettingsAccessibilityNotice", Listing_Standard.Events[0], "conflict explanation is first on accessibility tab");
-        Equal("MS_SettingsCaravanItemFilters", Listing_Standard.Events[1], "accessibility tab exposes caravan toggle");
-        Equal("MS_SettingsTradeItemFilters", Listing_Standard.Events[2], "accessibility tab exposes independent trade toggle");
-        Equal("MS_SettingsTidySupplyShelf", Listing_Standard.Events[3], "accessibility tab exposes tidy shelf toggle");
+        Equal(false, MagicStorageMod.Settings.WorkbenchDefaultLocation, "workbench location defaults off");
+        Equal("MS_SettingsWorkbenchDefaultLocation", Listing_Standard.Events[1], "accessibility exposes workbench default location");
+        Equal("MS_SettingsCaravanItemFilters", Listing_Standard.Events[2], "accessibility tab exposes caravan toggle");
+        Equal("MS_SettingsTradeItemFilters", Listing_Standard.Events[3], "accessibility tab exposes independent trade toggle");
+        Equal("MS_SettingsTidySupplyShelf", Listing_Standard.Events[4], "accessibility tab exposes tidy shelf toggle");
         Equal(false, Listing_Standard.Events.Contains("MS_SettingsTidySupplyShelfHelp"), "tidy shelf description is no longer a persistent label");
         Equal(0, Listing_Standard.NumericLabels.Count, "accessibility tab has no performance or storage numeric settings");
-        Equal(true, Listing_Standard.Events.Contains("MS_SettingsModifySilverStackLimit"), "accessibility exposes the silver stack toggle");
+        Equal(false, Listing_Standard.Events.Contains("MS_SettingsModifySilverStackLimit"), "silver balance option leaves accessibility");
+        TabDrawer.Tabs.Find(tab => tab.label == "MS_SettingsTabBalance").clickedAction();
+        Listing_Standard.Events.Clear();
+        mod.DoSettingsWindowContents(new UnityEngine.Rect(0, 0, 500, 400));
+        Equal(true, Listing_Standard.Events.Contains("MS_SettingsModifySilverStackLimit"), "balance exposes silver stack toggle");
         Equal(false, Listing_Standard.Events.Any(value => value.Contains("MS_SettingsSilverStackLimitWarning")), "silver warning is hidden while disabled");
         MagicStorageMod.Settings.ModifySilverStackLimit = true;
         Listing_Standard.NumericLabels.Clear();
@@ -196,7 +209,9 @@ internal static class StorageRefreshTests
         MagicStorageMod.Settings.CaravanItemFilters = true;
         MagicStorageMod.Settings.TradeItemFilters = true;
         MagicStorageMod.Settings.TidySupplyShelf = false;
+        MagicStorageMod.Settings.WorkbenchDefaultLocation = true;
         MagicStorageMod.Settings.RestoreDefaults();
+        Equal(false, MagicStorageMod.Settings.WorkbenchDefaultLocation, "restore defaults disables workbench location");
         Equal(false, MagicStorageMod.Settings.AllowAllMaterials, "restore defaults disables all materials");
         Equal(false, MagicStorageMod.Settings.CaravanItemFilters, "restore defaults disables caravan filter hook");
         Equal(false, MagicStorageMod.Settings.TradeItemFilters, "restore defaults disables trade filter hook");

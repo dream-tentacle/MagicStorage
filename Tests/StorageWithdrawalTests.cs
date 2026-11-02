@@ -34,9 +34,43 @@ internal static class StorageWithdrawalTests
     public static int Run()
     {
         Grouping(); MealTradeGrouping(); ReservationsAndPartial(); Revalidation(); PendingAndFlags(); LongCounts();
-        TradeQuantityEditing(); MinifiedPresentation(); FilterGrouping();
+        TradeQuantityEditing(); MinifiedPresentation(); FilterGrouping(); FailedGrouping();
         return assertions;
     }
+    private static void FailedGrouping()
+    {
+        var f = new Fixture();
+        var def = new ThingDef { defName = "BrokenGrouping", modContentPack = new ModContentPack { PackageId = "test.grouping" } };
+        Thing bad = f.Add(def, 7);
+        f.Add(def, 11); f.Add(def, 13);
+        int errors = Log.Errors.Count;
+        RimWorld.TransferableUtility.GroupingOverride = (a, b) =>
+        {
+            if (a == bad || b == bad) throw new NullReferenceException("test grouping failure");
+            return true;
+        };
+        try
+        {
+            var rows = StorageWithdrawal.Snapshot(f.Net);
+            Equal(2, rows.Count, "bad comparison does not block other grouping");
+            Equal(31L, rows.Sum(row => row.Total), "failed grouping preserves every item");
+            Equal(7L, rows.Single(row => row.Stacks.Contains(bad)).Total, "failing item stays separate");
+            StorageWithdrawal.Snapshot(f.Net);
+            Equal(errors + 1, Log.Errors.Count, "repeated refresh does not flood diagnostics");
+            string diagnostic = Log.Errors.Last();
+            Equal(true, diagnostic.Contains("BrokenGrouping") && diagnostic.Contains("test.grouping") &&
+                diagnostic.Contains("Verse.Thing") && diagnostic.Contains("thingID=" + bad.thingIDNumber), "diagnostic identifies compared items");
+            foreach (var row in rows) row.SetRequested(row.Available);
+            Equal(31L, StorageWithdrawal.Execute(f.Core, f.Net, rows, false).Withdrawn, "failed grouping does not prevent withdrawal");
+        }
+        finally { RimWorld.TransferableUtility.GroupingOverride = null; }
+
+        var filtered = new Fixture(); filtered.Add(def, 2); filtered.Add(def, 3);
+        var separated = StorageWithdrawal.Snapshot(filtered.Net, (a, b) => { throw new InvalidOperationException("filter failure"); });
+        Equal(2, separated.Count, "custom grouping callback failure also keeps separate rows");
+        Equal(5L, separated.Sum(row => row.Total), "custom grouping failure preserves counts");
+    }
+
     private static void Grouping()
     {
         var f = new Fixture(); var def = new ThingDef();

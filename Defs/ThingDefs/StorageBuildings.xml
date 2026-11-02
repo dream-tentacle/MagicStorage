@@ -118,7 +118,7 @@
     <defName>MS_CosmicWorkbench</defName>
     <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>cosmic workbench</label>
-    <description>Performs production orders assigned by the connected control core. When a worker takes an order, ingredients for the current batch are set aside from the network, using connected auto-restocking shelves to make up any shortfall. Prepared ingredients remain with the order when work is interrupted and are returned if the order is deleted.\n\nProducts default to the connected network, with overflow placed near the core. Products that do not pass the core's storage filter are also considered unable to be stored.\n\nWorkbench unlock mode can be enabled in the settings. Unlocking a workbench's recipes requires materials.</description>
+    <description>A central workplace where colonists carry out production tasks. Automatically uses items stored in the network.\n\nWorkbench unlock mode can be enabled in the settings, requiring materials to unlock the recipes of each workbench.</description>
     <thingClass>MagicStorage.Building_CosmicWorkbench</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
@@ -160,7 +160,7 @@
     <defName>MS_ConstructionSupplyUnit</defName>
     <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>construction supply unit</label>
-    <description>Periodically supplies construction materials from the connected storage network to friendly construction sites within the configured supply radius. No hauling is required; colonists still perform the construction work.\n\nThe supply range can be adjusted in the mod settings.</description>
+    <description>Automatically supplies construction blueprints within range. Colonists still perform the construction work.\n\nRepair mode is enabled by default, consuming components to repair damaged buildings.\n\nThe supply range can be adjusted in the settings.</description>
     <thingClass>MagicStorage.Building_ConstructionSupplyUnit</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>
@@ -185,7 +185,7 @@
     <defName>MS_StorageApparelAdapter</defName>
     <researchPrerequisites><li>MS_MagicDrive</li></researchPrerequisites>
     <label>apparel adapter</label>
-    <description>Allows colonists to collect apparel from the connected storage network and change clothes automatically. Follows each colonist's apparel policy and normal outfit scoring, comparing stored apparel with items on the map. Serves one colonist at a time.</description>
+    <description>Allows colonists to automatically collect apparel from the network and change clothes following the base game's rules.\n\nThe Dream's Equip Manager mod is recommended for easier manual management of weapons and apparel.</description>
     <thingClass>MagicStorage.Building_StorageApparelAdapter</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

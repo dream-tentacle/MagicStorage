@@ -33,6 +33,8 @@ namespace Verse
         public static void Warning(string text) { }
         public static void Message(string text) { Messages.Add(text); }
         public static void Error(string text) { Errors.Add(text); }
+        private static readonly HashSet<int> onceKeys = new HashSet<int>();
+        public static void ErrorOnce(string text, int key) { if (onceKeys.Add(key)) Error(text); }
     }
     public static partial class Find { public static TickManager TickManager = new TickManager(); public static WindowStack WindowStack = new WindowStack(); public static Selector Selector = new Selector(); public static readonly List<Map> Maps = new List<Map>(); }
     public class TickManager { public int TicksGame = 1; }

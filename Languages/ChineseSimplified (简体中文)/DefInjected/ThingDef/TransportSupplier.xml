@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_TransportSupplier.label>物资补给器</MS_TransportSupplier.label>
-  <MS_TransportSupplier.description>向正前方的运输容器或燃料设备提供物资。手动暂存模式将内部存货送往目标；持续供给模式按优先级直接从网络输送最多三种指定物品，自身不暂存物品。\n\n补料遵循原版规则：剩余燃料达到目标建筑的自动补料阈值时才会触发，通常为目标燃料量的30%；材料充足时补至目标量，燃料份数按原版向上取整。\n\n空投仓需要先点击“建立发射组”按钮，然后选择装入的物品。</MS_TransportSupplier.description>
+  <MS_TransportSupplier.description>穿梭机、空投仓、燃料设施，以及其他运输容器，使用此物品进行手动补给或持续供应。\n\n使用物资补给器为空投仓装货前，请先选中要一起发射的空投仓，点击本模组新增的“建立发射组”按钮，再配置供给物品。装货后使用原版发射按钮。</MS_TransportSupplier.description>
 </LanguageData>

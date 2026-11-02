@@ -39,9 +39,12 @@ namespace MagicStorage
             foreach (Thing target in targets)
             {
                 if (!CanWork || Network != network) break;
-                CompRefuelable refuelable = target.TryGetComp<CompRefuelable>();
-                if (StorageFuelSupply.NeedsFuel(refuelable, immediate))
-                    StorageFuelSupply.Deliver(this, network, refuelable, refuelable.Props.fuelFilter.AllowedThingDefs, immediate);
+                foreach (CompRefuelable refuelable in StorageFuelSupply.FuelComponents(target))
+                {
+                    if (!CanWork || Network != network) return;
+                    if (StorageFuelSupply.NeedsFuel(refuelable, immediate))
+                        StorageFuelSupply.Deliver(this, network, refuelable, refuelable.Props.fuelFilter.AllowedThingDefs, immediate);
+                }
             }
         }
 

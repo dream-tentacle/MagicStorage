@@ -3,7 +3,7 @@
   <ThingDef ParentName="MS_StorageBuildingBase">
     <defName>MS_ProductionOutputPort</defName>
     <label>production output port</label>
-    <description>Supplies ingredients from its connected magic storage network to production workbenches.\n\nMaterials are delivered when a production job begins; no ingredient hauling is required. Does not supply surgery or autonomous workbenches.</description>
+    <description>Supplies materials from the network to workbenches from the base game or other mods.\n\nDoes not supply surgery or automated production equipment.</description>
     <thingClass>MagicStorage.Building_ProductionOutputPort</thingClass>
     <researchPrerequisites><li>MS_BasicMagicStorage</li></researchPrerequisites>
     <size>(1,1)</size>

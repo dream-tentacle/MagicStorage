@@ -51,10 +51,16 @@
   <MS_Transport_SpecializedTarget>This target uses dedicated transporter or fuel supply rules.</MS_Transport_SpecializedTarget>
   <MS_Transport_ImmediateEmpty>The material supplier has no items to supply.</MS_Transport_ImmediateEmpty>
   <MS_Transport_CreateGroup>Create launch group</MS_Transport_CreateGroup>
-  <MS_Transport_CreateGroupDesc>Create a launch group from the {0} selected transport pods, keeping their contents. Material suppliers and launch checks share the group's total mass capacity; individual pods may exceed their own capacity. Use the standard launch command after grouping.</MS_Transport_CreateGroupDesc>
+  <MS_Transport_CreateGroupDesc>When using Magic Storage, first use this button to create a launch group, then use a single material supplier to provide the items you want to send by transport pod.</MS_Transport_CreateGroupDesc>
   <MS_Transport_GroupAlreadyAssigned>A selected transport pod already belongs to a launch group. Select only ungrouped pods.</MS_Transport_GroupAlreadyAssigned>
   <MS_Transport_GroupInvalid>Select ungrouped player-owned transport pods of the same type on the same map.</MS_Transport_GroupInvalid>
   <MS_Transport_GroupMass>Launch group mass: {0} / {1} kg</MS_Transport_GroupMass>
   <MS_Transport_TargetLimit>Target inventory limit</MS_Transport_TargetLimit>
   <MS_Transport_TargetLimitHelp>Counts all items of this type in the selected destination and supplies only the deficit. Default 75; 0 pauses. Excess stock is not reclaimed. Automatic and immediate supply both obey this limit, alongside transporter mass limits. Positive item limits do not replace a fuel device's own target level.</MS_Transport_TargetLimitHelp>
+  <MS_Transport_FirstPodTitle>Transport pods: create a launch group</MS_Transport_FirstPodTitle>
+  <MS_Transport_FirstPodText>Magic Storage tip:\nYou have built your first transport pod.\n\nWhen using Magic Storage, first select the transport pods you want to launch together and click the Create launch group button. Then use a single material supplier to provide the items you want to send by transport pod. Once loaded, use the standard launch button.</MS_Transport_FirstPodText>
+  <MS_Transport_FirstShuttleTitle>Shuttle: supplying materials</MS_Transport_FirstShuttleTitle>
+  <MS_Transport_FirstShuttleText>Magic Storage tip:\nYou have built your first passenger shuttle.\n\nUse a material supplier to manually resupply the shuttle or continuously supply it with materials.</MS_Transport_FirstShuttleText>
+  <MS_Transport_FirstVehicleTitle>Vehicles: cargo and caravans</MS_Transport_FirstVehicleTitle>
+  <MS_Transport_FirstVehicleText>Magic Storage tip: You have built your first Vehicle Framework vehicle.\n\nYou cannot form vehicle caravans using the caravan teleporter. However, you can load vehicles with a material supplier, then form a caravan through the normal caravan formation interface.</MS_Transport_FirstVehicleText>
 </LanguageData>

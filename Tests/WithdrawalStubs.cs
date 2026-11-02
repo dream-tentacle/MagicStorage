@@ -6,11 +6,11 @@ namespace Verse
     public interface ISuspendableThingHolder { bool IsContentsSuspended { get; } }
     public static class ThingOwnerUtility
     { public static void AppendThingHoldersFromThings(List<IThingHolder> list, ThingOwner owner) { } }
-    public partial class ThingDef { public bool tradeNeverStack, IsWeapon, IsApparel; }
+    public partial class ThingDef { public bool tradeNeverStack, IsWeapon, IsApparel; public ModContentPack modContentPack; }
     public partial class Thing
     {
         public int HitPoints = 100;
-        public string LabelNoCount => variant ?? "item";
+        public virtual string LabelNoCount => variant ?? "item";
         public static int InnerLookups;
         public Thing GetInnerIfMinified()
         { InnerLookups++; return this is MinifiedThing minified ? minified.InnerThing : this; }
@@ -46,9 +46,11 @@ namespace RimWorld
     {
         public static int Calls;
         public static TransferAsOneMode LastMode;
+        public static System.Func<Thing, Thing, bool> GroupingOverride;
         public static bool TransferAsOne(Thing a, Thing b, TransferAsOneMode mode)
         {
             Calls++; LastMode = mode;
+            if (GroupingOverride != null) return GroupingOverride(a, b);
             return a == b || (!a.def.tradeNeverStack && a.CanStackWith(b));
         }
     }

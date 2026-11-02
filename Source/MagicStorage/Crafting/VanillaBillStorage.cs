@@ -48,6 +48,7 @@ namespace MagicStorage
         internal static bool Supports(Bill bill, Pawn pawn, Thing giver) =>
             bill is Bill_Production && !(bill is Bill_Autonomous) &&
             giver is Building_WorkTable table && !(table is Building_WorkTableAutonomous) &&
+            FortifiedCompatibility.CanSupply(table) &&
             bill.billStack?.billGiver == table && bill.recipe != null &&
             bill.recipe.ingredients.Count > 0 && table.Spawned && !table.Destroyed &&
             pawn != null && pawn.Spawned && pawn.Map == table.Map &&
@@ -130,6 +131,15 @@ namespace MagicStorage
             Job job = __result;
             if (job == null || job.def != JobDefOf.DoBill || job.bill != bill ||
                 job.targetA.Thing != giver || !Supports(bill, pawn, giver as Thing) || job.targetQueueB == null) return;
+            // Fortified replaces this temporary job. Capture only its final job.
+            if (FortifiedCompatibility.IsTable(giver as Thing)) return;
+            AttachStoredPlan(pawn, ref __result);
+        }
+
+        internal static void AttachStoredPlan(Pawn pawn, ref Job __result)
+        {
+            Job job = __result;
+            if (job == null || !Supports(job.bill, pawn, job.targetA.Thing) || job.targetQueueB == null) return;
             bool hasStoredMaterial = false;
             foreach (var target in job.targetQueueB)
                 if (target.Thing?.holdingOwner?.Owner is Building_StorageUnit && !target.Thing.Spawned)
@@ -137,7 +147,7 @@ namespace MagicStorage
             if (!hasStoredMaterial) return;
             try
             {
-                var plan = BillStorageSupplyPlan.Capture(job, pawn, (Building_WorkTable)giver);
+                var plan = BillStorageSupplyPlan.Capture(job, pawn, (Building_WorkTable)job.targetA.Thing);
                 if (plan == null) { __result = null; return; }
                 plans.GetValue(job, _ => new PlanHolder()).Plan = plan;
             }
@@ -145,6 +155,9 @@ namespace MagicStorage
         }
 
         private static void Prepare(JobDriver_DoBill __instance, ref bool __result)
+            => PrepareForDriver(__instance, ref __result);
+
+        internal static void PrepareForDriver(JobDriver __instance, ref bool __result, ThingOwner container = null)
         {
             Job job = __instance.job;
             if (job == null || !plans.TryGetValue(job, out var holder) || holder.Plan == null || !__result) return;
@@ -152,15 +165,16 @@ namespace MagicStorage
             // Those probes may validate a plan but must never materialize it.
             if (__instance.pawn.CurJob != job)
             {
-                try { __result = holder.Plan.CanPrepare(job, __instance.pawn); }
+                try { __result = holder.Plan.CanPrepare(job, __instance.pawn, container); }
                 catch (Exception exception) { __result = false; Report(exception); }
                 return;
             }
-            try { __result = holder.Plan.Prepare(job, __instance.pawn); }
+            try { __result = holder.Plan.Prepare(job, __instance.pawn, container); }
             catch (Exception exception) { __result = false; Report(exception); }
             finally
             {
-                holder.Plan = null;
+                // Keep failed plans attached: a retry must validate/pay again.
+                if (__result) holder.Plan = null;
                 if (!__result && job.bill != null)
                     job.bill.nextTickToSearchForIngredients = GenTicks.TicksGame + 60;
             }

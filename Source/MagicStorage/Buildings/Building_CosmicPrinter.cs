@@ -37,7 +37,7 @@ namespace MagicStorage
         void ICraftingExecutor.NotifyCompleted(List<Thing> products) { }
 
         private bool Allows(CraftingOrder candidate)
-            => CanWork && PrinterCraftingWorkerPolicy.Allows(candidate, Settings.SkillLevel, BoundPawn, ignoreNonPrinterOrders) &&
+            => CanWork && candidate != null && !candidate.RestrictWorkbench && PrinterCraftingWorkerPolicy.Allows(candidate, Settings.SkillLevel, BoundPawn, ignoreNonPrinterOrders) &&
                 PrinterPawnBinding.WorkSpeed(BoundPawn, candidate.Recipe, Settings.WorkSpeed) > 0 &&
                 PrinterPawnBinding.Efficiency(BoundPawn, candidate.Recipe, Settings.Efficiency) > 0;
 

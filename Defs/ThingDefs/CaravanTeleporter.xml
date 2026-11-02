@@ -4,7 +4,7 @@
     <defName>MS_CaravanTeleporter</defName>
     <researchPrerequisites><li>MS_WarpTechnology</li></researchPrerequisites>
     <label>caravan teleporter</label>
-    <description>Forms a caravan using supplies from the connected magic storage network. Once confirmed, the selected supplies are transferred to the caravan members' inventories, and the members immediately form a caravan on the world map.</description>
+    <description>Forms a caravan using supplies from the connected magic storage network. Once confirmed, the selected supplies are transferred to the caravan members' inventories, and the members immediately form a caravan on the world map.\n\nIf you use Vehicle Framework: You cannot form vehicle caravans using the caravan teleporter. However, you can load vehicles with a material supplier, then form a caravan through the normal caravan formation interface.</description>
     <thingClass>MagicStorage.Building_CaravanTeleporter</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

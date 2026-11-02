@@ -42,6 +42,7 @@ namespace MagicStorage
         public bool SimplifiedMode = true;
         public bool WorkbenchUnlockMode;
         public bool NewWorkbenchOrdersFirst = true;
+        public bool WorkbenchDefaultLocation = false;
         public bool AllowPrinterParameterChanges;
         public bool CaravanItemFilters;
         public bool TradeItemFilters;
@@ -94,6 +95,7 @@ namespace MagicStorage
             CosmicWorkbenchWorkSpeedPercent = DefaultCosmicWorkbenchWorkSpeedPercent;
             WorkbenchUnlockMode = false;
             NewWorkbenchOrdersFirst = true;
+            WorkbenchDefaultLocation = false;
             AllowPrinterParameterChanges = false;
             CaravanItemFilters = false;
             TradeItemFilters = false;
@@ -132,6 +134,7 @@ namespace MagicStorage
             Scribe_Values.Look(ref SimplifiedMode, "simplifiedMode", true);
             Scribe_Values.Look(ref WorkbenchUnlockMode, "workbenchUnlockMode", false);
             Scribe_Values.Look(ref NewWorkbenchOrdersFirst, "newWorkbenchOrdersFirst", true);
+            Scribe_Values.Look(ref WorkbenchDefaultLocation, "workbenchDefaultLocation", false);
             Scribe_Values.Look(ref AllowPrinterParameterChanges, "allowPrinterParameterChanges", false);
             Scribe_Values.Look(ref CaravanItemFilters, "caravanItemFilters", false);
             Scribe_Values.Look(ref TradeItemFilters, "tradeItemFilters", false);

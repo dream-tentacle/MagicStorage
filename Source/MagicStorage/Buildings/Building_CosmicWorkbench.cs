@@ -4,11 +4,23 @@ using RimWorld;
 
 namespace MagicStorage
 {
-    public sealed class Building_CosmicWorkbench : Building, IBillGiver
+    internal sealed class Dialog_RenameCosmicWorkbench : Dialog_Rename<Building_CosmicWorkbench>
+    {
+        internal Dialog_RenameCosmicWorkbench(Building_CosmicWorkbench bench) : base(bench) { }
+        protected override AcceptanceReport NameIsValid(string name) => !string.IsNullOrWhiteSpace(name);
+    }
+
+    public sealed class Building_CosmicWorkbench : Building, IBillGiver, IRenameable
     {
         private List<WorkTypeDef> allowedWorkTypes;
         private RoomRoleDef preferredRoomRole;
         private BillStack billStack;
+        private string customName;
+        public override string LabelNoCount => customName ?? base.LabelNoCount;
+        public string RenamableLabel { get => LabelNoCount; set => customName = value?.Trim(); }
+        public string BaseLabel => base.LabelNoCount;
+        public string InspectLabel => LabelNoCount;
+        internal string SelectionLabel => LabelShortCap + " (" + Position.x + ", " + Position.z + ")";
         public StorageNetwork Network => GetComp<CompStorageNode>()?.Network;
         public bool CanWork => Spawned && Faction == Faction.OfPlayer && Network?.CanWork == true;
         public RoomRoleDef PreferredRoomRole => preferredRoomRole ?? (preferredRoomRole = RoomRoleDefOf.Workshop);
@@ -48,6 +60,7 @@ namespace MagicStorage
         public override void ExposeData()
         {
             base.ExposeData();
+            Scribe_Values.Look(ref customName, "customName");
             Scribe_Collections.Look(ref allowedWorkTypes, "allowedWorkTypes", LookMode.Def);
             preferredRoomRole = PreferredRoomRole;
             Scribe_Defs.Look(ref preferredRoomRole, "preferredRoomRole");
@@ -62,6 +75,12 @@ namespace MagicStorage
         {
             foreach (Gizmo gizmo in base.GetGizmos()) yield return gizmo;
             if (!Spawned || Faction != Faction.OfPlayer) yield break;
+            yield return new Command_Action
+            {
+                defaultLabel = "Rename".Translate(),
+                icon = TexButton.Rename,
+                action = () => Find.WindowStack.Add(new Dialog_RenameCosmicWorkbench(this))
+            };
             yield return new Command_Action
             {
                 defaultLabel = "MS_Craft_AllowedWorkTypes".Translate(),
@@ -85,7 +104,7 @@ namespace MagicStorage
                 {
                     if (!Spawned || Faction != Faction.OfPlayer) return;
                     Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
-                    if (CanWork) Find.WindowStack.Add(new Dialog_CosmicCrafting(Network.Core));
+                    if (CanWork) Find.WindowStack.Add(new Dialog_CosmicCrafting(Network.Core, this));
                 }
             };
         }

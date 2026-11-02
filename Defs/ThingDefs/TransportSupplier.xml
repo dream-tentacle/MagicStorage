@@ -4,7 +4,7 @@
     <defName>MS_TransportSupplier</defName>
     <researchPrerequisites><li>MS_MaterialSupplyTechnology</li></researchPrerequisites>
     <label>material supplier</label>
-    <description>Supplies the transporter or refuelable building directly ahead. Manual mode delivers items from its internal container. Continuous mode sends up to three selected item types directly from the network, in order of priority, without storing them in the supplier.\n\nFuel delivery uses normal refueling rules: delivery starts when the remaining fuel reaches the building's automatic refueling threshold, usually 30% of its target fuel level. With enough stock, it refills to the target level. Fuel item counts are rounded up as in normal refueling.\n\nFor transport pods, click Create launch group before selecting the items to load.</description>
+    <description>Use this building to manually resupply or continuously supply shuttles, transport pods, refuelable facilities and other transport containers.\n\nBefore loading transport pods with a material supplier, select the pods you want to launch together and click the Create launch group button added by this mod. Then configure the items to supply. Once loaded, use the standard launch button.</description>
     <thingClass>MagicStorage.Building_TransportSupplier</thingClass>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories><li>BuildingsMisc</li></thingCategories>

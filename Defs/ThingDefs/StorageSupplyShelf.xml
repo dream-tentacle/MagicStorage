@@ -43,7 +43,7 @@
   <ThingDef ParentName="MS_StorageSupplyShelfBase">
     <defName>MS_HighStackSupplyShelf</defName>
     <label>high-stack restocking shelf</label>
-    <description>A high-capacity shelf that automatically restocks up to 10 stacks of items from its connected storage network. Each slot can have its own restocking limit, and filter mode allows all slots to share a storage filter. Can directly replace a nutrient paste dispenser's hopper.\n\nStorage priority affects hauling of existing stock; colonists will not haul items into this shelf. Set its priority at least as high as the core's storage priority to avoid repeated hauling.</description>
+    <description>A version of the auto-restocking shelf with greater stack capacity, suitable for supplying materials.</description>
     <building>
       <maxItemsInCell>10</maxItemsInCell>
     </building>

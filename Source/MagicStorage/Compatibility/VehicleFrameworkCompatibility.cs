@@ -31,6 +31,32 @@ namespace MagicStorage
                 throw new InvalidOperationException("Vehicle Framework cargo API was not found.");
             addOrTransfer = add; getStatValue = get; cargoCapacity = stat;
             vehicleType = vehicle;
+
+            // This framework method handles construction only, not loading, repairs or caravan arrivals.
+            Type construction = AccessTools.TypeByName("Vehicles.Patch_Construction");
+            MethodInfo complete = construction == null ? null : AccessTools.Method(construction,
+                "CompleteConstructionVehicle", new[] { typeof(Pawn), typeof(Frame) });
+            if (complete?.ReturnType == typeof(bool) && complete.IsStatic)
+                harmony.Patch(complete,
+                    prefix: new HarmonyMethod(typeof(VehicleFrameworkCompatibility), nameof(BeforeVehicleConstruction)),
+                    postfix: new HarmonyMethod(typeof(VehicleFrameworkCompatibility), nameof(AfterVehicleConstruction)));
+            else
+                Log.Warning("[MagicStorage] Vehicle Framework construction notice API was not found; cargo supply remains enabled.");
+        }
+
+        // The framework's static method names its Frame argument __instance, so bind by index.
+        private static void BeforeVehicleConstruction(Pawn __0, Frame __1, out Map __state)
+        {
+            var notice = Current.Game?.GetComponent<GameComponent_StorageGuideNotice>();
+            __state = notice != null && !notice.VehicleNoticeSent && __0?.Faction == Faction.OfPlayer &&
+                __1 != null && __1.Spawned && __1.Faction == Faction.OfPlayer ? __1.Map : null;
+        }
+
+        private static void AfterVehicleConstruction(Frame __1, bool __result, Map __state)
+        {
+            // False means the framework completed a vehicle and skipped vanilla construction.
+            if (__state == null || __result || !__1.Destroyed) return;
+            Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.Notify_VehicleBuilt(__state, __1.Position);
         }
 
         private static bool Valid(Building_TransportSupplier supplier, Pawn vehicle) =>

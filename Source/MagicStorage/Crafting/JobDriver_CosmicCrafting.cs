@@ -60,7 +60,7 @@ namespace MagicStorage
         Building_StorageCore ICraftingExecutor.Core => Core;
         CraftingOrder ICraftingExecutor.Order => Order;
         bool ICraftingExecutor.AssignmentActive => !ended && pawn?.jobs?.curDriver == this && pawn.CurJob == job;
-        bool ICraftingExecutor.Allows(CraftingOrder order) => job.workGiverDef != null &&
+        bool ICraftingExecutor.Allows(CraftingOrder order) => order.AllowsWorkbench(Bench) && job.workGiverDef != null &&
             Bench?.AllowsWorkType(job.workGiverDef.workType) == true &&
             CraftingServices.Workers.Allows(order, pawn, job.workGiverDef.workType);
         bool ICraftingExecutor.CanContinue() => CanContinue();
@@ -134,7 +134,7 @@ namespace MagicStorage
                 Bench.IsForbidden(pawn) || Bench.IsBurning() || Bench.Network != Core.Network ||
                 Bench.Faction != pawn.Faction || Core.Faction != pawn.Faction ||
                 Bench.InteractionCell.IsForbidden(pawn) || job.workGiverDef == null || !Core.CanWork ||
-                !Bench.AllowsWorkType(job.workGiverDef.workType)) return false;
+                !Order.AllowsWorkbench(Bench) || !Bench.AllowsWorkType(job.workGiverDef.workType)) return false;
             if (!EnsureAssignment() || Order != claimedOrder || claimedOrder.Revision != revision) return false;
             if (!policyTimer.IsDue(StorageRefreshTask.CraftingPolicy, Find.TickManager.TicksGame)) return policyAllowed;
             policyAllowed = dispatcher.CanRun(Core, claimedOrder) &&

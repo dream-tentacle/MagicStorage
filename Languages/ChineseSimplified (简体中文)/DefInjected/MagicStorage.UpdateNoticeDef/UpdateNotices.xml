@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_2_8.label>版本日志</MS_UpdateNotice_1_2_8.label>
+  <MS_UpdateNotice_1_2_8.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_2_8.sections.0.heading>
+  <MS_UpdateNotice_1_2_8.sections.0.entries.0>生产输出口此前与失能机关2的自动生产设施兼容，但在消耗材料时失败，导致无消耗开始生产，现在已修复</MS_UpdateNotice_1_2_8.sections.0.entries.0>
+
+  <MS_UpdateNotice_1_2_7.label>版本日志</MS_UpdateNotice_1_2_7.label>
+  <MS_UpdateNotice_1_2_7.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_7.sections.0.heading>
+  <MS_UpdateNotice_1_2_7.sections.0.entries.0>优化货架绘制规则，让容易出错的对象直接使用占位贴图</MS_UpdateNotice_1_2_7.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_7.sections.0.entries.1>添加拆除存储线按钮</MS_UpdateNotice_1_2_7.sections.0.entries.1>
+  <MS_UpdateNotice_1_2_7.sections.0.entries.2>优化燃料补给器补给规则</MS_UpdateNotice_1_2_7.sections.0.entries.2>
+
+  <MS_UpdateNotice_1_2_6.label>版本日志</MS_UpdateNotice_1_2_6.label>
+  <MS_UpdateNotice_1_2_6.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_6.sections.0.heading>
+  <MS_UpdateNotice_1_2_6.sections.0.entries.0>优化建筑的描述文本</MS_UpdateNotice_1_2_6.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_6.sections.0.entries.1>优化提示文本</MS_UpdateNotice_1_2_6.sections.0.entries.1>
+  <MS_UpdateNotice_1_2_6.sections.0.entries.2>现在【制作清单】页面可以直接搜索配方和工作台</MS_UpdateNotice_1_2_6.sections.0.entries.2>
+  <MS_UpdateNotice_1_2_6.sections.1.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_2_6.sections.1.heading>
+  <MS_UpdateNotice_1_2_6.sections.1.entries.0>优化涅瓦莲的建筑维持生产时检测到存储内物品（注：此mod已经兼容多次，以后不会再进行优化）</MS_UpdateNotice_1_2_6.sections.1.entries.0>
+
+  <MS_UpdateNotice_1_2_5.label>版本日志</MS_UpdateNotice_1_2_5.label>
+  <MS_UpdateNotice_1_2_5.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_2_5.sections.0.heading>
+  <MS_UpdateNotice_1_2_5.sections.0.entries.0>优化dd.logicalfloors的货架选择问题</MS_UpdateNotice_1_2_5.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_5.sections.1.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_2_5.sections.1.heading>
+  <MS_UpdateNotice_1_2_5.sections.1.entries.0>进行物品合并判断报错时的防御性修复</MS_UpdateNotice_1_2_5.sections.1.entries.0>
+
+
+  <MS_UpdateNotice_1_2_4.label>版本日志</MS_UpdateNotice_1_2_4.label>
+  <MS_UpdateNotice_1_2_4.sections.0.heading>&lt;color=#BB88FF&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_2_4.sections.0.heading>
+  <MS_UpdateNotice_1_2_4.sections.0.entries.0>现在可以指定制作任务仅由某个工作台加工。工作台可以改名，方便选择。</MS_UpdateNotice_1_2_4.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_4.sections.0.entries.1>在设置里可以开启“工作台默认控制位置”，让从工作台添加的配方自动选择仅由该工作台加工。此选项默认关闭。</MS_UpdateNotice_1_2_4.sections.0.entries.1>
+  <MS_UpdateNotice_1_2_4.sections.0.entries.2>配方列表上方可以过滤不能在本工作台加工的任务，包括仅打印机任务。</MS_UpdateNotice_1_2_4.sections.0.entries.2>
+
   <MS_UpdateNotice_1_2_3.label>版本日志</MS_UpdateNotice_1_2_3.label>
   <MS_UpdateNotice_1_2_3.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_3.sections.0.heading>
   <MS_UpdateNotice_1_2_3.sections.0.entries.0>打印机可以选择仅加工已被选为“仅打印机”的任务。</MS_UpdateNotice_1_2_3.sections.0.entries.0>

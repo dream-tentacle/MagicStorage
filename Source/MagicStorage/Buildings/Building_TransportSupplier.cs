@@ -130,17 +130,17 @@ namespace MagicStorage
         }
         internal double StoredMass => StorageTransportExchange.ContainerMass(Contents);
 
-        internal CompRefuelable FrontRefuelable()
+        internal List<CompRefuelable> FrontRefuelables()
         {
-            if (!Spawned || !FrontCell.InBounds(Map)) return null;
+            var result = new List<CompRefuelable>();
+            if (!Spawned || !FrontCell.InBounds(Map)) return result;
             foreach (Thing thing in FrontCell.GetThingList(Map))
             {
                 if (thing == this || !thing.Spawned || thing.Destroyed || thing.Faction != Faction ||
                     !thing.OccupiedRect().Contains(FrontCell)) continue;
-                CompRefuelable refuelable = thing.TryGetComp<CompRefuelable>();
-                if (refuelable != null) return refuelable;
+                result.AddRange(StorageFuelSupply.FuelComponents(thing));
             }
-            return null;
+            return result;
         }
 
         private static List<ThingOwner> GenericContainers(Thing target)
@@ -282,8 +282,19 @@ namespace MagicStorage
             {
                 Pawn vehicle = VehicleFrameworkCompatibility.FrontVehicle(this);
                 if (vehicle != null) { VehicleFrameworkCompatibility.Supply(this, vehicle); return; }
-                CompRefuelable fuel = FrontRefuelable();
-                if (fuel != null) SupplyFuel(fuel, immediate);
+                List<CompRefuelable> fuels = FrontRefuelables();
+                if (fuels.Count > 0)
+                {
+                    StorageNetwork network = Network;
+                    foreach (CompRefuelable fuel in fuels)
+                    {
+                        if (!Spawned || Faction != Faction.OfPlayer ||
+                            (directSupply && (!CanWork || Network != network))) break;
+                        if (fuel.parent.Map != Map || fuel.parent.Faction != Faction ||
+                            !fuel.parent.OccupiedRect().Contains(FrontCell)) continue;
+                        SupplyFuel(fuel, immediate);
+                    }
+                }
                 else SupplyGenericContainer();
                 return;
             }
@@ -427,7 +438,7 @@ namespace MagicStorage
                         icon = ContentFinder<UnityEngine.Texture2D>.Get("UI/Gizmos/MagicStorage/TransferItems"),
                         action = ChooseGenericContainer
                     };
-                    if (FrontTransporter() != null || FrontRefuelable() != null || VehicleFrameworkCompatibility.FrontVehicle(this) != null)
+                    if (FrontTransporter() != null || FrontRefuelables().Count > 0 || VehicleFrameworkCompatibility.FrontVehicle(this) != null)
                         choose.Disable("MS_Transport_SpecializedTarget".Translate());
                     else if (FrontGenericTarget(out _) == null) choose.Disable("MS_Transport_NoGenericTarget".Translate());
                     yield return choose;
@@ -479,7 +490,7 @@ namespace MagicStorage
                 };
                 if (directSupply && !CanWork) immediate.Disable(StorageNetwork.StatusLabel(Network));
                 else if (!directSupply && Contents.Count == 0) immediate.Disable("MS_Transport_ImmediateEmpty".Translate());
-                else if (FrontTransporter() == null && FrontRefuelable() == null && VehicleFrameworkCompatibility.FrontVehicle(this) == null)
+                else if (FrontTransporter() == null && FrontRefuelables().Count == 0 && VehicleFrameworkCompatibility.FrontVehicle(this) == null)
                 {
                     Thing generic = FrontGenericTarget(out var containers);
                     if (generic == null) immediate.Disable((genericContainerSupply ? "MS_Transport_NoGenericTarget" : "MS_Transport_NoTarget").Translate());
@@ -505,11 +516,13 @@ namespace MagicStorage
             if (target == null)
             {
                 Pawn vehicle = VehicleFrameworkCompatibility.FrontVehicle(this);
-                CompRefuelable fuel = FrontRefuelable();
+                List<CompRefuelable> fuels = FrontRefuelables();
                 if (vehicle != null) status = "MS_Transport_Target".Translate(vehicle.LabelCap,
                     VehicleFrameworkCompatibility.Usage(vehicle).ToString("0.##"), VehicleFrameworkCompatibility.Capacity(vehicle).ToString("0.##"));
-                else if (fuel != null) status = "MS_Transport_FuelTarget".Translate(fuel.parent.LabelCap,
-                    fuel.Fuel.ToString("0.##"), fuel.TargetFuelLevel.ToString("0.##"));
+                else if (fuels.Count > 0) status = string.Join("\n", fuels.Select((fuel, index) =>
+                    "MS_Transport_FuelTarget".Translate(
+                        fuel.parent.LabelCap.ToString() + (fuels.Count > 1 ? " #" + (index + 1) : ""),
+                        fuel.Fuel.ToString("0.##"), fuel.TargetFuelLevel.ToString("0.##")).ToString()));
                 else if (genericContainerSupply)
                 {
                     Thing generic = FrontGenericTarget(out var containers);

@@ -109,6 +109,8 @@
     <Compile Include="UpdateNotice\GameComponent_UpdateNotice.cs" />
     <Compile Include="UI\Dialog_UpdateNotice.cs" />
     <Compile Include="Compatibility\IStorageCompatibility.cs" />
+    <Compile Include="Compatibility\FortifiedCompatibility.cs" />
+    <Compile Include="Compatibility\FortifiedBillSupplyPlan.cs" />
     <Compile Include="Compatibility\CompatibilityManager.cs" />
     <Compile Include="Compatibility\VehicleFrameworkCompatibility.cs" />
     <Compile Include="Compatibility\LogicalFloorsCompatibility.cs" />
@@ -124,6 +126,7 @@
     <Compile Include="Compatibility\RavenGiftCompatibility.cs" />
     <Compile Include="Compatibility\NivarianCannonApi.cs" />
     <Compile Include="Compatibility\NivarianCannonCompatibility.cs" />
+    <Compile Include="Compatibility\NivarianBillCompatibility.cs" />
     <Compile Include="Buildings\Building_NivarianCannonExtractor.cs" />
     <Compile Include="Buildings\Building_TransportSupplier.cs" />
     <Compile Include="Buildings\Building_CaravanTeleporter.cs" />
@@ -249,6 +252,7 @@
     <Compile Include="Buildings\Building_StorageCore.cs" />
     <Compile Include="Buildings\Building_StorageUnit.cs" />
     <Compile Include="Buildings\StorageConduit.cs" />
+    <Compile Include="Buildings\Designator_DeconstructStorageConduit.cs" />
     <Compile Include="Storage\StorageRecoveryBatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -27,12 +27,26 @@ internal static class StorageGraphicsTests
     {
         try
         {
-            LinkShapes(); PlannedConnectivity(); Previews(); Overlay(); PlanLifecycle(); Placement();
+            DeconstructTool(); LinkShapes(); PlannedConnectivity(); Previews(); Overlay(); PlanLifecycle(); Placement();
             Console.WriteLine("PASS: "+checks+" storage graphics assertions (actual mod classes; Unity draw calls and engine lifecycle boundaries stubbed).");
             return 0;
         }
         catch(Exception ex) { Console.Error.WriteLine(ex);return 1; }
     }
+    private static void DeconstructTool()
+    {
+        var tool = new Designator_DeconstructStorageConduit();
+        Equal(true, tool.CanDesignateThing(new Building_StorageConduit()).Accepted, "storage conduit accepted");
+        Equal(false, tool.CanDesignateThing(new Building()).Accepted, "other buildings excluded");
+        Equal(false, tool.CanDesignateThing(new ThingWithComps()).Accepted, "other things excluded");
+        tool.BaseAccepts = false;
+        Equal(false, tool.CanDesignateThing(new Building_StorageConduit()).Accepted, "vanilla rejection preserved");
+        var map = new Map(); Find.CurrentMap = map; Find.DesignatorManager.SelectedDesignator = tool;
+        Equal(true, StorageNetworkDrawing.ShouldDraw(map), "deconstruction reveals storage network");
+        Equal(false, StorageNetworkDrawing.ShouldDraw(new Map()), "deconstruction overlay limited to current map");
+        Find.DesignatorManager.SelectedDesignator = null;
+    }
+
     private static void LinkShapes()
     {
         for(int mask=0;mask<16;mask++)

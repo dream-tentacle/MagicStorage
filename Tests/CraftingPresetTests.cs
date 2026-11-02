@@ -31,7 +31,7 @@ internal static class CraftingPresetTests
             DefDatabase<RecipeDef>.AllDefsListForReading.AddRange(new[] { first, second });
             DefDatabase<SpecialThingFilterDef>.AllDefsListForReading.Add(special);
             first.defaultIngredientFilter.SetAllow(wood, true);
-            RoundTripAndFiles(); ApplyAndIsolation(); MissingAndValidation();
+            RoundTripAndFiles(); ApplyAndIsolation(); MissingAndValidation(); WorkbenchRestrictions();
             Console.WriteLine("Crafting presets: " + checks + " checks passed.");
             return 0;
         }
@@ -203,6 +203,27 @@ internal static class CraftingPresetTests
         first.Precepts.Clear();
         Equal(0, CraftingPresets.Decode(styleXml, out missing).Orders.Count, "unmatched ideology task is skipped");
         Equal(1, missing.Count, "unmatched ideology task is reported");
+    }
+    private static void WorkbenchRestrictions()
+    {
+        var list = new CraftingOrderList();
+        var order = list.Add(first);
+        var bench = new Building_CosmicWorkbench();
+        var other = new Building_CosmicWorkbench();
+        Equal(true, order.AllowsWorkbench(other), "unrestricted order accepts any bench");
+        order.RestrictWorkbench = true; order.Workbench = bench;
+        Equal(true, order.AllowsWorkbench(bench), "assigned bench can execute");
+        Equal(false, order.AllowsWorkbench(other), "another bench cannot execute");
+        Equal(false, order.AllowsWorkbench(null), "missing executor cannot match assigned bench");
+        var duplicate = list.Duplicate(order);
+        Equal(bench, duplicate.Workbench, "duplicate preserves assigned bench");
+        Equal(true, duplicate.RestrictWorkbench, "duplicate preserves restriction");
+        var preset = CraftingPreset.Capture(list);
+        Equal(false, preset.Orders[0].RestrictWorkbench, "portable preset clears local assignment");
+        Equal<Building_CosmicWorkbench>(null, preset.Orders[0].Workbench, "preset does not retain map building");
+        order.Workbench = null;
+        Equal(false, order.AllowsWorkbench(other), "lost assigned bench never broadens permission");
+        Equal(false, order.AllowsWorkbench(null), "lost assigned bench cannot match null");
     }
     private static void Reject(XElement original, Action<XElement> change, string message)
     {

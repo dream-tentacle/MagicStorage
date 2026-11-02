@@ -11,6 +11,9 @@
   <ItemGroup>
     <Compile Include="VanillaBillSupplyStubs.cs" />
     <Compile Include="VanillaBillSupplyTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\IStorageCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\FortifiedCompatibility.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\FortifiedBillSupplyPlan.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ProductionOutputPort.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\VanillaBillStorage.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\BillStorageSupplyPlan.cs" />

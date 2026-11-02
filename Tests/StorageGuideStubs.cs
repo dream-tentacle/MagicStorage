@@ -24,11 +24,13 @@ namespace Verse
     public struct IntVec3
     {
         public T GetFirstThing<T>(Map map) where T : class => null;
+        public List<Thing> GetThingList(Map map) => new List<Thing>();
     }
-    public class ThingDef { public string defName; public int stackLimit = 75; public object entityDefToBuild; public Type thingClass; }
+    public class ThingDef { public string defName; public int stackLimit = 75; public object entityDefToBuild; public Type thingClass; public bool HasComp(Type type) => false; }
     public class Thing
     {
         public ThingDef def;
+        public T TryGetComp<T>() where T : class => null;
         public int stackCount = 1;
         public bool Spawned, Destroyed;
         public Map Map;
@@ -57,6 +59,7 @@ namespace Verse
 namespace RimWorld
 {
     using Verse;
+    public class CompTransporter { }
     public class Faction { public static readonly Faction OfPlayer = new Faction(); }
     public static class ThingDefOf
     {
@@ -83,4 +86,8 @@ namespace RimWorld
         }
     }
 }
-namespace MagicStorage { public class Building_StorageCore : Verse.Thing { } }
+namespace MagicStorage
+{
+    public class Building_StorageCore : Verse.Thing { }
+    public static class StorageTransportGroups { public static bool IsPlayerPod(RimWorld.CompTransporter pod) => false; }
+}

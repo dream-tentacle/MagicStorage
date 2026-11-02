@@ -17,15 +17,16 @@ internal static class VanillaBillSupplyTests
     {
         internal readonly Map Map = new Map();
         internal readonly MapComponent_StorageNetworks Manager = new MapComponent_StorageNetworks();
-        internal readonly Building_WorkTable Table = new Building_WorkTable();
+        internal readonly Building_WorkTable Table;
         internal readonly Pawn Pawn = new Pawn();
         internal readonly Building_StorageUnit Unit = new Building_StorageUnit();
         internal readonly StorageNetwork Network = new StorageNetwork();
         internal readonly Building_ProductionOutputPort Port = new Building_ProductionOutputPort();
         internal readonly Bill_Production Bill = new Bill_Production();
         internal readonly ThingDef Steel = new ThingDef { defName = "Steel" };
-        internal Fixture()
+        internal Fixture(bool fortified = false)
         {
+            Table = fortified ? new Fortified.Building_WorkTableAutonomous() : new Building_WorkTable();
             GenSpawn.AfterSpawn = null;
             Map.Manager = Manager;
             Table.Map = Map; Table.Position = new IntVec3(10,10); Table.Spawned = true;
@@ -251,9 +252,105 @@ internal static class VanillaBillSupplyTests
         try
         {
             CandidateScopeAndPortRules(); NativeJobHandoff(); ContentionAndInvalidation(); SplitDeliveryAndRollback(); SavedPendingPlan();
+            FortifiedSupply();
             Console.WriteLine("PASS: " + checks + " production supply assertions (actual supply/transfer code; controlled engine boundary).");
             return 0;
         }
         catch (Exception exception) { Console.Error.WriteLine(exception); return 1; }
+    }
+
+    private static object FortifiedCall(string name, object[] args)
+    {
+        try { return typeof(FortifiedCompatibility).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, args); }
+        catch (TargetInvocationException exception) { throw exception.InnerException; }
+    }
+
+    private static Job FortifiedJob(Fixture f, Job temporary)
+    {
+        // Model the framework's replacement, copying only its native queues/bill.
+        Attach(f, temporary);
+        var actual = new Job { def = new JobDef { driverClass = typeof(Fortified.JobDriver_DoAutonomousBill) },
+            bill = temporary.bill, targetA = temporary.targetA,
+            targetQueueB = temporary.targetQueueB, countQueue = temporary.countQueue };
+        var args = new object[] { f.Pawn, actual };
+        FortifiedCall("AttachPlan", args);
+        return (Job)args[1];
+    }
+
+    private static bool FortifiedStart(Fixture f, Job job, bool probe = false)
+    {
+        if (!probe) f.Pawn.CurJob = job;
+        var args = new object[] { new Fortified.JobDriver_DoAutonomousBill { pawn = f.Pawn, job = job }, true };
+        FortifiedCall("Prepare", args);
+        return (bool)args[1];
+    }
+
+    private static void FortifiedSupply()
+    {
+        var f = new Fixture(true);
+        Equal(false, VanillaBillStorage.Supports(f.Bill, f.Pawn, f.Table), "unavailable adapter fails closed");
+        new FortifiedCompatibility().Apply(new HarmonyLib.Harmony("tests"));
+        var stock = f.Stock(30);
+        var ground = new Thing { def = f.Steel, stackCount = 4, Spawned = true, Map = f.Map };
+        var temporary = f.Job(stock, 8, ground, 4);
+        Attach(f, temporary);
+        Equal(2, temporary.targetQueueB.Count, "temporary job must retain warehouse ingredient queue");
+        var job = FortifiedJob(f, temporary);
+        Equal(1, job.targetQueueB.Count, "final job retains ground material hauling");
+        Equal(ground, job.targetQueueB[0].Thing, "native hauling target preserved");
+        Equal(true, FortifiedStart(f, job, true), "future job preflight succeeds");
+        Equal(30, f.StockCount, "preflight does not withdraw");
+        Equal(true, FortifiedStart(f, job), "actual task receives stored material");
+        var container = ((Fortified.Building_WorkTableAutonomous)f.Table).innerContainer;
+        Equal(22, f.StockCount, "warehouse debited exactly once");
+        Equal(8, container.Sum(t => t.stackCount), "machine owns real materials");
+        Equal(null, job.placedThings, "container delivery does not leave ground ingredients");
+        Equal(true, FortifiedStart(f, job), "repeat reservation succeeds without double debit");
+        Equal(22, f.StockCount, "repeat reservation cannot debit again");
+        foreach (var item in container.ToArray()) item.Destroy();
+        Equal(22, f.StockCount, "native finish destroys only delivered material");
+
+        var shortage = new Fixture(true);
+        var shortageJob = FortifiedJob(shortage, shortage.Job(shortage.Stock(20), 8));
+        shortage.Network.HasProductionOutputPort = false;
+        Log.Warnings.Clear();
+        Equal(false, FortifiedStart(shortage, shortageJob), "missing port prevents start");
+        Equal(true, Log.Warnings.Last().Contains("Ingredients or supply network"), "failed supply records its reason in the log");
+        Equal(0, shortage.Map.resourceCounter.Updates, "validation failure skips resource recount");
+        Equal(false, FortifiedStart(shortage, shortageJob), "retry cannot bypass failed payment");
+        Equal(20, shortage.StockCount, "failed payment leaves warehouse untouched");
+
+        var rollback = new Fixture(true);
+        var one = rollback.Stock(20); var two = rollback.Stock(20);
+        var rollbackJob = FortifiedJob(rollback, rollback.Job(one, 8, two, 6));
+        var destination = ((Fortified.Building_WorkTableAutonomous)rollback.Table).innerContainer;
+        var prior = new Thing { def = rollback.Steel, stackCount = 3 };
+        destination.TryAdd(prior, false);
+        int delivered = 0;
+        destination.AfterAdd = item => { if (++delivered == 2) throw new Exception("receiver failed after acceptance"); };
+        Equal(false, FortifiedStart(rollback, rollbackJob), "receiver exception prevents start");
+        Equal(40, rollback.StockCount, "whole batch is restored after partial delivery");
+        Equal(3, destination.Sum(t => t.stackCount), "rollback preserves preexisting materials");
+        Equal(0, rollback.Network.Claims.Count, "failed batch releases warehouse reservations");
+        destination.AfterAdd = null;
+        Equal(true, FortifiedStart(rollback, rollbackJob), "failed plan can retry and pay normally");
+        Equal(26, rollback.StockCount, "retry deducts the full batch once");
+
+        var changed = new Fixture(true);
+        var changedJob = FortifiedJob(changed, changed.Job(changed.Stock(20), 8, changed.Stock(20), 6));
+        var changedContainer = ((Fortified.Building_WorkTableAutonomous)changed.Table).innerContainer;
+        changedContainer.AfterAdd = item => changed.Network.HasProductionOutputPort = false;
+        Equal(false, FortifiedStart(changed, changedJob), "commit check catches callback invalidation without per-item rescans");
+        Equal(40, changed.StockCount, "commit failure restores the full batch");
+        Equal(0, changedContainer.Count, "commit failure leaves no unpaid ingredients");
+        Equal(1, changed.Map.resourceCounter.Updates, "attempted transfer refreshes resource counts after rollback");
+        Equal(true, Log.Warnings.Last().Contains("changed during transfer"), "commit failure is logged");
+
+        var invalidOwner = new Fixture(true);
+        var invalidOwnerJob = FortifiedJob(invalidOwner, invalidOwner.Job(invalidOwner.Stock(20), 8));
+        ((Fortified.Building_WorkTableAutonomous)invalidOwner.Table).innerContainer = new ThingOwner(invalidOwner.Unit);
+        Equal(false, FortifiedStart(invalidOwner, invalidOwnerJob), "supply entry rejects a foreign container owner");
+        Equal(20, invalidOwner.StockCount, "foreign container receives no materials");
+        Equal(0, invalidOwner.Map.resourceCounter.Updates, "foreign container rejection skips resource recount");
     }
 }

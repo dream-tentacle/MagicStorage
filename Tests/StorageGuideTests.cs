@@ -42,6 +42,10 @@ internal static class StorageGuideTests
         progress = Current.Game.Progress = loaded;
         Equal(true, progress.Learned(4), "partial progress survives loading and core changes");
         progress.Complete(5, second);
+        Equal(StorageGuideStage.Basics, progress.Stage, "basics wait for the construction supply tutorial");
+        Equal(0, DropPodUtility.Pods.Count, "basic reward waits for the construction supply tutorial");
+        int constructionStep = Array.IndexOf(GameComponent_StorageGuideNotice.AdvancedDefNames, "MS_ConstructionSupplyUnit");
+        progress.CompleteAdvanced(constructionStep, second);
         Equal(StorageGuideStage.Advanced, progress.Stage, "basics completion advances the global stage");
         Equal(1, DropPodUtility.Pods.Count, "all rewards arrive in one pod");
         Equal(second.Map, DropPodUtility.LastMap, "reward follows the core completing the stage");

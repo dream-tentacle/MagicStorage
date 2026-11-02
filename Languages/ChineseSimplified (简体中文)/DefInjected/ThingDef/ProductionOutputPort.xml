@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_ProductionOutputPort.label>生产输出口</MS_ProductionOutputPort.label>
-  <MS_ProductionOutputPort.description>为生产工作台提供相连魔法存储网络中的材料。\n\n生产任务开始时直接交付材料，无需搬运。不会为手术或自主生产设备供料。</MS_ProductionOutputPort.description>
+  <MS_ProductionOutputPort.description>为原版或其他mod的工作台提供网络内材料。\n\n不会为手术或自动生产设备供应。</MS_ProductionOutputPort.description>
 </LanguageData>

@@ -16,7 +16,7 @@ namespace MagicStorage
         private readonly string[] refreshBuffers = new string[(int)StorageRefreshTask.Count];
         private Vector2 settingsScroll;
         private float settingsHeight;
-        private enum SettingsTab { General, Performance, Accessibility, Compatibility }
+        private enum SettingsTab { General, Balance, Performance, Accessibility, Compatibility }
         private SettingsTab settingsTab;
 
         public MagicStorageMod(ModContentPack content) : base(content)
@@ -47,6 +47,7 @@ namespace MagicStorage
             TabDrawer.DrawTabs(body, new List<TabRecord>
             {
                 new TabRecord("MS_SettingsTabGeneral".Translate(), () => SelectSettingsTab(SettingsTab.General), settingsTab == SettingsTab.General),
+                new TabRecord("MS_SettingsTabBalance".Translate(), () => SelectSettingsTab(SettingsTab.Balance), settingsTab == SettingsTab.Balance),
                 new TabRecord("MS_SettingsTabPerformance".Translate(), () => SelectSettingsTab(SettingsTab.Performance), settingsTab == SettingsTab.Performance),
                 new TabRecord("MS_SettingsTabAccessibility".Translate(), () => SelectSettingsTab(SettingsTab.Accessibility), settingsTab == SettingsTab.Accessibility),
                 new TabRecord("MS_SettingsTabCompatibility".Translate(), () => SelectSettingsTab(SettingsTab.Compatibility), settingsTab == SettingsTab.Compatibility)
@@ -57,6 +58,7 @@ namespace MagicStorage
             var listing = new Listing_Standard();
             listing.Begin(view);
             if (settingsTab == SettingsTab.Accessibility) DrawAccessibilitySettings(listing);
+            else if (settingsTab == SettingsTab.Balance) DrawBalanceSettings(listing);
             else if (settingsTab == SettingsTab.Performance) DrawPerformanceSettings(listing);
             else if (settingsTab == SettingsTab.Compatibility) DrawCompatibilitySettings(listing);
             else DrawGeneralSettings(listing);
@@ -89,11 +91,30 @@ namespace MagicStorage
             if (listing.ButtonText("MS_Guide_Title".Translate()))
                 Find.WindowStack.Add(new Dialog_StorageGuide());
             listing.Gap();
-            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode,
-                "MS_SettingsWorkbenchUnlockModeHelp".Translate());
-            listing.Gap();
             listing.CheckboxLabeled("MS_SettingsNewWorkbenchOrdersFirst".Translate(), ref Settings.NewWorkbenchOrdersFirst,
                 "MS_SettingsNewWorkbenchOrdersFirstHelp".Translate());
+            listing.Gap();
+            listing.GapLine();
+            UpdateNoticeSettings noticeSettings = UpdateNoticeSettings.Current;
+            bool showUpdateLog = !noticeSettings.neverShowUpdateLog;
+            listing.CheckboxLabeled("MS_SettingsShowUpdateLog".Translate(), ref showUpdateLog,
+                "MS_SettingsShowUpdateLogHelp".Translate());
+            if (showUpdateLog != !noticeSettings.neverShowUpdateLog)
+            {
+                noticeSettings.neverShowUpdateLog = !showUpdateLog;
+                noticeSettings.Save();
+            }
+            if (listing.ButtonText("MS_SettingsOpenUpdateLog".Translate()))
+                Dialog_UpdateNotice.Open(UpdateNoticeUtility.AllNotices());
+            listing.Gap();
+            if (listing.ButtonText("MS_FeedbackTitle".Translate()))
+                Dialog_Feedback.Open();
+        }
+
+        private void DrawBalanceSettings(Listing_Standard listing)
+        {
+            listing.CheckboxLabeled("MS_SettingsWorkbenchUnlockMode".Translate(), ref Settings.WorkbenchUnlockMode,
+                "MS_SettingsWorkbenchUnlockModeHelp".Translate());
             listing.Gap();
             listing.CheckboxLabeled("MS_SettingsAllowPrinterParameterChanges".Translate(), ref Settings.AllowPrinterParameterChanges);
             listing.Gap();
@@ -116,32 +137,6 @@ namespace MagicStorage
                 MagicStorageSettings.MinCosmicWorkbenchWorkSpeedPercent / (float)speedStep,
                 MagicStorageSettings.MaxCosmicWorkbenchWorkSpeedPercent / (float)speedStep),
                 System.MidpointRounding.AwayFromZero) * speedStep;
-            listing.GapLine();
-            UpdateNoticeSettings noticeSettings = UpdateNoticeSettings.Current;
-            bool showUpdateLog = !noticeSettings.neverShowUpdateLog;
-            listing.CheckboxLabeled("MS_SettingsShowUpdateLog".Translate(), ref showUpdateLog,
-                "MS_SettingsShowUpdateLogHelp".Translate());
-            if (showUpdateLog != !noticeSettings.neverShowUpdateLog)
-            {
-                noticeSettings.neverShowUpdateLog = !showUpdateLog;
-                noticeSettings.Save();
-            }
-            if (listing.ButtonText("MS_SettingsOpenUpdateLog".Translate()))
-                Dialog_UpdateNotice.Open(UpdateNoticeUtility.AllNotices());
-            listing.Gap();
-            if (listing.ButtonText("MS_FeedbackTitle".Translate()))
-                Dialog_Feedback.Open();
-        }
-
-        private void DrawAccessibilitySettings(Listing_Standard listing)
-        {
-            listing.Label("MS_SettingsAccessibilityNotice".Translate());
-            listing.Gap();
-            listing.CheckboxLabeled("MS_SettingsCaravanItemFilters".Translate(), ref Settings.CaravanItemFilters);
-            listing.CheckboxLabeled("MS_SettingsTradeItemFilters".Translate(), ref Settings.TradeItemFilters);
-            listing.Gap();
-            listing.CheckboxLabeled("MS_SettingsTidySupplyShelf".Translate(), ref Settings.TidySupplyShelf,
-                "MS_SettingsTidySupplyShelfHelp".Translate());
             listing.Gap();
             listing.CheckboxLabeled("MS_SettingsModifySilverStackLimit".Translate(), ref Settings.ModifySilverStackLimit,
                 "MS_SettingsModifySilverStackLimitHelp".Translate());
@@ -153,6 +148,21 @@ namespace MagicStorage
                 Settings.SilverStackLimit = limit;
                 listing.Label("<color=#FF0000>" + "MS_SettingsSilverStackLimitWarning".Translate() + "</color>");
             }
+        }
+
+        private void DrawAccessibilitySettings(Listing_Standard listing)
+        {
+            listing.Label("MS_SettingsAccessibilityNotice".Translate());
+            listing.CheckboxLabeled("MS_SettingsWorkbenchDefaultLocation".Translate(), ref Settings.WorkbenchDefaultLocation,
+                "MS_SettingsWorkbenchDefaultLocationHelp".Translate());
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsCaravanItemFilters".Translate(), ref Settings.CaravanItemFilters);
+            listing.CheckboxLabeled("MS_SettingsTradeItemFilters".Translate(), ref Settings.TradeItemFilters);
+            listing.Gap();
+            listing.CheckboxLabeled("MS_SettingsTidySupplyShelf".Translate(), ref Settings.TidySupplyShelf,
+                "MS_SettingsTidySupplyShelfHelp".Translate());
+            listing.Gap();
+
         }
 
         private void ApplySilverStackLimit()

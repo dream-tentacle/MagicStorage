@@ -24,6 +24,7 @@ internal static class CosmicCraftingTests
         CoreContainerSelection();
         BenchSelectionAndPriority();
         WorkbenchWorkTypes();
+        AssignedWorkbench();
         WorkbenchBillGiver();
         OrderedJobPreflight();
         GroupedProductionPriority();
@@ -1003,6 +1004,25 @@ internal static class CosmicCraftingTests
             return job;
         }
     }
+    private static void AssignedWorkbench()
+    {
+        var f = new Fixture(); var a = f.Core(0); var order = f.Order(a.Item1);
+        var farther = new Building_CosmicWorkbench(); f.Register(farther, 3); f.Dispatch.Register(farther);
+        farther.RenamableLabel = "  Workshop A  ";
+        Equal("Workshop A", farther.LabelNoCount, "rename trims and updates displayed name");
+        order.RestrictWorkbench = true; order.Workbench = farther;
+        Equal(farther, f.Dispatch.FindJob(f.Pawn, f.Giver).targetA, "assignment overrides nearest bench");
+        Equal(null, f.Dispatch.FindJobOnBench(f.Pawn, f.Giver, a.Item2, true), "forced work cannot bypass assignment");
+        var running = f.Start(f.Dispatch.FindJob(f.Pawn, f.Giver));
+        order.Workbench = a.Item2; order.Changed();
+        Equal(false, running.CanContinue(), "changing assignment stops work at the previous bench");
+        running.EndJobWith(JobCondition.InterruptForced);
+        order.Workbench = farther; farther.SetWorkTypeAllowed(f.Type, false);
+        var fallback = f.Order(a.Item1, 1);
+        Equal(fallback.Id, f.Dispatch.FindJob(f.Pawn, f.Giver).count, "unavailable assigned bench does not block later tasks");
+        Equal(a.Item2, f.Dispatch.FindJob(f.Pawn, f.Giver).targetA, "later unrestricted task uses available bench");
+    }
+
     private static void WorkbenchWorkTypes()
     {
         var f = new Fixture();
@@ -1076,7 +1096,7 @@ internal static class CosmicCraftingTests
         finally { Scribe_Collections.Boundary = previousBoundary; Scribe.mode = previousMode; }
 
         var unconnected = new Building_CosmicWorkbench { Spawned = true, Map = f.Map, Faction = Faction.OfPlayer };
-        var gizmo = unconnected.GetGizmos().OfType<Command_Action>().Single();
+        var gizmo = unconnected.GetGizmos().OfType<Command_Action>().Single(g => g.defaultLabel == "MS_Craft_AllowedWorkTypes");
         Equal("MS_Craft_AllowedWorkTypes", gizmo.defaultLabel, "an unconnected bench still offers work type settings");
         gizmo.action();
         Equal(true, Find.WindowStack.Windows.Last() is Dialog_CosmicWorkbenchWorkTypes, "settings command opens its selection window");

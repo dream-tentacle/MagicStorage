@@ -101,4 +101,9 @@
   <MS_DebugFill_SelectUnit>请先单独选中当前地图上的一个存储单元。</MS_DebugFill_SelectUnit>
   <MS_DebugFill_NoMaterials>此工具使用的物品均未加载。</MS_DebugFill_NoMaterials>
   <MS_DebugFill_Completed>已存入{0}个满堆。存储槽位：{1}/{2}。</MS_DebugFill_Completed>
+  <MS_SettingsWorkbenchDefaultLocation>工作台默认控制位置</MS_SettingsWorkbenchDefaultLocation>
+  <MS_SettingsWorkbenchDefaultLocationHelp>开启后，如果制作配方是在工作台添加的，则任务默认分配给这个工作台。</MS_SettingsWorkbenchDefaultLocationHelp>
+  <MS_DeconstructStorageConduit>拆除存储线</MS_DeconstructStorageConduit>
+  <MS_DeconstructStorageConduitDesc>拆除存储线并回收部分资源。仅影响存储线，包括隐藏存储线。</MS_DeconstructStorageConduitDesc>
+  <MS_SettingsTabBalance>平衡性</MS_SettingsTabBalance>
 </LanguageData>

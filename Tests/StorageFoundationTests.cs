@@ -60,6 +60,9 @@ internal static class StorageFoundationTests
             assertions += WorkbenchUnlockTests.Run();
 #endif
             assertions += StorageResourceCounterTests.Run();
+#if NIVARIAN_BILL_TESTS
+            assertions += NivarianBillTests.Run();
+#endif
 #if MONOLYN_COMPATIBILITY_TESTS
             assertions += MonolynCompatibilityTests.Run();
             assertions += StorageMaterialTransactionTests.Run();

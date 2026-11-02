@@ -20,6 +20,9 @@ namespace HarmonyLib
     }
     public static class AccessTools
     {
+        public static Type TypeByName(string name) => typeof(AccessTools).Assembly.GetType(name);
+        public static FieldInfo Field(Type type, string name) => type.GetField(name);
+        public static MethodInfo DeclaredMethod(Type type, string name, Type[] args) => type.GetMethod(name, args);
         public static MethodInfo Method(Type type, string name) => type.GetMethod(name,
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
     }
@@ -129,6 +132,7 @@ namespace Verse
     {
         private readonly List<Thing> items = new List<Thing>();
         public IThingHolder Owner;
+        public Action<Thing> AfterAdd;
         public ThingOwner(IThingHolder owner) { Owner = owner; }
         public int Count => items.Count;
         public int GetCountCanAccept(Thing item, bool merge = true) => item.stackCount;
@@ -137,7 +141,7 @@ namespace Verse
         {
             if (item.Destroyed || item.holdingOwner != null) return false;
             if (merge) foreach (var other in items.ToArray()) if (other.TryAbsorbStack(item,true)) return true;
-            item.holdingOwner = this; items.Add(item); return true;
+            item.holdingOwner = this; items.Add(item); AfterAdd?.Invoke(item); return true;
         }
         public void Remove(Thing item) { items.Remove(item); if (item.holdingOwner == this) item.holdingOwner = null; }
         public Thing Take(Thing item, int count) => Contains(item) ? item.SplitOff(Math.Min(count,item.stackCount)) : null;
@@ -181,7 +185,12 @@ namespace Verse
         }
     }
     public static class GenTicks { public static int TicksGame = 100; }
-    public static class Log { public static void Error(string message) { } }
+    public static class Log
+    {
+        public static readonly List<string> Warnings = new List<string>();
+        public static void Warning(string message) { Warnings.Add(message); }
+        public static void Error(string message) { }
+    }
     public static class Scribe
     {
         public static LoadSaveMode mode;
@@ -272,13 +281,30 @@ namespace Verse.AI
         public Job Clone() => (Job)MemberwiseClone();
         public void ExposeData() { }
     }
-    public class JobDriver_DoBill { public Pawn pawn; public Job job; public bool TryMakePreToilReservations(bool error) => true; }
+    public class JobDriver { public Pawn pawn; public Job job; }
+    public class JobDriver_DoBill : JobDriver { public bool TryMakePreToilReservations(bool error) => true; }
     public static class Toils_JobTransforms
     { private static IEnumerable<IntVec3> IngredientPlaceCellsInOrder(Thing table) => ((RimWorld.Building_WorkTable)table).Cells; }
     public static class HaulAIUtility
     {
         public static void UpdateJobWithPlacedThings(Job job, Thing item, int count)
         { if (job.placedThings == null) job.placedThings = new List<ThingCountClass>(); job.placedThings.Add(new ThingCountClass(item,count)); }
+    }
+}
+namespace Fortified
+{
+    public class Building_WorkTableAutonomous : RimWorld.Building_WorkTable, IThingHolder
+    {
+        public ThingOwner innerContainer;
+        public Building_WorkTableAutonomous() { innerContainer = new ThingOwner(this); }
+    }
+    public class WorkGiver_DoAutonomousBill
+    {
+        public Job JobOnThing(Pawn pawn, Thing thing, bool forced) => null;
+    }
+    public class JobDriver_DoAutonomousBill : JobDriver
+    {
+        public bool TryMakePreToilReservations(bool error) => true;
     }
 }
 namespace MagicStorage

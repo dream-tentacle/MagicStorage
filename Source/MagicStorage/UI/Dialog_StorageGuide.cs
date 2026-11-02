@@ -158,12 +158,19 @@ namespace MagicStorage
                 DrawNavRow(new Rect(0, rowY, view.width, 42), i, ("MS_Guide_Nav" + i).Translate());
                 rowY += 46;
             }
+            for (int i = 0; i < AdvancedPages.Length; i++)
+            {
+                var page = AdvancedPages[i];
+                if (page.Def == null || !GameComponent_StorageGuideNotice.IsBasicBuilding(page.DefName)) continue;
+                DrawNavRow(new Rect(0, rowY, view.width, 42), i + 7, page.Def.LabelCap, page.Def);
+                rowY += 46;
+            }
             Label(new Rect(10, rowY + 8, view.width - 20, 24), "MS_Guide_Advanced".Translate(), Caption);
             rowY += 38;
             for (int i = 0; i < AdvancedPages.Length; i++)
             {
                 var page = AdvancedPages[i];
-                if (page.Def == null) continue;
+                if (page.Def == null || GameComponent_StorageGuideNotice.IsBasicBuilding(page.DefName)) continue;
                 DrawNavRow(new Rect(0, rowY, view.width, 42), i + 7, page.Def.LabelCap, page.Def);
                 rowY += 46;
             }

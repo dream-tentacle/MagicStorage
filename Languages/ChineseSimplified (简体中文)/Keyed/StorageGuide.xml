@@ -21,7 +21,7 @@
   <MS_Guide_NoMap>载入殖民地后，可以检查网络状态并使用操作按钮。</MS_Guide_NoMap>
   <MS_Guide_NoCore>请先建造或选择当前地图的控制核心。检查只针对所选核心的网络，其他网络的建筑不计入。</MS_Guide_NoCore>
   <MS_Guide_Progress>全局教学进度：{0} / {1}（{2}）</MS_Guide_Progress>
-  <MS_Guide_ProgressHelp>教学进度与完成阶段在本存档内全局共享，更换或新建核心无需重做。基础步骤学会后保持完成。进阶建筑建造并接入所选核心网络后记录为已学会，此后保持完成；缺少对应DLC的章节不计入。基础与进阶阶段完成后各获得一次奖励。当前网络配置仍单独检查。</MS_Guide_ProgressHelp>
+  <MS_Guide_ProgressHelp>教学进度与完成阶段在本存档内全局共享，更换或新建核心无需重做。基础步骤学会后保持完成。建筑供给单元与进阶建筑建造并接入所选核心网络后记录为已学会，此后保持完成；缺少对应DLC的章节不计入。基础与进阶阶段完成后各获得一次奖励。当前网络配置仍单独检查。</MS_Guide_ProgressHelp>
   <MS_Guide_Current>当前配置：{0}</MS_Guide_Current>
   <MS_Guide_Met>已满足</MS_Guide_Met>
   <MS_Guide_Unmet>未满足</MS_Guide_Unmet>
@@ -126,6 +126,6 @@
   <MS_Guide_AdvancedFuelBody>将燃料供给器接入网络，在其中备好目标建筑需要的燃料。供给器会为半径20格内的己方建筑自动补料，遵循目标的燃料筛选、自动补充开关与补料条件。\n\n自动补料并非少一点就立刻补满，而是在目标满足补料条件后执行；库存充足时补至目标量。</MS_Guide_AdvancedFuelBody>
   <MS_Guide_AdvancedFuelTips>选中供给器可查看范围，也可点击“立即补充”。立即补充可以忽略燃料百分比阈值，但仍遵循自动补充开关等其他条件。\n\n没有供料时，检查距离、目标的燃料类型、自动补充开关，以及网络中是否有可用燃料。需要一次加足的设备，在燃料不足时不会部分填充。</MS_Guide_AdvancedFuelTips>
   <MS_Guide_AdvancedTransportBody>物资补给器向正前方的运输容器或燃料设备供料，放置时注意朝向。\n\n手动暂存模式：通过物资转移界面把物品放入补给器，再由它送往目标。持续供给模式：最多选择三种物品，按从上到下的优先级直接从网络供给，自身不暂存。缺货或目标无法接收时会尝试下一项。\n\n运输容器和通用容器会按每种物品的目标库存上限补足差额，默认75个，0表示暂停；已超上限时不自动取回。立即供给也遵守此上限。燃料设备仍按自身目标燃料量补充，0同样暂停。</MS_Guide_AdvancedTransportBody>
-  <MS_Guide_AdvancedTransportTips>切换模式前必须清空补给器自身存货。可通过建筑按钮配置物品或立即供给。\n\n为空投仓装货前，先建立发射组，再选择装入物品。\n\n通用容器供给用于其他建筑公开的容器；多个容器时需选择目标。它提高兼容能力，但不保证目标模组能正确识别存入。运输容器和燃料设备优先使用专用规则。</MS_Guide_AdvancedTransportTips>
+  <MS_Guide_AdvancedTransportTips>切换模式前必须清空补给器自身存货。可通过建筑按钮配置物品或立即供给。\n\n使用物资补给器为空投仓装货前，请先选中要一起发射的空投仓，点击本模组新增的“建立发射组”按钮，再配置供给物品。装货后使用原版发射按钮。\n\n通用容器供给用于其他建筑公开的容器；多个容器时需选择目标。它提高兼容能力，但不保证目标模组能正确识别存入。运输容器和燃料设备优先使用专用规则。</MS_Guide_AdvancedTransportTips>
   <MS_Guide_AdvancedCaravanBody>将远行队传送器接入存储网络，点击建筑上的组建远行队按钮，选择人员和网络物资。\n\n确认后，所选物资直接进入远行队成员的背包，人员立即在大地图上形成远行队。无需先把这些物资手动取出再等待普通装载。</MS_Guide_AdvancedCaravanBody>
 </LanguageData>

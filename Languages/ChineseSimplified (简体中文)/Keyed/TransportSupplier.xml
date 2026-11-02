@@ -51,10 +51,16 @@
   <MS_Transport_SpecializedTarget>当前目标使用运输或燃料专用供给规则。</MS_Transport_SpecializedTarget>
   <MS_Transport_ImmediateEmpty>物资补给器内没有可供给的物品。</MS_Transport_ImmediateEmpty>
   <MS_Transport_CreateGroup>建立发射组</MS_Transport_CreateGroup>
-  <MS_Transport_CreateGroupDesc>将选中的{0}个空投仓建立为同一个发射组，保留仓内物品。物资补给器和发射检查共用整组载重上限，允许单仓超过自身容量。建组后直接使用原版发射按钮。</MS_Transport_CreateGroupDesc>
+  <MS_Transport_CreateGroupDesc>使用魔法存储时，需要首先使用此按钮建立发射组，然后通过单个物资补给器提供需要空投的内容。</MS_Transport_CreateGroupDesc>
   <MS_Transport_GroupAlreadyAssigned>选中的空投仓已有发射组。请只选择尚未编组的空投仓。</MS_Transport_GroupAlreadyAssigned>
   <MS_Transport_GroupInvalid>请选择同一地图上同类型、属于玩家且尚未编组的空投仓。</MS_Transport_GroupInvalid>
   <MS_Transport_GroupMass>发射组载重：{0} / {1}千克</MS_Transport_GroupMass>
   <MS_Transport_TargetLimit>目标库存上限</MS_Transport_TargetLimit>
   <MS_Transport_TargetLimitHelp>按选定目标容器内该物品的总数量计算，仅补差额；默认75，0暂停。已超上限不自动取回。自动供给和立即供给均遵守此上限，运输容器同时受载重限制。燃料设备的正数上限不替代其目标燃料量。</MS_Transport_TargetLimitHelp>
+  <MS_Transport_FirstPodTitle>空投仓：建立发射组</MS_Transport_FirstPodTitle>
+  <MS_Transport_FirstPodText>魔法存储提示：\n你已建成第一个空投仓。\n\n使用魔法存储时，请先选中要一起发射的空投仓，点击“建立发射组”按钮，再通过单个物资补给器提供需要空投的内容。装货后使用原版发射按钮。</MS_Transport_FirstPodText>
+  <MS_Transport_FirstShuttleTitle>穿梭机：物资补给</MS_Transport_FirstShuttleTitle>
+  <MS_Transport_FirstShuttleText>魔法存储提示：\n你已建成第一架载客穿梭机。\n\n可以使用物资补给器为穿梭机手动补给或持续供应物资。</MS_Transport_FirstShuttleText>
+  <MS_Transport_FirstVehicleTitle>载具：装货与远行队</MS_Transport_FirstVehicleTitle>
+  <MS_Transport_FirstVehicleText>魔法存储提示：你建造了第一个载具框架的载具。\n\n你无法通过远行队传送器来组建载具远行队。但是你可以通过物资补给器给载具装货，通过原版组建远行队的方式进行。</MS_Transport_FirstVehicleText>
 </LanguageData>

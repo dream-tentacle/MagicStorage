@@ -144,4 +144,9 @@
   <MS_Craft_WorkDisabled>Work not assigned</MS_Craft_WorkDisabled>
   <MS_Gestation_MissingMaterials>Insufficient materials (available/required): {0}</MS_Gestation_MissingMaterials>
   <MS_Gestation_MaterialCount>{0} {1}/{2}</MS_Gestation_MaterialCount>
+  <MS_Craft_WorkbenchOnly>Production workbench</MS_Craft_WorkbenchOnly>
+  <MS_Craft_AnyWorkbench>Any workbench</MS_Craft_AnyWorkbench>
+  <MS_Craft_MissingWorkbench>Assigned workbench no longer exists</MS_Craft_MissingWorkbench>
+  <MS_Craft_WorkbenchFilterOn>Workbench filter: on. Hides orders assigned elsewhere, printer-only orders, and work types disabled at this bench. Click to show all orders.</MS_Craft_WorkbenchFilterOn>
+  <MS_Craft_WorkbenchFilterOff>Workbench filter: off. Click to hide orders assigned elsewhere, printer-only orders, and work types disabled at this bench.</MS_Craft_WorkbenchFilterOff>
 </LanguageData>

@@ -104,7 +104,7 @@ namespace MagicStorage
         internal bool CanStartOrder(JobDriver_CosmicCrafting driver)
         {
             var core = driver.Core; var order = driver.Order;
-            return CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef) &&
+            return order != null && order.AllowsWorkbench(driver.Bench) && CanClaimOrder(core, order, driver.pawn, driver.job.workGiverDef) &&
                 (order.Batch != null || MaterialsAvailable(core, order, true));
         }
 
@@ -151,7 +151,7 @@ namespace MagicStorage
                 if (!core.CanWork || core.Faction != pawn.Faction) continue;
                 var order = FindOrder(pawn, giver, core, out _, FloatMenuMakerMap.makingFor == pawn, false);
                 if (order == null) continue;
-                var bench = FindBench(pawn, core.Network, giver.workType);
+                var bench = FindBench(pawn, core.Network, giver.workType, order);
                 if (bench == null) continue;
                 lastCoreIds[giver.workType] = core.thingIDNumber;
                 return MakeJob(giver, bench, core, order);
@@ -159,7 +159,7 @@ namespace MagicStorage
             return null;
         }
         private CraftingOrder FindOrder(Pawn pawn, WorkGiverDef giver, Building_StorageCore core, out string reason,
-            bool immediate = false, bool reportFailure = true)
+            bool immediate = false, bool reportFailure = true, Building_CosmicWorkbench requiredBench = null)
         {
             reason = null;
             foreach (var order in core.Crafting.Orders)
@@ -168,6 +168,8 @@ namespace MagicStorage
                 // Only this pawn's eligible orders may contribute an availability reason.
                 // This also avoids counting products or scanning materials for excluded orders.
                 if (!CraftingServices.Workers.Allows(order, pawn, giver.workType)) continue;
+                if (requiredBench != null ? !order.AllowsWorkbench(requiredBench)
+                    : FindBench(pawn, core.Network, giver.workType, order) == null) continue;
                 string failure = null;
                 var worker = AssignedThing(order);
                 if (worker != null)
@@ -209,7 +211,7 @@ namespace MagicStorage
                 active.Bench == bench && pawn.CurJob.workGiverDef == giver && active.CanContinue()) return pawn.CurJob;
             if (!CanUseBench(pawn, bench, network, giver.workType))
             { JobFailReason.Is("MS_Craft_NoBench".Translate()); return null; }
-            var order = FindOrder(pawn, giver, network.Core, out string reason, forced || FloatMenuMakerMap.makingFor == pawn);
+            var order = FindOrder(pawn, giver, network.Core, out string reason, forced || FloatMenuMakerMap.makingFor == pawn, requiredBench: bench);
             if (order == null) { JobFailReason.Is(reason); return null; }
             return MakeJob(giver, bench, network.Core, order);
         }
@@ -224,8 +226,8 @@ namespace MagicStorage
                 bench.InteractionCell.Standable(pawn.Map) && pawn.CanReserveAndReach(bench, PathEndMode.InteractionCell, Danger.Some) &&
                 pawn.CanReserveSittableOrSpot(bench.InteractionCell);
         }
-        private Building_CosmicWorkbench FindBench(Pawn pawn, StorageNetwork network, WorkTypeDef workType) => benches
-            .Where(b => CanUseBench(pawn, b, network, workType)).OrderBy(b => pawn.Position.DistanceToSquared(b.Position)).FirstOrDefault();
+        private Building_CosmicWorkbench FindBench(Pawn pawn, StorageNetwork network, WorkTypeDef workType, CraftingOrder order) => benches
+            .Where(b => order.AllowsWorkbench(b) && CanUseBench(pawn, b, network, workType)).OrderBy(b => pawn.Position.DistanceToSquared(b.Position)).FirstOrDefault();
 
         internal string Status(Building_StorageCore core, CraftingOrder order)
             => Status(core, order, null);
@@ -246,7 +248,7 @@ namespace MagicStorage
                 CraftingRecipeCatalog.Routes(order.Recipe).Any(w => CraftingServices.Workers.Allows(order, p, w.workType))).ToList();
             if (eligible.Count == 0) return "MS_Craft_NoWorker".Translate();
             return eligible.Any(p => CraftingRecipeCatalog.Routes(order.Recipe).Any(w =>
-                CraftingServices.Workers.Allows(order, p, w.workType) && FindBench(p, core.Network, w.workType) != null))
+                CraftingServices.Workers.Allows(order, p, w.workType) && FindBench(p, core.Network, w.workType, order) != null))
                 ? "MS_Craft_Ready".Translate() : "MS_Craft_NoBench".Translate();
         }
 

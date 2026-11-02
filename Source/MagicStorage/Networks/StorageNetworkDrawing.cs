@@ -16,6 +16,7 @@ namespace MagicStorage
         internal static bool ShouldDraw(Map map)
         {
             if (map != Find.CurrentMap) return false;
+            if (Find.DesignatorManager.SelectedDesignator is Designator_DeconstructStorageConduit) return true;
             if (Find.DesignatorManager.SelectedDesignator is Designator_Place placing &&
                 StorageConnectionQuery.IsStorage(placing.PlacingDef as ThingDef)) return true;
             foreach (var selected in Find.Selector.SelectedObjectsListForReading)

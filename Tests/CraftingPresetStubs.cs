@@ -65,6 +65,7 @@ namespace RimWorld
 }
 namespace MagicStorage
 {
+    public sealed class Building_CosmicWorkbench { }
     public sealed class CraftingBatch
     {
         public float Progress => .5f;

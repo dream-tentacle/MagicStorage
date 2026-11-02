@@ -51,9 +51,28 @@ internal static class FuelSupplierTests
     internal static int Run()
     {
         assertions = 0;
-        AreaAndTargets(); NativeRules(); HalfFullGenerator(); ImmediateSupply(); ReservationsAndRecovery(); OverlapAndOrder(); NetworkAndTicking(); CommitBoundaryExceptions();
+        AreaAndTargets(); NativeRules(); HalfFullGenerator(); ImmediateSupply(); ReservationsAndRecovery(); OverlapAndOrder(); NetworkAndTicking(); CommitBoundaryExceptions(); MultipleFuelComponents();
         return assertions;
     }
+    private static void MultipleFuelComponents()
+    {
+        var f = new Fixture(); f.Store(30);
+        var first = f.Target(3); first.Fuel = 10;
+        var second = new CompRefuelable { parent = first.parent, TargetFuelLevel = 10 };
+        second.Props.fuelFilter.SetAllow(f.Fuel, true);
+        ((ThingWithComps)first.parent).AllComps.Add(second);
+        f.Supplier.SupplyFuel();
+        Equal(10f, second.Fuel, "full first component does not hide empty second component");
+        Equal(20L, f.Network.GetTotalCount(f.Fuel), "only second component consumes fuel");
+        first.Fuel = 0; first.allowAutoRefuel = false; second.Fuel = 5;
+        f.Supplier.SupplyFuel();
+        Equal(5f, second.Fuel, "second component respects automatic threshold");
+        f.Supplier.GetGizmos().OfType<Command_Action>().Single().action();
+        Equal(10f, second.Fuel, "immediate command fills second component above threshold");
+        Equal(0f, first.Fuel, "disabled first component stays disabled");
+        Equal(15L, f.Network.GetTotalCount(f.Fuel), "multi-component immediate supply consumes exact deficit");
+    }
+
     private static void AreaAndTargets()
     {
         var f = new Fixture(); f.Store(100);

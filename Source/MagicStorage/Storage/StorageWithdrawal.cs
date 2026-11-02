@@ -61,8 +61,7 @@ namespace MagicStorage
                 // minified items and mod-provided CanStackWith rules. Physical stack limits
                 // do not limit a display row. No trade session or trade UI is constructed.
                 foreach (var candidate in candidates)
-                    if (TransferableUtility.TransferAsOne(item, candidate.Representative, TransferAsOneMode.Normal) &&
-                        (canGroup == null || canGroup(item, candidate.Representative)))
+                    if (CanGroupSafely(item, candidate.Representative, canGroup))
                     { row = candidate; break; }
                 if (row == null) { row = new StorageItemRow(); candidates.Add(row); result.Add(row); }
                 row.Stacks.Add(item);
@@ -70,6 +69,33 @@ namespace MagicStorage
             foreach (var row in result) row.Recount(network);
             return result;
         }
+
+        private static bool CanGroupSafely(Thing left, Thing right, Func<Thing, Thing, bool> canGroup)
+        {
+            try
+            {
+                return TransferableUtility.TransferAsOne(left, right, TransferAsOneMode.Normal) &&
+                    (canGroup == null || canGroup(left, right));
+            }
+            catch (Exception exception)
+            {
+                // Grouping is only a display optimization. Keep both real stacks available
+                // in separate rows if vanilla or a mod cannot compare them.
+                string leftInfo = GroupingIdentity(left);
+                string rightInfo = GroupingIdentity(right);
+                string key = "MagicStorage.InventoryGrouping:" + leftInfo + ":" + rightInfo + ":" + exception.GetType().FullName;
+                Log.ErrorOnce("[MagicStorage] Inventory grouping failed; keeping these stacks separate.\n" +
+                    "Left: " + leftInfo + ", thingID=" + left?.thingIDNumber + "\n" +
+                    "Right: " + rightInfo + ", thingID=" + right?.thingIDNumber + "\n" + exception, key.GetHashCode());
+                return false;
+            }
+        }
+
+        // Avoid labels, ToString and inner-item access: those may be the failing mod code.
+        private static string GroupingIdentity(Thing item) =>
+            "def=" + (item?.def?.defName ?? "<null>") +
+            ", type=" + (item?.GetType().FullName ?? "<null>") +
+            ", mod=" + (item?.def?.modContentPack?.PackageId ?? "<unknown>");
 
         internal static StorageWithdrawalResult Execute(Building_StorageCore core, StorageNetwork expected,
             IList<StorageItemRow> rows, bool forbid)

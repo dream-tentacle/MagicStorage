@@ -2,6 +2,89 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_8</defName>
+    <label>Version log</label>
+    <version>1.2.8</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>The production output port previously supplied automated production facilities from The Dead Man's Switch 2, but failed to consume ingredients, allowing production to start without using materials. This has now been fixed.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_7</defName>
+    <label>Version log</label>
+    <version>1.2.7</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved shelf rendering rules: objects prone to rendering errors now use a placeholder texture directly.</li>
+          <li>Added a deconstruct storage conduit button.</li>
+          <li>Improved fuel supplier refueling rules.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_6</defName>
+    <label>Version log</label>
+    <version>1.2.6</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved building descriptions.</li>
+          <li>Improved tip text.</li>
+          <li>You can now search for recipes and workbenches directly on the Production orders page.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved detection of items in storage when Nivarian buildings maintain production targets. (Note: Compatibility with this mod has already been improved several times; no further improvements will be made.)</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_5</defName>
+    <label>Version log</label>
+    <version>1.2.5</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved shelf selection compatibility with dd.logicalfloors.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Added defensive handling for errors when checking whether items can be grouped together.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_4</defName>
+    <label>Version log</label>
+    <version>1.2.4</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>Production orders can now be restricted to a specific workbench. Workbenches can be renamed to make selection easier.</li>
+          <li>Enable the option in settings to automatically assign orders added from a workbench to that workbench only. This option is disabled by default.</li>
+          <li>The filter above the production order list can hide orders that cannot be processed at the current workbench, including printer-only orders.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_2_3</defName>
     <label>Version log</label>
     <version>1.2.3</version>

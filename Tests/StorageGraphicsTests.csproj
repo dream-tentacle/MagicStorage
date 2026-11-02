@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup><Reference Include="System" /><Reference Include="System.Core" /></ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Source\MagicStorage\Buildings\Designator_DeconstructStorageConduit.cs" />
     <Compile Include="StorageGraphicsStubs.cs" /><Compile Include="StorageGraphicsTests.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\StorageConduit.cs" />
     <Compile Include="..\Source\MagicStorage\Networks\CompStorageNode.cs" />

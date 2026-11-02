@@ -6,7 +6,7 @@
     <LangVersion>7.3</LangVersion>
     <OutputPath Condition="'$(OutputPath)' == ''">bin\</OutputPath>
     <AssemblyName Condition="'$(AssemblyName)' == ''">StorageFoundationTests</AssemblyName>
-    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;WORKBENCH_UNLOCK_TESTS;CONSTRUCTION_REPAIR_TESTS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRANSPORT_SUPPLIER_TESTS;MONOLYN_COMPATIBILITY_TESTS;STORAGE_INDEX_TESTS;WORKBENCH_UNLOCK_TESTS;CONSTRUCTION_REPAIR_TESTS;NIVARIAN_BILL_TESTS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" /><Reference Include="System.Core" />
@@ -80,6 +80,8 @@
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfTemperaturePatches.cs" />
     <Compile Include="ResourceCounterStubs.cs" />
     <Compile Include="StorageResourceCounterTests.cs" />
+    <Compile Include="NivarianBillTests.cs" />
+    <Compile Include="..\Source\MagicStorage\Compatibility\NivarianBillCompatibility.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageResourceCounter.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_StorageSupplyShelf.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageShelfSupply.cs" />

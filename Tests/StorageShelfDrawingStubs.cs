@@ -95,8 +95,10 @@ namespace Verse
         public override bool Equals(object obj) => obj is Rot4 r && r==this;
         public override int GetHashCode() => Value;
     }
+    public class ModContentPack { public string Name, PackageId; }
     public class ThingDef
     {
+        public string defName; public ModContentPack modContentPack;
         public readonly List<DefModExtension> modExtensions = new List<DefModExtension>();
         public T GetModExtension<T>() where T : DefModExtension
         { foreach (var extension in modExtensions) if (extension is T match) return match; return null; }
@@ -120,9 +122,18 @@ namespace Verse
     }
     public class ThingWithComps : Thing
     {
+        public readonly List<ThingComp> AllComps = new List<ThingComp>();
         protected override void DrawAt(Vector3 drawLoc, bool flip = false) { }
         public override void Print(SectionLayer layer) { }
     }
+    public class ThingComp
+    {
+        public virtual bool DontDrawParent() => false;
+        public virtual void DrawAt(Vector3 pos, bool flip) { }
+        public virtual void PostDraw() { }
+        public virtual void PostPrintOnto(SectionLayer layer) { }
+    }
+    public static class Log { public static string LastMessage; public static int LastKey; public static void ErrorOnce(string message, int key) { LastMessage = message; LastKey = key; } }
     public class SectionLayer { }
     public class SectionLayer_ThingsGeneral : SectionLayer { public void TakePrintFrom(Thing t) { } }
     public static class GenThing { public static Vector3 TrueCenter(Thing t) => default(Vector3); }
@@ -144,6 +155,8 @@ namespace Verse
     }
     public static class Find { public static List<Map> Maps=new List<Map>(); }
     public class GraphicData { public float flipExtraRotation; }
+    public static class ContentFinder<T> where T : new()
+    { public static readonly T Value = new T(); public static T Get(string path) => Value; }
     public static class BaseContent
     {
         public static readonly Graphic BadGraphic = new Graphic();
@@ -223,7 +236,7 @@ namespace Verse
     public static class Printer_Plane
     {
         public static List<DrawCommand> Calls=new List<DrawCommand>();
-        public static void PrintPlane(SectionLayer_ThingsGeneral layer, Vector3 center, Vector2 size, Material mat,
+        public static void PrintPlane(SectionLayer layer, Vector3 center, Vector2 size, Material mat,
             float angle, bool flip, Vector2[] uvs, Color32[] colors) =>
             Calls.Add(new DrawCommand { Center=center,Size=size,Material=mat,Angle=angle,Flip=flip });
     }

@@ -309,3 +309,23 @@ namespace MagicStorage
     }
     internal sealed class VanillaCraftingProductionPolicy : TestProductionPolicy { }
 }
+
+namespace Verse
+{
+    public interface IRenameable
+    {
+        string RenamableLabel { get; set; }
+        string BaseLabel { get; }
+        string InspectLabel { get; }
+    }
+    public struct AcceptanceReport
+    {
+        public static implicit operator AcceptanceReport(bool accepted) => new AcceptanceReport();
+    }
+    public abstract class Dialog_Rename<T> where T : class, IRenameable
+    {
+        protected Dialog_Rename(T target) { }
+        protected virtual AcceptanceReport NameIsValid(string name) => true;
+    }
+    public static class TexButton { public static UnityEngine.Texture2D Rename; }
+}

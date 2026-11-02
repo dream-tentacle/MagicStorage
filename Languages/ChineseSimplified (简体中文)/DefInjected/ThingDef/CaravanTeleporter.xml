@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <MS_CaravanTeleporter.label>远行队传送器</MS_CaravanTeleporter.label>
-  <MS_CaravanTeleporter.description>使用连接的魔法存储网络中的物资组建远行队。确认后，所选物资直接转入远行队成员的背包，人员立即在大地图上形成远行队。</MS_CaravanTeleporter.description>
+  <MS_CaravanTeleporter.description>使用连接的魔法存储网络中的物资组建远行队。确认后，所选物资直接转入远行队成员的背包，人员立即在大地图上形成远行队。\n\n如果你使用了载具框架：你无法通过远行队传送器来组建载具远行队。但是你可以通过物资补给器给载具装货，通过原版组建远行队的方式进行。</MS_CaravanTeleporter.description>
 </LanguageData>

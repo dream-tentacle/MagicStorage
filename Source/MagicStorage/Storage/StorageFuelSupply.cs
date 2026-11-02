@@ -8,6 +8,15 @@ namespace MagicStorage
     // Shared by directional material suppliers and area fuel suppliers.
     internal static class StorageFuelSupply
     {
+        internal static List<CompRefuelable> FuelComponents(Thing target)
+        {
+            var result = new List<CompRefuelable>();
+            if (target is ThingWithComps withComps)
+                foreach (ThingComp comp in withComps.AllComps)
+                    if (comp is CompRefuelable fuel) result.Add(fuel);
+            return result;
+        }
+
         internal static bool NeedsFuel(CompRefuelable target, bool immediate = false)
         {
             if (target == null || !target.parent.Spawned || target.parent.Destroyed ||

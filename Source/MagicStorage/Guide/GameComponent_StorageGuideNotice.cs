@@ -10,6 +10,10 @@ namespace MagicStorage
     public sealed class GameComponent_StorageGuideNotice : GameComponent
     {
         private bool sent;
+        private bool transportPodNoticeSent;
+        private bool shuttleNoticeSent;
+        private bool vehicleNoticeSent;
+        internal bool VehicleNoticeSent => vehicleNoticeSent;
         private int learned;
         private int advancedLearned;
         private StorageGuideStage stage;
@@ -23,6 +27,7 @@ namespace MagicStorage
         };
 
         internal StorageGuideStage Stage => stage;
+        internal static bool IsBasicBuilding(string defName) => defName == "MS_ConstructionSupplyUnit";
         internal bool Learned(int step) => step >= 0 && step < 6 && (learned & (1 << step)) != 0;
         internal bool AdvancedLearned(int step) => (advancedLearned & (1 << step)) != 0;
 
@@ -32,6 +37,9 @@ namespace MagicStorage
         {
             base.ExposeData();
             Scribe_Values.Look(ref sent, "storageGuideNoticeSent", false);
+            Scribe_Values.Look(ref transportPodNoticeSent, "storageTransportPodNoticeSent", false);
+            Scribe_Values.Look(ref shuttleNoticeSent, "storageShuttleNoticeSent", false);
+            Scribe_Values.Look(ref vehicleNoticeSent, "storageVehicleNoticeSent", false);
             Scribe_Values.Look(ref learned, "storageGuideLearned", 0);
             Scribe_Values.Look(ref advancedLearned, "storageGuideAdvancedLearned", 0);
             Scribe_Values.Look(ref stage, "storageGuideStage", StorageGuideStage.Basics);
@@ -59,6 +67,8 @@ namespace MagicStorage
         private void UpdateStage(Building_StorageCore core)
         {
             if ((learned & 63) != 63) return;
+            for (int i = 0; i < AdvancedDefNames.Length; i++)
+                if (IsBasicBuilding(AdvancedDefNames[i]) && !AdvancedLearned(i)) return;
             if (stage == StorageGuideStage.Basics) stage = StorageGuideStage.Advanced;
             if (!basicRewardSent)
             {
@@ -66,7 +76,8 @@ namespace MagicStorage
                 basicRewardSent = true;
             }
             for (int i = 0; i < AdvancedDefNames.Length; i++)
-                if (DefDatabase<ThingDef>.GetNamedSilentFail(AdvancedDefNames[i]) != null && !AdvancedLearned(i)) return;
+                if (!IsBasicBuilding(AdvancedDefNames[i]) &&
+                    DefDatabase<ThingDef>.GetNamedSilentFail(AdvancedDefNames[i]) != null && !AdvancedLearned(i)) return;
             stage = StorageGuideStage.Completed;
             if (!advancedRewardSent)
             {
@@ -114,6 +125,32 @@ namespace MagicStorage
             }
         }
 
+        internal void Notify_TransportPodBuilt(Thing pod)
+        {
+            if (transportPodNoticeSent || !StorageTransportGroups.IsPlayerPod(pod.TryGetComp<CompTransporter>())) return;
+            Find.LetterStack.ReceiveLetter("MS_Transport_FirstPodTitle".Translate(),
+                "MS_Transport_FirstPodText".Translate(), LetterDefOf.NeutralEvent, pod);
+            transportPodNoticeSent = true;
+        }
+
+        internal void Notify_ShuttleBuilt(Thing shuttle)
+        {
+            if (shuttleNoticeSent || shuttle == null || !shuttle.Spawned || shuttle.Destroyed ||
+                shuttle.Faction != Faction.OfPlayer || shuttle.def.defName != "PassengerShuttle") return;
+            Find.LetterStack.ReceiveLetter("MS_Transport_FirstShuttleTitle".Translate(),
+                "MS_Transport_FirstShuttleText".Translate(), LetterDefOf.NeutralEvent, shuttle);
+            shuttleNoticeSent = true;
+        }
+
+        internal void Notify_VehicleBuilt(Map map, IntVec3 position)
+        {
+            if (vehicleNoticeSent || map == null) return;
+            Find.LetterStack.ReceiveLetter("MS_Transport_FirstVehicleTitle".Translate(),
+                "MS_Transport_FirstVehicleText".Translate(), LetterDefOf.NeutralEvent,
+                new TargetInfo(position, map));
+            vehicleNoticeSent = true;
+        }
+
         internal void Notify_CoreBuilt(Building_StorageCore core)
         {
             if (sent || stage != StorageGuideStage.Basics || !ValidCore(core)) return;
@@ -140,7 +177,8 @@ namespace MagicStorage
         {
             __state = __instance.Faction == Faction.OfPlayer &&
                 __instance.def.entityDefToBuild is ThingDef def &&
-                def.thingClass == typeof(Building_StorageCore) ? __instance.Map : null;
+                (def.thingClass == typeof(Building_StorageCore) || def.HasComp(typeof(CompTransporter)))
+                ? __instance.Map : null;
         }
 
         private static void AfterConstruction(Frame __instance, Map __state)
@@ -148,6 +186,13 @@ namespace MagicStorage
             if (__state == null || !__instance.Destroyed) return;
             var core = __instance.Position.GetFirstThing<Building_StorageCore>(__state);
             Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.Notify_CoreBuilt(core);
+            foreach (Thing thing in __instance.Position.GetThingList(__state))
+            {
+                if (thing.def != __instance.def.entityDefToBuild) continue;
+                Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.Notify_TransportPodBuilt(thing);
+                Current.Game?.GetComponent<GameComponent_StorageGuideNotice>()?.Notify_ShuttleBuilt(thing);
+                break;
+            }
         }
     }
 }

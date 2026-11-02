@@ -204,6 +204,13 @@ namespace RimWorld
 {
     public class Faction { public static readonly Faction OfPlayer=new Faction(); }
     public class Selector { public readonly List<object> SelectedObjectsListForReading=new List<object>(); }
+    public class Designator_Deconstruct
+    {
+        protected string defaultLabel, defaultDesc;
+        protected object icon;
+        public bool BaseAccepts = true;
+        public virtual Verse.AcceptanceReport CanDesignateThing(Verse.Thing t) => BaseAccepts;
+    }
     public class Designator_Place { public Verse.BuildableDef PlacingDef; }
     public static class MapMeshFlagDefOf { public const ulong Things=1,Buildings=2,FogOfWar=4; }
 }
@@ -218,3 +225,6 @@ namespace MagicStorage
         public void NotifyFactionChanged(Verse.Thing thing) { FactionChanges++; }
     }
 }
+
+namespace Verse { public static class ContentFinder<T> { public static T Get(string path) => default(T); } }
+namespace UnityEngine { public class Texture2D { } }

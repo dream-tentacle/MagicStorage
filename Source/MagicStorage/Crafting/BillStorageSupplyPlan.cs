@@ -9,7 +9,7 @@ namespace MagicStorage
 {
     // A saved plan owns no items and holds no reservations. Only an accepted job
     // stages real items; after delivery native placedThings owns the recipe state.
-    internal sealed class BillStorageSupplyPlan : IExposable
+    internal sealed partial class BillStorageSupplyPlan : IExposable
     {
         internal sealed class Entry : IExposable
         {
@@ -114,18 +114,20 @@ namespace MagicStorage
             return true;
         }
 
-        internal bool CanPrepare(Job job, Pawn pawn)
+        internal bool CanPrepare(Job job, Pawn pawn, ThingOwner container = null)
         {
             if (completed) return true;
             if (preparing || !(job.targetA.Thing is Building_WorkTable table)) return false;
             var manager = table.Map?.GetComponent<MapComponent_StorageNetworks>();
             if (manager == null) return false;
             manager.EnsureCurrent();
-            return Valid(job, pawn, table) && PlanCells(table, pawn) != null;
+            return Valid(job, pawn, table) && (container != null
+                ? ReferenceEquals(container.Owner, table) : PlanCells(table, pawn) != null);
         }
 
-        internal bool Prepare(Job job, Pawn pawn)
+        internal bool Prepare(Job job, Pawn pawn, ThingOwner container = null)
         {
+            if (container != null) return PrepareContainer(job, pawn, container);
             if (completed) return true;
             if (preparing || !(job.targetA.Thing is Building_WorkTable table)) return false;
             Map map = table.Map;

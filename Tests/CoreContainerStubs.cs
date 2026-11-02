@@ -48,7 +48,14 @@ namespace MagicStorage
         public static readonly object MS_ShelfLocalPresets = new object();
     }
     public sealed class CompStorageGuide : Verse.ThingComp { internal void Complete(int step) { } }
+#if WORKBENCH_UNLOCK_TESTS
+    public sealed class GameComponent_StorageGuideNotice : Verse.GameComponent
+    {
+        internal bool VehicleNoticeSent => false;
+        internal void Notify_VehicleBuilt(Verse.Map map, Verse.IntVec3 position) { }
+    }
+#endif
     public sealed class Dialog_StorageGuide { public Dialog_StorageGuide(Building_StorageCore core = null) { } }
-    public class Dialog_CosmicCrafting { public Dialog_CosmicCrafting(Building_StorageCore core) { } }
+    public class Dialog_CosmicCrafting { public Dialog_CosmicCrafting(Building_StorageCore core, Building_CosmicWorkbench sourceWorkbench = null) { } }
     public class Dialog_StorageInventory { public Dialog_StorageInventory(Building_StorageCore core) { } }
 }

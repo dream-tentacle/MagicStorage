@@ -31,6 +31,10 @@ namespace MagicStorage
                 prefix: Hook(nameof(BeginShelf)), finalizer: Hook(nameof(EndScope)), transpiler: new HarmonyMethod(route));
             harmony.Patch(AccessTools.Method(typeof(StorageShelfTemperaturePatches), "AdjustItemTemperature"),
                 prefix: Hook(nameof(BeginShelf)), finalizer: Hook(nameof(EndScope)), transpiler: new HarmonyMethod(route));
+            // Click and drag selection share this predicate. Resolve storage on the item's
+            // floor when it is evaluated, including during deferred candidate enumeration.
+            harmony.Patch(AccessTools.Method(typeof(StorageSelectionPatches), "IsSupplyShelfItem"),
+                prefix: Hook(nameof(BeginShelf)), finalizer: Hook(nameof(EndScope)), transpiler: new HarmonyMethod(route));
 
             harmony.Patch(AccessTools.Method(typeof(MapComponent_StorageNetworks), "CollectAdjacent"), prefix: Hook(nameof(CollectAdjacent)));
             harmony.Patch(AccessTools.Method(typeof(MapComponent_StorageNetworks), "EnqueueAt"), prefix: Hook(nameof(EnqueueAt)));

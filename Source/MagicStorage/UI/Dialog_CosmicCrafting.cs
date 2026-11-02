@@ -20,7 +20,10 @@ namespace MagicStorage
         private static readonly Texture2D BottomHoverIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/MagicStorage/BottomHover");
         private static Vector2? lastClosedPosition;
         private readonly Building_StorageCore core;
+        private readonly Building_CosmicWorkbench sourceWorkbench;
+        private bool filterToSourceWorkbench;
         private readonly CosmicCraftingListFilter listFilter = new CosmicCraftingListFilter();
+        private readonly QuickSearchWidget search = new QuickSearchWidget();
         private Vector2 scroll, workbenchScroll;
         private readonly Dictionary<ThingDef, HashSet<WorkTypeDef>> availableWorkbenchTypes;
         private List<ThingDef> filteredWorkbenches;
@@ -43,13 +46,28 @@ namespace MagicStorage
         private bool IsDragging => ReorderableWidget.Dragging || groupedDrag?.Started == true;
         private readonly Dictionary<CraftingOrder, long> productCounts = new Dictionary<CraftingOrder, long>();
         public override Vector2 InitialSize => new Vector2(Math.Min(1100, UI.screenWidth), Math.Min(800, UI.screenHeight));
-        public Dialog_CosmicCrafting(Building_StorageCore core)
+        public override QuickSearchWidget CommonSearchWidget => search;
+
+        protected override Rect QuickSearchWidgetRect(Rect winRect, Rect inRect)
+            => new Rect(inRect.x, inRect.y + 40f, inRect.width, 24f);
+
+        public override void Notify_CommonSearchChanged()
+        {
+            SharedFilterChanged();
+            selectingGroup = false;
+            groupSelection.Clear();
+            orderDragButton = -1;
+        }
+
+        public Dialog_CosmicCrafting(Building_StorageCore core, Building_CosmicWorkbench sourceWorkbench = null)
         {
             this.core = core;
+            this.sourceWorkbench = sourceWorkbench;
             uiState = Current.Game.GetComponent<GameComponent_CosmicCraftingUI>();
             availableWorkbenchTypes = CraftingRecipeCatalog.SnapshotWorkbenchTypes();
             forcePause = false; absorbInputAroundWindow = true; doCloseX = true; doCloseButton = true;
             draggable = true;
+            resizeable = true;
         }
         protected override void SetInitialSizeAndPosition()
         {
@@ -88,8 +106,8 @@ namespace MagicStorage
                     statuses.Clear(); productCounts.Clear(); refreshAt = 0;
                     SharedFilterChanged();
                 }));
-            Widgets.Label(new Rect(0, 40, rect.width, 50), "MS_Craft_ProductionNotice".Translate());
-            const float tabsY = 95f;
+            Widgets.Label(new Rect(0, 72, rect.width, 50), "MS_Craft_ProductionNotice".Translate());
+            const float tabsY = 127f;
             float tabsHeight = listFilter.DrawTabs(new Rect(0, tabsY, rect.width, 32), SharedFilterChanged);
             float filterY = tabsY + tabsHeight + 8;
             float allRecipesWidth = Math.Min(136f, rect.width * 0.35f);
@@ -106,7 +124,7 @@ namespace MagicStorage
             Widgets.Label(new Rect(0, headingY, titleWidth, 28), ordersHeading.Truncate(titleWidth));
             float hintX = titleWidth + 8f;
             string dragHint = "MS_Craft_DragToSort".Translate();
-            float groupX = Math.Min(hintX + Text.CalcSize(dragHint).x + 6f, leftWidth - 28f);
+            float groupX = Math.Min(hintX + Text.CalcSize(dragHint).x + 6f, leftWidth - (sourceWorkbench != null ? 60f : 28f));
             Color headingColor = GUI.color;
             GUI.color = ColoredText.SubtleGrayColor;
             var hintRect = new Rect(hintX, headingY, Math.Max(0, groupX - hintX - 4f), 28);
@@ -119,6 +137,14 @@ namespace MagicStorage
                 core.Crafting.GroupingMode = !core.Crafting.GroupingMode;
                 selectingGroup = false; groupSelection.Clear(); groupedDrag = null; orderDragButton = -1; scroll = Vector2.zero;
             }
+            if (sourceWorkbench != null && DrawListModeButton(new Rect(groupX + 32f, headingY, 28, 28),
+                TexButton.Search, filterToSourceWorkbench,
+                (filterToSourceWorkbench ? "MS_Craft_WorkbenchFilterOn" : "MS_Craft_WorkbenchFilterOff").Translate()))
+            {
+                filterToSourceWorkbench = !filterToSourceWorkbench;
+                selectingGroup = false; groupSelection.Clear(); groupedDrag = null;
+                orderDragButton = -1; scroll = Vector2.zero;
+            }
             string workbenchesHeading = "MS_Craft_Workbenches".Translate();
             float headingX = leftWidth + 16;
             float compactX = Math.Min(headingX + Text.CalcSize(workbenchesHeading).x + 8f, rect.xMax - 28f);
@@ -127,11 +153,11 @@ namespace MagicStorage
                 (CompactMode ? "MS_Craft_CompactModeOn" : "MS_Craft_CompactModeOff").Translate()))
             { CompactMode = !CompactMode; workbenchScroll = Vector2.zero; }
             float ordersHeight = Math.Max(0, listHeight - (core.Crafting.GroupingMode ? 40f : 0f));
-            DrawOrders(new Rect(0, listY, leftWidth, ordersHeight),
-                core.Crafting.Orders.Where(order => listFilter.Matches(order.Recipe)).ToList());
+            var visibleOrders = core.Crafting.Orders.Where(MatchesOrderFilters).ToList();
+            DrawOrders(new Rect(0, listY, leftWidth, ordersHeight), visibleOrders);
             if (core.Crafting.GroupingMode)
             {
-                groupSelection.RemoveWhere(order => !core.Crafting.Orders.Contains(order));
+                groupSelection.RemoveWhere(order => !core.Crafting.Orders.Contains(order) || !MatchesOrderFilters(order));
                 if (Widgets.ButtonText(new Rect(0, listY + ordersHeight + 6f, leftWidth, 32f),
                     (selectingGroup ? "MS_Craft_FinishGroup" : "MS_Craft_StartGroup").Translate(),
                     active: selectingGroup ? groupSelection.Count > 0 : core.Crafting.Orders.Count > 0))
@@ -146,6 +172,7 @@ namespace MagicStorage
                 }
             }
             DrawWorkbenches(new Rect(leftWidth + 16, listY, rect.width - leftWidth - 16, listHeight));
+            search.noResultsMatched = visibleOrders.Count == 0 && filteredWorkbenches?.Count == 0;
             Event current = Event.current;
             if (groupedDrag != null && current.button == groupedDrag.Button)
             {
@@ -176,6 +203,17 @@ namespace MagicStorage
                 else if (current.type == EventType.MouseDrag) current.Use();
             }
         }
+        private bool MatchesOrderFilters(CraftingOrder order)
+        {
+            if (!listFilter.Matches(order.Recipe)) return false;
+            if (!search.filter.Matches(CraftingRecipeCatalog.Label(order.Recipe, order.Precept))) return false;
+            if (!filterToSourceWorkbench || sourceWorkbench == null) return true;
+            return sourceWorkbench.Spawned && sourceWorkbench.Network?.Core == core &&
+                order.AllowsWorkbench(sourceWorkbench) &&
+                (order.Worker != null || order.WorkerKind != CraftingWorkerKind.Printers) &&
+                CraftingRecipeCatalog.Routes(order.Recipe).Any(route => sourceWorkbench.AllowsWorkType(route.workType));
+        }
+
         private void SharedFilterChanged()
         {
             filteredWorkbenches = null;
@@ -204,6 +242,7 @@ namespace MagicStorage
                 filteredWorkbenches = availableWorkbenchTypes
                     .Where(pair => listFilter.WorkType == null || pair.Value.Contains(listFilter.WorkType))
                     .Select(pair => pair.Key).Where(listFilter.MatchesWorkbench)
+                    .Where(table => search.filter.Matches(table.label))
                     .OrderBy(uiState.WorkbenchSortGroup).ThenBy(uiState.WorkbenchFavoriteOrder)
                     .ThenBy(table => table.label).ToList();
                 workbenchViewWidth = -1f;
@@ -302,7 +341,10 @@ namespace MagicStorage
             Find.WindowStack.Add(new Dialog_CosmicRecipePicker(core, table, (recipe, precept) =>
             {
                 if (!CraftingRecipeCatalog.CanAdd(recipe)) return;
-                core.Crafting.Add(recipe, precept);
+                var added = core.Crafting.Add(recipe, precept);
+                if (added != null && MagicStorageMod.Settings.WorkbenchDefaultLocation &&
+                    sourceWorkbench?.Spawned == true && sourceWorkbench.Network?.Core == core)
+                { added.RestrictWorkbench = true; added.Workbench = sourceWorkbench; }
                 scroll = Vector2.zero; refreshAt = 0;
             }));
         }
@@ -728,6 +770,11 @@ namespace MagicStorage
             var view = new Rect(0, 0, inner.width - 18, repeatHeight);
             Widgets.BeginScrollView(inner, ref repeatScroll, view);
             float y = 0, width = view.width;
+            Label(ref y, width, "MS_Craft_WorkbenchOnly".Translate());
+            string benchLabel = !selected.RestrictWorkbench ? "MS_Craft_AnyWorkbench".Translate().ToString()
+                : selected.Workbench?.SelectionLabel ?? "MS_Craft_MissingWorkbench".Translate().ToString();
+            if (Widgets.ButtonText(new Rect(0, y, width, 28), benchLabel)) ChooseWorkbench();
+            y += 38;
             if (Widgets.ButtonText(new Rect(0, y, width, 28), ModeLabel(selected.Mode))) ChooseMode();
             y += 38;
             if (selected.Mode == CraftingRepeatMode.RepeatCount)
@@ -839,6 +886,22 @@ namespace MagicStorage
             GUI.color = color;
             Text.Anchor = anchor;
             Text.Font = font;
+        }
+        private void ChooseWorkbench()
+        {
+            var options = new List<FloatMenuOption>
+            {
+                new FloatMenuOption("MS_Craft_AnyWorkbench".Translate(), () =>
+                { selected.RestrictWorkbench = false; selected.Workbench = null; Changed(); })
+            };
+            foreach (var bench in core.Map.GetComponent<MapComponent_CosmicCrafting>().Workbenches
+                .OfType<Building_CosmicWorkbench>().Where(b => b.Network == core.Network && b.Faction == core.Faction))
+            {
+                var chosen = bench;
+                options.Add(new FloatMenuOption(bench.SelectionLabel, () =>
+                { selected.RestrictWorkbench = true; selected.Workbench = chosen; Changed(); }));
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
         }
         private void ChooseMode()
         {

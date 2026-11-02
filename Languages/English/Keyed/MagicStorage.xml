@@ -101,4 +101,9 @@
   <MS_DebugFill_SelectUnit>Select a single storage unit on the current map first.</MS_DebugFill_SelectUnit>
   <MS_DebugFill_NoMaterials>None of the resources used by this tool are loaded.</MS_DebugFill_NoMaterials>
   <MS_DebugFill_Completed>Added {0} full stacks. Storage slots: {1}/{2}.</MS_DebugFill_Completed>
+  <MS_SettingsWorkbenchDefaultLocation>Default to the current workbench</MS_SettingsWorkbenchDefaultLocation>
+  <MS_SettingsWorkbenchDefaultLocationHelp>When enabled, production orders added from a workbench are assigned to that workbench by default.</MS_SettingsWorkbenchDefaultLocationHelp>
+  <MS_DeconstructStorageConduit>Deconstruct storage conduit</MS_DeconstructStorageConduit>
+  <MS_DeconstructStorageConduitDesc>Deconstruct storage conduits and recover some resources. Only affects storage conduits, including hidden storage conduits.</MS_DeconstructStorageConduitDesc>
+  <MS_SettingsTabBalance>Balance</MS_SettingsTabBalance>
 </LanguageData>
