@@ -78,8 +78,18 @@ namespace MagicStorage
                 if (!CanWork) break;
                 if (!item.Spawned || item.Map != Map || !InAbsorbRange(item.Position) ||
                     item.IsForbidden(Faction) || Map.reservationManager.IsReservedByAnyoneOf(item, Faction)) continue;
-                var result = StorageReception.Transfer(Network, item, Map, item.Position);
-                if (result.Transferred > 0) Network.Core?.GetComp<CompStorageGuide>()?.Complete(4);
+                IntVec3 source = item.Position;
+                var result = StorageReception.Transfer(Network, item, Map, source);
+                if (result.Transferred <= 0) continue;
+                Network?.Core?.GetComp<CompStorageGuide>()?.Complete(4);
+                if (Spawned && source != Position)
+                {
+                    var beam = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionSupplyBeam") ??
+                        DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ProductionSupplyBeamFallback");
+                    if (beam != null)
+                        MoteMaker.MakeInteractionOverlay(beam, new TargetInfo(source, Map), new TargetInfo(Position, Map),
+                            default, this.TrueCenter() - Position.ToVector3Shifted());
+                }
             }
         }
 

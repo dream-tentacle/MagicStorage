@@ -35,7 +35,8 @@ internal static class VanillaBillSupplyTests
             Network.Core = new Building_StorageCore { Map = Map, Spawned = true, Network = Network }; Network.Units.Add(Unit);
             Manager.Networks.Add(Network);
             Port.Map = Map; Port.Position = new IntVec3(9,10); Port.Spawned = true;
-            Port.Node = new CompStorageNode { Network = Network };
+            Port.Node = new CompStorageNode { Network = Network, parent = Port };
+            Network.Members.Add(Port.Node);
             Bill.billStack = new BillStack { billGiver = Table }; Bill.ingredientSearchRadius = 2;
         }
         internal Thing Stock(int count, ThingDef def = null)
@@ -247,12 +248,281 @@ internal static class VanillaBillSupplyTests
         Equal(21,cloneFixture.StockCount,"cloned job supplies its requested materials once");
     }
 
+    private static List<Thing> Search(Fixture f, Bill bill, Thing target, List<Thing> local)
+    {
+        var begin = new object[] { bill, f.Pawn, target, null };
+        Call("BeginSearch", begin);
+        try
+        {
+            var args = new object[] { bill, local, false };
+            Call("AddCandidates", args);
+            return (List<Thing>)args[1];
+        }
+        finally { Call("EndSearch", new[] { begin[3], null }); }
+    }
+
+    private static Job AttachSpecial(Fixture f, Bill bill, Thing target, Job job)
+    {
+        job.bill = bill;
+        job.targetA = target;
+        var args = new object[] { f.Pawn, bill, target, job };
+        Call("AttachPlan", args);
+        return (Job)args[3];
+    }
+
+    private static void ProductionDeliveryBeams()
+    {
+        var f = new Fixture();
+        var beamDef = new ThingDef();
+        DefDatabase<ThingDef>.Defs["MS_Mote_ConstructionSupplyBeam"] = beamDef;
+        MoteMaker.Beams.Clear();
+        var far = new Building_ProductionOutputPort { Map = f.Map, Spawned = true, Position = new IntVec3(50,50) };
+        f.Network.Members.Insert(0,new CompStorageNode { parent = far, Network = f.Network });
+        var other = new StorageNetwork();
+        other.Core = new Building_StorageCore { Map = f.Map, Spawned = true, Network = other };
+        var port = new Building_ProductionOutputPort { Map = f.Map, Spawned = true, Position = new IntVec3(0,0) };
+        other.Members.Add(new CompStorageNode { parent = port, Network = other });
+        var unit = new Building_StorageUnit { Map = f.Map, Spawned = true, Network = other };
+        other.Units.Add(unit);
+        f.Manager.Networks.Add(other);
+        var third = new Thing { def = f.Steel, stackCount = 4 };
+        unit.Inventory.Contents.TryAdd(third,false);
+        var job = Attach(f,f.Job(f.Stock(8),2,f.Stock(5),1,third,3));
+        var probe = new object[] { new JobDriver_DoBill { job = job, pawn = f.Pawn }, true };
+        Call("Prepare",probe);
+        Equal(0,MoteMaker.Beams.Count,"planning and reservation probe produce no beams");
+        GenSpawn.AfterSpawn = item => f.Network.HasProductionOutputPort = false;
+        Equal(false,Start(f,job),"failed transfer rolls back");
+        Equal(0,MoteMaker.Beams.Count,"rollback never plays a beam");
+        f.Network.HasProductionOutputPort = true;
+        GenSpawn.AfterSpawn = null;
+        Equal(true,Start(f,job),"retry delivers all network contributions");
+        Equal(2,MoteMaker.Beams.Count,"one beam per contributing network, not per stack");
+        Equal(true,MoteMaker.Beams.Any(b => b.Item2 == f.Port),"nearest port selected over farther port");
+        Equal(true,MoteMaker.Beams.Any(b => b.Item2 == port),"second contributing network emits its own beam");
+        Equal(true,MoteMaker.Beams.All(b => b.Item1 == beamDef && b.Item3 == f.Table),"construction supply visual targets bill giver");
+        Equal(true,Start(f,job),"completed job can reenter reservations");
+        Equal(2,MoteMaker.Beams.Count,"completed delivery never replays beams");
+        DefDatabase<ThingDef>.Defs.Clear();
+        var fallback = new ThingDef();
+        DefDatabase<ThingDef>.Defs["MS_Mote_ProductionSupplyBeamFallback"] = fallback;
+        job = Attach(f,f.Job(f.Stock(3),1));
+        Equal(true,Start(f,job),"core-only delivery succeeds");
+        Equal(fallback,MoteMaker.Beams.Last().Item1,"core-only delivery uses fallback beam");
+        DefDatabase<ThingDef>.Defs.Clear();
+    }
+
+    private static void MedicalSupply()
+    {
+        var f = new Fixture();
+        var patient = new Pawn { Map = f.Map, Spawned = true, Position = f.Table.Position,
+            Faction = null, MaxMedicinePotency = 2 };
+        var bill = new Bill_Medical { billStack = new BillStack { billGiver = patient } };
+        bill.recipe.IsSurgery = true;
+        bill.recipe.workerClass = typeof(Recipe_InstallImplant);
+        var implant = f.Stock(1);
+        var weak = new Thing { def = new ThingDef { IsMedicine = true, Potency = 1 }, Spawned = true, Map = f.Map };
+        var stronger = f.Stock(3, new ThingDef { IsMedicine = true, Potency = 2 });
+        var forbidden = f.Stock(3, new ThingDef { IsMedicine = true, Potency = 3 });
+        var local = new List<Thing> { weak };
+        var candidates = Search(f, bill, patient, local);
+        Equal(3, candidates.Count, "includes allowed stored medicine and implant with local medicine");
+        Equal(stronger, candidates[0], "allowed medicine ordered by potency");
+        Equal(false, candidates.Contains(forbidden), "patient's medical care excludes stronger medicine");
+        Equal(1, local.Count, "medical search leaves native scratch list alone");
+
+        var mixed = AttachSpecial(f, bill, patient, f.Job(weak, 1, implant, 1));
+        Equal(weak, mixed.targetQueueB.Single().Thing, "native medicine remains in the job");
+        var cancelled = AttachSpecial(f, bill, patient, f.Job(implant, 1));
+        Call("ClearPlan", new object[] { cancelled });
+        Equal(7, f.StockCount, "discarded medical job did not withdraw");
+        var competitor = AttachSpecial(f, bill, patient, f.Job(implant, 1));
+        Equal(true, Start(f, mixed), "operation receives stored implant");
+        Equal(implant, mixed.placedThings.Single().thing, "specific implant arrives at patient's ingredient cell");
+        var otherDoctor = new Pawn { Map = f.Map, Spawned = true, CurJob = competitor };
+        var competingStart = new object[] { new JobDriver_DoBill { pawn = otherDoctor, job = competitor }, true };
+        Call("Prepare", competingStart);
+        Equal(false, (bool)competingStart[1], "second doctor cannot spend the same implant");
+        var drugJob = AttachSpecial(f, bill, patient, f.Job(stronger, 1));
+        patient.MaxMedicinePotency = 1;
+        Equal(false, Start(f, drugJob), "changed care restriction invalidates stored medicine before withdrawal");
+        Equal(6, f.StockCount, "medicine remains available after rejection");
+
+        patient.MaxMedicinePotency = 2;
+        GenSpawn.AfterSpawn = t => patient.MaxMedicinePotency = 1;
+        Equal(false, Start(f, drugJob), "care changed during transfer aborts delivery");
+        Equal(6, f.StockCount, "aborted medicine is returned to storage");
+        GenSpawn.AfterSpawn = null;
+        bill.recipe.IsSurgery = false;
+        Equal(false, VanillaBillStorage.Supports(bill, f.Pawn, patient), "non-surgical recipe excluded");
+        bill.recipe.IsSurgery = true;
+        patient.Dead = true;
+        bill.recipe.modContentPack.IsOfficialMod = true;
+        Equal(false, VanillaBillStorage.Supports(bill, f.Pawn, patient), "dead target excluded");
+    }
+
+    private sealed class ThirdPartyMedicalBill : Bill_Medical { }
+
+    private static void ThirdPartySurgery()
+    {
+        var f = new Fixture();
+        var patient = new Pawn { Map = f.Map, Spawned = true, Position = f.Table.Position };
+        var bill = new ThirdPartyMedicalBill { billStack = new BillStack { billGiver = patient } };
+        bill.recipe.IsSurgery = true;
+        bill.recipe.allowMixingIngredients = true;
+        bill.recipe.modContentPack.IsOfficialMod = false;
+        var medicineA = f.Stock(3, new ThingDef { IsMedicine = true, Potency = 1 });
+        var medicineB = f.Stock(2, new ThingDef { IsMedicine = true, Potency = 2 });
+        var named = f.Stock(1);
+        var germ = new Thing { Spawned = true, Map = f.Map };
+        bill.uniqueRequiredIngredients = new List<Thing> { named };
+        bill.xenogerm = germ;
+        var candidates = Search(f, bill, patient, new List<Thing>());
+        Equal(2, candidates.Count, "third-party medical bill can choose both medicine types");
+        Equal(false, candidates.Contains(named), "named object is not offered as generic network stock");
+        var nativeOnly = AttachSpecial(f, bill, patient, f.Job(named, 1));
+        Equal(named, nativeOnly.targetQueueB.Single().Thing, "named-only job remains intact");
+        var job = AttachSpecial(f, bill, patient, f.Job(medicineA, 2, named, 1, medicineB, 1, germ, 1));
+        Equal(named, job.targetQueueB[0].Thing, "named item remains in native target queue");
+        Equal(germ, job.targetQueueB[1].Thing, "xenogerm remains in native target queue");
+        Equal(true, job.countQueue.SequenceEqual(new[] { 1, 1 }), "preserves quantities of exact targets");
+        Equal(true, Start(f, job), "accepts mixed materials selected by native recipe solver");
+        Equal(3, job.placedThings.Sum(t => t.Count), "only ordinary recipe ingredients withdrawn");
+        Equal(true, f.Unit.Inventory.Contents.Contains(named), "named item was not debited or replaced");
+    }
+
+    private static void SurgeryMenuSupply()
+    {
+        var f = new Fixture();
+        var patient = new Pawn { Map = f.Map, Spawned = true, MaxMedicinePotency = 1 };
+        var stack = new BillStack { billGiver = patient };
+        var recipe = new RecipeDef { IsSurgery = true, workerClass = typeof(Recipe_InstallImplant) };
+        var eye = new ThingDef { defName = "BionicEye" };
+        var herb = new ThingDef { defName = "Herbal", IsMedicine = true, Potency = 1 };
+        var glitter = new ThingDef { defName = "Glitter", IsMedicine = true, Potency = 3 };
+        recipe.ingredients[0].IsFixedIngredient = true;
+        recipe.ingredients[0].filter.AllowedThingDefs.Add(eye);
+        var meds = new IngredientCount();
+        meds.filter.AllowedThingDefs.AddRange(new[] { herb, glitter });
+        recipe.ingredients.Add(meds);
+        var storedEye = f.Stock(1, eye);
+        f.Stock(2, glitter);
+
+        MethodInfo Patch(string name) => typeof(SurgeryMenuStorage).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
+        List<ThingDef> CheckMissing(params ThingDef[] vanillaMissing)
+        {
+            object[] args = { recipe, null, f.Map, vanillaMissing };
+            Patch("IncludeStock").Invoke(null, args);
+            return ((IEnumerable<ThingDef>)args[3]).ToList();
+        }
+        List<ThingDef> Menu(params ThingDef[] vanillaMissing)
+        {
+            List<ThingDef> result = null;
+            Func<List<FloatMenuOption>> options = () => { result = CheckMissing(vanillaMissing); return new List<FloatMenuOption>(); };
+            object[] args = { stack, options };
+            Patch("WrapOptions").Invoke(null, args);
+            ((Func<List<FloatMenuOption>>)args[1])();
+            return result;
+        }
+        bool HasStockMedicine()
+        {
+            object[] args = { patient, recipe, false };
+            Patch("IncludeMedicine").Invoke(null, args);
+            return (bool)args[2];
+        }
+
+        Equal(herb, Menu(eye, herb).Single(), "eye in stock appears but banned medicine keeps surgery disabled");
+        Equal(false, HasStockMedicine(), "banned stock medicine does not clear the warning");
+        Equal(eye, CheckMissing(eye).Single(), "queries outside the patient menu are unchanged");
+        f.Map.Ground.Add(new Thing { def = herb, Spawned = true, Map = f.Map });
+        Equal(0, Menu(eye).Count, "local medicine plus stored eye enables surgery");
+        f.Map.Ground.Clear();
+        f.Stock(2, herb);
+        Equal(0, Menu(eye, herb).Count, "all ingredients can be in storage");
+        Equal(true, HasStockMedicine(), "permitted network medicine clears the warning");
+        f.Network.HasProductionOutputPort = false;
+        Equal(2, Menu(eye, herb).Count, "disconnected port cannot satisfy missing ingredients");
+        Equal(false, HasStockMedicine(), "disconnected port cannot clear warning");
+        f.Network.HasProductionOutputPort = true;
+        storedEye.Forbidden = true;
+        Equal(eye, Menu(eye).Single(), "forbidden implant stays unavailable");
+        storedEye.Forbidden = false;
+        f.Unit.Forbidden = true;
+        Equal(eye, Menu(eye).Single(), "forbidden unit does not expose implant");
+        f.Unit.Forbidden = false;
+        recipe.workerClass = typeof(Recipe_Surgery);
+        recipe.modContentPack.IsOfficialMod = false;
+        recipe.allowMixingIngredients = true;
+        Equal(0, Menu(eye).Count, "third-party mixed surgery sees stored implant in menu");
+        recipe.IsSurgery = false;
+        Equal(eye, Menu(eye).Single(), "non-surgery uses native missing ingredients");
+        Equal(5, f.StockCount, "opening menus never withdraws items");
+        Equal(0, f.Network.Claims.Count, "opening menus does not reserve items");
+    }
+
+    private sealed class ThirdPartyGestator : Building_MechGestator { }
+
+    private sealed class ThirdPartyManufacture : Bill_ProductionMech { }
+
+    private static void GestatorSupply()
+    {
+        var f = new Fixture();
+        var machine = new Building_MechGestator { Map = f.Map, Spawned = true, Position = f.Table.Position };
+        var bill = new Bill_ProductionMech { billStack = new BillStack { billGiver = machine } };
+        var inside = new Thing { def = f.Steel, stackCount = 4 };
+        machine.innerContainer.TryAdd(inside, false);
+        var stock = f.Stock(20);
+        var local = new List<Thing> { inside };
+        var candidates = Search(f, bill, machine, local);
+        Equal(inside, candidates[0], "gestator offers inside materials first");
+        Equal(stock, candidates[1], "available deficit may be supplied by storage");
+        var job = AttachSpecial(f, bill, machine, f.Job(inside, 4, stock, 6));
+        Equal(inside, job.targetQueueB.Single().Thing, "preexisting ingredients stay in native queue");
+        inside.stackCount++;
+        Equal(false, Start(f, job), "changed gestator contents invalidate queued deficit");
+        Equal(20, f.StockCount, "stale deficit did not withdraw from network");
+        inside.stackCount--;
+        Equal(true, Start(f, job), "gathering job accepts six missing units");
+        Equal(14, f.StockCount, "only missing units withdrawn");
+        Equal(null, job.placedThings, "network materials not marked as delivered before hauling");
+        Equal(true, job.targetQueueB[1].Thing.Spawned, "native driver receives a real stack to haul inside");
+        Equal(6, job.countQueue[1], "quantity passed to native driver");
+        Equal(true, Start(f, job), "second reservation can reuse delivered stack");
+        Equal(14, f.StockCount, "no duplicate withdrawal");
+        var pending = AttachSpecial(f, bill, machine, f.Job(stock, 2));
+        bill.State = FormingState.Forming;
+        Equal(false, Start(f, pending), "formed job does not withdraw");
+        Equal(14, f.StockCount, "no charge outside gathering");
+        bill.State = FormingState.Gathering;
+        machine.def.defName = "LargeMechGestator";
+        Equal(true, VanillaBillStorage.Supports(bill, f.Pawn, machine), "large vanilla gestator included");
+        var resurrection = new Bill_ResurrectMech { billStack = bill.billStack };
+        Equal(false, VanillaBillStorage.Supports(resurrection, f.Pawn, machine), "resurrection excluded");
+        machine.def.modContentPack.IsOfficialMod = false;
+        machine.def.defName = "OtherMod_Gestator";
+        bill.recipe.modContentPack.IsOfficialMod = false;
+        Equal(true, VanillaBillStorage.Supports(bill, f.Pawn, machine), "third-party def reusing vanilla gestator class");
+
+        var derived = new ThirdPartyGestator { Map = f.Map, Spawned = true, Position = f.Table.Position };
+        derived.def.modContentPack.IsOfficialMod = false;
+        var derivedBill = new ThirdPartyManufacture { billStack = new BillStack { billGiver = derived } };
+        derivedBill.recipe.modContentPack.IsOfficialMod = false;
+        Equal(stock, Search(f, derivedBill, derived, new List<Thing>()).Single(), "derived gestator and bill find network stock");
+        var derivedJob = AttachSpecial(f, derivedBill, derived, f.Job(stock, 3));
+        Equal(true, Start(f, derivedJob), "derived manufacture starts native ingredient hauling");
+        Equal(true, derivedJob.targetQueueB.Single().Thing.Spawned, "derived gestator receives physical ingredient target");
+        Equal(3, derivedJob.countQueue.Single(), "native queue gets requested quantity");
+        var cosmic = new Building_CosmicMechGestator { Map = f.Map, Spawned = true };
+        bill.billStack.billGiver = cosmic;
+        Equal(false, VanillaBillStorage.Supports(bill, f.Pawn, cosmic), "cosmic gestator keeps its own supply path");
+    }
+
     public static int Main()
     {
         try
         {
             CandidateScopeAndPortRules(); NativeJobHandoff(); ContentionAndInvalidation(); SplitDeliveryAndRollback(); SavedPendingPlan();
-            FortifiedSupply();
+            FortifiedSupply(); ProductionDeliveryBeams(); MedicalSupply(); ThirdPartySurgery(); SurgeryMenuSupply(); GestatorSupply();
             Console.WriteLine("PASS: " + checks + " production supply assertions (actual supply/transfer code; controlled engine boundary).");
             return 0;
         }

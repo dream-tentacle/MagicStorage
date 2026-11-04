@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -12,7 +13,10 @@ namespace MagicStorage
     [StaticConstructorOnStartup]
     internal static class StorageShelfDrawing
     {
-        private static readonly Dictionary<Type, bool> customDrawers = new Dictionary<Type, bool>();
+        private static readonly Dictionary<Shader, Shader> mapShaders = new Dictionary<Shader, Shader>();
+        private static readonly HashSet<Shader> unmappedShaders = new HashSet<Shader>();
+        private static readonly Vector2 IconResolution = new Vector2(27f, 27f);
+        private static readonly ConditionalWeakTable<Thing, object> iconDrawables = new ConditionalWeakTable<Thing, object>();
 
         static StorageShelfDrawing()
         {
@@ -22,6 +26,8 @@ namespace MagicStorage
             // This non-virtual entry point also covers items with custom DrawAt overrides.
             harmony.Patch(AccessTools.Method(typeof(Thing), nameof(Thing.DynamicDrawPhase)),
                 prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(DrawItem)));
+            harmony.Patch(AccessTools.Method(typeof(Thing), nameof(Thing.DeSpawn)),
+                prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(ReleaseIconDrawable)));
             harmony.Patch(AccessTools.Method(typeof(GenThing), nameof(GenThing.TrueCenter), new[] { typeof(Thing) }),
                 prefix: new HarmonyMethod(typeof(StorageShelfDrawing), nameof(ItemCenter)));
             harmony.Patch(AccessTools.Method(typeof(GenMapUI), nameof(GenMapUI.LabelDrawPosFor), new[] { typeof(Thing), typeof(float) }),
@@ -102,25 +108,70 @@ namespace MagicStorage
             return graphic;
         }
 
-        private static bool UsesPlaceholder(Thing item)
+        private static Shader MapShader(Shader uiShader, bool masked)
         {
-            if (item.def.graphicData == null) return true;
-            Type type = item.GetType();
-            if (!customDrawers.TryGetValue(type, out bool custom))
+            if (mapShaders.TryGetValue(uiShader, out var shader)) return shader;
+            if (!unmappedShaders.Contains(uiShader))
             {
-                custom = !OrdinaryMethod(AccessTools.Method(type, nameof(Thing.DynamicDrawPhaseAt),
-                    new[] { typeof(DrawPhase), typeof(Vector3), typeof(bool) })) ||
-                    !OrdinaryMethod(AccessTools.Method(type, "DrawAt", new[] { typeof(Vector3), typeof(bool) })) ||
-                    !OrdinaryMethod(AccessTools.Method(type, nameof(Thing.Print), new[] { typeof(SectionLayer) }));
-                customDrawers.Add(type, custom);
+                foreach (var def in DefDatabase<ShaderTypeDef>.AllDefsListForReading)
+                {
+                    shader = def.Shader;
+                    if (ShaderDatabase.TryGetUIShader(shader, out var ui) && ui == uiShader)
+                    {
+                        mapShaders.Add(uiShader, shader);
+                        return shader;
+                    }
+                }
+                unmappedShaders.Add(uiShader);
             }
-            if (custom) return true;
-            Graphic graphic = item.Graphic;
-            return graphic == null || ReferenceEquals(graphic, BaseContent.BadGraphic);
+            // Unregistered UI shaders still need a map-compatible shader. Keep the
+            // native material request's mask, colors, secondary texture and parameters.
+            return masked ? ShaderDatabase.CutoutComplex : ShaderDatabase.Transparent;
         }
 
-        private static bool OrdinaryMethod(MethodInfo method) => method != null &&
-            (method.DeclaringType == typeof(Thing) || method.DeclaringType == typeof(ThingWithComps));
+        private static Material IconMaterial(Texture texture, Color color, Material source)
+        {
+            if (source != null && MaterialPool.TryGetRequestForMat(source, out var request))
+            {
+                request.shader = MapShader(request.shader, request.maskTex != null);
+                request.mainTex = texture;
+                request.color *= color;
+                request.colorTwo *= color;
+                return MaterialPool.MatFrom(request);
+            }
+            return MaterialPool.MatFrom(new MaterialRequest(texture, ShaderDatabase.Transparent, color));
+        }
+
+        private static void RegisterIconDrawable(Thing item)
+        {
+            // Vanilla SpawnSetup excludes pure map-mesh items from dynamic drawing.
+            if (item.def.drawerType != DrawerType.MapMeshOnly || iconDrawables.TryGetValue(item, out _)) return;
+            item.Map.dynamicDrawManager.RegisterDrawable(item);
+            iconDrawables.Add(item, new object());
+        }
+
+        private static void ReleaseIconDrawable(Thing __instance)
+        {
+            if (!iconDrawables.TryGetValue(__instance, out _)) return;
+            __instance.Map?.dynamicDrawManager.DeRegisterDrawable(__instance);
+            iconDrawables.Remove(__instance);
+        }
+
+        private static void DrawCorpseIcon(Corpse item, Building_StorageSupplyShelf shelf, int slot)
+        {
+            // Match the inventory row, including its portrait cache resolution.
+            Texture texture = Widgets.GetIconFor(item, IconResolution, null, false,
+                out float scale, out float angle, out Vector2 proportions, out Color color, out Material source);
+            if (texture == null || texture == BaseContent.BadTex) return;
+            // Trade uses texture proportions when the original thing has no graphic
+            // data, including square portrait render textures for human corpses.
+            if (item.def.graphicData == null) proportions = new Vector2(texture.width, texture.height);
+            Vector2 size = StorageShelfLayout.FitSize(proportions, angle, shelf.SlotCount);
+            if (!float.IsNaN(scale) && !float.IsInfinity(scale) && scale > 0f)
+                size *= Math.Min(1f, scale);
+            Graphics.DrawMesh(MeshPool.GridPlane(size), Center(item, shelf, slot),
+                Quaternion.AngleAxis(angle, Vector3.up), IconMaterial(texture, color, source), 0);
+        }
 
         private static void Geometry(Graphic graphic, Rot4 rotation, int slotCount, out Vector2 size, out float angle, out bool flip)
         {
@@ -133,20 +184,6 @@ namespace MagicStorage
                 (rotation == Rot4.East && graphic.EastFlipped))) angle += 180f;
             if (flip && graphic.data != null) angle += graphic.data.flipExtraRotation;
             size = StorageShelfLayout.FitSize(size, angle, slotCount);
-        }
-
-        internal static bool PrintItem(SectionLayer_ThingsGeneral __instance, Thing t)
-        {
-            // The original method's catch cannot catch exceptions thrown by a prefix.
-            try
-            {
-                return PrintShelfItem(__instance, t);
-            }
-            catch (Exception ex)
-            {
-                ReportDrawingError(t, "StaticPrint", "Retry vanilla printing with its exception handler", ex);
-                return true;
-            }
         }
 
         private static void ReportDrawingError(Thing item, string stage, string recovery, Exception error)
@@ -170,109 +207,64 @@ namespace MagicStorage
                 key.GetHashCode());
         }
 
-        private static bool PreventsParentDrawing(Thing item)
+        internal static bool PrintItem(SectionLayer_ThingsGeneral __instance, Thing t)
         {
-            if (item is ThingWithComps withComps)
-                foreach (ThingComp comp in withComps.AllComps)
-                    if (comp.DontDrawParent()) return true;
-            return false;
-        }
-
-        private static bool PrintShelfItem(SectionLayer_ThingsGeneral layer, Thing t)
-        {
-            if (!TryGetShelf(t, out var shelf, out int slot)) return true;
-            if (StorageShelfVisibility.HidesContents(shelf)) return false;
-            if (UsesPlaceholder(t))
+            try
             {
-                if (t.def.drawerType == DrawerType.MapMeshOnly || t.def.drawerType == DrawerType.MapMeshAndRealTime)
-                    PrintPlaceholder(layer, t, shelf, slot);
-                return false;
+                if (!TryGetShelf(t, out var shelf, out int slot)) return true;
+                if (StorageShelfVisibility.HidesContents(shelf) || t.def.dontPrint) return false;
+                // Portraits are live textures; never bake them into the section mesh.
+                if (t is Corpse) { RegisterIconDrawable(t); return false; }
+                Graphic graphic = DisplayGraphic(t);
+                Geometry(graphic, t.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
+                Material material = graphic.MatAt(t.Rotation, t);
+                Graphic.TryGetTextureAtlasReplacementInfo(material, t.def.category.ToAtlasGroup(), flip, true,
+                    out material, out Vector2[] uvs, out Color32 color);
+                Printer_Plane.PrintPlane(__instance, Center(t, shelf, slot), size, material, angle, flip, uvs,
+                    new[] { color, color, color, color });
             }
-            if (!t.def.dontPrint && !PreventsParentDrawing(t))
-                PrintGraphic(layer, t, shelf, slot);
-            if (t is ThingWithComps withComps)
-                foreach (ThingComp comp in withComps.AllComps)
-                    comp.PostPrintOnto(layer);
+            catch (Exception ex)
+            {
+                ReportDrawingError(t, "StaticPrint", "Skip failed shelf print", ex);
+            }
             return false;
-        }
-
-        private static void PrintGraphic(SectionLayer layer, Thing t, Building_StorageSupplyShelf shelf, int slot)
-        {
-            Graphic graphic = DisplayGraphic(t);
-            Geometry(graphic, t.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
-            Material material = graphic.MatAt(t.Rotation, t);
-            Graphic.TryGetTextureAtlasReplacementInfo(material, t.def.category.ToAtlasGroup(), flip, true,
-                out material, out Vector2[] uvs, out Color32 color);
-            Printer_Plane.PrintPlane(layer, Center(t, shelf, slot), size, material, angle, flip, uvs,
-                new[] { color, color, color, color });
         }
 
         internal static bool DrawItem(Thing __instance, DrawPhase phase)
         {
-            if (phase != DrawPhase.Draw) return !StorageShelfVisibility.IsHidden(__instance);
-            if (!TryGetShelf(__instance, out var shelf, out int slot)) return true;
-            if (StorageShelfVisibility.HidesContents(shelf)) return false;
-            if (UsesPlaceholder(__instance))
+            if (phase != DrawPhase.Draw)
             {
-                if (__instance.def.drawerType == DrawerType.RealtimeOnly)
-                    DrawPlaceholder(__instance, shelf, slot);
-                return false;
+                // A shelf portrait does not use the map Pawn renderer's pre-draw phases.
+                // Only look up its shelf here; stock resolution mutates lists.
+                if (__instance is Corpse && __instance.Spawned && MagicStorageMod.Settings.TidySupplyShelf &&
+                    __instance.Map.haulDestinationManager.SlotGroupParentAt(__instance.Position) is Building_StorageSupplyShelf)
+                    return false;
+                return !StorageShelfVisibility.IsHidden(__instance);
             }
-            if (!PreventsParentDrawing(__instance) && __instance.def.drawerType == DrawerType.RealtimeOnly)
-                DrawFallbackGraphic(__instance, shelf, slot);
-            // Match ThingWithComps.DrawAt: all DrawAt callbacks precede PostDraw.
-            if (__instance is ThingWithComps withComps)
-            {
-                foreach (ThingComp comp in withComps.AllComps)
-                    comp.DrawAt(Center(__instance, shelf, slot), false);
-                foreach (ThingComp comp in withComps.AllComps)
-                    comp.PostDraw();
-            }
-            return false;
-        }
-
-        private static void DrawFallbackGraphic(Thing item, Building_StorageSupplyShelf shelf, int slot)
-        {
             try
             {
-                Graphic graphic = DisplayGraphic(item);
-                if (graphic != null && !ReferenceEquals(graphic, BaseContent.BadGraphic))
+                if (!TryGetShelf(__instance, out var shelf, out int slot)) return true;
+                if (StorageShelfVisibility.HidesContents(shelf)) return false;
+                if (__instance is Corpse corpse)
                 {
-                    Geometry(graphic, item.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
+                    DrawCorpseIcon(corpse, shelf, slot);
+                    return false;
+                }
+                // MapMeshAndRealTime items already have their main graphic in the section mesh.
+                if (__instance.def.drawerType == DrawerType.RealtimeOnly)
+                {
+                    Graphic graphic = DisplayGraphic(__instance);
+                    Geometry(graphic, __instance.Rotation, shelf.SlotCount, out Vector2 size, out float angle, out bool flip);
                     Graphics.DrawMesh(flip ? MeshPool.GridPlaneFlip(size) : MeshPool.GridPlane(size),
-                        Center(item, shelf, slot), Quaternion.AngleAxis(angle, Vector3.up),
-                        graphic.MatAt(item.Rotation, item), 0);
-                    return;
+                        Center(__instance, shelf, slot), Quaternion.AngleAxis(angle, Vector3.up),
+                        graphic.MatAt(__instance.Rotation, __instance), 0);
                 }
             }
             catch (Exception ex)
             {
-                ReportDrawingError(item, "FallbackGraphicResolutionAndDraw", "Draw placeholder", ex);
+                ReportDrawingError(__instance, "DynamicDraw", "Skip failed shelf draw", ex);
             }
-            DrawPlaceholder(item, shelf, slot);
-        }
-
-        private static Material PlaceholderMaterial(Building_StorageSupplyShelf shelf, out Vector2 size)
-        {
-            Texture2D texture = ContentFinder<Texture2D>.Get("UI/MagicStorageMissingItem");
-            size = StorageShelfLayout.FitSize(new Vector2(texture.width, texture.height), 0f, shelf.SlotCount);
-            return MaterialPool.MatFrom(new MaterialRequest(texture, ShaderDatabase.Transparent, Color.white));
-        }
-
-        private static void PrintPlaceholder(SectionLayer layer, Thing item, Building_StorageSupplyShelf shelf, int slot)
-        {
-            Material material = PlaceholderMaterial(shelf, out Vector2 size);
-            Graphic.TryGetTextureAtlasReplacementInfo(material, item.def.category.ToAtlasGroup(), false, true,
-                out material, out Vector2[] uvs, out Color32 color);
-            Printer_Plane.PrintPlane(layer, Center(item, shelf, slot), size, material, 0f, false, uvs,
-                new[] { color, color, color, color });
-        }
-
-        private static void DrawPlaceholder(Thing item, Building_StorageSupplyShelf shelf, int slot)
-        {
-            Material material = PlaceholderMaterial(shelf, out Vector2 size);
-            Graphics.DrawMesh(MeshPool.GridPlane(size), Center(item, shelf, slot),
-                Quaternion.AngleAxis(0f, Vector3.up), material, 0);
+            return false;
         }
 
         internal static void RefreshAll()

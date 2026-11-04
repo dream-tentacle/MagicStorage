@@ -150,6 +150,7 @@
     <Compile Include="UI\Dialog_SupplierSupply.cs" />
     <Compile Include="UI\StorageQuantityDrag.cs" />
     <Compile Include="MagicStorageSettings.cs" />
+    <Compile Include="StoredFilterGuard.cs" />
     <Compile Include="Buildings\Building_StorageApparelAdapter.cs" />
     <Compile Include="Apparel\StorageApparelPolicy.cs" />
     <Compile Include="Apparel\JobGiver_OptimizeStorageApparel.cs" />
@@ -200,6 +201,8 @@
     <Compile Include="Crafting\CraftingWorkerPolicy.cs" />
     <Compile Include="Crafting\CraftingMaterialPlanner.cs" />
     <Compile Include="Crafting\CraftingMaterials.cs" />
+    <Compile Include="Crafting\GameComponent_RecipeNotices.cs" />
+    <Compile Include="Crafting\RecipeOutputNotice.cs" />
     <Compile Include="Crafting\CraftingProductCounter.cs" />
     <Compile Include="Crafting\CraftingProductFilters.cs" />
     <Compile Include="Crafting\BillProductCountPatch.cs" />
@@ -232,6 +235,7 @@
     <Compile Include="Storage\StorageMaterialTransaction.cs" />
     <Compile Include="Buildings\Building_ProductionOutputPort.cs" />
     <Compile Include="Crafting\VanillaBillStorage.cs" />
+    <Compile Include="Crafting\SurgeryMenuStorage.cs" />
     <Compile Include="Crafting\BillStorageSupplyPlan.cs" />
     <Compile Include="Storage\StorageBeggarGifts.cs" />
     <Compile Include="Storage\StorageMaterialSources.cs" />

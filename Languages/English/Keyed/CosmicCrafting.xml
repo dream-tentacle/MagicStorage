@@ -87,6 +87,9 @@
   <MS_Craft_SourceFilter>Source: {0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>No matching production orders.</MS_Craft_NoMatchingOrders>
   <MS_Craft_NoMatchingRecipes>No matching recipes.</MS_Craft_NoMatchingRecipes>
+  <MS_Craft_NoOutputTitle>This recipe has no output</MS_Craft_NoOutputTitle>
+  <MS_Craft_NoOutputBody>This recipe defines no output! It may be a production result that another mod implements in code.\n\nIt may work normally, or it may not produce the expected result. Judge for yourself. If it does not work, use a production output port together with that mod's own workbench.</MS_Craft_NoOutputBody>
+  <MS_Craft_NoOutputSilence>Don't warn for this recipe</MS_Craft_NoOutputSilence>
   <MS_Craft_Suspended>Suspended</MS_Craft_Suspended>
   <MS_Craft_Locked>Not unlocked</MS_Craft_Locked>
   <MS_Craft_Satisfied>No repeats remaining, target met or waiting to resume</MS_Craft_Satisfied>

@@ -87,6 +87,9 @@
   <MS_Craft_SourceFilter>来源：{0}</MS_Craft_SourceFilter>
   <MS_Craft_NoMatchingOrders>没有符合筛选条件的制作任务。</MS_Craft_NoMatchingOrders>
   <MS_Craft_NoMatchingRecipes>没有符合筛选条件的配方。</MS_Craft_NoMatchingRecipes>
+  <MS_Craft_NoOutputTitle>此配方没有产物</MS_Craft_NoOutputTitle>
+  <MS_Craft_NoOutputBody>此配方没有产物！可能是其他mod自己通过代码实现的生产结果。\n\n此配方可能可以正常工作，也可能无法产生预期结果，请自行判断。如无法工作，需要使用生产输出口配合原mod工作台。</MS_Craft_NoOutputBody>
+  <MS_Craft_NoOutputSilence>此配方不再提示</MS_Craft_NoOutputSilence>
   <MS_Craft_Suspended>已暂停</MS_Craft_Suspended>
   <MS_Craft_Locked>尚未解锁</MS_Craft_Locked>
   <MS_Craft_Satisfied>次数已用完、达到目标或等待恢复</MS_Craft_Satisfied>

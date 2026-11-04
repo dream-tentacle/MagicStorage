@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_2_12.label>版本日志</MS_UpdateNotice_1_2_12.label>
+  <MS_UpdateNotice_1_2_12.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_12.sections.0.heading>
+  <MS_UpdateNotice_1_2_12.sections.0.entries.0>现在更不容易被其他模组的报错导致无法形成UI页面</MS_UpdateNotice_1_2_12.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_12.sections.0.entries.1>优化其他mod特殊无产物配方的提示</MS_UpdateNotice_1_2_12.sections.0.entries.1>
+
+  <MS_UpdateNotice_1_2_11.label>版本日志</MS_UpdateNotice_1_2_11.label>
+  <MS_UpdateNotice_1_2_11.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_11.sections.0.heading>
+  <MS_UpdateNotice_1_2_11.sections.0.entries.0>现在宇宙机械体培育器会继承原版的机械体培育器组件，以兼容更多模组。这会让它多出一个电力开关按钮，没有实际作用。</MS_UpdateNotice_1_2_11.sections.0.entries.0>
+
+  <MS_UpdateNotice_1_2_10.label>版本日志</MS_UpdateNotice_1_2_10.label>
+  <MS_UpdateNotice_1_2_10.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_10.sections.0.heading>
+  <MS_UpdateNotice_1_2_10.sections.0.entries.0>优化渲染流程，难以渲染的物品现在会绘制图标而非实时渲染</MS_UpdateNotice_1_2_10.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_10.sections.1.heading>&lt;color=#BB88FF&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_2_10.sections.1.heading>
+  <MS_UpdateNotice_1_2_10.sections.1.entries.0>现在生产输出口也可以支持手术和机械体培育！（注意，其他用途暂不考虑一项项专门接入，请使用自动补货架）</MS_UpdateNotice_1_2_10.sections.1.entries.0>
+  <MS_UpdateNotice_1_2_10.sections.1.entries.1>现在生产输出口和存储接收器也会有动画效果提示。</MS_UpdateNotice_1_2_10.sections.1.entries.1>
+
+  <MS_UpdateNotice_1_2_9.label>版本日志</MS_UpdateNotice_1_2_9.label>
+  <MS_UpdateNotice_1_2_9.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_2_9.sections.0.heading>
+  <MS_UpdateNotice_1_2_9.sections.0.entries.0>修复1.2.7引入的错误渲染，优化渲染逻辑</MS_UpdateNotice_1_2_9.sections.0.entries.0>
+
   <MS_UpdateNotice_1_2_8.label>版本日志</MS_UpdateNotice_1_2_8.label>
   <MS_UpdateNotice_1_2_8.sections.0.heading>&lt;color=#6FA8FF&gt;兼容性&lt;/color&gt;</MS_UpdateNotice_1_2_8.sections.0.heading>
   <MS_UpdateNotice_1_2_8.sections.0.entries.0>生产输出口此前与失能机关2的自动生产设施兼容，但在消耗材料时失败，导致无消耗开始生产，现在已修复</MS_UpdateNotice_1_2_8.sections.0.entries.0>

@@ -39,11 +39,13 @@ namespace MagicStorage
                 AccessTools.Method(typeof(Toils_JobTransforms), "IngredientPlaceCellsInOrder"));
         private List<Entry> entries = new List<Entry>();
         private RecipeDef recipe;
+        private List<ThingCountClass> gestatorContents;
         private bool completed, preparing;
 
         internal BillStorageSupplyPlan Copy() => new BillStorageSupplyPlan
         {
             recipe = recipe,
+            gestatorContents = gestatorContents, // Immutable snapshot shared by queued job copies.
             completed = completed,
             // A reentrant clone during transfer must fail closed rather than
             // inheriting a partly delivered plan as an ingredient-free recipe.
@@ -51,7 +53,7 @@ namespace MagicStorage
                 new Entry { Item = entry.Item, Count = entry.Count, Core = entry.Core })
         };
 
-        internal static BillStorageSupplyPlan Capture(Job job, Pawn pawn, Building_WorkTable table)
+        internal static BillStorageSupplyPlan Capture(Job job, Pawn pawn, Thing table)
         {
             if (job.targetQueueB == null || job.countQueue == null || job.targetQueueB.Count != job.countQueue.Count)
                 return null;
@@ -65,7 +67,8 @@ namespace MagicStorage
             {
                 Thing item = job.targetQueueB[i].Thing;
                 int count = job.countQueue[i];
-                if (item == null || item.Spawned || !(item.holdingOwner?.Owner is Building_StorageUnit unit))
+                if (item == null || item.Spawned || VanillaBillStorage.IsSpecifiedIngredient(job.bill, item) ||
+                    !(item.holdingOwner?.Owner is Building_StorageUnit unit))
                 {
                     remaining.Add(job.targetQueueB[i]); remainingCounts.Add(count);
                     continue;
@@ -81,13 +84,19 @@ namespace MagicStorage
                 entry.Count += count;
             }
             if (plan.entries.Count == 0) return null;
+            if (table is Building_MechGestator gestator)
+            {
+                plan.gestatorContents = new List<ThingCountClass>();
+                foreach (Thing item in gestator.innerContainer)
+                    plan.gestatorContents.Add(new ThingCountClass(item, item.stackCount));
+            }
             // Publish both queues only after the complete plan has been validated.
             job.targetQueueB = remaining;
             job.countQueue = remainingCounts;
             return plan;
         }
 
-        private bool Valid(Job job, Pawn pawn, Building_WorkTable table)
+        private bool Valid(Job job, Pawn pawn, Thing table)
         {
             if (!ValidContext(job, pawn, table)) return false;
             foreach (var entry in entries)
@@ -104,11 +113,16 @@ namespace MagicStorage
             return true;
         }
 
-        private bool ValidContext(Job job, Pawn pawn, Building_WorkTable table)
+        private bool ValidContext(Job job, Pawn pawn, Thing table)
         {
             if (!VanillaBillStorage.Supports(job.bill, pawn, table) || job.bill.recipe != recipe ||
                 job.bill.DeletedOrDereferenced || job.bill.suspended || !job.bill.PawnAllowedToStartAnew(pawn) ||
                 entries == null || entries.Count == 0) return false;
+            // A queued job may have selected the deficit before another delivery.
+            if (table is Building_MechGestator gestator &&
+                (gestatorContents == null || gestator.innerContainer.Count != gestatorContents.Count ||
+                gestatorContents.Exists(e => e.thing == null || e.thing.stackCount != e.Count ||
+                    !gestator.innerContainer.Contains(e.thing)))) return false;
             foreach (var entry in entries)
                 if (entry?.Core == null || !VanillaBillStorage.CanSupply(entry.Core.Network, table.Map, pawn)) return false;
             return true;
@@ -117,7 +131,8 @@ namespace MagicStorage
         internal bool CanPrepare(Job job, Pawn pawn, ThingOwner container = null)
         {
             if (completed) return true;
-            if (preparing || !(job.targetA.Thing is Building_WorkTable table)) return false;
+            Thing table = job.targetA.Thing;
+            if (preparing || table == null) return false;
             var manager = table.Map?.GetComponent<MapComponent_StorageNetworks>();
             if (manager == null) return false;
             manager.EnsureCurrent();
@@ -127,9 +142,48 @@ namespace MagicStorage
 
         internal bool Prepare(Job job, Pawn pawn, ThingOwner container = null)
         {
-            if (container != null) return PrepareContainer(job, pawn, container);
             if (completed) return true;
-            if (preparing || !(job.targetA.Thing is Building_WorkTable table)) return false;
+            bool delivered = container == null ? PrepareOnMap(job, pawn) : PrepareContainer(job, pawn, container);
+            if (delivered)
+            {
+                // Visual failures must never turn an already paid delivery into a failed job.
+                try { ShowDeliveryBeams(job.targetA.Thing); }
+                catch (Exception exception) { Log.ErrorOnce("[MagicStorage] Production supply beam failed: " + exception, 142770831); }
+            }
+            return delivered;
+        }
+
+        private void ShowDeliveryBeams(Thing target)
+        {
+            if (target == null || !target.Spawned) return;
+            var beam = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionSupplyBeam") ??
+                DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ProductionSupplyBeamFallback");
+            if (beam == null) return;
+            var seen = new HashSet<StorageNetwork>();
+            foreach (var entry in entries)
+            {
+                var network = entry.Core?.Network;
+                if (network == null || !seen.Add(network)) continue;
+                Building_ProductionOutputPort nearest = null;
+                int distance = int.MaxValue;
+                foreach (var member in network.Members)
+                {
+                    if (!(member.parent is Building_ProductionOutputPort port) || !port.Spawned || port.Map != target.Map) continue;
+                    int squared = port.Position.DistanceToSquared(target.Position);
+                    if (squared < distance)
+                    {
+                        nearest = port;
+                        distance = squared;
+                    }
+                }
+                if (nearest != null) MoteMaker.MakeInteractionOverlay(beam, nearest, target);
+            }
+        }
+
+        private bool PrepareOnMap(Job job, Pawn pawn)
+        {
+            Thing table = job.targetA.Thing;
+            if (preparing || table == null) return false;
             Map map = table.Map;
             var manager = map?.GetComponent<MapComponent_StorageNetworks>();
             if (manager == null) return false;
@@ -139,6 +193,7 @@ namespace MagicStorage
             if (destinations == null) return false;
             preparing = true;
             var receipts = new List<Receipt>();
+            bool pickup = table is Building_MechGestator;
             bool staged = false;
             try
             {
@@ -170,11 +225,11 @@ namespace MagicStorage
                                     receipts.Add(receipt);
                                     if (!CanPlace(part, receipt.Cell, table, pawn) ||
                                         !pawn.Reserve(part, job, 1, -1, null, false)) return false;
-                                    map.physicalInteractionReservationManager.Reserve(pawn, job, part);
+                                    if (!pickup) map.physicalInteractionReservationManager.Reserve(pawn, job, part);
                                     GenSpawn.Spawn(part, receipt.Cell, map);
                                     if (!part.Spawned || part.Destroyed || part.Map != map ||
                                         part.Position != receipt.Cell || part.stackCount != amount) return false;
-                                    HaulAIUtility.UpdateJobWithPlacedThings(job, part, amount);
+                                    if (!pickup) HaulAIUtility.UpdateJobWithPlacedThings(job, part, amount);
                                     remaining -= amount;
                                 }
                                 accepted = true;
@@ -186,7 +241,17 @@ namespace MagicStorage
                         foreach (var receipt in receipts)
                             if (receipt.Item.Destroyed || !receipt.Item.Spawned || receipt.Item.Map != map ||
                                 receipt.Item.Position != receipt.Cell || receipt.Item.stackCount != receipt.Count ||
-                                !map.reservationManager.ReservedBy(receipt.Item, pawn, job)) return false;
+                                !map.reservationManager.ReservedBy(receipt.Item, pawn, job) ||
+                                (table is Pawn && !VanillaBillStorage.AllowsIngredient(job.bill, receipt.Item))) return false;
+                        if (pickup)
+                        {
+                            // Let the native driver carry these real stacks into the gestator.
+                            foreach (var receipt in receipts)
+                            {
+                                job.targetQueueB.Add(receipt.Item);
+                                job.countQueue.Add(receipt.Count);
+                            }
+                        }
                         completed = true;
                         return true;
                     }
@@ -203,7 +268,7 @@ namespace MagicStorage
             }
         }
 
-        private List<IntVec3> PlanCells(Building_WorkTable table, Pawn pawn)
+        private List<IntVec3> PlanCells(Thing table, Pawn pawn)
         {
             // Fully enumerate native placement order before callbacks can start a
             // nested search; its iterator uses a shared vanilla scratch set.
@@ -226,7 +291,7 @@ namespace MagicStorage
             return result;
         }
 
-        private static bool CanPlace(Thing item, IntVec3 cell, Building_WorkTable table, Pawn pawn)
+        private static bool CanPlace(Thing item, IntVec3 cell, Thing table, Pawn pawn)
         {
             Map map = table.Map;
             if (map == null || !table.Spawned || !cell.InBounds(map) || map.haulDestinationManager.SlotGroupParentAt(cell) != null ||
@@ -276,6 +341,7 @@ namespace MagicStorage
         {
             Scribe_Defs.Look(ref recipe, "recipe");
             Scribe_Values.Look(ref completed, "completed");
+            Scribe_Collections.Look(ref gestatorContents, "gestatorContents", LookMode.Deep);
             Scribe_Collections.Look(ref entries, "materials", LookMode.Deep);
         }
     }

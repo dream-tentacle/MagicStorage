@@ -187,7 +187,7 @@ namespace MagicStorage
         {
             EnsureSlotCapacity();
             return item != null && GetParentStoreSettings().AllowedToAccept(item) &&
-                (filterMode ? SharedFilter.Allows(item) : item.def == selections[slot] && filters[slot].Allows(item));
+                (filterMode ? StoredFilterGuard.Allows(SharedFilter, item) : item.def == selections[slot] && filters[slot].Allows(item));
         }
         public int RestockLimit(int slot)
         { EnsureSlotCapacity(); return Math.Max(0, Math.Min(restockLimits[slot], selections[slot]?.stackLimit ?? 0)); }

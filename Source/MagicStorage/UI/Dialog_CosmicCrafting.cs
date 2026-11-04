@@ -342,6 +342,8 @@ namespace MagicStorage
             {
                 if (!CraftingRecipeCatalog.CanAdd(recipe)) return;
                 var added = core.Crafting.Add(recipe, precept);
+                // 配方定义上没有产物时提醒一次：这类配方可能靠其他 mod 的代码产出结果。
+                RecipeOutputNotice.Warn(recipe);
                 if (added != null && MagicStorageMod.Settings.WorkbenchDefaultLocation &&
                     sourceWorkbench?.Spawned == true && sourceWorkbench.Network?.Core == core)
                 { added.RestrictWorkbench = true; added.Workbench = sourceWorkbench; }

@@ -43,7 +43,7 @@ namespace MagicStorage
                     foreach (Thing item in stacks)
                     {
                         if (remaining == 0) break;
-                        if (!seen.Add(item) || item.Destroyed || !target.Props.fuelFilter.Allows(item)) continue;
+                        if (!seen.Add(item) || !StoredFilterGuard.Allows(target.Props.fuelFilter, item)) continue;
                         int count = Math.Min(remaining, network.AvailableToWithdraw(item));
                         if (count <= 0) continue;
                         if (!transfer.Add(item, count, network, supplier)) return;

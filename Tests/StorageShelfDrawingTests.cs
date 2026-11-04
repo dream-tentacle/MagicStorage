@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
@@ -15,22 +15,19 @@ internal static class StorageShelfDrawingTests
     private static void Near(float a, float b, string label) => Check(Math.Abs(a-b)<0.00001f,label+": "+a+" / "+b);
     public static int Main()
     {
-        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); IconRouting(); HiddenShelfRouting(); RegressionRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
+        try { Layout(); DynamicLayout(); Routing(); DynamicRouting(); HiddenShelfRouting(); InitialGraphicRouting(); Console.WriteLine("PASS: "+checks+" shelf layout/drawing assertions (renderer boundaries stubbed).");return 0; }
         catch(Exception ex) { Console.Error.WriteLine(ex);return 1; }
     }
 
-    private sealed class RecordingComp : ThingComp
+    private sealed class MealVariant : Graphic_StackCount
     {
-        public bool Hide;
-        public int Prints, Draws, Posts;
-        public override bool DontDrawParent() => Hide;
-        public override void DrawAt(Vector3 pos, bool flip) { Draws++; }
-        public override void PostDraw() { Check(Draws > Posts, "component DrawAt precedes PostDraw"); Posts++; }
-        public override void PostPrintOnto(SectionLayer layer) { Prints++; }
+        public readonly Graphic Selected = new Graphic();
+        public override Graphic SubGraphicFor(Thing item) => Selected;
     }
-    private sealed class BrokenGraphic : Graphic
-    { public override Material MatAt(Rot4 r, Thing t) { throw new Exception("broken material"); } }
-    private static void RegressionRouting()
+
+    private sealed class ModGraphic : Graphic { }
+
+    private static void InitialGraphicRouting()
     {
         var map = new Map();
         var shelf = new Building_StorageSupplyShelf { Map = map };
@@ -38,50 +35,21 @@ internal static class StorageShelfDrawingTests
         var item = new ThingWithComps { Map = map };
         shelf.Selections[0] = item.def;
         shelf.GetSlotGroup().HeldThings.Add(item);
-        var comp = new RecordingComp(); item.AllComps.Add(comp);
-        foreach (bool hide in new[] { false, true })
+        var meal = new MealVariant();
+        var modGraphic = new ModGraphic();
+        foreach (Graphic graphic in new Graphic[] { meal, modGraphic })
         {
-            comp.Hide = hide;
+            item.Graphic = graphic;
+            Material expected = graphic == meal ? meal.Selected.Material : modGraphic.Material;
+            Printer_Plane.Calls.Clear();
+            item.def.drawerType = DrawerType.MapMeshOnly;
+            Check(!StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item)
+                && Printer_Plane.Calls.Single().Material == expected, "static shelf preserves actual item artwork");
             item.def.drawerType = DrawerType.RealtimeOnly;
-            Graphics.Calls.Clear(); Printer_Plane.Calls.Clear();
-            Check(!StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item), "component printing handled");
-            Check(!StorageShelfDrawing.DrawItem(item, DrawPhase.Draw), "component drawing handled");
-            Check(Graphics.Calls.Count == (hide ? 0 : 1) && Printer_Plane.Calls.Count == (hide ? 0 : 1), "parent visibility honored in both paths");
+            Graphics.Calls.Clear();
+            Check(!StorageShelfDrawing.DrawItem(item, DrawPhase.Draw)
+                && Graphics.Calls.Single().Material == expected, "realtime shelf preserves actual item artwork");
         }
-        Check(comp.Prints == 2 && comp.Draws == 2 && comp.Posts == 2, "components run even when parent hidden");
-        comp.Hide = false;
-        item.def.defName = "TestShelfItem";
-        item.def.modContentPack = new ModContentPack { Name = "Test Content", PackageId = "test.content" };
-        item.Graphic = new BrokenGraphic();
-        Check(StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item), "static material exception stays inside prefix and falls back to native protected print");
-        Check(Log.LastMessage.Contains("Stage=StaticPrint") && Log.LastMessage.Contains("DefName=TestShelfItem") &&
-            Log.LastMessage.Contains("DefinitionMod=Test Content") && Log.LastMessage.Contains("DefinitionPackageId=test.content") &&
-            Log.LastMessage.Contains("RuntimeType=Verse.ThingWithComps") && Log.LastMessage.Contains("broken material") &&
-            Log.LastMessage.Contains("not the mod responsible"), "diagnostic includes source, phase, original exception and neutral attribution");
-        int firstKey = Log.LastKey;
-        item.def.defName = "AnotherShelfItem";
-        StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item);
-        Check(firstKey != Log.LastKey, "different item definitions do not suppress each other's diagnostics");
-        item.def.modContentPack = null;
-        StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item);
-        Check(Log.LastMessage.Contains("DefinitionMod=<unknown>"), "missing source metadata is safe");
-        item.Graphic = new Graphic(); item.def.graphicData = null;
-        foreach (DrawerType drawer in new[] { DrawerType.MapMeshOnly, DrawerType.MapMeshAndRealTime, DrawerType.RealtimeOnly })
-        {
-            item.def.drawerType = drawer;
-            foreach (bool throws in new[] { false, true })
-            {
-                Widgets.Resolve = t => { if (throws) throw new Exception("icon unavailable"); return new ResolvedIcon(); };
-                Graphics.Calls.Clear();
-                Printer_Plane.Calls.Clear();
-                StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item);
-                Check(!StorageShelfDrawing.DrawItem(item, DrawPhase.Draw), "placeholder intercepts native draw");
-                bool realtime = drawer == DrawerType.RealtimeOnly;
-                Check(Graphics.Calls.Count == (realtime ? 1 : 0) && Printer_Plane.Calls.Count == (realtime ? 0 : 1), "placeholder follows original drawer type");
-                Near(StorageShelfLayout.ItemSizeFor(3), (realtime ? Graphics.Calls[0] : Printer_Plane.Calls[0]).Size.x, "placeholder remains shelf sized");
-            }
-        }
-        Widgets.Resolve = t => new ResolvedIcon();
     }
 
     private static void DynamicLayout()
@@ -113,13 +81,6 @@ internal static class StorageShelfDrawingTests
     {
         public override Graphic Graphic { get => throw new Exception("A custom renderer has no ordinary graphic"); set { } }
     }
-    private sealed class CustomPhaseItem : Thing
-    { public override void DynamicDrawPhaseAt(DrawPhase phase, Vector3 drawLoc, bool flip = false) { } }
-    private sealed class CustomDrawItem : Thing
-    { protected override void DrawAt(Vector3 drawLoc, bool flip = false) { } }
-    private sealed class CustomPrintItem : Thing
-    { public override void Print(SectionLayer layer) { } }
-
     private sealed class HiddenItem : NoGraphicItem
     { public override void DrawGUIOverlay() { throw new Exception("Hidden custom overlay must never run"); } }
 
@@ -174,41 +135,6 @@ internal static class StorageShelfDrawingTests
         shelf.def.modExtensions.Clear();
         Check(!StorageShelfVisibility.IsHidden(item), "ordinary supply shelves do not hide their contents");
         MagicStorageMod.Settings.TidySupplyShelf = true;
-    }
-
-    private static void IconRouting()
-    {
-        var map = new Map();
-        var shelf = new Building_StorageSupplyShelf { Map = map };
-        map.haulDestinationManager.Parent = shelf;
-        Widgets.Resolve = t => { throw new Exception("Placeholder items must never request icons"); };
-        int iconCalls = Widgets.IconCalls;
-        var noGraphic = new NoGraphicItem(); noGraphic.def.graphicData = null;
-        var invalidGraphic = new ThingWithComps { Graphic = BaseContent.BadGraphic };
-        var comp = new RecordingComp { Hide = true }; invalidGraphic.AllComps.Add(comp);
-        foreach (Thing item in new Thing[] { noGraphic, invalidGraphic, new CustomPhaseItem(), new CustomDrawItem(), new CustomPrintItem() })
-        {
-            item.Map = map;
-            shelf.Selections[0] = item.def; shelf.Stocks = new Thing[3];
-            shelf.GetSlotGroup().HeldThings.Clear(); shelf.GetSlotGroup().HeldThings.Add(item);
-            foreach (DrawerType drawer in new[] { DrawerType.MapMeshOnly, DrawerType.RealtimeOnly, DrawerType.MapMeshAndRealTime })
-            {
-                item.def.drawerType = drawer;
-                Printer_Plane.Calls.Clear(); Graphics.Calls.Clear();
-                Check(!StorageShelfDrawing.PrintItem(new SectionLayer_ThingsGeneral(), item), "special item bypasses original printing");
-                bool realtime = drawer == DrawerType.RealtimeOnly;
-                Check(Printer_Plane.Calls.Count == (realtime ? 0 : 1), "static and hybrid placeholders use section mesh");
-                Check(!StorageShelfDrawing.DrawItem(item, DrawPhase.Draw) && Graphics.Calls.Count == (realtime ? 1 : 0), "only realtime placeholders draw dynamically");
-                var draw = realtime ? Graphics.Calls[0] : Printer_Plane.Calls[0];
-                Check(draw.Material.Request.mainTex == ContentFinder<Texture2D>.Value, "all special items use supplied placeholder");
-                Near(StorageShelfLayout.ItemSizeFor(3), draw.Size.x, "placeholder fits shelf");
-                Check(map.dynamicDrawManager.Drawables.Count == 0, "static items never acquire dynamic registrations");
-
-            }
-        }
-        Check(Widgets.IconCalls == iconCalls, "no special-item icon resolver is invoked");
-        Check(comp.Draws == 0 && comp.Posts == 0 && comp.Prints == 0, "special item components cannot add artwork or suppress placeholder");
-        Widgets.Resolve = t => new ResolvedIcon();
     }
 
     private static void DynamicRouting()

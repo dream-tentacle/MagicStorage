@@ -125,7 +125,7 @@ namespace MagicStorage
 
         internal bool Matches(Thing item) => Category != null
             ? Category.ContainedInThisOrDescendant(item.GetInnerIfMinified().def)
-            : Rule.Filter.Allows(item);
+            : StoredFilterGuard.Allows(Rule.Filter, item);
 
         internal void Toggle(bool blacklist)
         {
@@ -139,7 +139,7 @@ namespace MagicStorage
         internal static bool CanGroup(Thing left, Thing right, IEnumerable<StorageInventoryRule> rules) =>
             left != null && right != null &&
             string.Equals(SourceOf(left)?.PackageId, SourceOf(right)?.PackageId, StringComparison.OrdinalIgnoreCase) &&
-            rules.All(rule => rule.Filter.Allows(left) == rule.Filter.Allows(right));
+            rules.All(rule => StoredFilterGuard.Allows(rule.Filter, left) == StoredFilterGuard.Allows(rule.Filter, right));
 
         internal static ModContentPack SourceOf(Thing item) => item?.GetInnerIfMinified()?.ContentSource;
 

@@ -10,11 +10,12 @@ namespace MagicStorage
 {
     internal static class CosmicGestationMaterials
     {
-        internal static bool Allows(Bill bill, Pawn pawn, Thing item) => item != null &&
-            !item.Destroyed && !(item is Pawn) && !item.IsForbidden(pawn) &&
-            bill.IsFixedOrAllowedIngredient(item) && bill.recipe.ingredients.Any(i => i.filter.Allows(item)) &&
+        internal static bool Allows(Bill bill, Pawn pawn, Thing item) => StoredFilterGuard.IsUsable(item) &&
+            !(item is Pawn) && !item.IsForbidden(pawn) &&
+            StoredFilterGuard.IsFixedOrAllowedIngredient(bill, item) &&
+            StoredFilterGuard.AnyIngredientAllows(bill.recipe, item) &&
             (!bill.recipe.interruptIfIngredientIsRotting || item.GetRotStage() == RotStage.Fresh) &&
-            (!(item is Corpse corpse) || (corpse.InnerPawn.Faction == pawn.Faction &&
+            (!(item is Corpse corpse) || (corpse.InnerPawn != null && corpse.InnerPawn.Faction == pawn.Faction &&
                 pawn.mechanitor != null && pawn.mechanitor.HasBandwidthToResurrect(corpse)));
 
         internal static bool TryPlan(Building_CosmicMechGestator table, Bill bill, Pawn pawn,
@@ -36,8 +37,7 @@ namespace MagicStorage
             {
                 Value = ingredient.GetBaseCount(),
                 CountRequired = t => ingredient.CountRequiredOfFor(t.def, recipe, bill),
-                Allows = t => ingredient.filter.Allows(t) &&
-                    (ingredient.IsFixedIngredient || bill.ingredientFilter.Allows(t))
+                Allows = t => StoredFilterGuard.IngredientAllows(ingredient, bill.ingredientFilter, t)
             }).ToList();
             if (CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
                 recipe.ignoreIngredientCountTakeEntireStacks, out allocations)) return true;

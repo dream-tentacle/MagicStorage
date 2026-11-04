@@ -126,6 +126,7 @@ namespace Verse
         protected override void DrawAt(Vector3 drawLoc, bool flip = false) { }
         public override void Print(SectionLayer layer) { }
     }
+    public class Corpse : ThingWithComps { }
     public class ThingComp
     {
         public virtual bool DontDrawParent() => false;
@@ -224,7 +225,7 @@ namespace Verse
     public class Graphic_StackCount : Graphic
     {
         public Graphic Single=new Graphic(),Stack=new Graphic();
-        public Graphic SubGraphicFor(Thing t) => t.stackCount==1 ? Single : Stack;
+        public virtual Graphic SubGraphicFor(Thing t) => t.stackCount==1 ? Single : Stack;
     }
     public class Graphic_Random : Graphic { public Graphic Variant=new Graphic(); public Graphic SubGraphicFor(Thing t) => Variant; }
     public static class AtlasGroup { public static object ToAtlasGroup(this ThingCategory c) => null; }

@@ -33,7 +33,7 @@ namespace MagicStorage
             {
                 Value = ingredient.GetBaseCount(),
                 CountRequired = t => ingredient.CountRequiredOfFor(t.def, recipe, bill),
-                Allows = t => ingredient.filter.Allows(t) && (ingredient.IsFixedIngredient || order.Ingredients.Allows(t))
+                Allows = t => StoredFilterGuard.IngredientAllows(ingredient, order.Ingredients, t)
             }).ToList();
             if (CraftingMaterialPlanner.TryPlan(stocks, needs, recipe.allowMixingIngredients,
                 recipe.ignoreIngredientCountTakeEntireStacks, out allocations)) return true;
@@ -118,8 +118,9 @@ namespace MagicStorage
         private static string Number(double value) => value.ToString("0.##", CultureInfo.CurrentCulture);
 
         internal static bool Allows(CraftingOrder order, Bill_Production bill, Thing t) =>
-            t != null && !t.Destroyed && bill.IsFixedOrAllowedIngredient(t) &&
-                    order.Recipe.ingredients.Any(i => i.filter.Allows(t)) &&
+            StoredFilterGuard.IsUsable(t) &&
+                    StoredFilterGuard.IsFixedOrAllowedIngredient(bill, t) &&
+                    StoredFilterGuard.AnyIngredientAllows(order.Recipe, t) &&
                     (!order.Recipe.interruptIfIngredientIsRotting || t.GetRotStage() == RotStage.Fresh);
 
         internal static int Available(StorageNetwork network, Thing item) => StorageMaterialSources.Available(network, item);

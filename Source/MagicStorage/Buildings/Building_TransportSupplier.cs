@@ -337,7 +337,7 @@ namespace MagicStorage
             int needed = target.GetFuelCountToFullyRefuel();
             if (!directSupply)
             {
-                var fuel = Contents.Where(t => !t.Destroyed && target.Props.fuelFilter.Allows(t)).ToList();
+                var fuel = Contents.Where(t => StoredFilterGuard.Allows(target.Props.fuelFilter, t)).ToList();
                 if (fuel.Count == 0 || (target.Props.atomicFueling && fuel.Sum(t => (long)t.stackCount) < needed)) return;
                 target.Refuel(fuel);
                 return;

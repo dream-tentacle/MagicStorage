@@ -56,7 +56,7 @@ internal static class StorageReceiverTests
     {
         RuntimeHelpers.RunClassConstructor(typeof(StorageReceiverHaulingPatches).TypeHandle);
         NativeBoundary(); PrioritySortLifecycle(); DeferredAndMixed(); FullAndPartial(); NetworkChanges(); PolicyAndReservations(); Removal();
-        CapacityPlanning(); AutomaticIntake(); DeliveryCallbacks(); GodModeMapIntake();
+        CapacityPlanning(); AutomaticIntake(); RangeIntakeBeams(); DeliveryCallbacks(); GodModeMapIntake();
         assertions += ReceiverRemovalTests.Run();
         return assertions;
     }
@@ -312,6 +312,33 @@ internal static class StorageReceiverTests
         full.Core.Network.TryTransferTo(full.Unit.Inventory.Contents[0], 75, new ThingOwner(null));
         full.Tick(60);
         Equal(3L, full.Core.Network.GetTotalCount(full.Y), "waiting drop enters storage when space opens without a new haul");
+    }
+
+    private static void RangeIntakeBeams()
+    {
+        var f = new Fixture(1);
+        typeof(Building_StorageReceiver).GetField("absorbRadius",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(f.Receiver, 1);
+        var source = new IntVec3(f.Receiver.Position.x + 1, f.Receiver.Position.z);
+        int initial = MoteMaker.Beams;
+        f.Deliver(f.X, 5);
+        f.Tick();
+        Equal(initial, MoteMaker.Beams, "receiver's own cell does not emit a beam");
+        var whole = f.Deliver(f.X, 10);
+        whole.Position = source;
+        f.Tick();
+        Equal(false, whole.Spawned, "whole remote stack leaves the map");
+        Equal(initial + 1, MoteMaker.Beams, "whole remote stack emits one beam");
+        Equal(source, MoteMaker.Source.Cell, "beam starts at original item cell");
+        Equal(f.Receiver.Position, MoteMaker.Destination.Cell, "beam ends at receiver");
+        Equal(f.Map, MoteMaker.Source.Map, "beam stays on the intake map");
+        var partial = f.Deliver(f.X, 70);
+        partial.Position = source;
+        f.Tick();
+        Equal(10, partial.stackCount, "partial absorption leaves remainder");
+        Equal(initial + 2, MoteMaker.Beams, "partial absorption emits one beam");
+        f.Tick();
+        Equal(initial + 2, MoteMaker.Beams, "full network does not emit on retry");
     }
 
     private static Pawn Hauler(Fixture f)

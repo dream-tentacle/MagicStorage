@@ -29,4 +29,24 @@
       </shaderParameters>
     </graphicData>
   </ThingDef>
+  <!-- Short core-only visual for production deliveries without Biotech. -->
+  <ThingDef ParentName="MoteBase">
+    <defName>MS_Mote_ProductionSupplyBeamFallback</defName>
+    <thingClass>MoteDualAttached</thingClass>
+    <altitudeLayer>MoteOverhead</altitudeLayer>
+    <drawOffscreen>true</drawOffscreen>
+    <mote>
+      <fadeInTime>0.02</fadeInTime>
+      <solidTime>0.13</solidTime>
+      <fadeOutTime>0.05</fadeOutTime>
+      <needsMaintenance>false</needsMaintenance>
+      <rotateTowardsTarget>true</rotateTowardsTarget>
+      <scaleToConnectTargets>true</scaleToConnectTargets>
+    </mote>
+    <graphicData>
+      <texPath>Things/Mote/PowerBeam</texPath>
+      <graphicClass>Graphic_Mote</graphicClass>
+      <shaderType>MoteGlow</shaderType>
+    </graphicData>
+  </ThingDef>
 </Defs>

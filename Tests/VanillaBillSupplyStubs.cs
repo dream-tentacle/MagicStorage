@@ -45,6 +45,7 @@ namespace Verse
         public int x, z;
         public IntVec3(int x, int z) { this.x = x; this.z = z; }
         public static readonly IntVec3 Invalid = new IntVec3(-1000, -1000);
+        public int DistanceToSquared(IntVec3 other) => (x-other.x)*(x-other.x)+(z-other.z)*(z-other.z);
         public bool InBounds(Map map) => x >= 0 && z >= 0;
         public bool Fogged(Map map) => map.Fog.Contains(this);
         public bool InHorDistOf(IntVec3 other, float radius) => (long)(x-other.x)*(x-other.x) + (long)(z-other.z)*(z-other.z) <= radius*radius;
@@ -63,9 +64,24 @@ namespace Verse
         public static implicit operator LocalTargetInfo(Thing item) => new LocalTargetInfo { Thing = item };
         public static implicit operator LocalTargetInfo(IntVec3 cell) => new LocalTargetInfo { Cell = cell };
     }
-    public class ThingDef { public string defName; public int stackLimit = 75; public ThingCategory category = ThingCategory.Item; }
+    public static class DefDatabase<T> where T : class
+    {
+        public static Dictionary<string,T> Defs = new Dictionary<string,T>();
+        public static T GetNamedSilentFail(string name) => Defs.TryGetValue(name,out var value) ? value : null;
+    }
+    public static class MoteMaker
+    {
+        public static List<Tuple<ThingDef, Thing, Thing>> Beams = new List<Tuple<ThingDef, Thing, Thing>>();
+        public static void MakeInteractionOverlay(ThingDef def, Thing source, Thing target) =>
+            Beams.Add(Tuple.Create(def,source,target));
+    }
+    public class ModContentPack { public bool IsOfficialMod = true; }
+    public class ThingDef { public float BaseMarketValue; public Type thingClass; public bool IsMechGestator => typeof(RimWorld.Building_MechGestator).IsAssignableFrom(thingClass); public ModContentPack modContentPack = new ModContentPack(); public bool IsMedicine; public float Potency; public string defName; public int stackLimit = 75; public ThingCategory category = ThingCategory.Item; }
     public class Thing
     {
+        public IntVec3 InteractionCell => Position;
+        public IntVec3 PositionHeld => Position;
+        public float GetStatValue(object stat) => def.Potency;
         public ThingDef def = new ThingDef();
         public int stackCount = 1;
         public string variant;
@@ -75,6 +91,7 @@ namespace Verse
         public IntVec3 Position;
         public Faction Faction = Faction.OfPlayer;
         public bool IsForbidden(Pawn pawn) => Forbidden;
+        public bool IsForbidden(Faction faction) => Forbidden;
         public bool IsBurning() => Burning;
         public bool CanStackWith(Thing other) => !Destroyed && !other.Destroyed && other.def == def && other.variant == variant;
         public void DeSpawn() { Map?.Ground.Remove(this); Spawned = false; }
@@ -97,12 +114,12 @@ namespace Verse
     public class Building : Thing
     {
         public MagicStorage.CompStorageNode Node;
-        public IntVec3 InteractionCell => Position;
         public T GetComp<T>() where T : class => Node as T;
         public virtual void SetFaction(Faction faction, Pawn recruiter = null) { Faction = faction; }
     }
-    public class Pawn : Thing
+    public class Pawn : Thing, RimWorld.IBillGiver
     {
+        public bool Dead; public float MaxMedicinePotency = 100;
         public Job CurJob;
         public bool CanReserve(LocalTargetInfo target) => target.Thing == null ? !Map.Blocked.Contains(target.Cell) :
             !Map.reservationManager.Claims.TryGetValue(target.Thing, out var claim) || claim.Worker == this;
@@ -150,13 +167,24 @@ namespace Verse
         public IEnumerator<Thing> GetEnumerator() => items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-    public class ThingCountClass
+    public class ThingCountClass : IExposable
     {
         public Thing thing; public int Count;
+        public ThingCountClass() { }
+        public void ExposeData() { Scribe_References.Look(ref thing,"thing"); Scribe_Values.Look(ref Count,"count"); }
         public ThingCountClass(Thing item, int count) { thing = item; Count = count; }
+    }
+    public class FloatMenuOption { }
+    public enum ThingRequestGroup { HaulableEver }
+    public class ListerThings
+    {
+        private readonly Map map;
+        public ListerThings(Map map) { this.map = map; }
+        public List<Thing> ThingsInGroup(ThingRequestGroup group) => map.Ground;
     }
     public class Map : IThingHolder
     {
+        public ListerThings listerThings => new ListerThings(this);
         public readonly List<Thing> Ground = new List<Thing>();
         public readonly HashSet<IntVec3> Blocked = new HashSet<IntVec3>(), Fog = new HashSet<IntVec3>();
         public MagicStorage.MapComponent_StorageNetworks Manager;
@@ -190,6 +218,7 @@ namespace Verse
         public static readonly List<string> Warnings = new List<string>();
         public static void Warning(string message) { Warnings.Add(message); }
         public static void Error(string message) { }
+        public static void ErrorOnce(string message, int key) { }
     }
     public static class Scribe
     {
@@ -243,13 +272,44 @@ namespace RimWorld
     public class Building_WorkTable : Building, IBillGiver
     { public List<IntVec3> Cells = Enumerable.Range(0,20).Select(i => new IntVec3(i+20,20)).ToList(); }
     public class Building_WorkTableAutonomous : Building_WorkTable { }
-    public class RecipeDef { public List<IngredientCount> ingredients = new List<IngredientCount> { new IngredientCount() }; }
-    public class IngredientCount { public ThingFilter filter = new ThingFilter(); }
-    public class ThingFilter { public Predicate<Thing> AllowsThing = t => true; public bool Allows(Thing item) => AllowsThing(item); }
-    public class BillStack { public IBillGiver billGiver; }
+    public class Building_MechGestator : Building_WorkTableAutonomous, IThingHolder
+    {
+        public ThingOwner innerContainer;
+        public Building_MechGestator() { innerContainer = new ThingOwner(this); def.defName = "MechGestator"; def.thingClass = GetType(); }
+    }
+    public class Recipe_InstallImplant { }
+    public class Recipe_InstallArtificialBodyPart { }
+    public class Recipe_InstallNaturalBodyPart { }
+    public class Recipe_RemoveImplant { }
+    public class Recipe_Surgery { }
+    public class Recipe_ExecuteByCut { }
+    public class Recipe_RemoveBodyPart { }
+    public static class StatDefOf { public static object MedicalPotency; }
+    public class MedicalCareCategory
+    {
+        public float MaxPotency;
+        public bool AllowsMedicine(ThingDef def) => def.Potency <= MaxPotency;
+    }
+    public class RecipeDef {
+        public ThingFilter fixedIngredientFilter = new ThingFilter();
+        public IEnumerable<ThingDef> PotentiallyMissingIngredients(Pawn billDoer, Map map) { yield break; }
+        public bool IsSurgery, allowMixingIngredients; public ModContentPack modContentPack = new ModContentPack(); public string defName; public Type workerClass; public List<IngredientCount> ingredients = new List<IngredientCount> { new IngredientCount() }; }
+    public class IngredientCount { public bool IsFixedIngredient; public ThingFilter filter = new ThingFilter(); }
+    public class ThingFilter
+    {
+        public List<ThingDef> AllowedThingDefs = new List<ThingDef>();
+        public Predicate<Thing> AllowsThing = t => true;
+        public bool Allows(ThingDef def) => AllowedThingDefs.Count == 0 || AllowedThingDefs.Contains(def);
+        public bool Allows(Thing item) => Allows(item.def) && AllowsThing(item);
+    }
+    public class BillStack { public IBillGiver billGiver; public void DoListing() { } }
+    public static class HealthCardUtility
+    {
+        private static bool CanDoRecipeWithMedicineRestriction(IBillGiver giver, RecipeDef recipe) => false;
+    }
     public class Bill
     {
-        public BillStack billStack; public RecipeDef recipe = new RecipeDef(); public float ingredientSearchRadius = 999;
+        public Thing xenogerm; public BillStack billStack; public RecipeDef recipe = new RecipeDef(); public float ingredientSearchRadius = 999;
         public bool DeletedOrDereferenced, suspended; public int nextTickToSearchForIngredients;
         public Predicate<Thing> Filter = t => true;
         public bool IsFixedOrAllowedIngredient(Thing item) => Filter(item);
@@ -257,9 +317,14 @@ namespace RimWorld
         public bool PawnAllowedToStartAnew(Pawn pawn) => true;
     }
     public class Bill_Production : Bill { }
+    public class Bill_Medical : Bill { public List<Thing> uniqueRequiredIngredients; }
+    public enum FormingState { Gathering, Forming }
+    public class Bill_ProductionMech : Bill_Autonomous { public FormingState State; }
+    public class Bill_ResurrectMech : Bill_Autonomous { }
     public class Bill_Autonomous : Bill_Production { }
     public class WorkGiver_DoBill
     {
+        public static MedicalCareCategory GetMedicalCareCategory(Pawn patient) => new MedicalCareCategory { MaxPotency = patient.MaxMedicinePotency };
         private static bool TryFindBestBillIngredients() => false;
         private static bool TryFindBestBillIngredientsInSet() => false;
         public static Job TryStartNewDoBillJob() => null;
@@ -284,7 +349,7 @@ namespace Verse.AI
     public class JobDriver { public Pawn pawn; public Job job; }
     public class JobDriver_DoBill : JobDriver { public bool TryMakePreToilReservations(bool error) => true; }
     public static class Toils_JobTransforms
-    { private static IEnumerable<IntVec3> IngredientPlaceCellsInOrder(Thing table) => ((RimWorld.Building_WorkTable)table).Cells; }
+    { private static IEnumerable<IntVec3> IngredientPlaceCellsInOrder(Thing table) => table is RimWorld.Building_WorkTable workTable ? workTable.Cells : new List<IntVec3> { table.Position, new IntVec3(table.Position.x + 1, table.Position.z) }; }
     public static class HaulAIUtility
     {
         public static void UpdateJobWithPlacedThings(Job job, Thing item, int count)
@@ -309,7 +374,8 @@ namespace Fortified
 }
 namespace MagicStorage
 {
-    public class CompStorageNode { public StorageNetwork Network; }
+    public sealed class Building_CosmicMechGestator : RimWorld.Building_MechGestator { }
+    public class CompStorageNode { public StorageNetwork Network; public Thing parent; }
     public class Inventory { public ThingOwner Contents; public void RefreshStack(Thing item) { } }
     public class Building_StorageUnit : Building, IThingHolder
     {
@@ -319,6 +385,7 @@ namespace MagicStorage
     public class Building_StorageCore : Building { public StorageNetwork Network; }
     public class StorageNetwork
     {
+        public List<CompStorageNode> Members = new List<CompStorageNode>();
         public bool CanWork = true, HasProductionOutputPort = true; public Building_StorageCore Core;
         public List<Building_StorageUnit> Units = new List<Building_StorageUnit>();
         public Dictionary<object, Tuple<Thing,int>> Claims = new Dictionary<object, Tuple<Thing,int>>();

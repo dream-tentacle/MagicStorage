@@ -46,8 +46,12 @@ namespace MagicStorage
                         case SpecialProductType.Butchery:
                             // Corpse.ButcherProducts assumes a pawn for filth and tales.
                             // Its inner pawn exposes the same yield/body-part calculation.
+                            // A corpse without an inner pawn has nothing to butcher and
+                            // vanilla would dereference that null pawn.
                             output = ingredient is Corpse corpse
-                                ? corpse.InnerPawn.ButcherProducts(null, efficiency)
+                                ? (corpse.InnerPawn != null
+                                    ? corpse.InnerPawn.ButcherProducts(null, efficiency)
+                                    : Array.Empty<Thing>())
                                 : ingredient.ButcherProducts(null, efficiency);
                             break;
                         case SpecialProductType.Smelted: output = ingredient.SmeltProducts(efficiency); break;

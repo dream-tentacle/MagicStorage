@@ -16,6 +16,7 @@
     <Compile Include="..\Source\MagicStorage\Compatibility\FortifiedBillSupplyPlan.cs" />
     <Compile Include="..\Source\MagicStorage\Buildings\Building_ProductionOutputPort.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\VanillaBillStorage.cs" />
+    <Compile Include="..\Source\MagicStorage\Crafting\SurgeryMenuStorage.cs" />
     <Compile Include="..\Source\MagicStorage\Crafting\BillStorageSupplyPlan.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageMaterialTransaction.cs" />
     <Compile Include="..\Source\MagicStorage\Storage\StorageTransfer.cs" />

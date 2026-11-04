@@ -2,6 +2,66 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_12</defName>
+    <label>Version log</label>
+    <version>1.2.12</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Errors thrown by other mods are now less likely to prevent a UI page from being built.</li>
+          <li>Improved the notice for special recipes from other mods that define no output.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_11</defName>
+    <label>Version log</label>
+    <version>1.2.11</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>The Cosmic Mech Gestator now inherits the components of the vanilla Mech Gestator to improve compatibility with more mods. This adds an extra power toggle button, which has no actual function.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_10</defName>
+    <label>Version log</label>
+    <version>1.2.10</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>Improved shelf rendering. Items that are difficult to render now appear as icons instead of being rendered in real time.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#BB88FF&gt;New content&lt;/color&gt;</heading>
+        <entries>
+          <li>The production output port can now supply materials for surgery and mech gestation! For other jobs, use the auto-restocking shelf. We don't currently plan to add support for those jobs individually.</li>
+          <li>Production output ports and storage receivers now show a beam when transferring items.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_9</defName>
+    <label>Version log</label>
+    <version>1.2.9</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed incorrect rendering introduced in version 1.2.7 and improved rendering logic.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_2_8</defName>
     <label>Version log</label>
     <version>1.2.8</version>
