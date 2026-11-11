@@ -304,8 +304,8 @@ namespace MagicStorage
             {
                 if (!transporter.parent.Spawned || transporter.parent.Destroyed) break;
                 int count = StorageTransportExchange.CountThatFits(item, StorageTransportGroups.FreeMass(transporter));
-                if (count > 0)
-                    StorageTransfer.Move(Contents, transporter.innerContainer, item, count, Map, Position);
+                if (count > 0 && StorageTransfer.Move(Contents, transporter.innerContainer, item, count, Map, Position) > 0)
+                    EnsureLoadingStarted(transporter);
             }
         }
 
@@ -326,9 +326,20 @@ namespace MagicStorage
                     if (deficit == 0) break;
                     int count = Math.Min(deficit, Math.Min(network.AvailableToWithdraw(item),
                         StorageTransportExchange.CountThatFits(item, StorageTransportGroups.FreeMass(transporter))));
-                    if (count > 0) network.TryTransferTo(item, count, transporter.innerContainer);
+                    if (count > 0 && network.TryTransferTo(item, count, transporter.innerContainer).Transferred > 0)
+                        EnsureLoadingStarted(transporter);
                 }
             }
+        }
+
+        private static void EnsureLoadingStarted(CompTransporter transporter)
+        {
+            if (transporter.groupID >= 0 || !transporter.parent.Spawned || transporter.parent.Destroyed ||
+                transporter.parent.Faction != Faction.OfPlayer) return;
+            if (!StorageTransportGroups.IsPlayerPod(transporter) && transporter.Shuttle?.IsPlayerShuttle != true) return;
+            // Native loading dialogs only include and preselect existing cargo after loading starts.
+            // Create a solo group after a successful delivery; preserve existing groups and orders.
+            TransporterUtility.InitiateLoading(new[] { transporter });
         }
 
         private void SupplyFuel(CompRefuelable target, bool immediate)

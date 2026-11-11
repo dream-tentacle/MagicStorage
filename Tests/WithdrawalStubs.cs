@@ -7,6 +7,7 @@ namespace Verse
     public static class ThingOwnerUtility
     { public static void AppendThingHoldersFromThings(List<IThingHolder> list, ThingOwner owner) { } }
     public partial class ThingDef { public bool tradeNeverStack, IsWeapon, IsApparel; public ModContentPack modContentPack; }
+    public class Corpse : Thing { public Pawn InnerPawn; }
     public partial class Thing
     {
         public int HitPoints = 100;

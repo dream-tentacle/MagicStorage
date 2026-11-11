@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EngineStubs.cs" /><Compile Include="StorageFoundationTests.cs" />
+    <Compile Include="..\Source\MagicStorage\StoredFilterGuard.cs" />
     <Compile Include="StorageRefreshTests.cs" />
     <Compile Include="StorageIndexTests.cs" />
     <Compile Include="MonolynCompatibilityStubs.cs" />

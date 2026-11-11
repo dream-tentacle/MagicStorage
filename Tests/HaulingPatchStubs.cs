@@ -6,7 +6,7 @@ using Verse;
 
 namespace Verse
 {
-    public class ModContentPack { public string PackageId; }
+    public class ModContentPack { public string PackageId; public string Name; }
     public class Mod
     {
         public static int SettingsReads;

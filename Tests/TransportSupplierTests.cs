@@ -70,7 +70,7 @@ internal static class TransportSupplierTests
         TwoSidedInventory(); WeightLimits(); Reservations(); ReturnRejected(); FullNetworkSwap();
         AllReturnsReservedTogether(); AutoLoadingAndDirections(); Preservation(); QuantityEditing(); MassStoppingPoints();
         ManualFuel(); SupplyModes(); DirectTransport(); DirectFuel(); AtomicFuel(); ImmediateSupply(); CachedPreview();
-        SharedLaunchCapacity();
+        SharedLaunchCapacity(); AutomaticLoadingState();
         TargetInventoryLimits(); TransportInventoryLimits(); TargetLimitPersistence();
         FilterGroupingAndSelections();
         GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
@@ -511,6 +511,69 @@ internal static class TransportSupplierTests
         Equal(true, f.Net.HasOutgoingReservation(claim, first, 4), "restoration does not consume another task's reservation");
         f.Net.ReleaseOutgoing(claim);
     }
+    private static void AutomaticLoadingState()
+    {
+        int originalTick = Find.TickManager.TicksGame;
+        try
+        {
+            foreach (bool direct in new[] { false, true })
+            foreach (bool shuttle in new[] { false, true })
+            foreach (bool grouped in new[] { false, true })
+            {
+                var f = new Fixture();
+                var itemDef = new ThingDef();
+                var target = f.Target(150);
+                target.parent.Faction = Faction.OfPlayer;
+                if (shuttle) target.Shuttle = new CompShuttle { IsPlayerShuttle = true };
+                else target.Launchable = new CompLaunchable_TransportPod();
+                var peer = f.Target(150, 4);
+                if (grouped) TransporterUtility.InitiateLoading(new[] { target, peer });
+                int initialGroup = target.groupID;
+                var orders = new List<TransferableOneWay> { new TransferableOneWay() };
+                target.leftToLoad = orders;
+                var cargo = new Thing { def = itemDef, stackCount = 2 };
+                target.innerContainer.TryAdd(cargo);
+                if (direct) { f.Supplier.TrySwitchMode(); f.Select(0, itemDef); }
+
+                Find.TickManager.TicksGame = 0;
+                f.Supplier.RunTransportTestTick();
+                Equal(initialGroup, target.groupID, "no stock does not start or replace loading");
+                if (direct) f.Store(itemDef, 10); else f.Cargo(itemDef, 10);
+                Find.TickManager.TicksGame = 60000;
+                f.Supplier.RunTransportTestTick();
+                Equal(12L, f.Count(target.innerContainer, itemDef), "automatic tick delivers all ten items alongside existing cargo");
+                Equal(true, target.groupID >= 0, "automatic delivery starts native loading for a player shuttle or solo pod");
+                Equal(true, target.innerContainer.Contains(cargo), "existing cargo survives loading initialization");
+                Equal(orders, target.leftToLoad, "loading initialization preserves native orders");
+                Equal(1, orders.Count, "loading initialization preserves outstanding order entries");
+                if (grouped) Equal(initialGroup, target.groupID, "automatic delivery preserves the existing group");
+                else Equal(-1, peer.groupID, "nearby transporters are not implicitly grouped");
+                int loadedGroup = target.groupID;
+                if (direct) f.Store(itemDef, 10); else f.Cargo(itemDef, 10);
+                Find.TickManager.TicksGame = 120000;
+                f.Supplier.RunTransportTestTick();
+                Equal(22L, f.Count(target.innerContainer, itemDef), "later automatic delivery still works");
+                Equal(loadedGroup, target.groupID, "later delivery reuses the loading group");
+                Equal(0L, direct ? f.Net.GetTotalCount(itemDef) : f.Count(f.Supplier.Contents, itemDef),
+                    "all delivered items are removed from their source exactly once");
+            }
+
+            for (int kind = 0; kind < 4; kind++)
+            {
+                var f = new Fixture(); var itemDef = new ThingDef();
+                var target = f.Target(kind == 3 ? 0 : 150);
+                target.parent.Faction = kind == 2 ? new Faction() : Faction.OfPlayer;
+                if (kind == 1) target.Shuttle = new CompShuttle(); // Quest shuttle.
+                if (kind >= 2) target.Launchable = new CompLaunchable_TransportPod();
+                f.Cargo(itemDef, 10);
+                f.Supplier.RunTransportTestTick();
+                Equal(-1, target.groupID, "ordinary/quest/foreign transporters and full pods are not initialized: " + kind);
+                Equal(kind == 3 ? 0L : 10L, f.Count(target.innerContainer, itemDef), "existing cargo transfer rules remain intact: " + kind);
+            }
+        }
+        finally { Find.TickManager.TicksGame = originalTick; }
+    }
+
     private static void SharedLaunchCapacity()
     {
         var f = new Fixture();
@@ -569,7 +632,7 @@ internal static class TransportSupplierTests
         Equal(300f, a.MassUsage, "continuous supply fills exactly to group capacity");
         Equal(4L, direct.Net.GetTotalCount(light), "continuous supply retains excess network stock");
         Equal(0, direct.Supplier.Contents.Count, "continuous group delivery uses no buffer");
-        b.Shuttle = new object();
+        b.Shuttle = new CompShuttle();
         Equal(150f, StorageTransportGroups.Capacity(a), "mixed shuttle groups retain native single-pod rules");
         a.groupID = -1; b.groupID = -1;
         Equal(false, StorageTransportGroups.TryCreate(new[] { a, b }, out _), "quest shuttle cannot be grouped by this command");

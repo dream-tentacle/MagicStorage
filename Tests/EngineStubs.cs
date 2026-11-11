@@ -31,6 +31,7 @@ namespace Verse
         public static readonly List<string> Messages = new List<string>();
         public static readonly List<string> Errors = new List<string>();
         public static void Warning(string text) { }
+        public static void WarningOnce(string text, int key) { if (onceKeys.Add(key)) Warning(text); }
         public static void Message(string text) { Messages.Add(text); }
         public static void Error(string text) { Errors.Add(text); }
         private static readonly HashSet<int> onceKeys = new HashSet<int>();

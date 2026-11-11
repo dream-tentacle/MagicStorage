@@ -61,6 +61,8 @@ namespace MagicStorage
         protected override void Tick()
         {
             base.Tick();
+            // Minified containers still tick their unspawned contents.
+            if (!Spawned) return;
             Map.GetComponent<MapComponent_StorageNetworks>().EnsureCurrent();
             if (order != null && !CanContinue()) ReleaseAssignment();
             if (!CanWork) return;

@@ -13,7 +13,7 @@ namespace MagicStorage
 {
     internal static class FeedbackUploader
     {
-        private const string Endpoint = "https://mengjing-mod-feedback.vividheron129.chatgpt.site/api/game-feedback";
+        private const string Endpoint = "https://mengjing-mod-feedback.stirringblimp1.chatgpt.site/api/game-feedback";
         private const int MaxLogCharacters = 250000;
         private const int MaxRequestBytes = 2 * 1024 * 1024;
         private static readonly HttpClient Client = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };

@@ -10,7 +10,7 @@ namespace MagicStorage
 {
     internal static class FeedbackReader
     {
-        private const string Endpoint = "https://mengjing-mod-feedback.vividheron129.chatgpt.site/api/game-feedback/query";
+        private const string Endpoint = "https://mengjing-mod-feedback.stirringblimp1.chatgpt.site/api/game-feedback/query";
         private const int MaxResponseBytes = 4 * 1024 * 1024;
         private static readonly HttpClient Client = CreateClient();
 

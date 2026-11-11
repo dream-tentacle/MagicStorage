@@ -107,7 +107,7 @@ namespace RimWorld
         public int groupID = -1;
         public bool Groupable = true;
         public CompLaunchable Launchable;
-        public object Shuttle;
+        public CompShuttle Shuttle;
         public List<TransferableOneWay> leftToLoad;
         public float MassCapacity = 150;
         public ThingOwner innerContainer;
@@ -118,6 +118,7 @@ namespace RimWorld
         public ThingOwner GetDirectlyHeldThings() => innerContainer;
         public void GetChildHolders(List<IThingHolder> children) { }
     }
+    public sealed class CompShuttle { public bool IsPlayerShuttle; }
     public class CompLaunchable { }
     public sealed class CompLaunchable_TransportPod : CompLaunchable { }
     public static class TransporterUtility

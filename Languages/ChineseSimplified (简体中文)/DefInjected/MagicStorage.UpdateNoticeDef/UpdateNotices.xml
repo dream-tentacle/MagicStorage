@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+  <MS_UpdateNotice_1_2_14.label>版本日志</MS_UpdateNotice_1_2_14.label>
+  <MS_UpdateNotice_1_2_14.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_2_14.sections.0.heading>
+  <MS_UpdateNotice_1_2_14.sections.0.entries.0>修复了卸载宇宙打印机后的报错</MS_UpdateNotice_1_2_14.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_14.sections.1.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_14.sections.1.heading>
+  <MS_UpdateNotice_1_2_14.sections.1.entries.0>优化物资补给器对穿梭机和空投仓的交互逻辑</MS_UpdateNotice_1_2_14.sections.1.entries.0>
+  <MS_UpdateNotice_1_2_13.label>版本日志</MS_UpdateNotice_1_2_13.label>
+  <MS_UpdateNotice_1_2_13.sections.0.heading>&lt;color=#BB88FF&gt;内容更新&lt;/color&gt;</MS_UpdateNotice_1_2_13.sections.0.heading>
+  <MS_UpdateNotice_1_2_13.sections.0.entries.0>作者已更换反馈网站，本次更新调整了游戏内的反馈目标网址。11 月 6 日后提交的反馈可能丢失。</MS_UpdateNotice_1_2_13.sections.0.entries.0>
+
   <MS_UpdateNotice_1_2_12.label>版本日志</MS_UpdateNotice_1_2_12.label>
   <MS_UpdateNotice_1_2_12.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_12.sections.0.heading>
   <MS_UpdateNotice_1_2_12.sections.0.entries.0>现在更不容易被其他模组的报错导致无法形成UI页面</MS_UpdateNotice_1_2_12.sections.0.entries.0>
