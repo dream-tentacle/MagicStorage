@@ -2,7 +2,7 @@
 <LanguageData>
   <MS_UpdateNotice_1_2_16.label>版本日志</MS_UpdateNotice_1_2_16.label>
   <MS_UpdateNotice_1_2_16.sections.0.heading>&lt;color=#78D06B&gt;体验优化&lt;/color&gt;</MS_UpdateNotice_1_2_16.sections.0.heading>
-  <MS_UpdateNotice_1_2_16.sections.0.entries.0>现在可以在模组设置的“视觉”里，单独关掉各类建筑的供料特效了</MS_UpdateNotice_1_2_16.sections.0.entries.0>
+  <MS_UpdateNotice_1_2_16.sections.0.entries.0>现在可以在模组选项的“视觉”页签中，按建筑类型单独关闭供料特效。</MS_UpdateNotice_1_2_16.sections.0.entries.0>
   <MS_UpdateNotice_1_2_15.label>版本日志</MS_UpdateNotice_1_2_15.label>
   <MS_UpdateNotice_1_2_15.sections.0.heading>&lt;color=#FF6B6B&gt;bug修复&lt;/color&gt;</MS_UpdateNotice_1_2_15.sections.0.heading>
   <MS_UpdateNotice_1_2_15.sections.0.entries.0>修复宇宙打印机制作的奥德赛人物雕像在未取出就存档后，读档再取出会持续报错的问题</MS_UpdateNotice_1_2_15.sections.0.entries.0>
