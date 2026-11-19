@@ -54,6 +54,7 @@ namespace MagicStorage
             var byDef = new Dictionary<ThingDef, List<StorageItemRow>>();
             foreach (Thing item in stacks)
             {
+                if (!StoredFilterGuard.CheckInventoryItem(item)) continue;
                 if (!byDef.TryGetValue(item.def, out var candidates))
                     byDef.Add(item.def, candidates = new List<StorageItemRow>());
                 StorageItemRow row = null;

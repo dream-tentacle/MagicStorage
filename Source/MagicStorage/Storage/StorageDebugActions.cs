@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using LudeonTK;
 using RimWorld;
 using Verse;
@@ -8,13 +7,8 @@ namespace MagicStorage
 {
     internal static class StorageDebugActions
     {
-        private static readonly string[] materials =
-            { "WoodLog", "Steel", "ComponentIndustrial", "Plasteel", "ComponentSpacer", "Bioferrite", "MealSimple", "RawRice" };
-
         [DebugAction("Magic storage", "填满选中的存储单元：随机物资", allowedGameStates = AllowedGameStates.PlayingOnMap)]
-        private static void FillSelectedWithMaterials() => FillSelected(materials);
-
-        private static void FillSelected(string[] defNames)
+        private static void FillSelectedWithMaterials()
         {
             var unit = Find.Selector.SingleSelectedThing as Building_StorageUnit;
             if (unit == null || !unit.Spawned || unit.Destroyed || unit.Map != Find.CurrentMap)
@@ -22,15 +16,9 @@ namespace MagicStorage
                 Messages.Message("MS_DebugFill_SelectUnit".Translate(), MessageTypeDefOf.RejectInput, false);
                 return;
             }
-            var defs = new List<ThingDef>();
-            foreach (string name in defNames)
-            {
-                // DLC resources are optional; draw uniformly from the loaded pool.
-                ThingDef def = DefDatabase<ThingDef>.GetNamedSilentFail(name);
-                if (def != null && def.category == ThingCategory.Item && !def.destroyOnDrop && def.stackLimit > 0)
-                    defs.Add(def);
-            }
-            if (defs.Count == 0)
+            var defs = DefDatabase<ThingDef>.AllDefsListForReading;
+            // Check before retrying so an empty eligible pool cannot loop forever.
+            if (!defs.Exists(IsEligibleItem))
             {
                 Messages.Message("MS_DebugFill_NoMaterials".Translate(), MessageTypeDefOf.RejectInput, false);
                 return;
@@ -40,8 +28,10 @@ namespace MagicStorage
             int freeSlots = Math.Max(0, unit.SlotCapacity - unit.Inventory.UsedSlots);
             for (int i = 0; i < freeSlots; i++)
             {
-                ThingDef def = defs[Rand.Range(0, defs.Count)];
-                Thing item = ThingMaker.MakeThing(def);
+                ThingDef def;
+                do { def = defs[Rand.Range(0, defs.Count)]; }
+                while (!IsEligibleItem(def));
+                Thing item = ThingMaker.MakeThing(def, def.MadeFromStuff ? GenStuff.DefaultStuffFor(def) : null);
                 item.stackCount = def.stackLimit;
                 bool stored;
                 try { stored = unit.Inventory.Contents.TryAdd(item, false); }
@@ -55,5 +45,8 @@ namespace MagicStorage
             Messages.Message("MS_DebugFill_Completed".Translate(added, unit.Inventory.UsedSlots, unit.SlotCapacity),
                 MessageTypeDefOf.TaskCompletion, false);
         }
+
+        private static bool IsEligibleItem(ThingDef def) =>
+            def != null && def.category == ThingCategory.Item && !def.destroyOnDrop && def.stackLimit > 0;
     }
 }

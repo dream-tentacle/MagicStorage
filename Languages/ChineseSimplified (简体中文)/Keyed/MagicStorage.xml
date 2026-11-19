@@ -57,6 +57,10 @@
   <MS_SettingsCategory>[DR] 魔法存储</MS_SettingsCategory>
   <MS_SettingsTabGeneral>通用</MS_SettingsTabGeneral>
   <MS_SettingsTabCompatibility>兼容性</MS_SettingsTabCompatibility>
+  <MS_SettingsTabVisual>视觉</MS_SettingsTabVisual>
+  <MS_SettingsShowConstructionSupplyBeams>显示建筑供给单元激光</MS_SettingsShowConstructionSupplyBeams>
+  <MS_SettingsShowProductionOutputBeams>显示生产输出口激光</MS_SettingsShowProductionOutputBeams>
+  <MS_SettingsShowStorageReceiverBeams>显示存储接收器激光</MS_SettingsShowStorageReceiverBeams>
   <MS_SettingsAllowAllMaterials>允许全部材料</MS_SettingsAllowAllMaterials>
   <MS_SettingsAllowAllMaterialsHelp>如果开启后仍然无法识别全部材质，则必定发生了mod冲突，请自我检查已安装mod列表是否有建筑UI或逻辑mod</MS_SettingsAllowAllMaterialsHelp>
   <MS_SettingsForceCompatBuildMaterials>强行兼容：建造材料识别</MS_SettingsForceCompatBuildMaterials>

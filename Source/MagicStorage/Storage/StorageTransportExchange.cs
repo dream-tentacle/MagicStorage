@@ -38,7 +38,9 @@ namespace MagicStorage
     {
         // Small tolerance covers float mass stats without allowing another whole item.
         internal const double MassTolerance = 0.00001;
-        internal static double UnitMass(Thing thing) => Math.Max(0, (double)thing.GetStatValue(StatDefOf.Mass));
+        // Unknown mass must never grant free capacity or call stats on a malformed corpse.
+        internal static double UnitMass(Thing thing) => StoredFilterGuard.CheckInventoryItem(thing)
+            ? Math.Max(0, (double)thing.GetStatValue(StatDefOf.Mass)) : double.PositiveInfinity;
         internal static double ContainerMass(ThingOwner contents)
         {
             double mass = 0;
@@ -71,6 +73,7 @@ namespace MagicStorage
         private static void Add(List<StorageTransportRow> rows, Dictionary<ThingDef, List<StorageTransportRow>> byDef,
             Thing item, bool fromNetwork, StorageNetwork network, Func<Thing, Thing, bool> canGroup)
         {
+            if (!StoredFilterGuard.CheckInventoryItem(item)) return;
             if (!byDef.TryGetValue(item.def, out var candidates)) byDef.Add(item.def, candidates = new List<StorageTransportRow>());
             StorageTransportRow row = null;
             foreach (var candidate in candidates)
@@ -198,7 +201,10 @@ namespace MagicStorage
             var manager = supplier.Map.GetComponent<MapComponent_StorageNetworks>();
             manager.EnsureCurrent();
             if (!supplier.CanWork || supplier.Network != expected) return false;
-            if (!(ProjectedMass(supplier, expected, rows) <= capacity + MassTolerance))
+            double mass = ProjectedMass(supplier, expected, rows);
+            if (double.IsNaN(mass) || double.IsInfinity(mass))
+            { error = "MS_Transport_PreviewUnavailable"; return false; }
+            if (!(mass <= capacity + MassTolerance))
             { error = "MS_Transport_Overweight"; return false; }
             var moves = new List<Move>();
             var seen = new HashSet<Thing>();

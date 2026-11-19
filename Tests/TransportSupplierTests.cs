@@ -74,8 +74,52 @@ internal static class TransportSupplierTests
         TargetInventoryLimits(); TransportInventoryLimits(); TargetLimitPersistence();
         FilterGroupingAndSelections();
         GenericManualSupply(); GenericDirectSupply(); GenericContainerSelection(); GenericTargetRules();
-        VehicleSupply(); MultipleFuelComponents();
+        VehicleSupply(); MultipleFuelComponents(); InvalidCorpseInventory();
         return assertions;
+    }
+
+    private static void InvalidCorpseInventory()
+    {
+        var f = new Fixture();
+        var def = new ThingDef { defName = "TransportCorpseValidation", stackLimit = 1, transportMass = 12 };
+        var healthy = new Corpse { def = def, InnerPawn = new Pawn { def = new ThingDef() } };
+        var bad = new Corpse { def = def, InnerPawn = new Pawn { def = new ThingDef(), kindDef = null } };
+        f.Unit.Inventory.Contents.TryAdd(bad, false);
+        f.Unit.Inventory.Contents.TryAdd(healthy, false);
+        var rows = f.Rows();
+        Equal(1, rows.Count, "invalid network corpse excluded before grouping");
+        Equal(healthy, rows[0].Representative, "healthy corpse remains transferable");
+        using (var preview = new StorageTransportPreview(f.Supplier, f.Net, rows, 150))
+        {
+            rows[0].SetChange(1);
+            Equal(12d, preview.ProjectedMass, "healthy corpse weight is counted normally");
+        }
+        var cargo = new Corpse { def = def };
+        f.Supplier.Contents.TryAdd(cargo, false);
+        rows = f.Rows();
+        Equal(1, rows.Count, "invalid cargo excluded from list rows too");
+        int statReads = Thing.StatReads;
+        Equal(double.PositiveInfinity, StorageTransportExchange.UnitMass(cargo), "unknown cargo mass grants no capacity");
+        Equal(statReads, Thing.StatReads, "invalid corpse stats are never accessed");
+        bool failed = false;
+        try
+        {
+            using (var preview = new StorageTransportPreview(f.Supplier, f.Net, rows, 150)) { }
+        }
+        catch (InvalidOperationException exception)
+        {
+            failed = true;
+            Equal(true, exception.Message.Contains("thingID=" + cargo.thingIDNumber), "failure identifies invalid cargo without its label");
+        }
+        Equal(true, failed, "invalid cargo prevents mass preview initialization");
+        rows[0].SetChange(1);
+        Equal(false, f.Execute(rows, 150, out string error), "invalid cargo prevents transfer confirmation");
+        Equal("MS_Transport_PreviewUnavailable", error, "unknown mass has an explicit failure reason");
+        Equal(true, f.Supplier.Contents.Contains(cargo) && !cargo.Destroyed, "invalid cargo is not deleted");
+        Equal(true, f.Unit.Inventory.Contents.Contains(healthy), "rejected transfer leaves healthy inventory intact");
+        cargo.InnerPawn = new Pawn { def = new ThingDef() };
+        using (var preview = new StorageTransportPreview(f.Supplier, f.Net, f.Rows(), 150))
+            Equal(12d, preview.StoredMass, "preview can recover after cargo data is repaired");
     }
 
     private static void MultipleFuelComponents()

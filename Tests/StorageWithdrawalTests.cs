@@ -34,8 +34,40 @@ internal static class StorageWithdrawalTests
     public static int Run()
     {
         Grouping(); MealTradeGrouping(); ReservationsAndPartial(); Revalidation(); PendingAndFlags(); LongCounts();
-        TradeQuantityEditing(); MinifiedPresentation(); FilterGrouping(); FailedGrouping();
+        TradeQuantityEditing(); MinifiedPresentation(); FilterGrouping(); FailedGrouping(); InvalidInventoryItems();
         return assertions;
+    }
+
+    private static void InvalidInventoryItems()
+    {
+        var f = new Fixture();
+        var def = new ThingDef { defName = "CorpseValidation", stackLimit = 1 };
+        var healthy = new Corpse { def = def, InnerPawn = new Pawn { def = new ThingDef() } };
+        var invalid = new Thing[]
+        {
+            new Corpse { def = def },
+            new Corpse { def = def, InnerPawn = new Pawn { def = null } },
+            new Corpse { def = def, InnerPawn = new Pawn { def = new ThingDef(), kindDef = null } },
+            new Thing { def = def }
+        };
+        f.Unit.Inventory.Contents.TryAdd(healthy, false);
+        foreach (var item in invalid) f.Unit.Inventory.Contents.TryAdd(item, false);
+        invalid[3].def = null;
+        Thing ordinary = f.Add(new ThingDef(), 7);
+        Equal(false, StoredFilterGuard.IsUsable(null), "null item is unusable");
+        Equal(false, StoredFilterGuard.IsUsable(new Thing { def = null }), "missing item definition is unusable");
+        Equal(true, StoredFilterGuard.IsUsable(healthy), "healthy corpse remains usable");
+        foreach (var item in invalid) Equal(false, StoredFilterGuard.IsUsable(item), "invalid inventory structure rejected");
+        int warnings = Log.Warnings.Count;
+        var rows = StorageWithdrawal.Snapshot(f.Net);
+        Equal(2, rows.Count, "only healthy corpse and ordinary goods become list rows");
+        Equal(true, rows.Any(row => row.Representative == healthy), "healthy corpse remains visible");
+        Equal(7L, rows.Single(row => row.Representative == ordinary).Total, "ordinary count preserved");
+        Equal(warnings + invalid.Length, Log.Warnings.Count, "invalid items identified once");
+        StorageWithdrawal.Snapshot(f.Net);
+        Equal(warnings + invalid.Length, Log.Warnings.Count, "reopening does not flood warnings");
+        foreach (var item in invalid)
+            Equal(true, f.Unit.Inventory.Contents.Contains(item) && !item.Destroyed, "invalid item is retained");
     }
     private static void FailedGrouping()
     {

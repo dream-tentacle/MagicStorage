@@ -75,7 +75,7 @@ namespace Verse
         public static void MakeInteractionOverlay(ThingDef def, Thing source, Thing target) =>
             Beams.Add(Tuple.Create(def,source,target));
     }
-    public class ModContentPack { public bool IsOfficialMod = true; }
+    public class ModContentPack { public bool IsOfficialMod = true; public string Name = "Test mod"; }
     public class ThingDef { public float BaseMarketValue; public Type thingClass; public bool IsMechGestator => typeof(RimWorld.Building_MechGestator).IsAssignableFrom(thingClass); public ModContentPack modContentPack = new ModContentPack(); public bool IsMedicine; public float Potency; public string defName; public int stackLimit = 75; public ThingCategory category = ThingCategory.Item; }
     public class Thing
     {
@@ -83,6 +83,7 @@ namespace Verse
         public IntVec3 PositionHeld => Position;
         public float GetStatValue(object stat) => def.Potency;
         public ThingDef def = new ThingDef();
+        public int thingIDNumber;
         public int stackCount = 1;
         public string variant;
         public bool Spawned, Destroyed, Forbidden, Burning;
@@ -111,6 +112,7 @@ namespace Verse
             other.Destroy(); return true;
         }
     }
+    public class Corpse : Thing { public bool Bugged; }
     public class Building : Thing
     {
         public MagicStorage.CompStorageNode Node;
@@ -215,6 +217,7 @@ namespace Verse
     public static class GenTicks { public static int TicksGame = 100; }
     public static class Log
     {
+        public static void WarningOnce(string message, int key) { }
         public static readonly List<string> Warnings = new List<string>();
         public static void Warning(string message) { Warnings.Add(message); }
         public static void Error(string message) { }
@@ -292,7 +295,19 @@ namespace RimWorld
     }
     public class RecipeDef {
         public ThingFilter fixedIngredientFilter = new ThingFilter();
-        public IEnumerable<ThingDef> PotentiallyMissingIngredients(Pawn billDoer, Map map) { yield break; }
+        // Vanilla existence-only query; no solver, reservations or withdrawals.
+        public IEnumerable<ThingDef> PotentiallyMissingIngredients(Pawn billDoer, Map map)
+        {
+            foreach (var ingredient in ingredients)
+            {
+                if (map.listerThings.ThingsInGroup(ThingRequestGroup.HaulableEver).Any(t =>
+                    (billDoer == null || !t.IsForbidden(billDoer)) && !t.Position.Fogged(map) &&
+                    (ingredient.IsFixedIngredient || fixedIngredientFilter.Allows(t)) && ingredient.filter.Allows(t))) continue;
+                var representative = ingredient.IsFixedIngredient ? ingredient.filter.AllowedThingDefs.First() :
+                    ingredient.filter.AllowedThingDefs.OrderBy(d => d.BaseMarketValue).FirstOrDefault(d => fixedIngredientFilter.Allows(d));
+                if (representative != null) yield return representative;
+            }
+        }
         public bool IsSurgery, allowMixingIngredients; public ModContentPack modContentPack = new ModContentPack(); public string defName; public Type workerClass; public List<IngredientCount> ingredients = new List<IngredientCount> { new IngredientCount() }; }
     public class IngredientCount { public bool IsFixedIngredient; public ThingFilter filter = new ThingFilter(); }
     public class ThingFilter
@@ -374,6 +389,8 @@ namespace Fortified
 }
 namespace MagicStorage
 {
+    internal static class MagicStorageMod { internal static readonly MagicStorageSettings Settings = new MagicStorageSettings(); }
+    internal sealed class MagicStorageSettings { public bool ShowProductionOutputBeams = true; }
     public sealed class Building_CosmicMechGestator : RimWorld.Building_MechGestator { }
     public class CompStorageNode { public StorageNetwork Network; public Thing parent; }
     public class Inventory { public ThingOwner Contents; public void RefreshStack(Thing item) { } }

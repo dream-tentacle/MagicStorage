@@ -7,7 +7,14 @@ namespace Verse
     public static class ThingOwnerUtility
     { public static void AppendThingHoldersFromThings(List<IThingHolder> list, ThingOwner owner) { } }
     public partial class ThingDef { public bool tradeNeverStack, IsWeapon, IsApparel; public ModContentPack modContentPack; }
-    public class Corpse : Thing { public Pawn InnerPawn; }
+    public partial class Pawn { public object kindDef = new object(); }
+    public class Corpse : Thing
+    {
+        public Pawn InnerPawn;
+        public bool Bugged => InnerPawn == null || InnerPawn.def == null || InnerPawn.kindDef == null;
+        public override string LabelNoCount => Bugged
+            ? throw new System.InvalidOperationException("Invalid corpse label accessed") : base.LabelNoCount;
+    }
     public partial class Thing
     {
         public int HitPoints = 100;

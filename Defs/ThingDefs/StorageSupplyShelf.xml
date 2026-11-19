@@ -36,7 +36,11 @@
       <drawRotated>false</drawRotated>
       <drawOffset>(0,0,0)</drawOffset>
     </graphicData>
-    <comps><li Class="MagicStorage.CompProperties_StorageNode" /></comps>
+    <comps>
+      <li Class="MagicStorage.CompProperties_StorageNode" />
+      <!-- VNPE grinders discover hoppers through this component, not isHopper. -->
+      <li Class="VNPE.CompProperties_RegisterToGrinder" MayRequire="VanillaExpanded.VNutrientE" />
+    </comps>
     <costList><Steel>40</Steel><ComponentIndustrial>2</ComponentIndustrial></costList>
     <uiOrder>3107</uiOrder>
   </ThingDef>

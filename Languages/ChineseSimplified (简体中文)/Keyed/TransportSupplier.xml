@@ -63,4 +63,6 @@
   <MS_Transport_FirstShuttleText>魔法存储提示：\n你已建成第一架载客穿梭机。\n\n可以使用物资补给器为穿梭机手动补给或持续供应物资。</MS_Transport_FirstShuttleText>
   <MS_Transport_FirstVehicleTitle>载具：装货与远行队</MS_Transport_FirstVehicleTitle>
   <MS_Transport_FirstVehicleText>魔法存储提示：你建造了第一个载具框架的载具。\n\n你无法通过远行队传送器来组建载具远行队。但是你可以通过物资补给器给载具装货，通过原版组建远行队的方式进行。</MS_Transport_FirstVehicleText>
+  <MS_Transport_PreviewUnavailable>无法计算物品重量，暂时无法确认转移。</MS_Transport_PreviewUnavailable>
+  <MS_Transport_PreviewRetry>可能存在异常物品数据，详情请查看日志。可点击“重置”重试。</MS_Transport_PreviewRetry>
 </LanguageData>

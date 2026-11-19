@@ -57,6 +57,10 @@
   <MS_SettingsCategory>[DR] Magic Storage</MS_SettingsCategory>
   <MS_SettingsTabGeneral>General</MS_SettingsTabGeneral>
   <MS_SettingsTabCompatibility>Compatibility</MS_SettingsTabCompatibility>
+  <MS_SettingsTabVisual>Visual</MS_SettingsTabVisual>
+  <MS_SettingsShowConstructionSupplyBeams>Show construction supply unit beams</MS_SettingsShowConstructionSupplyBeams>
+  <MS_SettingsShowProductionOutputBeams>Show production output port beams</MS_SettingsShowProductionOutputBeams>
+  <MS_SettingsShowStorageReceiverBeams>Show storage receiver beams</MS_SettingsShowStorageReceiverBeams>
   <MS_SettingsAllowAllMaterials>Allow all materials</MS_SettingsAllowAllMaterials>
   <MS_SettingsAllowAllMaterialsHelp>If some materials are still not recognized after enabling this option, a mod conflict is definitely occurring. Check your installed mod list for mods that modify the building UI or logic.</MS_SettingsAllowAllMaterialsHelp>
   <MS_SettingsForceCompatBuildMaterials>Force compatibility: build materials</MS_SettingsForceCompatBuildMaterials>

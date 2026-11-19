@@ -14,10 +14,21 @@ namespace MagicStorage
         private const string StageFilter = "ThingFilter.Allows";
         private const string StageIngredient = "IngredientCount.Allows";
 
-        // 原版方法会解引用物品及其 def，而尸体特殊过滤器还解引用
-        // Corpse.InnerPawn 却没做空值判断。
+        // 与原版尸体名称使用相同的完整检查：内部角色、def、kindDef 都必须存在。
         internal static bool IsUsable(Thing thing) =>
-            thing != null && !thing.Destroyed && (!(thing is Corpse corpse) || corpse.InnerPawn != null);
+            thing != null && !thing.Destroyed && thing.def != null &&
+            (!(thing is Corpse corpse) || !corpse.Bugged);
+
+        internal static bool CheckInventoryItem(Thing thing)
+        {
+            if (IsUsable(thing)) return true;
+            // Do not read labels or ToString here: those can fail on the invalid item.
+            string identity = "thingID=" + (thing?.thingIDNumber.ToString() ?? "<null>") +
+                "; DefName=" + (thing?.def?.defName ?? "<null>");
+            Log.WarningOnce("[MagicStorage] Invalid inventory item skipped; the item was not deleted. " +
+                identity, ("MagicStorage.InvalidInventoryItem|" + identity).GetHashCode());
+            return false;
+        }
 
         // 等价于 filter.Allows(thing)，包含特殊过滤器，以及只用 ThingDef 重载时
         // 会丢失的品质与耐久百分比限制。

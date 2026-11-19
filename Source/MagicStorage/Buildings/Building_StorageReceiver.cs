@@ -82,7 +82,7 @@ namespace MagicStorage
                 var result = StorageReception.Transfer(Network, item, Map, source);
                 if (result.Transferred <= 0) continue;
                 Network?.Core?.GetComp<CompStorageGuide>()?.Complete(4);
-                if (Spawned && source != Position)
+                if (Spawned && source != Position && MagicStorageMod.Settings.ShowStorageReceiverBeams)
                 {
                     var beam = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionSupplyBeam") ??
                         DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ProductionSupplyBeamFallback");

@@ -63,4 +63,6 @@
   <MS_Transport_FirstShuttleText>Magic Storage tip:\nYou have built your first passenger shuttle.\n\nUse a material supplier to manually resupply the shuttle or continuously supply it with materials.</MS_Transport_FirstShuttleText>
   <MS_Transport_FirstVehicleTitle>Vehicles: cargo and caravans</MS_Transport_FirstVehicleTitle>
   <MS_Transport_FirstVehicleText>Magic Storage tip: You have built your first Vehicle Framework vehicle.\n\nYou cannot form vehicle caravans using the caravan teleporter. However, you can load vehicles with a material supplier, then form a caravan through the normal caravan formation interface.</MS_Transport_FirstVehicleText>
+  <MS_Transport_PreviewUnavailable>Unable to calculate item mass. Transfer confirmation is disabled.</MS_Transport_PreviewUnavailable>
+  <MS_Transport_PreviewRetry>Some item data may be invalid. See the log for details. Use Reset to retry.</MS_Transport_PreviewRetry>
 </LanguageData>

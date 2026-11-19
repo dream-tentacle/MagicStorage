@@ -39,7 +39,13 @@ namespace Verse
     {
         public string LabelCap => LabelNoCount;
         public static int StatReads;
-        public float GetStatValue(object stat) { StatReads++; return Stuff?.transportMass ?? def.transportMass; }
+        public float GetStatValue(object stat)
+        {
+            StatReads++;
+            if (this is Corpse corpse && corpse.Bugged)
+                throw new System.InvalidOperationException("Invalid corpse stat accessed");
+            return Stuff?.transportMass ?? def.transportMass;
+        }
     }
     public partial struct Rot4
     {

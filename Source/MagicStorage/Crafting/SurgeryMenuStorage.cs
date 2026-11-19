@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -9,50 +8,38 @@ namespace MagicStorage
 {
     internal static class SurgeryMenuStorage
     {
-        [ThreadStatic] private static Pawn menuPatient;
-
         internal static void Apply(Harmony harmony)
         {
-            harmony.Patch(AccessTools.Method(typeof(BillStack), nameof(BillStack.DoListing)),
-                prefix: new HarmonyMethod(typeof(SurgeryMenuStorage), nameof(WrapOptions)));
             harmony.Patch(AccessTools.Method(typeof(RecipeDef), nameof(RecipeDef.PotentiallyMissingIngredients)),
                 postfix: new HarmonyMethod(typeof(SurgeryMenuStorage), nameof(IncludeStock)));
             harmony.Patch(AccessTools.Method(typeof(HealthCardUtility), "CanDoRecipeWithMedicineRestriction"),
                 postfix: new HarmonyMethod(typeof(SurgeryMenuStorage), nameof(IncludeMedicine)));
         }
 
-        private static void WrapOptions(BillStack __instance, ref Func<List<FloatMenuOption>> recipeOptionsMaker)
-        {
-            if (!(__instance.billGiver is Pawn patient) || !patient.Spawned || patient.Dead || recipeOptionsMaker == null) return;
-            var original = recipeOptionsMaker;
-            recipeOptionsMaker = () =>
-            {
-                var previous = menuPatient;
-                menuPatient = patient;
-                try { return original(); }
-                finally { menuPatient = previous; }
-            };
-        }
-
         private static bool Allows(RecipeDef recipe, IngredientCount ingredient, Thing item) =>
             StoredFilterGuard.IngredientAllows(ingredient, recipe.fixedIngredientFilter, item);
 
-        private static List<Thing> Stock(Pawn patient, RecipeDef recipe, bool medicineOnly)
+        private static List<Thing> StockMedicine(Pawn patient, RecipeDef recipe)
         {
             var care = WorkGiver_DoBill.GetMedicalCareCategory(patient);
             return VanillaBillStorage.CollectStock(patient.Map, null,
-                def => (!medicineOnly || def.IsMedicine) && (!def.IsMedicine || care.AllowsMedicine(def)) &&
+                def => def.IsMedicine && care.AllowsMedicine(def) &&
                     recipe.ingredients.Exists(i => i.filter.Allows(def)),
                 item => recipe.ingredients.Exists(i => Allows(recipe, i, item)));
         }
 
         private static void IncludeStock(RecipeDef __instance, Pawn billDoer, Map map, ref IEnumerable<ThingDef> __result)
         {
-            if (menuPatient == null || menuPatient.Map != map || billDoer != null ||
-                !VanillaBillStorage.SupportsSurgery(__instance)) return;
+            // This is a map-wide existence estimate used by surgery menus and quest
+            // generation, not a patient-specific permission or a material reservation.
+            // Actual bill supply and the medical warning still enforce medical care.
+            if (map == null || __result == null || __instance.ingredients.Count == 0 ||
+                (billDoer != null && (!billDoer.Spawned || billDoer.Map != map))) return;
             var missing = __result.ToList();
             if (missing.Count == 0) return;
-            var stock = Stock(menuPatient, __instance, false);
+            var stock = VanillaBillStorage.CollectStock(map, billDoer,
+                def => __instance.ingredients.Exists(i => i.filter.Allows(def)),
+                item => __instance.ingredients.Exists(i => Allows(__instance, i, item)));
             if (stock.Count == 0) return;
             var ground = map.listerThings.ThingsInGroup(ThingRequestGroup.HaulableEver);
             foreach (var ingredient in __instance.ingredients)
@@ -63,8 +50,12 @@ namespace MagicStorage
                 var allowed = ingredient.filter.AllowedThingDefs;
                 var representative = ingredient.IsFixedIngredient ? allowed.FirstOrDefault() :
                     allowed.Where(d => __instance.fixedIngredientFilter.Allows(d)).OrderBy(d => d.BaseMarketValue).FirstOrDefault();
+                // Match vanilla's ground test exactly, including the optional worker.
+                // Otherwise a group already satisfied on the map could remove another
+                // group's identical representative from the original missing list.
                 if (missing.Contains(representative) &&
-                    !ground.Any(t => !t.Position.Fogged(map) && Allows(__instance, ingredient, t)))
+                    !ground.Any(t => (billDoer == null || !t.IsForbidden(billDoer)) && !t.Position.Fogged(map) &&
+                        (ingredient.IsFixedIngredient || __instance.fixedIngredientFilter.Allows(t)) && ingredient.filter.Allows(t)))
                     missing.Remove(representative);
             }
             __result = missing;
@@ -73,7 +64,7 @@ namespace MagicStorage
         private static void IncludeMedicine(IBillGiver giver, RecipeDef recipe, ref bool __result)
         {
             if (!__result && giver is Pawn patient && patient.Spawned && !patient.Dead && VanillaBillStorage.SupportsSurgery(recipe))
-                __result = Stock(patient, recipe, true).Count != 0;
+                __result = StockMedicine(patient, recipe).Count != 0;
         }
     }
 }

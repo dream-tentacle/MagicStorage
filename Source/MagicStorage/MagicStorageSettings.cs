@@ -49,6 +49,9 @@ namespace MagicStorage
         public bool AllowAllMaterials;
         public bool ForceCompatBuildMaterials = true;
         public bool TidySupplyShelf = true;
+        public bool ShowConstructionSupplyBeams = true;
+        public bool ShowProductionOutputBeams = true;
+        public bool ShowStorageReceiverBeams = true;
         public bool ModifySilverStackLimit;
         public const int DefaultSilverStackLimit = 5000;
         public const int MinSilverStackLimit = 500;
@@ -102,6 +105,9 @@ namespace MagicStorage
             AllowAllMaterials = false;
             ForceCompatBuildMaterials = true;
             TidySupplyShelf = true;
+            ShowConstructionSupplyBeams = true;
+            ShowProductionOutputBeams = true;
+            ShowStorageReceiverBeams = true;
             ModifySilverStackLimit = false;
             SilverStackLimit = DefaultSilverStackLimit;
             SimplifiedMode = true;
@@ -141,6 +147,9 @@ namespace MagicStorage
             Scribe_Values.Look(ref AllowAllMaterials, "allowAllMaterials", false);
             Scribe_Values.Look(ref ForceCompatBuildMaterials, "forceCompatBuildMaterials", true);
             Scribe_Values.Look(ref TidySupplyShelf, "tidySupplyShelf", true);
+            Scribe_Values.Look(ref ShowConstructionSupplyBeams, "showConstructionSupplyBeams", true);
+            Scribe_Values.Look(ref ShowProductionOutputBeams, "showProductionOutputBeams", true);
+            Scribe_Values.Look(ref ShowStorageReceiverBeams, "showStorageReceiverBeams", true);
             Scribe_Values.Look(ref ModifySilverStackLimit, "modifySilverStackLimit", false);
             Scribe_Values.Look(ref silverStackLimit, "silverStackLimit", DefaultSilverStackLimit);
             SilverStackLimit = silverStackLimit;

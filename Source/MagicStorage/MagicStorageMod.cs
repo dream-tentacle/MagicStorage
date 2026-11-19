@@ -16,7 +16,7 @@ namespace MagicStorage
         private readonly string[] refreshBuffers = new string[(int)StorageRefreshTask.Count];
         private Vector2 settingsScroll;
         private float settingsHeight;
-        private enum SettingsTab { General, Balance, Performance, Accessibility, Compatibility }
+        private enum SettingsTab { General, Balance, Performance, Accessibility, Visual, Compatibility }
         private SettingsTab settingsTab;
 
         public MagicStorageMod(ModContentPack content) : base(content)
@@ -50,6 +50,7 @@ namespace MagicStorage
                 new TabRecord("MS_SettingsTabBalance".Translate(), () => SelectSettingsTab(SettingsTab.Balance), settingsTab == SettingsTab.Balance),
                 new TabRecord("MS_SettingsTabPerformance".Translate(), () => SelectSettingsTab(SettingsTab.Performance), settingsTab == SettingsTab.Performance),
                 new TabRecord("MS_SettingsTabAccessibility".Translate(), () => SelectSettingsTab(SettingsTab.Accessibility), settingsTab == SettingsTab.Accessibility),
+                new TabRecord("MS_SettingsTabVisual".Translate(), () => SelectSettingsTab(SettingsTab.Visual), settingsTab == SettingsTab.Visual),
                 new TabRecord("MS_SettingsTabCompatibility".Translate(), () => SelectSettingsTab(SettingsTab.Compatibility), settingsTab == SettingsTab.Compatibility)
             });
             var viewport = new Rect(body.x + 12f, body.y + 12f, body.width - 24f, Mathf.Max(0f, body.height - 24f));
@@ -60,6 +61,7 @@ namespace MagicStorage
             if (settingsTab == SettingsTab.Accessibility) DrawAccessibilitySettings(listing);
             else if (settingsTab == SettingsTab.Balance) DrawBalanceSettings(listing);
             else if (settingsTab == SettingsTab.Performance) DrawPerformanceSettings(listing);
+            else if (settingsTab == SettingsTab.Visual) DrawVisualSettings(listing);
             else if (settingsTab == SettingsTab.Compatibility) DrawCompatibilitySettings(listing);
             else DrawGeneralSettings(listing);
             listing.Gap();
@@ -84,6 +86,13 @@ namespace MagicStorage
             settingsTab = tab;
             settingsScroll = Vector2.zero;
             settingsHeight = 0f;
+        }
+
+        private static void DrawVisualSettings(Listing_Standard listing)
+        {
+            listing.CheckboxLabeled("MS_SettingsShowConstructionSupplyBeams".Translate(), ref Settings.ShowConstructionSupplyBeams);
+            listing.CheckboxLabeled("MS_SettingsShowProductionOutputBeams".Translate(), ref Settings.ShowProductionOutputBeams);
+            listing.CheckboxLabeled("MS_SettingsShowStorageReceiverBeams".Translate(), ref Settings.ShowStorageReceiverBeams);
         }
 
         private void DrawGeneralSettings(Listing_Standard listing)

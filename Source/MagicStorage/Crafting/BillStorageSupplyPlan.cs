@@ -144,7 +144,7 @@ namespace MagicStorage
         {
             if (completed) return true;
             bool delivered = container == null ? PrepareOnMap(job, pawn) : PrepareContainer(job, pawn, container);
-            if (delivered)
+            if (delivered && MagicStorageMod.Settings.ShowProductionOutputBeams)
             {
                 // Visual failures must never turn an already paid delivery into a failed job.
                 try { ShowDeliveryBeams(job.targetA.Thing); }

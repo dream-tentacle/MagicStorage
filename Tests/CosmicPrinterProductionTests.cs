@@ -16,6 +16,7 @@ internal static class CosmicPrinterProductionTests
         {
             ParameterConfirmation();
             BoundColonistParameters();
+            StatuesInitializeBeforeStorage();
             var printer = new Building_CosmicPrinter();
             printer.Settings.Efficiency = 2.5f; printer.Settings.QualityOffset = 1;
             var material = new Thing { def = new ThingDef(), DrawColor = 31 };
@@ -152,6 +153,53 @@ internal static class CosmicPrinterProductionTests
         output = PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList();
         Check(output.Sum(product => product.stackCount) == 20 && QualityUtility.LastSkill == 1,
             "unbinding restores manual yield and quality together");
+    }
+
+    private static void StatuesInitializeBeforeStorage()
+    {
+        var printer = new Building_CosmicPrinter();
+        var recipe = new RecipeDef();
+        recipe.products.Add(new ThingDefCountClass
+        { thingDef = new ThingDef { Statue = true, Quality = true, Minifiable = true, stackLimit = 1 }, count = 2 });
+        foreach (var boundPawn in new[] { null, new Pawn() })
+        {
+            printer.BoundPawn = boundPawn;
+            var output = PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList();
+            Check(output.Count == 2, "each statue is returned as an individual product");
+            Check(output.Cast<MinifiedThing>().All(item => item.InnerThing.Statue.Active &&
+                item.InnerThing.Statue.SavedSubject != null && item.InnerThing.Statue.InitializationCalls == 1),
+                "bound and unbound printers capture every statue subject before storage without drawing");
+        }
+
+        try
+        {
+            ThingMaker.OnMade = thing => { thing.Statue.Active = true; thing.Statue.SavedSubject = "Existing subject"; };
+            var existing = PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).Cast<MinifiedThing>().ToList();
+            Check(existing.All(item => item.InnerThing.Statue.SavedSubject == "Existing subject" &&
+                item.InnerThing.Statue.InitializationCalls == 0), "already initialized statues retain their subject");
+        }
+        finally { ThingMaker.OnMade = null; }
+
+        foreach (Action<CompStatue> failure in new Action<CompStatue>[]
+        {
+            statue => statue.parent.Destroy(),
+            statue => { },
+            statue => { statue.Active = true; throw new InvalidOperationException("Rendering initialization failed"); }
+        })
+        {
+            Thing created = null;
+            try
+            {
+                ThingMaker.OnMade = thing => created = thing;
+                CompStatue.InitializeOverride = failure;
+                bool stopped = false;
+                try { PrinterCraftingProduction.MakeProducts(printer, recipe, new List<Thing>(), null).ToList(); }
+                catch (InvalidOperationException) { stopped = true; }
+                Check(stopped, "initialization failure stops output generation for the batch");
+                Check(created != null && created.Destroyed, "failed statue is discarded before packaging or storage");
+            }
+            finally { ThingMaker.OnMade = null; CompStatue.InitializeOverride = null; }
+        }
     }
 
     private sealed class SpecialIngredient : Thing

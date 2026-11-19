@@ -3,6 +3,17 @@ using System;
 using System.Collections.Generic;
 using RimWorld;
 
+namespace HarmonyLib
+{
+    public static class AccessTools
+    {
+        public static System.Reflection.MethodInfo Method(Type type, string name) =>
+            type.GetMethod(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        public static T MethodDelegate<T>(System.Reflection.MethodInfo method) where T : class =>
+            (T)(object)Delegate.CreateDelegate(typeof(T), method);
+    }
+}
+
 namespace MagicStorage
 {
     public sealed class Building_CosmicPrinter
@@ -43,7 +54,7 @@ namespace Verse
     }
     public sealed class ThingDef
     {
-        public bool MadeFromStuff, Minifiable, Quality;
+        public bool MadeFromStuff, Minifiable, Quality, Statue;
         public int stackLimit = 75;
         public List<StyleChance> randomStyle;
         public float randomStyleChance;
@@ -69,10 +80,12 @@ namespace Verse
         public ThingStyleDef StyleDef;
         public Precept_ThingStyle StyleSourcePrecept;
         public CompQuality Quality;
+        public CompStatue Statue;
         public CompIngredients Ingredients = new CompIngredients();
         public float LastEfficiency;
         public int ButcherCalls, SmeltCalls, StoneCalls;
-        public T TryGetComp<T>() where T : class => (Quality as T) ?? (Ingredients as T);
+        public T TryGetComp<T>() where T : class => (Quality as T) ?? (Ingredients as T) ?? (Statue as T);
+        public void Destroy() { Destroyed = true; }
         public void SetColor(int color, bool reportFailure) { DrawColor = color; }
         public void Notify_RecipeProduced(object pawn) { throw new Exception("Machine invoked pawn-only callbacks"); }
         public void SetStyleDef(ThingStyleDef style) { StyleDef = style; }
@@ -85,6 +98,8 @@ namespace Verse
         public Thing MakeMinified()
         {
             if (stackCount != 1) throw new Exception("Minification would discard extra furniture");
+            if (Destroyed) throw new Exception("Destroyed product reached minification");
+            if (Statue != null && !Statue.Active) throw new Exception("Statue reached minification without a snapshot");
             return new MinifiedThing { InnerThing = this };
         }
     }
@@ -100,8 +115,14 @@ namespace Verse
     }
     public static class ThingMaker
     {
-        public static Thing MakeThing(ThingDef def, ThingDef stuff = null) => new Thing
-        { def = def, Stuff = stuff, Quality = def.Quality ? new CompQuality() : null };
+        public static Action<Thing> OnMade;
+        public static Thing MakeThing(ThingDef def, ThingDef stuff = null)
+        {
+            var thing = new Thing { def = def, Stuff = stuff, Quality = def.Quality ? new CompQuality() : null };
+            if (def.Statue) thing.Statue = new CompStatue { parent = thing };
+            OnMade?.Invoke(thing);
+            return thing;
+        }
     }
     public static class ListHelpers
     {
@@ -111,6 +132,20 @@ namespace Verse
 }
 namespace RimWorld
 {
+    public sealed class CompStatue
+    {
+        public Verse.Thing parent;
+        public bool Active;
+        public string SavedSubject;
+        public int InitializationCalls;
+        public static Action<CompStatue> InitializeOverride;
+        private void InitializeAsFactionLeaderStatue()
+        {
+            InitializationCalls++;
+            if (InitializeOverride != null) InitializeOverride(this);
+            else { SavedSubject = "Faction leader"; Active = true; }
+        }
+    }
     public sealed class StatDef { }
     public sealed class WorkTypeDef { }
     public sealed class WorkGiverDef { public WorkTypeDef workType; }

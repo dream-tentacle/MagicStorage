@@ -50,7 +50,7 @@ namespace MagicStorage
             var sourceOffset = supplier.TrueCenter() - supplier.Position.ToVector3Shifted();
             var destinationOffset = target.TrueCenter() - target.Position.ToVector3Shifted();
             int delivered = DeliverMaterials(supplier, target);
-            if (delivered > 0)
+            if (delivered > 0 && MagicStorageMod.Settings.ShowConstructionSupplyBeams)
             {
                 var beamDef = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionSupplyBeam");
                 if (beamDef != null)

@@ -30,6 +30,8 @@
     <HarmonyAssemblyPath Condition=" '$(HarmonyAssemblyPath)' == '' ">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\$(GameVersion)\Assemblies\0Harmony.dll</HarmonyAssemblyPath>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <!-- Keep source file names and line numbers in distributed symbols without recording the build directory. -->
+    <PathMap Condition=" '$(UsePhysicalSourcePaths)' != 'true' ">$(MSBuildProjectDirectory)=/MagicStorage/</PathMap>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

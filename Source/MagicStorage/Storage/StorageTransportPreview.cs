@@ -28,18 +28,25 @@ namespace MagicStorage
             {
                 foreach (Thing item in row.NetworkStacks) MassOf(item);
                 foreach (Thing item in row.SupplyStacks) MassOf(item);
-                row.SelectionChanged += SelectionChanged;
             }
             double stored = 0;
             foreach (Thing item in supplier.Contents) stored += MassOf(item) * item.stackCount;
             StoredMass = stored;
             Recalculate();
+            // Subscribe only after initialization succeeds, so failure leaves no live handlers.
+            foreach (var row in rows) row.SelectionChanged += SelectionChanged;
         }
 
         private double MassOf(Thing item)
         {
             if (!masses.TryGetValue(item, out double mass))
-                masses.Add(item, mass = StorageTransportExchange.UnitMass(item));
+            {
+                mass = StorageTransportExchange.UnitMass(item);
+                if (double.IsNaN(mass) || double.IsInfinity(mass))
+                    throw new InvalidOperationException("Cannot calculate inventory mass. thingID=" +
+                        (item?.thingIDNumber.ToString() ?? "<null>") + "; DefName=" + (item?.def?.defName ?? "<null>"));
+                masses.Add(item, mass);
+            }
             return mass;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using RimWorld;
 using Verse;
 
@@ -7,6 +8,10 @@ namespace MagicStorage
 {
     internal static class PrinterCraftingProduction
     {
+        private static readonly Action<CompStatue> initializeStatue =
+            AccessTools.MethodDelegate<Action<CompStatue>>(
+                AccessTools.Method(typeof(CompStatue), "InitializeAsFactionLeaderStatue"));
+
         internal static IEnumerable<Thing> MakeProducts(Building_CosmicPrinter printer, RecipeDef recipe,
             List<Thing> ingredients, Thing dominant, Precept_ThingStyle precept = null)
         {
@@ -72,6 +77,26 @@ namespace MagicStorage
                 product.StyleSourcePrecept = precept;
             else if (product.StyleDef == null && !product.def.randomStyle.NullOrEmpty() && Rand.Chance(product.def.randomStyleChance))
                 product.SetStyleDef(product.def.randomStyle.RandomElementByWeight(x => x.Chance).StyleDef);
+            CompStatue statue = product.TryGetComp<CompStatue>();
+            if (statue != null && !statue.Active)
+            {
+                // Stored products may be saved before their first draw. Statue's quality
+                // callback does not capture a pawn, but PostLoadInit assumes that snapshot
+                // exists. Run the same fallback as its first draw before packaging it.
+                try
+                {
+                    initializeStatue(statue);
+                    if (product.Destroyed || !statue.Active)
+                        throw new InvalidOperationException("Printer could not initialize statue before storage.");
+                }
+                catch
+                {
+                    // This product is not in the batch's holder yet. Discard incomplete
+                    // output; the batch catches the exception and retains its ingredients.
+                    if (!product.Destroyed) product.Destroy();
+                    throw;
+                }
+            }
             return product.def.Minifiable ? product.MakeMinified() : product;
         }
     }

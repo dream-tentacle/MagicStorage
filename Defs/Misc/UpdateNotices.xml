@@ -2,6 +2,38 @@
 <Defs>
   <!-- Add one Def per release and match version to About/About.xml's modVersion. -->
   <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_16</defName>
+    <label>Version log</label>
+    <version>1.2.16</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#78D06B&gt;Experience improvements&lt;/color&gt;</heading>
+        <entries>
+          <li>You can now turn off supply beam effects separately for each building type under Visual in the mod settings.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
+    <defName>MS_UpdateNotice_1_2_15</defName>
+    <label>Version log</label>
+    <version>1.2.15</version>
+    <sections>
+      <li>
+        <heading>&lt;color=#FF6B6B&gt;Bug fixes&lt;/color&gt;</heading>
+        <entries>
+          <li>Fixed repeated errors when withdrawing Odyssey statues made by a cosmic printer after saving and loading without first taking them out of storage.</li>
+        </entries>
+      </li>
+      <li>
+        <heading>&lt;color=#6FA8FF&gt;Compatibility&lt;/color&gt;</heading>
+        <entries>
+          <li>Restocking shelves are now compatible with Vanilla Nutrient Paste Expanded.</li>
+        </entries>
+      </li>
+    </sections>
+  </MagicStorage.UpdateNoticeDef>
+  <MagicStorage.UpdateNoticeDef>
     <defName>MS_UpdateNotice_1_2_14</defName>
     <label>Version log</label>
     <version>1.2.14</version>

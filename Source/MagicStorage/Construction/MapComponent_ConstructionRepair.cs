@@ -116,13 +116,18 @@ namespace MagicStorage
                 if (network.ReserveOutgoing(repair, item, 1, supplier) != 1) continue;
                 try
                 {
-                    var beamDef = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionRepairBeam") ??
-                        DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionRepairBeamFallback");
-                    if (beamDef == null) return;
-                    var sourceOffset = supplier.TrueCenter() - supplier.Position.ToVector3Shifted();
-                    var targetOffset = target.TrueCenter() - target.Position.ToVector3Shifted();
-                    repair.Beam = MoteMaker.MakeInteractionOverlay(beamDef,
-                        new TargetInfo(supplier.Position, map), new TargetInfo(target.Position, map), sourceOffset, targetOffset);
+                    if (MagicStorageMod.Settings.ShowConstructionSupplyBeams)
+                    {
+                        var beamDef = DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionRepairBeam") ??
+                            DefDatabase<ThingDef>.GetNamedSilentFail("MS_Mote_ConstructionRepairBeamFallback");
+                        if (beamDef != null)
+                        {
+                            var sourceOffset = supplier.TrueCenter() - supplier.Position.ToVector3Shifted();
+                            var targetOffset = target.TrueCenter() - target.Position.ToVector3Shifted();
+                            repair.Beam = MoteMaker.MakeInteractionOverlay(beamDef,
+                                new TargetInfo(supplier.Position, map), new TargetInfo(target.Position, map), sourceOffset, targetOffset);
+                        }
+                    }
                     active.Add(target, repair);
                     return;
                 }

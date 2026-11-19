@@ -395,7 +395,6 @@ internal static class VanillaBillSupplyTests
     {
         var f = new Fixture();
         var patient = new Pawn { Map = f.Map, Spawned = true, MaxMedicinePotency = 1 };
-        var stack = new BillStack { billGiver = patient };
         var recipe = new RecipeDef { IsSurgery = true, workerClass = typeof(Recipe_InstallImplant) };
         var eye = new ThingDef { defName = "BionicEye" };
         var herb = new ThingDef { defName = "Herbal", IsMedicine = true, Potency = 1 };
@@ -409,21 +408,6 @@ internal static class VanillaBillSupplyTests
         f.Stock(2, glitter);
 
         MethodInfo Patch(string name) => typeof(SurgeryMenuStorage).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
-        List<ThingDef> CheckMissing(params ThingDef[] vanillaMissing)
-        {
-            object[] args = { recipe, null, f.Map, vanillaMissing };
-            Patch("IncludeStock").Invoke(null, args);
-            return ((IEnumerable<ThingDef>)args[3]).ToList();
-        }
-        List<ThingDef> Menu(params ThingDef[] vanillaMissing)
-        {
-            List<ThingDef> result = null;
-            Func<List<FloatMenuOption>> options = () => { result = CheckMissing(vanillaMissing); return new List<FloatMenuOption>(); };
-            object[] args = { stack, options };
-            Patch("WrapOptions").Invoke(null, args);
-            ((Func<List<FloatMenuOption>>)args[1])();
-            return result;
-        }
         bool HasStockMedicine()
         {
             object[] args = { patient, recipe, false };
@@ -431,33 +415,104 @@ internal static class VanillaBillSupplyTests
             return (bool)args[2];
         }
 
-        Equal(herb, Menu(eye, herb).Single(), "eye in stock appears but banned medicine keeps surgery disabled");
+        Equal(0, Missing(recipe, f.Map).Count, "direct third-party menu query sees implant and medicine without patient context");
         Equal(false, HasStockMedicine(), "banned stock medicine does not clear the warning");
-        Equal(eye, CheckMissing(eye).Single(), "queries outside the patient menu are unchanged");
+        var medical = new Bill_Medical { recipe = recipe, billStack = new BillStack { billGiver = patient } };
+        Equal(storedEye, Search(f, medical, patient, new List<Thing>()).Single(),
+            "menu availability does not bypass patient medicine restriction during actual selection");
         f.Map.Ground.Add(new Thing { def = herb, Spawned = true, Map = f.Map });
-        Equal(0, Menu(eye).Count, "local medicine plus stored eye enables surgery");
+        Equal(0, Missing(recipe, f.Map).Count, "local medicine plus stored eye enables surgery");
         f.Map.Ground.Clear();
         f.Stock(2, herb);
-        Equal(0, Menu(eye, herb).Count, "all ingredients can be in storage");
+        Equal(0, Missing(recipe, f.Map).Count, "all ingredients can be in storage");
         Equal(true, HasStockMedicine(), "permitted network medicine clears the warning");
         f.Network.HasProductionOutputPort = false;
-        Equal(2, Menu(eye, herb).Count, "disconnected port cannot satisfy missing ingredients");
+        Equal(2, Missing(recipe, f.Map).Count, "disconnected port cannot satisfy missing ingredients");
         Equal(false, HasStockMedicine(), "disconnected port cannot clear warning");
         f.Network.HasProductionOutputPort = true;
         storedEye.Forbidden = true;
-        Equal(eye, Menu(eye).Single(), "forbidden implant stays unavailable");
+        Equal(eye, Missing(recipe, f.Map).Single(), "forbidden implant stays unavailable");
         storedEye.Forbidden = false;
         f.Unit.Forbidden = true;
-        Equal(eye, Menu(eye).Single(), "forbidden unit does not expose implant");
+        Equal(2, Missing(recipe, f.Map).Count, "forbidden unit exposes neither implant nor medicine");
         f.Unit.Forbidden = false;
         recipe.workerClass = typeof(Recipe_Surgery);
         recipe.modContentPack.IsOfficialMod = false;
         recipe.allowMixingIngredients = true;
-        Equal(0, Menu(eye).Count, "third-party mixed surgery sees stored implant in menu");
+        Equal(0, Missing(recipe, f.Map).Count, "third-party mixed surgery sees stored implant in menu");
         recipe.IsSurgery = false;
-        Equal(eye, Menu(eye).Single(), "non-surgery uses native missing ingredients");
+        Equal(0, Missing(recipe, f.Map).Count, "non-surgery queries also include available stock");
         Equal(5, f.StockCount, "opening menus never withdraws items");
         Equal(0, f.Network.Claims.Count, "opening menus does not reserve items");
+    }
+
+    private static List<ThingDef> Missing(RecipeDef recipe, Map map, Pawn worker = null)
+    {
+        object[] args = { recipe, worker, map, recipe.PotentiallyMissingIngredients(worker, map) };
+        typeof(SurgeryMenuStorage).GetMethod("IncludeStock", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, args);
+        return ((IEnumerable<ThingDef>)args[3]).ToList();
+    }
+
+    private static void GeneralMissingIngredients()
+    {
+        var f = new Fixture();
+        var recipe = f.Bill.recipe;
+        var ingredient = recipe.ingredients[0];
+        ingredient.filter.AllowedThingDefs.Add(f.Steel);
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "absent material remains missing");
+        var item = f.Stock(1);
+        Equal(0, Missing(recipe, f.Map).Count, "quest-style query sees stored material without a menu or worker");
+        Equal(0, Missing(recipe, f.Map, f.Pawn).Count, "worker query includes eligible stock");
+        var other = new Fixture();
+        Equal(f.Steel, Missing(recipe, other.Map).Single(), "stock never crosses maps");
+        Equal(f.Steel, Missing(recipe, other.Map, f.Pawn).Single(), "worker on another map does not supply stock");
+        f.Network.CanWork = false;
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "inactive network remains unavailable");
+        f.Network.CanWork = true;
+        f.Map.Fog.Add(f.Unit.Position);
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "fogged storage remains unavailable");
+        f.Map.Fog.Clear();
+        f.Unit.Faction = null;
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "foreign storage remains unavailable");
+        f.Unit.Faction = Faction.OfPlayer;
+        f.Network.ReserveOutgoing(new object(), item, 1);
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "claimed stock remains unavailable");
+        f.Network.Claims.Clear();
+        f.Map.reservationManager.Claims[item] = new Claim { Worker = new Pawn() };
+        Equal(f.Steel, Missing(recipe, f.Map, f.Pawn).Single(), "worker cannot advertise another worker's reserved stock");
+        f.Map.reservationManager.Claims.Clear();
+        recipe.fixedIngredientFilter.AllowsThing = t => false;
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "recipe fixed filter checks actual stored items");
+        ingredient.IsFixedIngredient = true;
+        Equal(0, Missing(recipe, f.Map).Count, "fixed ingredient bypasses recipe fixed filter like vanilla");
+        ingredient.IsFixedIngredient = false;
+        recipe.fixedIngredientFilter.AllowsThing = t => true;
+        ingredient.filter.AllowsThing = t => t.variant == "required quality";
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "instance restrictions cannot be satisfied by matching def alone");
+        item.variant = "required quality";
+        Equal(0, Missing(recipe, f.Map).Count, "matching instance satisfies ingredient");
+        var ground = new Thing { def = f.Steel, Map = f.Map, Spawned = true, variant = item.variant };
+        f.Map.Ground.Add(ground);
+        var unsatisfied = new IngredientCount { IsFixedIngredient = true };
+        unsatisfied.filter.AllowedThingDefs.Add(f.Steel);
+        unsatisfied.filter.AllowsThing = t => t.variant == "different quality";
+        recipe.ingredients.Add(unsatisfied);
+        Equal(f.Steel, Missing(recipe, f.Map).Single(), "ground-satisfied group cannot clear another group's identical missing def");
+        ground.Forbidden = true;
+        Equal(2, recipe.PotentiallyMissingIngredients(f.Pawn, f.Map).Count(), "worker query ignores forbidden ground stack for both groups");
+        Equal(f.Steel, Missing(recipe, f.Map, f.Pawn).Single(), "storage removes exactly one of two identical missing defs");
+        Equal(1, item.stackCount, "queries never change stored quantity");
+        Equal(true, f.Unit.Inventory.Contents.Contains(item), "queries never extract the stored item");
+        Equal(0, f.Network.Claims.Count, "queries do not claim stock");
+        Equal(1, f.Map.Ground.Count, "queries do not spawn substitute ingredients");
+
+        var extra = new ThingDef { defName = "OtherModMissingRequirement" };
+        object[] args = { recipe, null, f.Map, new[] { f.Steel, extra } };
+        typeof(SurgeryMenuStorage).GetMethod("IncludeStock", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, args);
+        Equal(true, ((IEnumerable<ThingDef>)args[3]).SequenceEqual(new[] { f.Steel, extra }),
+            "unresolved groups and additional missing results from other patches are retained");
+        f.Unit.Inventory.Contents.Take(item, 1);
+        Equal(2, Missing(recipe, f.Map, f.Pawn).Count, "next query observes withdrawal instead of reusing stale stock");
     }
 
     private sealed class ThirdPartyGestator : Building_MechGestator { }
@@ -522,7 +577,7 @@ internal static class VanillaBillSupplyTests
         try
         {
             CandidateScopeAndPortRules(); NativeJobHandoff(); ContentionAndInvalidation(); SplitDeliveryAndRollback(); SavedPendingPlan();
-            FortifiedSupply(); ProductionDeliveryBeams(); MedicalSupply(); ThirdPartySurgery(); SurgeryMenuSupply(); GestatorSupply();
+            FortifiedSupply(); ProductionDeliveryBeams(); MedicalSupply(); ThirdPartySurgery(); SurgeryMenuSupply(); GeneralMissingIngredients(); GestatorSupply();
             Console.WriteLine("PASS: " + checks + " production supply assertions (actual supply/transfer code; controlled engine boundary).");
             return 0;
         }

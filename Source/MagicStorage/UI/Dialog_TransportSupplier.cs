@@ -60,10 +60,21 @@ namespace MagicStorage
             network = supplier.Network;
             revision = network?.Revision ?? -1;
             preview?.Dispose();
-            rows = StorageTransportExchange.Snapshot(supplier, network, filters.CanGroup);
-            if (preserveSelections) StorageTransportExchange.RestoreSelections(previousRows, rows, network);
-            preview = new StorageTransportPreview(supplier, network, rows, capacity);
-            ApplyFilter();
+            preview = null;
+            try
+            {
+                rows = StorageTransportExchange.Snapshot(supplier, network, filters.CanGroup);
+                if (preserveSelections) StorageTransportExchange.RestoreSelections(previousRows, rows, network);
+                ApplyFilter();
+                preview = new StorageTransportPreview(supplier, network, rows, capacity);
+            }
+            catch (Exception exception)
+            {
+                // Keep the window usable for closing/retrying, without rethrowing every repaint.
+                visible.Clear();
+                Log.ErrorOnce("[MagicStorage] Material supplier preview initialization failed.\n" + exception,
+                    ("MagicStorage.TransportPreview|" + supplier.thingIDNumber + "|" + exception).GetHashCode());
+            }
         }
         private void ApplyFilter()
         {
@@ -189,21 +200,22 @@ namespace MagicStorage
         {
             Rect amount = new Rect(rect.center.x - 42, rect.center.y - 12.5f, 84, 25).Rounded();
             bool enabled = GUI.enabled;
-            GUI.enabled = enabled && supplier.CanWork;
+            bool canEdit = supplier.CanWork && preview != null;
+            GUI.enabled = enabled && canEdit;
             try
             {
                 GUI.SetNextControlName("MS_Transport_" + row.Representative.thingIDNumber);
                 string value = Widgets.TextField(amount, row.Buffer);
                 if (value != row.Buffer) row.EditChange(value);
                 int step = GenUI.CurrentAdjustmentMultiplier();
-                if (supplier.CanWork && row.Change > -row.SupplyCount)
+                if (canEdit && row.Change > -row.SupplyCount)
                 {
                     StorageQuantityDrag.ButtonText(new Rect(amount.x - 58, rect.y, 29, rect.height), "<<", row.Representative.thingIDNumber,
                         () => row.SetChange(-row.SupplyCount));
                     StorageQuantityDrag.ButtonText(new Rect(amount.x - 29, rect.y, 29, rect.height), "<", row.Representative.thingIDNumber,
                         () => row.SetChange(row.Change - Math.Min(step, row.Change + row.SupplyCount)));
                 }
-                if (supplier.CanWork && row.Change < row.Available)
+                if (canEdit && row.Change < row.Available)
                 {
                     StorageQuantityDrag.ButtonText(new Rect(amount.xMax, rect.y, 29, rect.height), ">", row.Representative.thingIDNumber,
                         () => row.SetChange(row.Change + Math.Min(step, row.Available - row.Change)));
@@ -220,22 +232,28 @@ namespace MagicStorage
 
         private void DrawFooter(Rect rect)
         {
-            double mass = preview.ProjectedMass;
-            bool withinCapacity = mass <= capacity + StorageTransportExchange.MassTolerance;
+            double mass = preview?.ProjectedMass ?? double.PositiveInfinity;
+            bool withinCapacity = preview != null && mass <= capacity + StorageTransportExchange.MassTolerance;
             float y = rect.height - 126;
             Color color = GUI.color;
             if (!withinCapacity) GUI.color = Color.red;
-            Widgets.Label(new Rect(0, y, rect.width, 26), "MS_Transport_Mass".Translate(
-                preview.StoredMass.ToString("0.##"), mass.ToString("0.##"), capacity.ToString("0.##")));
+            Widgets.Label(new Rect(0, y, rect.width, 26), preview == null
+                ? "MS_Transport_PreviewUnavailable".Translate()
+                : "MS_Transport_Mass".Translate(preview.StoredMass.ToString("0.##"), mass.ToString("0.##"), capacity.ToString("0.##")));
             GUI.color = color;
-            string status = !supplier.CanWork ? StorageNetwork.StatusLabel(network) : !withinCapacity ? "MS_Transport_Overweight".Translate().ToString() :
+            string status = preview == null ? "MS_Transport_PreviewRetry".Translate().ToString() :
+                !supplier.CanWork ? StorageNetwork.StatusLabel(network) : !withinCapacity ? "MS_Transport_Overweight".Translate().ToString() :
                 feedback.Length > 0 ? feedback : "MS_Transport_Hint".Translate().ToString();
             Text.Font = GameFont.Tiny;
             Widgets.Label(new Rect(0, y + 28, rect.width, 37), status);
             Text.Font = GameFont.Small;
             Rect accept = new Rect(rect.width / 2 - 80, rect.height - 55, 160, 40);
             if (Widgets.ButtonText(new Rect(accept.x - 170, accept.y, 160, 40), "ResetButton".Translate()))
-            { preview.ResetSelections(); feedback = ""; ApplyFilter(); GUI.FocusControl(null); }
+            {
+                if (preview == null) Refresh();
+                else { preview.ResetSelections(); ApplyFilter(); }
+                feedback = ""; GUI.FocusControl(null);
+            }
             bool enabled = GUI.enabled;
             GUI.enabled = enabled && supplier.CanWork && withinCapacity;
             bool confirm;
